@@ -1,0 +1,95 @@
+# Clean_exp pipeline configuration. Secrets never go here -- they come from
+# ../.env (LLM2_API_KEY for Groq, GPU_* for the SERC GPU server).
+
+paths:
+  inputs_dir: ../inputs          # inputs/<project>/{srs/, code/, project.yaml}
+  runs_dir: runs                 # runs/<project>/... (git-excluded)
+  cache_dir: .cache/llm          # prompt-hash cache: re-runs cost nothing
+
+# Providers: any OpenAI-compatible API (kind: openai) or native Ollama.
+# key_env = name of the variable in ../.env holding that provider's API key.
+providers:
+  groq:       {kind: openai, base_url: "https://api.groq.com/openai/v1", key_env: LLM2_API_KEY, max_request_tokens: 7900}
+  openai:     {kind: openai, base_url: "https://api.openai.com/v1", key_env: OPENAI_API_KEY}
+  gemini:     {kind: openai, base_url: "https://generativelanguage.googleapis.com/v1beta/openai", key_env: GEMINI_API_KEY, no_seed: true}
+  anthropic:  {kind: openai, base_url: "https://api.anthropic.com/v1", key_env: ANTHROPIC_API_KEY, no_seed: true}
+  openrouter: {kind: openai, base_url: "https://openrouter.ai/api/v1", key_env: OPENROUTER_API_KEY}
+  together:   {kind: openai, base_url: "https://api.together.xyz/v1", key_env: TOGETHER_API_KEY}
+  deepseek:   {kind: openai, base_url: "https://api.deepseek.com/v1", key_env: DEEPSEEK_API_KEY}
+  ollama:     {kind: ollama, base_url: "http://localhost:11435"}   # GPU server via tools/tunnel_keepalive.sh
+  vllm:       {kind: openai, base_url: "http://localhost:8000/v1"} # GPU server via SSH tunnel
+
+# Model spec = "<provider>:<model id>", e.g. "openai:gpt-4o", "ollama:qwen2.5-coder:7b".
+models:
+  # Fixed helper models: the SAME for every generator, so differences in the
+  # results come from the generator alone.
+  # Groq's free tier (~200K tokens/day/model) can't carry judge/executor load for
+  # 12 models x 2 arms x 3 projects, so those run on the GPU server. gpt-oss is a
+  # different family from all 12 subjects -> no self-grading.
+  extractor: "ollama:gpt-oss:20b"            # S1 extraction for prose SRSs (Groq free-tier quotas too small; structured SRSs need no LLM)
+  judge: "ollama:gpt-oss:20b"                # S5 FSA judge (also used for the baseline arm)
+  executor: "ollama:gpt-oss:20b"             # S6 canonical tests -> runnable tests, failure triage, audit
+  executor_think: low                        # executor calls only (NOT the judge): long reasoning filled the context -> empty answers
+  # smoke-test values without the server: judge groq:qwen/qwen3.8-27b, executor groq:openai/gpt-oss-120b
+
+  # Generators under test = the planned 14 (2 closed SOTA controls + 12 open-weights subjects).
+  # Open-weights run on the SERC GPU server (Ollama, reached through an SSH tunnel on :11434).
+  generators:
+    # All 12 open-weights subjects (user 2026-09-27: "download all the LLMs in the 14 and do all pairs").
+    # Closed controls GPT-4o / Claude need paid API keys -> not run (no billing).
+    # Phi-4 = bartowski's GGUF build: Ollama's own phi4:14b crashes while loading on this llama.cpp build.
+    - "ollama:qwen2.5-coder:7b"
+    - "ollama:llama3.1:8b"
+    - "ollama:deepseek-coder-v2:16b"
+    - "ollama:gemma3:27b"
+    - "ollama:codegemma:7b"
+    - "ollama:granite4.1:8b"
+    - "ollama:phi3.5:3.8b"
+    - "ollama:qwen3:30b-a3b"
+    - "ollama:qwen2.5-coder:32b"
+    - "ollama:hf.co/bartowski/Phi-3.5-MoE-instruct-GGUF:Q4_K_M"
+    - "ollama:hf.co/bartowski/phi-4-GGUF:Q4_K_M"
+    - "ollama:llama3.3:70b"
+
+  # Which generators each project is run with: every model on every project
+  plan:
+    doorstop: ["ollama:qwen2.5-coder:7b", "ollama:llama3.1:8b", "ollama:deepseek-coder-v2:16b", "ollama:gemma3:27b", "ollama:codegemma:7b", "ollama:granite4.1:8b", "ollama:phi3.5:3.8b", "ollama:qwen3:30b-a3b", "ollama:qwen2.5-coder:32b", "ollama:hf.co/bartowski/Phi-3.5-MoE-instruct-GGUF:Q4_K_M", "ollama:hf.co/bartowski/phi-4-GGUF:Q4_K_M", "ollama:llama3.3:70b"]
+    ventilator: ["ollama:qwen2.5-coder:7b", "ollama:llama3.1:8b", "ollama:deepseek-coder-v2:16b", "ollama:gemma3:27b", "ollama:codegemma:7b", "ollama:granite4.1:8b", "ollama:phi3.5:3.8b", "ollama:qwen3:30b-a3b", "ollama:qwen2.5-coder:32b", "ollama:hf.co/bartowski/Phi-3.5-MoE-instruct-GGUF:Q4_K_M", "ollama:hf.co/bartowski/phi-4-GGUF:Q4_K_M", "ollama:llama3.3:70b"]
+    virtual_clinic: ["ollama:qwen2.5-coder:7b", "ollama:llama3.1:8b", "ollama:deepseek-coder-v2:16b", "ollama:gemma3:27b", "ollama:codegemma:7b", "ollama:granite4.1:8b", "ollama:phi3.5:3.8b", "ollama:qwen3:30b-a3b", "ollama:qwen2.5-coder:32b", "ollama:hf.co/bartowski/Phi-3.5-MoE-instruct-GGUF:Q4_K_M", "ollama:hf.co/bartowski/phi-4-GGUF:Q4_K_M", "ollama:llama3.3:70b"]
+
+  # Quick runs without the GPU server: --gen groq:openai/gpt-oss-20b
+
+# Extra request fields for specific models (sent as-is to the API).
+model_params:
+  openai/gpt-oss-120b: {reasoning_effort: medium}
+  openai/gpt-oss-20b: {reasoning_effort: medium}
+  qwen/qwen3.8-27b: {reasoning_effort: none, max_tokens: 3500}   # Groq output-tokens/min limit
+  # Ollama models take options via the native API; see llm.py _ollama
+  qwen3:30b-a3b: {think: false}   # thinking model: hidden reasoning used the whole output budget -> 54 empty answers (2026-09-27)
+
+llm:
+  temperature: 0.0
+  seed: 42
+  max_tokens: 8192
+  timeout_s: 600
+  max_retries: 6
+  backoff_base_s: 5
+  ollama_num_ctx: 12288
+
+pipeline:
+  unit_max_reqs: 8          # requirements per test unit (a section, split if bigger)
+  reps_per_unit: 2          # how many Gate-1-passing representations to generate per unit
+  reps_per_unit_by_project: {ventilator: 1, virtual_clinic: 1}   # time budget 2026-09-26: all 8 models x 3 projects in a few hours
+  max_repairs: 3            # closed-loop repair attempts per gate (framework spec: <=3)
+  workers: 3                # concurrent requests per process (Ollama OLLAMA_NUM_PARALLEL=3: generator + judge must both fit in 32 GB)
+
+gates:
+  rss_threshold: 0.60
+  fsa_threshold: 0.50
+  # SFV thresholds per representation group live in tcgen/gates/config.py
+
+execution:
+  test_timeout_s: 300
+  batch_size: 8             # canonical test cases per generated test file
+  max_source_chars: 12000   # how much implementation code the executor model sees (execution mode)
+  audit_code_chars: 10000   # retrieved code per audit call (audit mode)
