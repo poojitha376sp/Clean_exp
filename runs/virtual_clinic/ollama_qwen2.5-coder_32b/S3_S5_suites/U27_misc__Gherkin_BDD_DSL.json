@@ -1,0 +1,2280 @@
+{
+  "unit_id": "U27_misc",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.75,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.5,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 19,
+    "uncovered_clauses": [
+      "VCMSP03-2",
+      "VCMCL01"
+    ],
+    "weaknesses": [
+      "No test coverage for Speciality existence (VCMSP03-2).",
+      "No test coverage for editing Chemist/Labs (VCMCL01).",
+      "Missing validation tests for Sex and Qualification fields in doctor add/edit.",
+      "Missing validation test for Chemist/Lab Flag field.",
+      "Success assertions are vague; should verify actual state changes or database entries."
+    ],
+    "traceability": 0.875,
+    "untraced_reqs": [
+      "VCMSP03-2"
+    ],
+    "fsa_score": 0.825,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Maintain Doctors and Chemists/Labs\n  As an administrator,\n  I want to manage doctors and chemists/labs,\n  So that I can ensure accurate and up-to-date information.\n\n  Scenario: Adding a new doctor\n    Given I am on the Add Doctor Screen\n    When I enter the required details\n    And I submit the form\n    Then a new Doctor Id is generated\n    And the doctor details are saved successfully\n\n  Scenario: Editing an existing doctor\n    Given I am on the Edit/Update Doctors Screen\n    And I query for an existing Doctor Id\n    Then the original doctor details are displayed\n    When I modify the doctor details\n    And I submit the form\n    Then the doctor details are updated successfully\n\n  Scenario: Deleting a doctor with no open consultation requests\n    Given I am on the Edit/Update Doctors Screen\n    And I query for a Doctor Id with no open consultation requests\n    When I delete the doctor\n    Then the doctor details are deleted successfully\n\n  Scenario: Deleting a doctor with open consultation requests\n    Given I am on the Edit/Update Doctors Screen\n    And I query for a Doctor Id with open consultation requests\n    When I attempt to delete the doctor\n    Then an exception error message is displayed \"Doctor has open Consultation Requests - cannot delete\"\n\n  Scenario: Attempting to edit a non-existent doctor\n    Given I am on the Edit/Update Doctors Screen\n    When I query for a non-existent Doctor Id\n    Then an exception error message is displayed \"Doctor does not exist\"\n\n  Scenario: Adding a new chemist/lab\n    Given I am on the Add Chemist/Lab Screen\n    When I enter the required details\n    And I submit the form\n    Then a new Chemist/Lab Id is generated\n    And the chemist/lab details are saved successfully\n\n  Scenario: Administrators Menu Screen to Maintain Doctors\n    Given I am on the Administrators Menu Screen\n    When I navigate to the Maintain Doctors section\n    Then I see options to Add Doctors and Edit/Update Doctors\n\n  Scenario: Administrators Menu Screen to Maintain Chemist & Labs\n    Given I am on the Administrators Menu Screen\n    When I navigate to the Maintain Chemist & Labs section\n    Then I see options to Add Chemist/Labs and Edit/Update Chemist/Labs\n\n  Scenario Outline: Adding a doctor with invalid input values\n    Given I am on the Add Doctor Screen\n    When I enter invalid <field> value \"<value>\"\n    And I submit the form\n    Then an error message is displayed \"<message>\"\n\n    Examples:\n      | field      | value | message                           |\n      | Doctor Name|       | Doctor Name is required           |\n      | Age        | -1    | Age must be a positive number     |\n      | Age        | 150   | Age must be less than 150         |\n      | Experience | -1    | Experience must be a positive number |\n      | Experience | 100   | Experience must be less than 100  |\n\n  Scenario Outline: Editing a doctor with invalid input values\n    Given I am on the Edit/Update Doctors Screen\n    And I query for an existing Doctor Id\n    When I enter invalid <field> value \"<value>\"\n    And I submit the form\n    Then an error message is displayed \"<message>\"\n\n    Examples:\n      | field      | value | message                           |\n      | Doctor Name|       | Doctor Name is required           |\n      | Age        | -1    | Age must be a positive number     |\n      | Age        | 150   | Age must be less than 150         |\n      | Experience | -1    | Experience must be a positive number |\n      | Experience | 100   | Experience must be less than 100  |\n\n  Scenario Outline: Adding a chemist/lab with invalid input values\n    Given I am on the Add Chemist/Lab Screen\n    When I enter invalid <field> value \"<value>\"\n    And I submit the form\n    Then an error message is displayed \"<message>\"\n\n    Examples:\n      | field              | value | message                           |\n      | Chemist Lab Name   |       | Chemist Lab Name is required      |\n      | Chemist Lab Address|       | Chemist Lab Address is required   |\n      | Chemist Lab Contact|       | Chemist Lab Contact is required   |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Adding a new doctor",
+      "req_ids": [
+        "VCMDR02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User is on the Add Doctor Screen"
+      ],
+      "inputs": {},
+      "steps": [
+        "Enter required details",
+        "Submit the form"
+      ],
+      "expected": [
+        "New Doctor Id is generated",
+        "Doctor details are saved successfully"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Editing an existing doctor",
+      "req_ids": [
+        "VCMDR03-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User is on the Edit/Update Doctors Screen",
+        "Doctor Id exists"
+      ],
+      "inputs": {},
+      "steps": [
+        "Query for Doctor Id",
+        "Modify doctor details",
+        "Submit the form"
+      ],
+      "expected": [
+        "Original doctor details are displayed",
+        "Doctor details are updated successfully"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Deleting a doctor with no open consultation requests",
+      "req_ids": [
+        "VCMDR03-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User is on the Edit/Update Doctors Screen",
+        "Doctor Id exists with no open requests"
+      ],
+      "inputs": {},
+      "steps": [
+        "Query for Doctor Id",
+        "Delete the doctor"
+      ],
+      "expected": [
+        "Doctor details are deleted successfully"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Deleting a doctor with open consultation requests",
+      "req_ids": [
+        "VCMDR03-3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Edit/Update Doctors Screen",
+        "Doctor Id exists with open requests"
+      ],
+      "inputs": {},
+      "steps": [
+        "Query for Doctor Id",
+        "Attempt to delete the doctor"
+      ],
+      "expected": [
+        "Exception error message is displayed 'Doctor has open Consultation Requests - cannot delete'"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Attempting to edit a non-existent doctor",
+      "req_ids": [
+        "VCMDR03-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Edit/Update Doctors Screen"
+      ],
+      "inputs": {
+        "Doctor Id": "non-existent"
+      },
+      "steps": [
+        "Query for non-existent Doctor Id"
+      ],
+      "expected": [
+        "Exception error message is displayed 'Doctor does not exist'"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Adding a new chemist/lab",
+      "req_ids": [
+        "VCMCL02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User is on the Add Chemist/Lab Screen"
+      ],
+      "inputs": {},
+      "steps": [
+        "Enter required details",
+        "Submit the form"
+      ],
+      "expected": [
+        "New Chemist/Lab Id is generated",
+        "Chemist/Lab details are saved successfully"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Administrators Menu Screen to Maintain Doctors",
+      "req_ids": [
+        "VCMDR01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User is on the Administrators Menu Screen"
+      ],
+      "inputs": {},
+      "steps": [
+        "Navigate to Maintain Doctors section"
+      ],
+      "expected": [
+        "Options to Add Doctors and Edit/Update Doctors are visible"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Administrators Menu Screen to Maintain Chemist & Labs",
+      "req_ids": [
+        "VCMCL01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User is on the Administrators Menu Screen"
+      ],
+      "inputs": {},
+      "steps": [
+        "Navigate to Maintain Chemist & Labs section"
+      ],
+      "expected": [
+        "Options to Add Chemist/Labs and Edit/Update Chemist/Labs are visible"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Adding a doctor with invalid input values",
+      "req_ids": [
+        "VCMDR02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Add Doctor Screen"
+      ],
+      "inputs": {
+        "field": "Doctor Name",
+        "value": ""
+      },
+      "steps": [
+        "Enter invalid Doctor Name",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Doctor Name is required'"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Adding a doctor with invalid input values",
+      "req_ids": [
+        "VCMDR02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Add Doctor Screen"
+      ],
+      "inputs": {
+        "field": "Age",
+        "value": "-1"
+      },
+      "steps": [
+        "Enter invalid Age",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Age must be a positive number'"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Adding a doctor with invalid input values",
+      "req_ids": [
+        "VCMDR02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Add Doctor Screen"
+      ],
+      "inputs": {
+        "field": "Age",
+        "value": "150"
+      },
+      "steps": [
+        "Enter invalid Age",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Age must be less than 150'"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Adding a doctor with invalid input values",
+      "req_ids": [
+        "VCMDR02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Add Doctor Screen"
+      ],
+      "inputs": {
+        "field": "Experience",
+        "value": "-1"
+      },
+      "steps": [
+        "Enter invalid Experience",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Experience must be a positive number'"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Adding a doctor with invalid input values",
+      "req_ids": [
+        "VCMDR02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Add Doctor Screen"
+      ],
+      "inputs": {
+        "field": "Experience",
+        "value": "100"
+      },
+      "steps": [
+        "Enter invalid Experience",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Experience must be less than 100'"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Editing a doctor with invalid input values",
+      "req_ids": [
+        "VCMDR03-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Edit/Update Doctors Screen",
+        "Doctor Id exists"
+      ],
+      "inputs": {
+        "field": "Doctor Name",
+        "value": ""
+      },
+      "steps": [
+        "Query for Doctor Id",
+        "Enter invalid Doctor Name",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Doctor Name is required'"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "Editing a doctor with invalid input values",
+      "req_ids": [
+        "VCMDR03-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Edit/Update Doctors Screen",
+        "Doctor Id exists"
+      ],
+      "inputs": {
+        "field": "Age",
+        "value": "-1"
+      },
+      "steps": [
+        "Query for Doctor Id",
+        "Enter invalid Age",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Age must be a positive number'"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "Editing a doctor with invalid input values",
+      "req_ids": [
+        "VCMDR03-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Edit/Update Doctors Screen",
+        "Doctor Id exists"
+      ],
+      "inputs": {
+        "field": "Age",
+        "value": "150"
+      },
+      "steps": [
+        "Query for Doctor Id",
+        "Enter invalid Age",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Age must be less than 150'"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "Editing a doctor with invalid input values",
+      "req_ids": [
+        "VCMDR03-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Edit/Update Doctors Screen",
+        "Doctor Id exists"
+      ],
+      "inputs": {
+        "field": "Experience",
+        "value": "-1"
+      },
+      "steps": [
+        "Query for Doctor Id",
+        "Enter invalid Experience",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Experience must be a positive number'"
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "Editing a doctor with invalid input values",
+      "req_ids": [
+        "VCMDR03-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Edit/Update Doctors Screen",
+        "Doctor Id exists"
+      ],
+      "inputs": {
+        "field": "Experience",
+        "value": "100"
+      },
+      "steps": [
+        "Query for Doctor Id",
+        "Enter invalid Experience",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Experience must be less than 100'"
+      ]
+    },
+    {
+      "id": "TC-019",
+      "title": "Adding a chemist/lab with invalid input values",
+      "req_ids": [
+        "VCMCL02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Add Chemist/Lab Screen"
+      ],
+      "inputs": {
+        "field": "Chemist Lab Name",
+        "value": ""
+      },
+      "steps": [
+        "Enter invalid Chemist Lab Name",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Chemist Lab Name is required'"
+      ]
+    },
+    {
+      "id": "TC-020",
+      "title": "Adding a chemist/lab with invalid input values",
+      "req_ids": [
+        "VCMCL02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Add Chemist/Lab Screen"
+      ],
+      "inputs": {
+        "field": "Chemist Lab Address",
+        "value": ""
+      },
+      "steps": [
+        "Enter invalid Chemist Lab Address",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Chemist Lab Address is required'"
+      ]
+    },
+    {
+      "id": "TC-021",
+      "title": "Adding a chemist/lab with invalid input values",
+      "req_ids": [
+        "VCMCL02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User is on the Add Chemist/Lab Screen"
+      ],
+      "inputs": {
+        "field": "Chemist Lab Contact",
+        "value": ""
+      },
+      "steps": [
+        "Enter invalid Chemist Lab Contact",
+        "Submit the form"
+      ],
+      "expected": [
+        "Error message is displayed 'Chemist Lab Contact is required'"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Maintain Doctors and Chemists/Labs\n  As an administrator,\n  I want to manage doctors and chemists/labs,\n  So that I can ensure accurate and up-to-date information.\n\n  Scenario: Attempt to access a non-existent speciality\n    Given a speciality with ID \"12345\" does not exist\n    When I attempt to access the speciality with ID \"12345\"\n    Then an exception error message \"Speciality does not exist\" is displayed\n\n  Scenario Outline: Add a new doctor\n    Given I am on the Add Doctor Screen\n    When I enter the following details:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | <Doctor Name> | <Age> | <Sex> | <Qualification> | <Experience> |\n    And I submit the form\n    Then a new doctor is added with a generated Doctor Id\n    And the doctor details are as specified\n\n    Examples:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | Dr. John Doe | 45 | Male | MBBS | 15 years |\n      | Dr. Jane Smith | 30 | Female | MD | 5 years |\n      | Dr. Alex Johnson | 50 | Male | PhD | 20 years |\n\n  Scenario Outline: Edit an existing doctor\n    Given I am on the Edit/Update Doctors Screen\n    And a doctor with ID \"<Doctor Id>\" exists with the following details:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | <Doctor Name> | <Age> | <Sex> | <Qualification> | <Experience> |\n    When I query the doctor with ID \"<Doctor Id>\"\n    Then the doctor details are displayed as specified\n    And I update the following details:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | <Updated Doctor Name> | <Updated Age> | <Updated Sex> | <Updated Qualification> | <Updated Experience> |\n    And I submit the form\n    Then the doctor details are updated as specified\n\n    Examples:\n      | Doctor Id | Doctor Name | Age | Sex | Qualification | Experience | Updated Doctor Name | Updated Age | Updated Sex | Updated Qualification | Updated Experience |\n      | 101 | Dr. John Doe | 45 | Male | MBBS | 15 years | Dr. John Doe | 46 | Male | MBBS | 16 years |\n      | 102 | Dr. Jane Smith | 30 | Female | MD | 5 years | Dr. Jane Smith | 31 | Female | MD | 6 years |\n\n  Scenario: Attempt to edit a non-existent doctor\n    Given a doctor with ID \"9999\" does not exist\n    When I attempt to edit the doctor with ID \"9999\"\n    Then an exception error message \"Doctor does not exist\" is displayed\n\n  Scenario: Attempt to delete a doctor with open consultation requests\n    Given a doctor with ID \"101\" has open consultation requests\n    When I attempt to delete the doctor with ID \"101\"\n    Then an exception error message \"Doctor has open Consultation Requests - cannot delete\" is displayed\n\n  Scenario Outline: Add a new chemist/lab\n    Given I am on the Add Chemist/Lab Screen\n    When I enter the following details:\n      | Chemist/Lab Flag | Chemist Lab Name | Chemist Lab Address | Chemist Lab Contact Details |\n      | <Chemist/Lab Flag> | <Chemist Lab Name> | <Chemist Lab Address> | <Chemist Lab Contact Details> |\n    And I submit the form\n    Then a new chemist/lab is added with a generated Chemist/Lab Id\n    And the chemist/lab details are as specified\n\n    Examples:\n      | Chemist/Lab Flag | Chemist Lab Name | Chemist Lab Address | Chemist Lab Contact Details |\n      | Chemist | Chemist Labs Inc. | 123 Main St, Anytown | 555-1234 |\n      | Lab | Lab Services Inc. | 456 Elm St, Othertown | 555-5678 |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Attempt to access a non-existent speciality",
+          "req_ids": [
+            "VCMSP03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a speciality with ID '12345' does not exist"
+          ],
+          "inputs": {
+            "speciality_id": "12345"
+          },
+          "steps": [
+            "attempt to access the speciality with ID '12345'"
+          ],
+          "expected": [
+            "an exception error message 'Speciality does not exist' is displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Add a new doctor with valid details",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "Doctor Name": "Dr. John Doe",
+            "Age": "45",
+            "Sex": "Male",
+            "Qualification": "MBBS",
+            "Experience": "15 years"
+          },
+          "steps": [
+            "enter the details and submit the form"
+          ],
+          "expected": [
+            "a new doctor is added with a generated Doctor Id",
+            "the doctor details are as specified"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Add a new doctor with valid details",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "Doctor Name": "Dr. Jane Smith",
+            "Age": "30",
+            "Sex": "Female",
+            "Qualification": "MD",
+            "Experience": "5 years"
+          },
+          "steps": [
+            "enter the details and submit the form"
+          ],
+          "expected": [
+            "a new doctor is added with a generated Doctor Id",
+            "the doctor details are as specified"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add a new doctor with valid details",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "Doctor Name": "Dr. Alex Johnson",
+            "Age": "50",
+            "Sex": "Male",
+            "Qualification": "PhD",
+            "Experience": "20 years"
+          },
+          "steps": [
+            "enter the details and submit the form"
+          ],
+          "expected": [
+            "a new doctor is added with a generated Doctor Id",
+            "the doctor details are as specified"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Edit an existing doctor with valid details",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Edit/Update Doctors Screen",
+            "a doctor with ID '101' exists with the following details: Dr. John Doe, 45, Male, MBBS, 15 years"
+          ],
+          "inputs": {
+            "Doctor Id": "101",
+            "Updated Doctor Name": "Dr. John Doe",
+            "Updated Age": "46",
+            "Updated Sex": "Male",
+            "Updated Qualification": "MBBS",
+            "Updated Experience": "16 years"
+          },
+          "steps": [
+            "query the doctor with ID '101', update the details and submit the form"
+          ],
+          "expected": [
+            "the doctor details are displayed as specified",
+            "the doctor details are updated as specified"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Edit an existing doctor with valid details",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Edit/Update Doctors Screen",
+            "a doctor with ID '102' exists with the following details: Dr. Jane Smith, 30, Female, MD, 5 years"
+          ],
+          "inputs": {
+            "Doctor Id": "102",
+            "Updated Doctor Name": "Dr. Jane Smith",
+            "Updated Age": "31",
+            "Updated Sex": "Female",
+            "Updated Qualification": "MD",
+            "Updated Experience": "6 years"
+          },
+          "steps": [
+            "query the doctor with ID '102', update the details and submit the form"
+          ],
+          "expected": [
+            "the doctor details are displayed as specified",
+            "the doctor details are updated as specified"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Attempt to edit a non-existent doctor",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a doctor with ID '9999' does not exist"
+          ],
+          "inputs": {
+            "Doctor Id": "9999"
+          },
+          "steps": [
+            "attempt to edit the doctor with ID '9999'"
+          ],
+          "expected": [
+            "an exception error message 'Doctor does not exist' is displayed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Attempt to delete a doctor with open consultation requests",
+          "req_ids": [
+            "VCMDR03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a doctor with ID '101' has open consultation requests"
+          ],
+          "inputs": {
+            "Doctor Id": "101"
+          },
+          "steps": [
+            "attempt to delete the doctor with ID '101'"
+          ],
+          "expected": [
+            "an exception error message 'Doctor has open Consultation Requests - cannot delete' is displayed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Add a new chemist/lab with valid details",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Chemist/Lab Screen"
+          ],
+          "inputs": {
+            "Chemist/Lab Flag": "Chemist",
+            "Chemist Lab Name": "Chemist Labs Inc.",
+            "Chemist Lab Address": "123 Main St, Anytown",
+            "Chemist Lab Contact Details": "555-1234"
+          },
+          "steps": [
+            "enter the details and submit the form"
+          ],
+          "expected": [
+            "a new chemist/lab is added with a generated Chemist/Lab Id",
+            "the chemist/lab details are as specified"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Add a new chemist/lab with valid details",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Chemist/Lab Screen"
+          ],
+          "inputs": {
+            "Chemist/Lab Flag": "Lab",
+            "Chemist Lab Name": "Lab Services Inc.",
+            "Chemist Lab Address": "456 Elm St, Othertown",
+            "Chemist Lab Contact Details": "555-5678"
+          },
+          "steps": [
+            "enter the details and submit the form"
+          ],
+          "expected": [
+            "a new chemist/lab is added with a generated Chemist/Lab Id",
+            "the chemist/lab details are as specified"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0938,
+        "hallucinated": [
+          {
+            "value": "101",
+            "context": "Doctor Id",
+            "grounded": false
+          },
+          {
+            "value": "102",
+            "context": "Doctor Id",
+            "grounded": false
+          },
+          {
+            "value": "9999",
+            "context": "Doctor Id",
+            "grounded": false
+          },
+          {
+            "value": "Dr. John Doe",
+            "context": "Doctor Name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Jane Smith",
+            "context": "Doctor Name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Alex Johnson",
+            "context": "Doctor Name",
+            "grounded": false
+          },
+          {
+            "value": "45",
+            "context": "Age",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "Age",
+            "grounded": false
+          },
+          {
+            "value": "50",
+            "context": "Age",
+            "grounded": false
+          },
+          {
+            "value": "46",
+            "context": "Updated Age",
+            "grounded": false
+          },
+          {
+            "value": "31",
+            "context": "Updated Age",
+            "grounded": false
+          },
+          {
+            "value": "Male",
+            "context": "Sex",
+            "grounded": false
+          },
+          {
+            "value": "Female",
+            "context": "Sex",
+            "grounded": false
+          },
+          {
+            "value": "MBBS",
+            "context": "Qualification",
+            "grounded": false
+          },
+          {
+            "value": "MD",
+            "context": "Qualification",
+            "grounded": false
+          },
+          {
+            "value": "PhD",
+            "context": "Qualification",
+            "grounded": false
+          },
+          {
+            "value": "15 years",
+            "context": "Experience",
+            "grounded": false
+          },
+          {
+            "value": "5 years",
+            "context": "Experience",
+            "grounded": false
+          },
+          {
+            "value": "20 years",
+            "context": "Experience",
+            "grounded": false
+          },
+          {
+            "value": "16 years",
+            "context": "Updated Experience",
+            "grounded": false
+          },
+          {
+            "value": "6 years",
+            "context": "Updated Experience",
+            "grounded": false
+          },
+          {
+            "value": "Chemist",
+            "context": "Chemist/Lab Flag",
+            "grounded": false
+          },
+          {
+            "value": "Lab",
+            "context": "Chemist/Lab Flag",
+            "grounded": false
+          },
+          {
+            "value": "Chemist Labs Inc.",
+            "context": "Chemist Lab Name",
+            "grounded": false
+          },
+          {
+            "value": "Lab Services Inc.",
+            "context": "Chemist Lab Name",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St, Anytown",
+            "context": "Chemist Lab Address",
+            "grounded": false
+          },
+          {
+            "value": "456 Elm St, Othertown",
+            "context": "Chemist Lab Address",
+            "grounded": false
+          },
+          {
+            "value": "555-1234",
+            "context": "Chemist Lab Contact Details",
+            "grounded": false
+          },
+          {
+            "value": "555-5678",
+            "context": "Chemist Lab Contact Details",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 32,
+        "uncovered_clauses": [
+          "VCMDR01",
+          "VCMCL01"
+        ],
+        "weaknesses": [
+          "Missing tests for menu screens (VCMDR01, VCMCL01).",
+          "No tests for successful deletion of doctors without open requests.",
+          "No boundary value tests for age, experience, etc.",
+          "Test data values are arbitrary and not grounded in the SRS.",
+          "Generated IDs are not verified for format or uniqueness."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VCMCL01",
+          "VCMDR01"
+        ],
+        "fsa_score": 0.5841,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.5841; sub-scores {'clause_coverage': 0.75, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.8, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0938}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCMCL01', 'VCMDR01'] (add at least one each)\n- uncovered clause: VCMDR01\n- uncovered clause: VCMCL01\n- ungrounded value '101' (Doctor Id): remove or use the SRS value\n- ungrounded value '102' (Doctor Id): remove or use the SRS value\n- ungrounded value '9999' (Doctor Id): remove or use the SRS value\n- ungrounded value 'Dr. John Doe' (Doctor Name): remove or use the SRS value\n- ungrounded value 'Dr. Jane Smith' (Doctor Name): remove or use the SRS value\n- ungrounded value 'Dr. Alex Johnson' (Doctor Name): remove or use the SRS value\n- Missing tests for menu screens (VCMDR01, VCMCL01).\n- No tests for successful deletion of doctors without open requests.\n- No boundary value tests for age, experience, etc.\n- Test data values are arbitrary and not grounded in the SRS.\n- Generated IDs are not verified for format or uniqueness.",
+      "artifact": "Feature: Maintain Doctors and Chemists/Labs\n  As an administrator,\n  I want to manage doctors and chemists/labs,\n  So that I can ensure accurate and up-to-date information.\n\n  Scenario: Attempt to add a doctor with a non-existent speciality\n    Given the speciality with Speciality Id does not exist\n    When I attempt to add a doctor with a non-existent Speciality Id\n    Then an exception error message \"Speciality does not exist\" is displayed\n\n  Scenario: Access Administrators Menu Screen to Maintain Doctors\n    Given I am on the Administrators Menu Screen\n    Then I see options to \"Add Doctors\" and \"Edit/Update Doctors\"\n\n  Scenario: Access Administrators Menu Screen to Maintain Chemist & Labs\n    Given I am on the Administrators Menu Screen\n    Then I see options to \"Add Chemist / Labs\" and \"Edit/Update Chemist/ Labs\"\n\n  Scenario Outline: Add a doctor with valid details\n    Given I am on the Add Doctor Screen\n    When I enter the following details:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | <Doctor Name> | <Age> | <Sex> | <Qualification> | <Experience> |\n    And I submit the form\n    Then a Doctor Id is generated and displayed\n    And the doctor details are saved successfully\n\n    Examples:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | Dr. Smith   | 45  | M   | MBBS          | 10         |\n      | Dr. Doe     | 30  | F   | MD            | 5          |\n      | Dr. Brown   | 50  | M   | MS            | 15         |\n\n  Scenario Outline: Edit/Update a doctor with valid details\n    Given I am on the Edit/Update Doctors Screen\n    And I query the doctor with Doctor Id <Doctor Id>\n    When I modify the following details:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | <Doctor Name> | <Age> | <Sex> | <Qualification> | <Experience> |\n    And I submit the form\n    Then the doctor details are updated successfully\n\n    Examples:\n      | Doctor Id | Doctor Name | Age | Sex | Qualification | Experience |\n      | 1         | Dr. Smith   | 46  | M   | MBBS          | 11         |\n      | 2         | Dr. Doe     | 31  | F   | MD            | 6          |\n      | 3         | Dr. Brown   | 51  | M   | MS            | 16         |\n\n  Scenario: Attempt to edit/update a non-existent doctor\n    Given I am on the Edit/Update Doctors Screen\n    When I query the doctor with a non-existent Doctor Id\n    Then an exception error message \"Doctor does not exist\" is displayed\n\n  Scenario: Attempt to delete a doctor with open consultation requests\n    Given I am on the Edit/Update Doctors Screen\n    And the doctor with Doctor Id 1 has open consultation requests\n    When I attempt to delete the doctor with Doctor Id 1\n    Then an exception error message \"Doctor has open Consultation Requests - cannot delete\" is displayed\n\n  Scenario: Successfully delete a doctor without open consultation requests\n    Given I am on the Edit/Update Doctors Screen\n    And the doctor with Doctor Id 2 has no open consultation requests\n    When I delete the doctor with Doctor Id 2\n    Then the doctor details are deleted successfully\n\n  Scenario Outline: Add a chemist/lab with valid details\n    Given I am on the Add Chemist/Lab Screen\n    When I enter the following details:\n      | Chemist/Lab Flag | Chemist Lab Name | Chemist Lab Address | Chemist Lab Contact Details |\n      | <Chemist/Lab Flag> | <Chemist Lab Name> | <Chemist Lab Address> | <Chemist Lab Contact Details> |\n    And I submit the form\n    Then a Chemist/Lab Id is generated and displayed\n    And the chemist/lab details are saved successfully\n\n    Examples:\n      | Chemist/Lab Flag | Chemist Lab Name | Chemist Lab Address | Chemist Lab Contact Details |\n      | Chemist          | Lab A            | Address A           | Contact A                   |\n      | Lab              | Lab B            | Address B           | Contact B                   |\n      | Chemist          | Lab C            | Address C           | Contact C                   |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Attempt to add a doctor with a non-existent speciality",
+          "req_ids": [
+            "VCMSP03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the speciality with Speciality Id does not exist"
+          ],
+          "inputs": {},
+          "steps": [
+            "attempt to add a doctor with a non-existent Speciality Id"
+          ],
+          "expected": [
+            "an exception error message \"Speciality does not exist\" is displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Access Administrators Menu Screen to Maintain Doctors",
+          "req_ids": [
+            "VCMDR01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Administrators Menu Screen"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "I see options to \"Add Doctors\" and \"Edit/Update Doctors\""
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Access Administrators Menu Screen to Maintain Chemist & Labs",
+          "req_ids": [
+            "VCMCL01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Administrators Menu Screen"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "I see options to \"Add Chemist / Labs\" and \"Edit/Update Chemist/ Labs\""
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add a doctor with valid details",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "Doctor Name": "Dr. Smith",
+            "Age": "45",
+            "Sex": "M",
+            "Qualification": "MBBS",
+            "Experience": "10"
+          },
+          "steps": [
+            "enter the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "a Doctor Id is generated and displayed",
+            "the doctor details are saved successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Add a doctor with valid details",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "Doctor Name": "Dr. Doe",
+            "Age": "30",
+            "Sex": "F",
+            "Qualification": "MD",
+            "Experience": "5"
+          },
+          "steps": [
+            "enter the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "a Doctor Id is generated and displayed",
+            "the doctor details are saved successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Add a doctor with valid details",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "Doctor Name": "Dr. Brown",
+            "Age": "50",
+            "Sex": "M",
+            "Qualification": "MS",
+            "Experience": "15"
+          },
+          "steps": [
+            "enter the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "a Doctor Id is generated and displayed",
+            "the doctor details are saved successfully"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Edit/Update a doctor with valid details",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Edit/Update Doctors Screen",
+            "the doctor with Doctor Id 1 exists"
+          ],
+          "inputs": {
+            "Doctor Name": "Dr. Smith",
+            "Age": "46",
+            "Sex": "M",
+            "Qualification": "MBBS",
+            "Experience": "11"
+          },
+          "steps": [
+            "query the doctor with Doctor Id 1",
+            "modify the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "the doctor details are updated successfully"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Edit/Update a doctor with valid details",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Edit/Update Doctors Screen",
+            "the doctor with Doctor Id 2 exists"
+          ],
+          "inputs": {
+            "Doctor Name": "Dr. Doe",
+            "Age": "31",
+            "Sex": "F",
+            "Qualification": "MD",
+            "Experience": "6"
+          },
+          "steps": [
+            "query the doctor with Doctor Id 2",
+            "modify the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "the doctor details are updated successfully"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Edit/Update a doctor with valid details",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Edit/Update Doctors Screen",
+            "the doctor with Doctor Id 3 exists"
+          ],
+          "inputs": {
+            "Doctor Name": "Dr. Brown",
+            "Age": "51",
+            "Sex": "M",
+            "Qualification": "MS",
+            "Experience": "16"
+          },
+          "steps": [
+            "query the doctor with Doctor Id 3",
+            "modify the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "the doctor details are updated successfully"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Attempt to edit/update a non-existent doctor",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "I am on the Edit/Update Doctors Screen"
+          ],
+          "inputs": {},
+          "steps": [
+            "query the doctor with a non-existent Doctor Id"
+          ],
+          "expected": [
+            "an exception error message \"Doctor does not exist\" is displayed"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Attempt to delete a doctor with open consultation requests",
+          "req_ids": [
+            "VCMDR03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "I am on the Edit/Update Doctors Screen",
+            "the doctor with Doctor Id 1 has open consultation requests"
+          ],
+          "inputs": {},
+          "steps": [
+            "attempt to delete the doctor with Doctor Id 1"
+          ],
+          "expected": [
+            "an exception error message \"Doctor has open Consultation Requests - cannot delete\" is displayed"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Successfully delete a doctor without open consultation requests",
+          "req_ids": [
+            "VCMDR03-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Edit/Update Doctors Screen",
+            "the doctor with Doctor Id 2 has no open consultation requests"
+          ],
+          "inputs": {},
+          "steps": [
+            "delete the doctor with Doctor Id 2"
+          ],
+          "expected": [
+            "the doctor details are deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Add a chemist/lab with valid details",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Chemist/Lab Screen"
+          ],
+          "inputs": {
+            "Chemist/Lab Flag": "Chemist",
+            "Chemist Lab Name": "Lab A",
+            "Chemist Lab Address": "Address A",
+            "Chemist Lab Contact Details": "Contact A"
+          },
+          "steps": [
+            "enter the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "a Chemist/Lab Id is generated and displayed",
+            "the chemist/lab details are saved successfully"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Add a chemist/lab with valid details",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Chemist/Lab Screen"
+          ],
+          "inputs": {
+            "Chemist/Lab Flag": "Lab",
+            "Chemist Lab Name": "Lab B",
+            "Chemist Lab Address": "Address B",
+            "Chemist Lab Contact Details": "Contact B"
+          },
+          "steps": [
+            "enter the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "a Chemist/Lab Id is generated and displayed",
+            "the chemist/lab details are saved successfully"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Add a chemist/lab with valid details",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Chemist/Lab Screen"
+          ],
+          "inputs": {
+            "Chemist/Lab Flag": "Chemist",
+            "Chemist Lab Name": "Lab C",
+            "Chemist Lab Address": "Address C",
+            "Chemist Lab Contact Details": "Contact C"
+          },
+          "steps": [
+            "enter the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "a Chemist/Lab Id is generated and displayed",
+            "the chemist/lab details are saved successfully"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.8667,
+        "representation_score": 1.0,
+        "sfv_score": 0.9333,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #2 (TC-002): [] should be non-empty",
+          "test case #3 (TC-003): [] should be non-empty"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.93). Fix these problems and output the full corrected suite:\n- test case #2 (TC-002): [] should be non-empty\n- test case #3 (TC-003): [] should be non-empty",
+      "artifact": "Feature: Maintain Doctors and Chemists/Labs\n  As an administrator,\n  I want to manage doctors and chemists/labs,\n  So that I can ensure accurate and up-to-date information.\n\n  Scenario: Attempt to access a non-existent speciality\n    Given a speciality with ID \"9999\" does not exist\n    When I attempt to access the speciality with ID \"9999\"\n    Then an exception error message \"Speciality does not exist\" is displayed\n\n  Scenario Outline: Add a new doctor\n    Given I am on the Add Doctor Screen\n    When I enter the following details:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | <name>      | <age>| <sex>| <qualification>| <experience> |\n    And I submit the form\n    Then a new doctor is added with a generated Doctor ID\n    And the doctor details are as follows:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | <name>      | <age>| <sex>| <qualification>| <experience> |\n\n    Examples:\n      | name        | age | sex | qualification | experience |\n      | Dr. John Doe| 45  | M   | MBBS          | 10         | # Normal case\n      | Dr. Jane    | 30  | F   | MD            | 5          | # Normal case\n      | Dr. A       | 25  | M   | MBBS          | 2          | # Edge case - minimum age\n      | Dr. B       | 100 | F   | MD            | 40         | # Edge case - maximum age\n      | Dr. C       | 0   | M   | MBBS          | 0          | # Invalid case - zero age\n      | Dr. D       | -1  | F   | MD            | -5         | # Invalid case - negative values\n\n  Scenario Outline: Edit an existing doctor\n    Given a doctor with ID \"<doctor_id>\" exists with the following details:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | <name>      | <age>| <sex>| <qualification>| <experience> |\n    When I navigate to the Edit/Update Doctors Screen\n    And I query the doctor with ID \"<doctor_id>\"\n    And I update the following details:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | <new_name>  | <new_age>| <new_sex>| <new_qualification>| <new_experience> |\n    And I submit the form\n    Then the doctor details are updated as follows:\n      | Doctor Name | Age | Sex | Qualification | Experience |\n      | <new_name>  | <new_age>| <new_sex>| <new_qualification>| <new_experience> |\n\n    Examples:\n      | doctor_id | name        | age | sex | qualification | experience | new_name      | new_age | new_sex | new_qualification | new_experience |\n      | 1         | Dr. John Doe| 45  | M   | MBBS          | 10         | Dr. John Smith| 46      | M     | MBBS              | 11             | # Normal case\n      | 2         | Dr. Jane    | 30  | F   | MD            | 5          | Dr. Jane Doe  | 31      | F     | MD                | 6              | # Normal case\n      | 3         | Dr. A       | 25  | M   | MBBS          | 2          | Dr. A         | 26      | M     | MBBS              | 3              | # Edge case - minimum age\n      | 4         | Dr. B       | 100 | F   | MD            | 40         | Dr. B         | 101     | F     | MD                | 41             | # Edge case - maximum age\n      | 5         | Dr. C       | 0   | M   | MBBS          | 0          | Dr. C         | 1       | M     | MBBS              | 1              | # Invalid case - zero age\n      | 6         | Dr. D       | -1  | F   | MD            | -5         | Dr. D         | 1       | F     | MD                | 1              | # Invalid case - negative values\n\n  Scenario: Attempt to edit a non-existent doctor\n    Given a doctor with ID \"9999\" does not exist\n    When I attempt to edit the doctor with ID \"9999\"\n    Then an exception error message \"Doctor does not exist\" is displayed\n\n  Scenario: Attempt to delete a doctor with open consultation requests\n    Given a doctor with ID \"1\" has open consultation requests\n    When I attempt to delete the doctor with ID \"1\"\n    Then an exception error message \"Doctor has open Consultation Requests - cannot delete\" is displayed\n\n  Scenario Outline: Add a new chemist/lab\n    Given I am on the Add Chemist/Lab Screen\n    When I enter the following details:\n      | Chemist/Lab Flag | Chemist Lab Name | Chemist Lab Address | Chemist Lab Contact Details |\n      | <flag>           | <name>           | <address>           | <contact_details>         |\n    And I submit the form\n    Then a new chemist/lab is added with a generated Chemist/Lab ID\n    And the chemist/lab details are as follows:\n      | Chemist/Lab Flag | Chemist Lab Name | Chemist Lab Address | Chemist Lab Contact Details |\n      | <flag>           | <name>           | <address>           | <contact_details>         |\n\n    Examples:\n      | flag | name          | address         | contact_details     |\n      | C    | Chemist X     | 123 Main St     | 1234567890          | # Normal case\n      | L    | Lab Y         | 456 Elm St      | 0987654321          | # Normal case\n      | C    | C             | A               | 1                   | # Edge case - minimum length\n      | L    | L             | B               | 2                   | # Edge case - minimum length\n      | C    |               |                 |                     | # Invalid case - empty fields\n      | L    |               |                 |                     | # Invalid case - empty fields",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Attempt to access a non-existent speciality",
+          "req_ids": [
+            "VCMSP03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a speciality with ID '9999' does not exist"
+          ],
+          "inputs": {
+            "speciality_id": "9999"
+          },
+          "steps": [
+            "attempt to access the speciality with ID '9999'"
+          ],
+          "expected": [
+            "an exception error message 'Speciality does not exist' is displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Add a new doctor with normal details",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "Doctor Name": "Dr. John Doe",
+            "Age": "45",
+            "Sex": "M",
+            "Qualification": "MBBS",
+            "Experience": "10"
+          },
+          "steps": [
+            "enter the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "a new doctor is added with a generated Doctor ID",
+            "the doctor details are as follows: Dr. John Doe, 45, M, MBBS, 10"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Edit an existing doctor with normal details",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a doctor with ID '1' exists with the following details: Dr. John Doe, 45, M, MBBS, 10"
+          ],
+          "inputs": {
+            "doctor_id": "1",
+            "new_name": "Dr. John Smith",
+            "new_age": "46",
+            "new_sex": "M",
+            "new_qualification": "MBBS",
+            "new_experience": "11"
+          },
+          "steps": [
+            "navigate to the Edit/Update Doctors Screen",
+            "query the doctor with ID '1'",
+            "update the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "the doctor details are updated as follows: Dr. John Smith, 46, M, MBBS, 11"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Attempt to edit a non-existent doctor",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a doctor with ID '9999' does not exist"
+          ],
+          "inputs": {
+            "doctor_id": "9999"
+          },
+          "steps": [
+            "attempt to edit the doctor with ID '9999'"
+          ],
+          "expected": [
+            "an exception error message 'Doctor does not exist' is displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Attempt to delete a doctor with open consultation requests",
+          "req_ids": [
+            "VCMDR03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a doctor with ID '1' has open consultation requests"
+          ],
+          "inputs": {
+            "doctor_id": "1"
+          },
+          "steps": [
+            "attempt to delete the doctor with ID '1'"
+          ],
+          "expected": [
+            "an exception error message 'Doctor has open Consultation Requests - cannot delete' is displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Add a new chemist/lab with normal details",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "I am on the Add Chemist/Lab Screen"
+          ],
+          "inputs": {
+            "Chemist/Lab Flag": "C",
+            "Chemist Lab Name": "Chemist X",
+            "Chemist Lab Address": "123 Main St",
+            "Chemist Lab Contact Details": "1234567890"
+          },
+          "steps": [
+            "enter the following details",
+            "submit the form"
+          ],
+          "expected": [
+            "a new chemist/lab is added with a generated Chemist/Lab ID",
+            "the chemist/lab details are as follows: C, Chemist X, 123 Main St, 1234567890"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.625,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0536,
+        "hallucinated": [
+          {
+            "value": "Dr. John Doe",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Jane",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. A",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. B",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. C",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. D",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. John Smith",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Jane Doe",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. A",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. B",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. C",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. D",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "45",
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": "25",
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": "100",
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": "0",
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": "-1",
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": "46",
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": "31",
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": "26",
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": "101",
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": "M",
+            "context": "sex",
+            "grounded": false
+          },
+          {
+            "value": "F",
+            "context": "sex",
+            "grounded": false
+          },
+          {
+            "value": "MBBS",
+            "context": "qualification",
+            "grounded": false
+          },
+          {
+            "value": "MD",
+            "context": "qualification",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": "5",
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": "40",
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": "0",
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": "-5",
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": "11",
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": "6",
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": "3",
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": "41",
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": "C",
+            "context": "flag",
+            "grounded": false
+          },
+          {
+            "value": "L",
+            "context": "flag",
+            "grounded": false
+          },
+          {
+            "value": "Chemist X",
+            "context": "chemist/lab name",
+            "grounded": false
+          },
+          {
+            "value": "Lab Y",
+            "context": "chemist/lab name",
+            "grounded": false
+          },
+          {
+            "value": "C",
+            "context": "chemist/lab name",
+            "grounded": false
+          },
+          {
+            "value": "L",
+            "context": "chemist/lab name",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "address",
+            "grounded": false
+          },
+          {
+            "value": "456 Elm St",
+            "context": "address",
+            "grounded": false
+          },
+          {
+            "value": "A",
+            "context": "address",
+            "grounded": false
+          },
+          {
+            "value": "B",
+            "context": "address",
+            "grounded": false
+          },
+          {
+            "value": "1234567890",
+            "context": "contact",
+            "grounded": false
+          },
+          {
+            "value": "0987654321",
+            "context": "contact",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "contact",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "contact",
+            "grounded": false
+          },
+          {
+            "value": "",
+            "context": "empty field",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 56,
+        "uncovered_clauses": [
+          "VCMDR01",
+          "VCMCL01",
+          "VCMDR03-1"
+        ],
+        "weaknesses": [
+          "Add tests for the administrators menu screens (VCMDR01, VCMCL01).",
+          "Assert that the edit screen displays the original doctor details (VCMDR03-1).",
+          "Include negative test cases for invalid input values in add/edit doctor and chemist/lab scenarios.",
+          "Verify that generated IDs are unique and follow the expected format.",
+          "Add boundary checks for age and experience limits as per business rules."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VCMCL01",
+          "VCMDR01"
+        ],
+        "fsa_score": 0.528,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.528; sub-scores {'clause_coverage': 0.625, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.8, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0536}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCMCL01', 'VCMDR01'] (add at least one each)\n- uncovered clause: VCMDR01\n- uncovered clause: VCMCL01\n- uncovered clause: VCMDR03-1\n- ungrounded value 'Dr. John Doe' (doctor name): remove or use the SRS value\n- ungrounded value 'Dr. Jane' (doctor name): remove or use the SRS value\n- ungrounded value 'Dr. A' (doctor name): remove or use the SRS value\n- ungrounded value 'Dr. B' (doctor name): remove or use the SRS value\n- ungrounded value 'Dr. C' (doctor name): remove or use the SRS value\n- ungrounded value 'Dr. D' (doctor name): remove or use the SRS value\n- Add tests for the administrators menu screens (VCMDR01, VCMCL01).\n- Assert that the edit screen displays the original doctor details (VCMDR03-1).\n- Include negative test cases for invalid input values in add/edit doctor and chemist/lab scenarios.\n- Verify that generated IDs are unique and follow the expected format.\n- Add boundary checks for age and experience limits as per business rules.",
+      "artifact": "Feature: Maintain Doctors and Chemists/Labs\n  As an administrator,\n  I want to manage doctors and chemists/labs,\n  So that I can ensure accurate and up-to-date information.\n\n  Scenario: Adding a new doctor\n    Given I am on the Add Doctor Screen\n    When I enter the required details\n    And I submit the form\n    Then a new Doctor Id is generated\n    And the doctor details are saved successfully\n\n  Scenario: Editing an existing doctor\n    Given I am on the Edit/Update Doctors Screen\n    And I query for an existing Doctor Id\n    Then the original doctor details are displayed\n    When I modify the doctor details\n    And I submit the form\n    Then the doctor details are updated successfully\n\n  Scenario: Deleting a doctor with no open consultation requests\n    Given I am on the Edit/Update Doctors Screen\n    And I query for a Doctor Id with no open consultation requests\n    When I delete the doctor\n    Then the doctor details are deleted successfully\n\n  Scenario: Deleting a doctor with open consultation requests\n    Given I am on the Edit/Update Doctors Screen\n    And I query for a Doctor Id with open consultation requests\n    When I attempt to delete the doctor\n    Then an exception error message is displayed \"Doctor has open Consultation Requests - cannot delete\"\n\n  Scenario: Attempting to edit a non-existent doctor\n    Given I am on the Edit/Update Doctors Screen\n    When I query for a non-existent Doctor Id\n    Then an exception error message is displayed \"Doctor does not exist\"\n\n  Scenario: Adding a new chemist/lab\n    Given I am on the Add Chemist/Lab Screen\n    When I enter the required details\n    And I submit the form\n    Then a new Chemist/Lab Id is generated\n    And the chemist/lab details are saved successfully\n\n  Scenario: Administrators Menu Screen to Maintain Doctors\n    Given I am on the Administrators Menu Screen\n    When I navigate to the Maintain Doctors section\n    Then I see options to Add Doctors and Edit/Update Doctors\n\n  Scenario: Administrators Menu Screen to Maintain Chemist & Labs\n    Given I am on the Administrators Menu Screen\n    When I navigate to the Maintain Chemist & Labs section\n    Then I see options to Add Chemist/Labs and Edit/Update Chemist/Labs\n\n  Scenario Outline: Adding a doctor with invalid input values\n    Given I am on the Add Doctor Screen\n    When I enter invalid <field> value \"<value>\"\n    And I submit the form\n    Then an error message is displayed \"<message>\"\n\n    Examples:\n      | field      | value | message                           |\n      | Doctor Name|       | Doctor Name is required           |\n      | Age        | -1    | Age must be a positive number     |\n      | Age        | 150   | Age must be less than 150         |\n      | Experience | -1    | Experience must be a positive number |\n      | Experience | 100   | Experience must be less than 100  |\n\n  Scenario Outline: Editing a doctor with invalid input values\n    Given I am on the Edit/Update Doctors Screen\n    And I query for an existing Doctor Id\n    When I enter invalid <field> value \"<value>\"\n    And I submit the form\n    Then an error message is displayed \"<message>\"\n\n    Examples:\n      | field      | value | message                           |\n      | Doctor Name|       | Doctor Name is required           |\n      | Age        | -1    | Age must be a positive number     |\n      | Age        | 150   | Age must be less than 150         |\n      | Experience | -1    | Experience must be a positive number |\n      | Experience | 100   | Experience must be less than 100  |\n\n  Scenario Outline: Adding a chemist/lab with invalid input values\n    Given I am on the Add Chemist/Lab Screen\n    When I enter invalid <field> value \"<value>\"\n    And I submit the form\n    Then an error message is displayed \"<message>\"\n\n    Examples:\n      | field              | value | message                           |\n      | Chemist Lab Name   |       | Chemist Lab Name is required      |\n      | Chemist Lab Address|       | Chemist Lab Address is required   |\n      | Chemist Lab Contact|       | Chemist Lab Contact is required   |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Adding a new doctor",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Add Doctor Screen"
+          ],
+          "inputs": {},
+          "steps": [
+            "Enter required details",
+            "Submit the form"
+          ],
+          "expected": [
+            "New Doctor Id is generated",
+            "Doctor details are saved successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Editing an existing doctor",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Edit/Update Doctors Screen",
+            "Doctor Id exists"
+          ],
+          "inputs": {},
+          "steps": [
+            "Query for Doctor Id",
+            "Modify doctor details",
+            "Submit the form"
+          ],
+          "expected": [
+            "Original doctor details are displayed",
+            "Doctor details are updated successfully"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Deleting a doctor with no open consultation requests",
+          "req_ids": [
+            "VCMDR03-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Edit/Update Doctors Screen",
+            "Doctor Id exists with no open requests"
+          ],
+          "inputs": {},
+          "steps": [
+            "Query for Doctor Id",
+            "Delete the doctor"
+          ],
+          "expected": [
+            "Doctor details are deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Deleting a doctor with open consultation requests",
+          "req_ids": [
+            "VCMDR03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Edit/Update Doctors Screen",
+            "Doctor Id exists with open requests"
+          ],
+          "inputs": {},
+          "steps": [
+            "Query for Doctor Id",
+            "Attempt to delete the doctor"
+          ],
+          "expected": [
+            "Exception error message is displayed 'Doctor has open Consultation Requests - cannot delete'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Attempting to edit a non-existent doctor",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Edit/Update Doctors Screen"
+          ],
+          "inputs": {
+            "Doctor Id": "non-existent"
+          },
+          "steps": [
+            "Query for non-existent Doctor Id"
+          ],
+          "expected": [
+            "Exception error message is displayed 'Doctor does not exist'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Adding a new chemist/lab",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Add Chemist/Lab Screen"
+          ],
+          "inputs": {},
+          "steps": [
+            "Enter required details",
+            "Submit the form"
+          ],
+          "expected": [
+            "New Chemist/Lab Id is generated",
+            "Chemist/Lab details are saved successfully"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Administrators Menu Screen to Maintain Doctors",
+          "req_ids": [
+            "VCMDR01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Administrators Menu Screen"
+          ],
+          "inputs": {},
+          "steps": [
+            "Navigate to Maintain Doctors section"
+          ],
+          "expected": [
+            "Options to Add Doctors and Edit/Update Doctors are visible"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Administrators Menu Screen to Maintain Chemist & Labs",
+          "req_ids": [
+            "VCMCL01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Administrators Menu Screen"
+          ],
+          "inputs": {},
+          "steps": [
+            "Navigate to Maintain Chemist & Labs section"
+          ],
+          "expected": [
+            "Options to Add Chemist/Labs and Edit/Update Chemist/Labs are visible"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Adding a doctor with invalid input values",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "field": "Doctor Name",
+            "value": ""
+          },
+          "steps": [
+            "Enter invalid Doctor Name",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Doctor Name is required'"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Adding a doctor with invalid input values",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "field": "Age",
+            "value": "-1"
+          },
+          "steps": [
+            "Enter invalid Age",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Age must be a positive number'"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Adding a doctor with invalid input values",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "field": "Age",
+            "value": "150"
+          },
+          "steps": [
+            "Enter invalid Age",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Age must be less than 150'"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Adding a doctor with invalid input values",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "field": "Experience",
+            "value": "-1"
+          },
+          "steps": [
+            "Enter invalid Experience",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Experience must be a positive number'"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Adding a doctor with invalid input values",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "field": "Experience",
+            "value": "100"
+          },
+          "steps": [
+            "Enter invalid Experience",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Experience must be less than 100'"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Editing a doctor with invalid input values",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Edit/Update Doctors Screen",
+            "Doctor Id exists"
+          ],
+          "inputs": {
+            "field": "Doctor Name",
+            "value": ""
+          },
+          "steps": [
+            "Query for Doctor Id",
+            "Enter invalid Doctor Name",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Doctor Name is required'"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Editing a doctor with invalid input values",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Edit/Update Doctors Screen",
+            "Doctor Id exists"
+          ],
+          "inputs": {
+            "field": "Age",
+            "value": "-1"
+          },
+          "steps": [
+            "Query for Doctor Id",
+            "Enter invalid Age",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Age must be a positive number'"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Editing a doctor with invalid input values",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Edit/Update Doctors Screen",
+            "Doctor Id exists"
+          ],
+          "inputs": {
+            "field": "Age",
+            "value": "150"
+          },
+          "steps": [
+            "Query for Doctor Id",
+            "Enter invalid Age",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Age must be less than 150'"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Editing a doctor with invalid input values",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Edit/Update Doctors Screen",
+            "Doctor Id exists"
+          ],
+          "inputs": {
+            "field": "Experience",
+            "value": "-1"
+          },
+          "steps": [
+            "Query for Doctor Id",
+            "Enter invalid Experience",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Experience must be a positive number'"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Editing a doctor with invalid input values",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Edit/Update Doctors Screen",
+            "Doctor Id exists"
+          ],
+          "inputs": {
+            "field": "Experience",
+            "value": "100"
+          },
+          "steps": [
+            "Query for Doctor Id",
+            "Enter invalid Experience",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Experience must be less than 100'"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Adding a chemist/lab with invalid input values",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Add Chemist/Lab Screen"
+          ],
+          "inputs": {
+            "field": "Chemist Lab Name",
+            "value": ""
+          },
+          "steps": [
+            "Enter invalid Chemist Lab Name",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Chemist Lab Name is required'"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Adding a chemist/lab with invalid input values",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Add Chemist/Lab Screen"
+          ],
+          "inputs": {
+            "field": "Chemist Lab Address",
+            "value": ""
+          },
+          "steps": [
+            "Enter invalid Chemist Lab Address",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Chemist Lab Address is required'"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "Adding a chemist/lab with invalid input values",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is on the Add Chemist/Lab Screen"
+          ],
+          "inputs": {
+            "field": "Chemist Lab Contact",
+            "value": ""
+          },
+          "steps": [
+            "Enter invalid Chemist Lab Contact",
+            "Submit the form"
+          ],
+          "expected": [
+            "Error message is displayed 'Chemist Lab Contact is required'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.5,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 19,
+        "uncovered_clauses": [
+          "VCMSP03-2",
+          "VCMCL01"
+        ],
+        "weaknesses": [
+          "No test coverage for Speciality existence (VCMSP03-2).",
+          "No test coverage for editing Chemist/Labs (VCMCL01).",
+          "Missing validation tests for Sex and Qualification fields in doctor add/edit.",
+          "Missing validation test for Chemist/Lab Flag field.",
+          "Success assertions are vague; should verify actual state changes or database entries."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "VCMSP03-2"
+        ],
+        "fsa_score": 0.825,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

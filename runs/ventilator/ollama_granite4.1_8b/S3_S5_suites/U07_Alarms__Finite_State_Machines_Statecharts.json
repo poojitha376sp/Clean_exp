@@ -1,0 +1,708 @@
+{
+  "unit_id": "U07_Alarms",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.8,
+    "sfv_score": 0.9,
+    "threshold": 0.7,
+    "sfv_pass": true,
+    "issues": [
+      "missing: states declared"
+    ]
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 25,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No negative test cases for thresholds (e.g., breath rate below threshold).",
+      "No boundary tests for pulse counts (e.g., 9 or 11 pulses).",
+      "No tests for 60‑second pause expiration edge (e.g., 59s, 61s).",
+      "No tests for simultaneous multiple alarms.",
+      "No tests for state transitions under false guard conditions (e.g., apneaTimeExceeded false)."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.76,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "/* Finite State Machine (FSM) for Alarm System */\nstates {\n    Idle;\n    MediumAlarm;\n    HighAlarm;\n    Paused;\n}\n\ninitial state is Idle;\n\ntransitions {\n    Idle --> MediumAlarm : AlarmMediumTriggered;\n    MediumAlarm --> Idle : AlarmMediumResolved;\n    Idle --> HighAlarm : AlarmHighTriggered;\n    HighAlarm --> Idle : AlarmHighResolved;\n    Idle --> Paused : AudioPausePressed;\n    Paused --> Idle : PauseTimeout;\n}\n\nevents {\n    AlarmMediumTriggered;\n    AlarmMediumResolved;\n    AlarmHighTriggered;\n    AlarmHighResolved;\n    AudioPausePressed;\n    PauseTimeout;\n}\n\nguards {\n    /* Guard for MediumAlarm trigger */\n    AlarmMediumTriggered: /* condition from requirement RW-SW-80 */\n        apneaTimeExceeded;\n\n    /* Guard for HighAlarm trigger */\n    AlarmHighTriggered: /* condition from requirement RW-SW-82 */\n        breathRateExceeded;\n\n    /* Guard for pause initiation */\n    AudioPausePressed: true;\n\n    /* Guard for pause timeout */\n    PauseTimeout: timeElapsed(60s);\n}\n\n/* Additional details for guards based on requirements */\nguard apneaTimeExceeded {\n    /* Requirement RW-SW-80 */\n    return !breathDetectedWithin(apneaInterval);\n}\n\nguard breathRateExceeded {\n    /* Requirement RW-SW-82 */\n    return breathRate > breathRateSetting;\n}\n\n/* Note: Specific timing and signal details (e.g., flashing frequency, auditory pulses) are assumed to be handled within the respective state logic as per requirements RW-SW-75, RW-SW-76, RW-SW-77, RW-SW-78, RW-SW-83, RW-SW-84. */",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Medium severity alarm indication",
+      "req_ids": [
+        "RW-SW-75"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Apnea time interval not exceeded"
+      ],
+      "inputs": {
+        "name": "apneaTimeExceeded",
+        "value": true
+      },
+      "steps": [
+        "Trigger apnea time exceeded condition",
+        "System transitions to MediumAlarm state",
+        "Verify yellow color and flashing frequency of 0.5Hz with 50% duty cycle"
+      ],
+      "expected": [
+        "Display yellow color",
+        "Flashing frequency of 0.5Hz with 50% duty cycle"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "High severity alarm auditory signal (10 pulses)",
+      "req_ids": [
+        "RW-SW-76"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Breath rate exceeds setting"
+      ],
+      "inputs": {
+        "name": "breathRateExceeded",
+        "value": true
+      },
+      "steps": [
+        "Trigger breath rate exceeds setting condition",
+        "System transitions to HighAlarm state",
+        "Verify auditory signal of 10 pulses, each 200ms, frequency 500Hz (A4 note)"
+      ],
+      "expected": [
+        "Auditory signal with 10 pulses",
+        "Each pulse lasting 200ms",
+        "Pulse frequency of 500Hz"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "High severity alarm auditory signal (4 pulses)",
+      "req_ids": [
+        "RW-SW-77"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Breath rate exceeds setting"
+      ],
+      "inputs": {
+        "name": "breathRateExceeded",
+        "value": true
+      },
+      "steps": [
+        "Trigger breath rate exceeds setting condition",
+        "System transitions to HighAlarm state",
+        "Verify auditory signal of 4 pulses, each 200ms, frequency 500Hz"
+      ],
+      "expected": [
+        "Auditory signal with 4 pulses",
+        "Each pulse lasting 200ms",
+        "Pulse frequency of 500Hz"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Audio pause initiation and inactivation",
+      "req_ids": [
+        "RW-SW-78"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "All active alarms present"
+      ],
+      "inputs": {
+        "name": "AudioPausePressed",
+        "value": true
+      },
+      "steps": [
+        "Press AUDIO PAUSE / ALARM PAUSE key",
+        "System transitions to Paused state",
+        "Verify alarm activation symbol IEC 60417-5576 displayed",
+        "Wait 60 seconds",
+        "System transitions back to Idle state"
+      ],
+      "expected": [
+        "Alarm activation symbol IEC 60417-5576 displayed during pause",
+        "Pause duration of 60 seconds"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Apnea alarm trigger",
+      "req_ids": [
+        "RW-SW-80"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "No breath detected within apnea interval"
+      ],
+      "inputs": {
+        "name": "apneaTimeExceeded",
+        "value": true
+      },
+      "steps": [
+        "Trigger apnea time exceeded condition",
+        "System transitions to MediumAlarm state",
+        "Verify display text 'APNEA ALARM'"
+      ],
+      "expected": [
+        "Display text 'APNEA ALARM'"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Breath rate alarm trigger",
+      "req_ids": [
+        "RW-SW-82"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Breath rate exceeds setting"
+      ],
+      "inputs": {
+        "name": "breathRateExceeded",
+        "value": true
+      },
+      "steps": [
+        "Trigger breath rate exceeds setting condition",
+        "System transitions to MediumAlarm state",
+        "Verify display text 'HIGH BREATH RATE'"
+      ],
+      "expected": [
+        "Display text 'HIGH BREATH RATE'"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Maximum breath rate setting as alarm threshold",
+      "req_ids": [
+        "RW-SW-83"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Breath rate setting defined"
+      ],
+      "inputs": {
+        "name": "breathRateSetting",
+        "value": "as specified"
+      },
+      "steps": [
+        "Set breath rate to maximum setting",
+        "Trigger breath rate exceeds setting condition",
+        "Verify alarm activation"
+      ],
+      "expected": [
+        "Medium level alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Low pressure alarm trigger",
+      "req_ids": [
+        "RW-SW-84"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Low pressure condition detected"
+      ],
+      "inputs": {
+        "name": "lowPressureDetected",
+        "value": true
+      },
+      "steps": [
+        "Trigger low pressure condition",
+        "System transitions to HighAlarm state",
+        "Verify auditory signal and display text 'LOW INSP P'"
+      ],
+      "expected": [
+        "Auditory signal",
+        "Display text 'LOW INSP P'"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "/* Finite State Machine (FSM) for Alarm System */\nstates {\n    Normal;\n    MediumAlarm;\n    HighAlarm;\n    Paused;\n}\n\nevents {\n    NoBreathDetected;\n    BreathRateExceeded;\n    AudioPausePressed;\n    ApneaTimeIntervalExpired;\n    LowPressureDetected;\n}\n\ntransitions {\n    Normal --> MediumAlarm : NoBreathDetected [guard: true];\n    Normal --> HighAlarm : BreathRateExceeded [guard: true];\n    Normal --> Paused : AudioPausePressed [guard: true];\n    MediumAlarm --> Normal : ApneaTimeIntervalExpired [guard: true];\n    HighAlarm --> Normal : ApneaTimeIntervalExpired [guard: true];\n    Paused --> Normal : /* after 60 seconds */ [guard: true];\n}\n\n/* Guards and Actions */\nguard NoBreathDetected {\n    /* Check if no breath is triggered within apnea time interval */\n    return true; // Assume apnea condition met\n}\nguard BreathRateExceeded {\n    /* Check if breath rate exceeds setting */\n    return true; // Assume rate exceeds\n}\nguard AudioPausePressed {\n    /* Inhibit all active alarms */\n    return true; // Assume pause initiated\n}\nguard ApneaTimeIntervalExpired {\n    /* Allow transition back to Normal */\n    return true; // Assume interval expired\n}\n\nactions {\n    MediumAlarm: {\n        /* Yellow color, flashing 0.5Hz, 50% duty cycle */\n        setAlarmColor(\"yellow\");\n        startFlashing(0.5, 0.5);\n        displayText(\"APNEA ALARM\");\n    }\n    HighAlarm: {\n        /* Auditory signal: 10 pulses, 200ms each, 500Hz */\n        playAuditorySignal(10, 200, 500);\n        displayText(\"HIGH BREATH RATE\"); // For breath rate alarm\n        displayText(\"LOW INSP P\"); // For low pressure alarm\n    }\n    Paused: {\n        /* Display IEC 60417-5576 symbol */\n        displayAlarmSymbol(\"IEC 60417-5576\");\n        pauseAllAlarms(60); // 60 seconds pause\n    }\n}",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Medium severity alarm indication",
+          "req_ids": [
+            "RW-SW-75"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No breath detected within apnea time interval"
+          ],
+          "inputs": {
+            "event": "NoBreathDetected"
+          },
+          "steps": [
+            "Trigger NoBreathDetected event",
+            "Verify alarm color is yellow",
+            "Verify flashing frequency is 0.5Hz with 50% duty cycle"
+          ],
+          "expected": [
+            "Alarm color is yellow",
+            "Flashing frequency is 0.5Hz with 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test High severity auditory alarm signal (10 pulses)",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Breath rate exceeds setting"
+          ],
+          "inputs": {
+            "event": "BreathRateExceeded"
+          },
+          "steps": [
+            "Trigger BreathRateExceeded event",
+            "Verify auditory signal consists of 10 pulses",
+            "Verify each pulse lasts 200ms",
+            "Verify pulse frequency is 500Hz (A4 note)"
+          ],
+          "expected": [
+            "Auditory signal has 10 pulses",
+            "Each pulse lasts 200ms",
+            "Pulse frequency is 500Hz"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test High severity auditory alarm signal (4 pulses)",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Breath rate exceeds setting"
+          ],
+          "inputs": {
+            "event": "BreathRateExceeded"
+          },
+          "steps": [
+            "Trigger BreathRateExceeded event",
+            "Verify auditory signal consists of 4 pulses",
+            "Verify each pulse lasts 200ms",
+            "Verify pulse frequency is 500Hz"
+          ],
+          "expected": [
+            "Auditory signal has 4 pulses",
+            "Each pulse lasts 200ms",
+            "Pulse frequency is 500Hz"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Audio Pause / Alarm Pause key functionality",
+          "req_ids": [
+            "RW-SW-78"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "All active alarms are running"
+          ],
+          "inputs": {
+            "event": "AudioPausePressed"
+          },
+          "steps": [
+            "Press Audio Pause / Alarm Pause key",
+            "Verify all active alarms are paused",
+            "Verify alarm activation symbol IEC 60417-5576 is displayed",
+            "Wait 60 seconds",
+            "Verify alarms resume normal operation"
+          ],
+          "expected": [
+            "All active alarms are paused",
+            "Symbol IEC 60417-5576 is displayed",
+            "Alarms resume after 60 seconds"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Apnea alarm activation",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No breath detected within apnea time interval"
+          ],
+          "inputs": {
+            "event": "NoBreathDetected"
+          },
+          "steps": [
+            "Trigger NoBreathDetected event",
+            "Verify medium priority alarm is triggered",
+            "Verify display text is 'APNEA ALARM'"
+          ],
+          "expected": [
+            "Medium priority alarm is triggered",
+            "Display text is 'APNEA ALARM'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Breath rate alarm activation",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Breath rate exceeds setting"
+          ],
+          "inputs": {
+            "event": "BreathRateExceeded"
+          },
+          "steps": [
+            "Trigger BreathRateExceeded event",
+            "Verify medium level alarm is triggered",
+            "Verify display text is 'HIGH BREATH RATE'"
+          ],
+          "expected": [
+            "Medium level alarm is triggered",
+            "Display text is 'HIGH BREATH RATE'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Maximum breath rate setting as alarm threshold",
+          "req_ids": [
+            "RW-SW-83"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Breath rate approaches maximum setting"
+          ],
+          "inputs": {
+            "breathRate": "maxSetting"
+          },
+          "steps": [
+            "Set breath rate to maximum setting",
+            "Verify alarm is triggered",
+            "Verify display text is 'HIGH BREATH RATE'"
+          ],
+          "expected": [
+            "Alarm is triggered at maximum breath rate",
+            "Display text is 'HIGH BREATH RATE'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Low pressure alarm activation",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Low pressure condition detected"
+          ],
+          "inputs": {
+            "event": "LowPressureDetected"
+          },
+          "steps": [
+            "Trigger LowPressureDetected event",
+            "Verify high severity alarm is triggered",
+            "Verify auditory signal is sounded",
+            "Verify display text is 'LOW INSP P'"
+          ],
+          "expected": [
+            "High severity alarm is triggered",
+            "Auditory signal is sounded",
+            "Display text is 'LOW INSP P'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.6,
+        "sfv_score": 0.8,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: states declared",
+          "missing: initial state"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.80). Fix these problems and output the full corrected suite:\n- missing: states declared\n- missing: initial state",
+      "artifact": "/* Finite State Machine (FSM) for Alarm System */\nstates {\n    Idle;\n    MediumAlarm;\n    HighAlarm;\n    Paused;\n}\n\ninitial state is Idle;\n\ntransitions {\n    Idle --> MediumAlarm : AlarmMediumTriggered;\n    MediumAlarm --> Idle : AlarmMediumResolved;\n    Idle --> HighAlarm : AlarmHighTriggered;\n    HighAlarm --> Idle : AlarmHighResolved;\n    Idle --> Paused : AudioPausePressed;\n    Paused --> Idle : PauseTimeout;\n}\n\nevents {\n    AlarmMediumTriggered;\n    AlarmMediumResolved;\n    AlarmHighTriggered;\n    AlarmHighResolved;\n    AudioPausePressed;\n    PauseTimeout;\n}\n\nguards {\n    /* Guard for MediumAlarm trigger */\n    AlarmMediumTriggered: /* condition from requirement RW-SW-80 */\n        apneaTimeExceeded;\n\n    /* Guard for HighAlarm trigger */\n    AlarmHighTriggered: /* condition from requirement RW-SW-82 */\n        breathRateExceeded;\n\n    /* Guard for pause initiation */\n    AudioPausePressed: true;\n\n    /* Guard for pause timeout */\n    PauseTimeout: timeElapsed(60s);\n}\n\n/* Additional details for guards based on requirements */\nguard apneaTimeExceeded {\n    /* Requirement RW-SW-80 */\n    return !breathDetectedWithin(apneaInterval);\n}\n\nguard breathRateExceeded {\n    /* Requirement RW-SW-82 */\n    return breathRate > breathRateSetting;\n}\n\n/* Note: Specific timing and signal details (e.g., flashing frequency, auditory pulses) are assumed to be handled within the respective state logic as per requirements RW-SW-75, RW-SW-76, RW-SW-77, RW-SW-78, RW-SW-83, RW-SW-84. */",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Medium severity alarm indication",
+          "req_ids": [
+            "RW-SW-75"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Apnea time interval not exceeded"
+          ],
+          "inputs": {
+            "name": "apneaTimeExceeded",
+            "value": true
+          },
+          "steps": [
+            "Trigger apnea time exceeded condition",
+            "System transitions to MediumAlarm state",
+            "Verify yellow color and flashing frequency of 0.5Hz with 50% duty cycle"
+          ],
+          "expected": [
+            "Display yellow color",
+            "Flashing frequency of 0.5Hz with 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "High severity alarm auditory signal (10 pulses)",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Breath rate exceeds setting"
+          ],
+          "inputs": {
+            "name": "breathRateExceeded",
+            "value": true
+          },
+          "steps": [
+            "Trigger breath rate exceeds setting condition",
+            "System transitions to HighAlarm state",
+            "Verify auditory signal of 10 pulses, each 200ms, frequency 500Hz (A4 note)"
+          ],
+          "expected": [
+            "Auditory signal with 10 pulses",
+            "Each pulse lasting 200ms",
+            "Pulse frequency of 500Hz"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "High severity alarm auditory signal (4 pulses)",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Breath rate exceeds setting"
+          ],
+          "inputs": {
+            "name": "breathRateExceeded",
+            "value": true
+          },
+          "steps": [
+            "Trigger breath rate exceeds setting condition",
+            "System transitions to HighAlarm state",
+            "Verify auditory signal of 4 pulses, each 200ms, frequency 500Hz"
+          ],
+          "expected": [
+            "Auditory signal with 4 pulses",
+            "Each pulse lasting 200ms",
+            "Pulse frequency of 500Hz"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Audio pause initiation and inactivation",
+          "req_ids": [
+            "RW-SW-78"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "All active alarms present"
+          ],
+          "inputs": {
+            "name": "AudioPausePressed",
+            "value": true
+          },
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "System transitions to Paused state",
+            "Verify alarm activation symbol IEC 60417-5576 displayed",
+            "Wait 60 seconds",
+            "System transitions back to Idle state"
+          ],
+          "expected": [
+            "Alarm activation symbol IEC 60417-5576 displayed during pause",
+            "Pause duration of 60 seconds"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Apnea alarm trigger",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No breath detected within apnea interval"
+          ],
+          "inputs": {
+            "name": "apneaTimeExceeded",
+            "value": true
+          },
+          "steps": [
+            "Trigger apnea time exceeded condition",
+            "System transitions to MediumAlarm state",
+            "Verify display text 'APNEA ALARM'"
+          ],
+          "expected": [
+            "Display text 'APNEA ALARM'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Breath rate alarm trigger",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Breath rate exceeds setting"
+          ],
+          "inputs": {
+            "name": "breathRateExceeded",
+            "value": true
+          },
+          "steps": [
+            "Trigger breath rate exceeds setting condition",
+            "System transitions to MediumAlarm state",
+            "Verify display text 'HIGH BREATH RATE'"
+          ],
+          "expected": [
+            "Display text 'HIGH BREATH RATE'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Maximum breath rate setting as alarm threshold",
+          "req_ids": [
+            "RW-SW-83"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Breath rate setting defined"
+          ],
+          "inputs": {
+            "name": "breathRateSetting",
+            "value": "as specified"
+          },
+          "steps": [
+            "Set breath rate to maximum setting",
+            "Trigger breath rate exceeds setting condition",
+            "Verify alarm activation"
+          ],
+          "expected": [
+            "Medium level alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Low pressure alarm trigger",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Low pressure condition detected"
+          ],
+          "inputs": {
+            "name": "lowPressureDetected",
+            "value": true
+          },
+          "steps": [
+            "Trigger low pressure condition",
+            "System transitions to HighAlarm state",
+            "Verify auditory signal and display text 'LOW INSP P'"
+          ],
+          "expected": [
+            "Auditory signal",
+            "Display text 'LOW INSP P'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": [
+          "missing: states declared"
+        ]
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 25,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No negative test cases for thresholds (e.g., breath rate below threshold).",
+          "No boundary tests for pulse counts (e.g., 9 or 11 pulses).",
+          "No tests for 60‑second pause expiration edge (e.g., 59s, 61s).",
+          "No tests for simultaneous multiple alarms.",
+          "No tests for state transitions under false guard conditions (e.g., apneaTimeExceeded false)."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.76,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

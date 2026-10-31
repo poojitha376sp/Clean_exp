@@ -1,0 +1,512 @@
+{
+  "unit_id": "U02_Alarms",
+  "representation": "GUI Event Graphs",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "GUI Event Graphs",
+    "group": 3,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 1.0,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.3,
+    "hallucinated": [
+      {
+        "value": "Input Air Line Blocked",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Input O2 Line Blocked",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Inspiratory Pressure Low",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Input O2 Line Pressure Too High",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "GUI Unresponsive",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Overpressure",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Controller Unresponsive",
+        "context": "alarm message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 10,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No timing verification for 1/2 apnea time condition",
+      "No test for modal dialog blocking background interactions",
+      "Event sequence length only 1; no multi-step sequences tested",
+      "No separate verification of overpressure alarm display on GUI vs controller",
+      "No test for actual low pressure measurement when lines are blocked"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.895,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "// GUI Event Graphs for unit U02_Alarms\n\n// Graph 1: Input Air Line Blocked (Low Pressure) Alarm\nAirLineBlocked:\n  - Event: \"AirLineBlocked\"\n    - Follow-on: AlarmTriggered(\"Input Air Line Blocked\", SEVERITY_HIGH)\n\n// Graph 2: Input O2 Line Blocked (Low Pressure) Alarm\nO2LineBlocked:\n  - Event: \"O2LineBlocked\"\n    - Follow-on: AlarmTriggered(\"Input O2 Line Blocked\", SEVERITY_HIGH)\n\n// Graph 3: Inspiratory Pressure Below Threshold Alarm\nInspiratoryPressureLow:\n  - Event: \"InspiratoryPressureBelowThreshold(-4)\"\n    - Follow-on: AlarmTriggered(\"Inspiratory Pressure Low\", SEVERITY_HIGH)\n\n// Graph 4: Input O2 Line Pressure Too High Alarm\nO2LinePressureHigh:\n  - Event: \"O2LinePressureTooHigh\"\n    - Follow-on: AlarmTriggered(\"Input O2 Line Pressure Too High\", SEVERITY_HIGH)\n\n// Graph 5: GUI Unresponsive Alarm (1/2 Apnea Time)\nGUIUnresponsive:\n  - Event: \"GUIUnresponsive\"\n    - Follow-on: AlarmTriggered(\"GUI Unresponsive\", SEVERITY_HIGH)\n\n// Graph 6: Overpressure Alarm (GUI)\nOverpressureGUI:\n  - Event: \"OverpressureDetected\"\n    - Follow-on: AlarmTriggered(\"Overpressure\", SEVERITY_HIGH)\n\n// Graph 7: Controller Unresponsive Alarm (1/2 Apnea Time)\nControllerUnresponsive:\n  - Event: \"ControllerUnresponsive\"\n    - Follow-on: AlarmTriggered(\"Controller Unresponsive\", SEVERITY_HIGH)\n\n// Graph 8: Overpressure Alarm (Controller) above 60 cmH2O\nOverpressureController:\n  - Event: \"OverpressureAbove60cmH2O\"\n    - Follow-on: AlarmTriggered(\"Overpressure\", SEVERITY_HIGH)\n\n// Helper Node: Alarm Triggered\nAlarmTriggered(message, severity):\n  - DisplayAlarm(message, severity)",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test Input Air Line Blocked Alarm",
+      "req_ids": [
+        "RW-SW-45"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Air line is operational"
+      ],
+      "inputs": {
+        "AirLineBlocked": true
+      },
+      "steps": [
+        "Trigger AirLineBlocked event",
+        "Observe AlarmTriggered event"
+      ],
+      "expected": [
+        "Alarm displayed: 'Input Air Line Blocked' with severity HIGH"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test Input O2 Line Blocked Alarm",
+      "req_ids": [
+        "RW-SW-58"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "O2 line is operational"
+      ],
+      "inputs": {
+        "O2LineBlocked": true
+      },
+      "steps": [
+        "Trigger O2LineBlocked event",
+        "Observe AlarmTriggered event"
+      ],
+      "expected": [
+        "Alarm displayed: 'Input O2 Line Blocked' with severity HIGH"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test Inspiratory Pressure Low Alarm",
+      "req_ids": [
+        "RW-SW-60"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Inspiratory pressure is monitored"
+      ],
+      "inputs": {
+        "InspiratoryPressureBelowThreshold": -4
+      },
+      "steps": [
+        "Set inspiratory pressure to -4 cm H2O",
+        "Observe AlarmTriggered event"
+      ],
+      "expected": [
+        "Alarm displayed: 'Inspiratory Pressure Low' with severity HIGH"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test Input O2 Line Pressure Too High Alarm",
+      "req_ids": [
+        "RW-SW-21"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "O2 line pressure is monitored"
+      ],
+      "inputs": {
+        "O2LinePressureTooHigh": true
+      },
+      "steps": [
+        "Trigger O2LinePressureTooHigh event",
+        "Observe AlarmTriggered event"
+      ],
+      "expected": [
+        "Alarm displayed: 'Input O2 Line Pressure Too High' with severity HIGH"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test GUI Unresponsive Alarm",
+      "req_ids": [
+        "RW-SW-61"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "GUI is responsive"
+      ],
+      "inputs": {
+        "GUIUnresponsive": true
+      },
+      "steps": [
+        "Trigger GUIUnresponsive event",
+        "Observe AlarmTriggered event"
+      ],
+      "expected": [
+        "Alarm displayed: 'GUI Unresponsive' with severity HIGH"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Test Overpressure Alarm (GUI)",
+      "req_ids": [
+        "RW-SW-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Overpressure detection is enabled"
+      ],
+      "inputs": {
+        "OverpressureGUI": true
+      },
+      "steps": [
+        "Trigger OverpressureGUI event",
+        "Observe AlarmTriggered event"
+      ],
+      "expected": [
+        "Alarm displayed: 'Overpressure' with severity HIGH"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Test Controller Unresponsive Alarm",
+      "req_ids": [
+        "RW-SW-36"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Controller is responsive"
+      ],
+      "inputs": {
+        "ControllerUnresponsive": true
+      },
+      "steps": [
+        "Trigger ControllerUnresponsive event",
+        "Observe AlarmTriggered event"
+      ],
+      "expected": [
+        "Alarm displayed: 'Controller Unresponsive' with severity HIGH"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Test Overpressure Alarm (Controller) above 60 cmH2O",
+      "req_ids": [
+        "RW-SW-6"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Overpressure threshold is set to 60 cmH2O"
+      ],
+      "inputs": {
+        "OverpressureController": true
+      },
+      "steps": [
+        "Set pressure to 60 cmH2O + epsilon",
+        "Observe AlarmTriggered event"
+      ],
+      "expected": [
+        "Alarm displayed: 'Overpressure' with severity HIGH"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "// GUI Event Graphs for unit U02_Alarms\n\n// Graph 1: Input Air Line Blocked (Low Pressure) Alarm\nAirLineBlocked:\n  - Event: \"AirLineBlocked\"\n    - Follow-on: AlarmTriggered(\"Input Air Line Blocked\", SEVERITY_HIGH)\n\n// Graph 2: Input O2 Line Blocked (Low Pressure) Alarm\nO2LineBlocked:\n  - Event: \"O2LineBlocked\"\n    - Follow-on: AlarmTriggered(\"Input O2 Line Blocked\", SEVERITY_HIGH)\n\n// Graph 3: Inspiratory Pressure Below Threshold Alarm\nInspiratoryPressureLow:\n  - Event: \"InspiratoryPressureBelowThreshold(-4)\"\n    - Follow-on: AlarmTriggered(\"Inspiratory Pressure Low\", SEVERITY_HIGH)\n\n// Graph 4: Input O2 Line Pressure Too High Alarm\nO2LinePressureHigh:\n  - Event: \"O2LinePressureTooHigh\"\n    - Follow-on: AlarmTriggered(\"Input O2 Line Pressure Too High\", SEVERITY_HIGH)\n\n// Graph 5: GUI Unresponsive Alarm (1/2 Apnea Time)\nGUIUnresponsive:\n  - Event: \"GUIUnresponsive\"\n    - Follow-on: AlarmTriggered(\"GUI Unresponsive\", SEVERITY_HIGH)\n\n// Graph 6: Overpressure Alarm (GUI)\nOverpressureGUI:\n  - Event: \"OverpressureDetected\"\n    - Follow-on: AlarmTriggered(\"Overpressure\", SEVERITY_HIGH)\n\n// Graph 7: Controller Unresponsive Alarm (1/2 Apnea Time)\nControllerUnresponsive:\n  - Event: \"ControllerUnresponsive\"\n    - Follow-on: AlarmTriggered(\"Controller Unresponsive\", SEVERITY_HIGH)\n\n// Graph 8: Overpressure Alarm (Controller) above 60 cmH2O\nOverpressureController:\n  - Event: \"OverpressureAbove60cmH2O\"\n    - Follow-on: AlarmTriggered(\"Overpressure\", SEVERITY_HIGH)\n\n// Helper Node: Alarm Triggered\nAlarmTriggered(message, severity):\n  - DisplayAlarm(message, severity)",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Input Air Line Blocked Alarm",
+          "req_ids": [
+            "RW-SW-45"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Air line is operational"
+          ],
+          "inputs": {
+            "AirLineBlocked": true
+          },
+          "steps": [
+            "Trigger AirLineBlocked event",
+            "Observe AlarmTriggered event"
+          ],
+          "expected": [
+            "Alarm displayed: 'Input Air Line Blocked' with severity HIGH"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Input O2 Line Blocked Alarm",
+          "req_ids": [
+            "RW-SW-58"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "O2 line is operational"
+          ],
+          "inputs": {
+            "O2LineBlocked": true
+          },
+          "steps": [
+            "Trigger O2LineBlocked event",
+            "Observe AlarmTriggered event"
+          ],
+          "expected": [
+            "Alarm displayed: 'Input O2 Line Blocked' with severity HIGH"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Inspiratory Pressure Low Alarm",
+          "req_ids": [
+            "RW-SW-60"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Inspiratory pressure is monitored"
+          ],
+          "inputs": {
+            "InspiratoryPressureBelowThreshold": -4
+          },
+          "steps": [
+            "Set inspiratory pressure to -4 cm H2O",
+            "Observe AlarmTriggered event"
+          ],
+          "expected": [
+            "Alarm displayed: 'Inspiratory Pressure Low' with severity HIGH"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Input O2 Line Pressure Too High Alarm",
+          "req_ids": [
+            "RW-SW-21"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "O2 line pressure is monitored"
+          ],
+          "inputs": {
+            "O2LinePressureTooHigh": true
+          },
+          "steps": [
+            "Trigger O2LinePressureTooHigh event",
+            "Observe AlarmTriggered event"
+          ],
+          "expected": [
+            "Alarm displayed: 'Input O2 Line Pressure Too High' with severity HIGH"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test GUI Unresponsive Alarm",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "GUI is responsive"
+          ],
+          "inputs": {
+            "GUIUnresponsive": true
+          },
+          "steps": [
+            "Trigger GUIUnresponsive event",
+            "Observe AlarmTriggered event"
+          ],
+          "expected": [
+            "Alarm displayed: 'GUI Unresponsive' with severity HIGH"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Overpressure Alarm (GUI)",
+          "req_ids": [
+            "RW-SW-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Overpressure detection is enabled"
+          ],
+          "inputs": {
+            "OverpressureGUI": true
+          },
+          "steps": [
+            "Trigger OverpressureGUI event",
+            "Observe AlarmTriggered event"
+          ],
+          "expected": [
+            "Alarm displayed: 'Overpressure' with severity HIGH"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Controller Unresponsive Alarm",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Controller is responsive"
+          ],
+          "inputs": {
+            "ControllerUnresponsive": true
+          },
+          "steps": [
+            "Trigger ControllerUnresponsive event",
+            "Observe AlarmTriggered event"
+          ],
+          "expected": [
+            "Alarm displayed: 'Controller Unresponsive' with severity HIGH"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Overpressure Alarm (Controller) above 60 cmH2O",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Overpressure threshold is set to 60 cmH2O"
+          ],
+          "inputs": {
+            "OverpressureController": true
+          },
+          "steps": [
+            "Set pressure to 60 cmH2O + epsilon",
+            "Observe AlarmTriggered event"
+          ],
+          "expected": [
+            "Alarm displayed: 'Overpressure' with severity HIGH"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "GUI Event Graphs",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.3,
+        "hallucinated": [
+          {
+            "value": "Input Air Line Blocked",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 Line Blocked",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Inspiratory Pressure Low",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 Line Pressure Too High",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "GUI Unresponsive",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Overpressure",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Controller Unresponsive",
+            "context": "alarm message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 10,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No timing verification for 1/2 apnea time condition",
+          "No test for modal dialog blocking background interactions",
+          "Event sequence length only 1; no multi-step sequences tested",
+          "No separate verification of overpressure alarm display on GUI vs controller",
+          "No test for actual low pressure measurement when lines are blocked"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.895,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

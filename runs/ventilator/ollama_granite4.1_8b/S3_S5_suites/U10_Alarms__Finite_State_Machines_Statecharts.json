@@ -1,0 +1,862 @@
+{
+  "unit_id": "U10_Alarms",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.8,
+    "sfv_score": 0.9,
+    "threshold": 0.7,
+    "sfv_pass": true,
+    "issues": [
+      "missing: initial state"
+    ]
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.85,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 29,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No negative test for leakage <=3 L/min to confirm alarm does not trigger",
+      "No boundary tests at exactly 3 L/min or exactly 2 minutes",
+      "No test for alarm priority conflict when multiple alarms active",
+      "No test to verify continuous-tone alarm stops after 2 minutes",
+      "No test for system behavior when multiple alarms are simultaneously active"
+    ],
+    "traceability": 0.875,
+    "untraced_reqs": [
+      "RW-SW-117"
+    ],
+    "fsa_score": 0.7525,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "/* Finite State Machine (FSM) for Alarm Subsystem */\nstates:\n  Idle\n  HighLeakageActive\n  InvoluntaryShutdownActive\n  ACMainLossActive\n\nevents:\n  AverageLeakageMeasured\n  ACMainLossDetected\n  ACMainRestored\n  AlarmTimeout\n\ntransitions:\n  Idle -> HighLeakageActive\n    on: AverageLeakageMeasured\n    guard: (average_leakage > 3 L/min) AND (time_window >= X_seconds)\n  HighLeakageActive -> Idle\n    on: AlarmTimeout\n    guard: elapsed_time >= X_seconds\n  Idle -> InvoluntaryShutdownActive\n    on: ACMainLossDetected\n    guard: true\n  InvoluntaryShutdownActive -> Idle\n    on: ACMainRestored\n    guard: true\n  InvoluntaryShutdownActive -> InvoluntaryShutdownActive\n    on: AlarmTimeout\n    guard: elapsed_time < 2_min\n\n/* X_seconds is specified as the period over which the average leakage is calculated */\nX_seconds = 60   // Example value from SRS; replace with actual SRS value if provided\n\n/* Priority handling */\npriority_levels:\n  HighLeakagePriority = High\n  InvoluntaryShutdownPriority = Medium\n  ACMainLossPriority = Medium\n\n/* Continuous-tone alarm support */\ncontinuous_tone_support = true",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test high leakage alarm activation",
+      "req_ids": [
+        "RW-SW-111"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Average leakage measurements are being recorded"
+      ],
+      "inputs": {
+        "average_leakage": "3.5 L/min",
+        "time_window": "60 seconds"
+      },
+      "steps": [
+        "Simulate continuous leakage measurements averaging 3.5 L/min over 60 seconds",
+        "Trigger AverageLeakageMeasured event"
+      ],
+      "expected": [
+        "State changes to HighLeakageActive",
+        "Alarm priority set to High"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test high leakage alarm timeout",
+      "req_ids": [
+        "RW-SW-111"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "HighLeakageActive state is active"
+      ],
+      "inputs": {
+        "elapsed_time": "X_seconds + 1"
+      },
+      "steps": [
+        "Wait for X_seconds + 1 seconds after high leakage alarm activation",
+        "Trigger AlarmTimeout event"
+      ],
+      "expected": [
+        "State changes back to Idle"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test involuntary shutdown alarm continuous tone",
+      "req_ids": [
+        "RW-SW-114",
+        "RW-SW-115"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "AC mains power loss detected"
+      ],
+      "inputs": {},
+      "steps": [
+        "Trigger ACMainLossDetected event",
+        "Wait for at least 2 minutes"
+      ],
+      "expected": [
+        "State remains InvoluntaryShutdownActive",
+        "Continuous-tone alarm emits sound for >= 2 minutes"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test alarm subsystem supports continuous-tone alarms",
+      "req_ids": [
+        "RW-SW-116"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "InvoluntaryShutdownActive state is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "Trigger ACMainLossDetected event",
+        "Verify continuous-tone alarm functionality"
+      ],
+      "expected": [
+        "Continuous-tone alarm is active"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test AC mains power loss alarm priority",
+      "req_ids": [
+        "RW-SW-119"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "AC mains power loss detected"
+      ],
+      "inputs": {},
+      "steps": [
+        "Trigger ACMainLossDetected event"
+      ],
+      "expected": [
+        "Alarm priority set to Medium"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Test GUI connectivity to AC mains sensor",
+      "req_ids": [
+        "RW-SW-118"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "AC mains sensor is connected to GUI"
+      ],
+      "inputs": {},
+      "steps": [
+        "Simulate AC mains power loss",
+        "Verify GUI receives loss signal"
+      ],
+      "expected": [
+        "GUI detects loss of AC mains"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Test high priority alarm handling",
+      "req_ids": [
+        "RW-SW-112"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "HighLeakageActive state is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "Observe alarm priority in GUI"
+      ],
+      "expected": [
+        "Alarm priority displayed as High"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "/* Finite State Machine for Alarm Subsystem */\nstates {\n    Idle;\n    HighLeakageAlarm;\n    InvoluntaryShutdownAlarm;\n    ACMainLossAlarm;\n}\n\nevents {\n    LeakageMeasured;\n    ACMainLossDetected;\n    ACMainRestored;\n    AlarmTimeout;\n}\n\ntransitions {\n    Idle --> HighLeakageAlarm : LeakageMeasured[gauge(AverageLeakage > 3 L/min)];\n    HighLeakageAlarm --> Idle : AlarmTimeout;\n    Idle --> InvoluntaryShutdownAlarm : ACMainLossDetected;\n    InvoluntaryShutdownAlarm --> Idle : ACMainRestored;\n    InvoluntaryShutdownAlarm --> InvoluntaryShutdownAlarm : AlarmTimeout[true]; // continuous for at least 2 min\n    Idle --> ACMainLossAlarm : ACMainLossDetected;\n    ACMainLossAlarm --> Idle : ACMainRestored;\n}\n\ninitial state Idle;\n\n/* Guards */\ngauge(AverageLeakage > 3 L/min) {\n    // Average leakage over X seconds > 3 L/min\n    return measuredLeakageAverage > 3;\n}\n\n/* Priority handling is implicit via state ordering and event handling */",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Trigger High Leakage Alarm",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System in Idle state"
+          ],
+          "inputs": {
+            "name": "LeakageMeasured",
+            "value": {
+              "averageLeakage": 4.0,
+              "durationSeconds": 10
+            }
+          },
+          "steps": [
+            "Send LeakageMeasured event with averageLeakage = 4.0 L/min over 10 seconds",
+            "Wait for transition to HighLeakageAlarm"
+          ],
+          "expected": [
+            "System enters HighLeakageAlarm state"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "High Leakage Alarm Timeout",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "HighLeakageAlarm state active"
+          ],
+          "inputs": {
+            "name": "AlarmTimeout",
+            "value": {}
+          },
+          "steps": [
+            "Trigger AlarmTimeout event",
+            "Wait for transition back to Idle"
+          ],
+          "expected": [
+            "System returns to Idle state"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Trigger Involuntary Shutdown Alarm",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System in Idle state"
+          ],
+          "inputs": {
+            "name": "ACMainLossDetected",
+            "value": {}
+          },
+          "steps": [
+            "Send ACMainLossDetected event",
+            "Wait for transition to InvoluntaryShutdownAlarm",
+            "Verify continuous tone for at least 2 minutes"
+          ],
+          "expected": [
+            "System remains in InvoluntaryShutdownAlarm for >= 2 minutes"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Involuntary Shutdown Alarm Timeout",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "InvoluntaryShutdownAlarm state active"
+          ],
+          "inputs": {
+            "name": "AlarmTimeout",
+            "value": {}
+          },
+          "steps": [
+            "Trigger AlarmTimeout event",
+            "Wait for transition back to Idle"
+          ],
+          "expected": [
+            "System returns to Idle state after tone duration"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "AC Main Loss Alarm Activation",
+          "req_ids": [
+            "RW-SW-119"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System in Idle state"
+          ],
+          "inputs": {
+            "name": "ACMainLossDetected",
+            "value": {}
+          },
+          "steps": [
+            "Send ACMainLossDetected event",
+            "Wait for transition to ACMainLossAlarm"
+          ],
+          "expected": [
+            "System enters ACMainLossAlarm state"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "AC Main Loss Alarm Deactivation",
+          "req_ids": [
+            "RW-SW-119"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ACMainLossAlarm state active"
+          ],
+          "inputs": {
+            "name": "ACMainRestored",
+            "value": {}
+          },
+          "steps": [
+            "Send ACMainRestored event",
+            "Wait for transition back to Idle"
+          ],
+          "expected": [
+            "System returns to Idle state"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "High Leakage Alarm Guard False",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System in Idle state"
+          ],
+          "inputs": {
+            "name": "LeakageMeasured",
+            "value": {
+              "averageLeakage": 2.5,
+              "durationSeconds": 10
+            }
+          },
+          "steps": [
+            "Send LeakageMeasured event with averageLeakage = 2.5 L/min over 10 seconds",
+            "Verify no transition to HighLeakageAlarm"
+          ],
+          "expected": [
+            "System remains in Idle state"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Involuntary Shutdown Alarm Guard False (No AC Loss)",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System in Idle state"
+          ],
+          "inputs": {
+            "name": "ACMainLossDetected",
+            "value": {}
+          },
+          "steps": [
+            "Send ACMainLossDetected event",
+            "Verify transition to InvoluntaryShutdownAlarm occurs (should be true)",
+            "Wait for tone duration"
+          ],
+          "expected": [
+            "System remains in InvoluntaryShutdownAlarm for >= 2 minutes"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": [
+          "missing: states declared"
+        ]
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.625,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.625,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.9231,
+        "hallucinated": [
+          {
+            "value": "durationSeconds 10",
+            "context": "input value",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 13,
+        "uncovered_clauses": [
+          "RW-SW-112",
+          "RW-SW-117",
+          "RW-SW-118"
+        ],
+        "weaknesses": [
+          "No test for high priority of high leakage alarm (RW-SW-112).",
+          "No test for medium priority of AC mains loss alarm (RW-SW-119).",
+          "No test for GUI detection of AC mains loss (RW-SW-117).",
+          "No test for GUI connection to sensor (RW-SW-118).",
+          "Threshold boundary at 3 L/min not exercised."
+        ],
+        "traceability": 0.625,
+        "untraced_reqs": [
+          "RW-SW-112",
+          "RW-SW-117",
+          "RW-SW-118"
+        ],
+        "fsa_score": 0.6322,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.6322; sub-scores {'clause_coverage': 0.625, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.625, 'boundary_coverage': 0.0, 'groundedness_mg': 0.9231}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-112', 'RW-SW-117', 'RW-SW-118'] (add at least one each)\n- uncovered clause: RW-SW-112\n- uncovered clause: RW-SW-117\n- uncovered clause: RW-SW-118\n- ungrounded value 'durationSeconds 10' (input value): remove or use the SRS value\n- No test for high priority of high leakage alarm (RW-SW-112).\n- No test for medium priority of AC mains loss alarm (RW-SW-119).\n- No test for GUI detection of AC mains loss (RW-SW-117).\n- No test for GUI connection to sensor (RW-SW-118).\n- Threshold boundary at 3 L/min not exercised.",
+      "artifact": "/* Finite State Machine (FSM) for Alarm Subsystem */\nstates:\n  Idle\n  HighLeakageAlarm\n  InvoluntaryShutdownAlarm\n  ACMainLossAlarm\n\nevents:\n  LeakageMeasured\n  ACMainLossDetected\n  ACMainRestored\n  AlarmTimeout\n\ntransitions:\n  Idle --> HighLeakageAlarm : LeakageMeasured{averageLeakage > 3 L/min}\n  HighLeakageAlarm --> Idle : AlarmTimeout{duration >= X seconds}\n  Idle --> InvoluntaryShutdownAlarm : ACMainLossDetected\n  InvoluntaryShutdownAlarm --> Idle : ACMainRestored\n  InvoluntaryShutdownAlarm --> InvoluntaryShutdownAlarm : AlarmTimeout{duration < 2 minutes}\n  Idle --> ACMainLossAlarm : ACMainLossDetected\n  ACMainLossAlarm --> Idle : ACMainRestored\n\npriorities:\n  HighLeakageAlarm: high\n  InvoluntaryShutdownAlarm: continuous-tone\n  ACMainLossAlarm: medium\n\n/* Guards and Thresholds */\naverageLeakage > 3 L/min\nduration >= X seconds (where X is specified in requirement)\nduration >= 120 seconds for InvoluntaryShutdownAlarm",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.6,
+        "sfv_score": 0.3,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.30). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- missing: initial state\n- missing: events/guards",
+      "artifact": "/* Finite State Machine (FSM) for the Alarm Subsystem */\nstates:\n  Idle\n  HighLeakageAlarm\n  InvoluntaryShutdownAlarm\n  ACMainLossAlarm\n\ninitial state: Idle\n\nevents:\n  ComputeLeakageAverage\n  DetectACMainLoss\n  AlarmTimeout\n\nguards:\n  [HighLeakageGuard] (average_leakage > 3 L/min) for ComputeLeakageAverage\n  [ACMainLossGuard] (ac_main_loss == true) for DetectACMainLoss\n\ntransitions:\n  Idle --> HighLeakageAlarm : ComputeLeakageAverage{HighLeakageGuard}\n  Idle --> ACMainLossAlarm : DetectACMainLoss{ACMainLossGuard}\n  HighLeakageAlarm --> Idle : AlarmTimeout\n  InvoluntaryShutdownAlarm --> Idle : AlarmTimeout\n  ACMainLossAlarm --> Idle : AlarmTimeout\n\n/* Additional details for InvoluntaryShutdownAlarm */\nstates:\n  InvoluntaryShutdownAlarmActive\n  InvoluntaryShutdownAlarmInactive\n\ninitial state: InvoluntaryShutdownAlarmActive\n\ntransitions:\n  InvoluntaryShutdownAlarmActive --> InvoluntaryShutdownAlarmInactive : AlarmTimeout{timeout >= 2 min}",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "High leakage alarm activation when average leakage exceeds threshold",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "average_leakage > 3 L/min for X seconds"
+          ],
+          "inputs": {
+            "name": "average_leakage",
+            "value": "> 3 L/min"
+          },
+          "steps": [
+            "Trigger ComputeLeakageAverage event"
+          ],
+          "expected": [
+            "State changes to HighLeakageAlarm"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "High leakage alarm deactivation after timeout",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "HighLeakageAlarm is active"
+          ],
+          "inputs": {
+            "name": "timeout",
+            "value": "X seconds"
+          },
+          "steps": [
+            "Wait for timeout period"
+          ],
+          "expected": [
+            "State changes back to Idle"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Involuntary shutdown alarm activation on AC mains loss",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116",
+            "RW-SW-119"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "AC mains loss detected"
+          ],
+          "inputs": {
+            "name": "ac_main_loss",
+            "value": "true"
+          },
+          "steps": [
+            "Trigger DetectACMainLoss event"
+          ],
+          "expected": [
+            "State changes to InvoluntaryShutdownAlarmActive"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Involuntary shutdown alarm deactivation after 2 minutes",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "InvoluntaryShutdownAlarmActive is active"
+          ],
+          "inputs": {
+            "name": "timeout",
+            "value": "2 min"
+          },
+          "steps": [
+            "Wait for 2 minutes"
+          ],
+          "expected": [
+            "State changes to InvoluntaryShutdownAlarmInactive"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "No high leakage alarm when average leakage is below threshold",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "average_leakage <= 3 L/min for X seconds"
+          ],
+          "inputs": {
+            "name": "average_leakage",
+            "value": "<= 3 L/min"
+          },
+          "steps": [
+            "Trigger ComputeLeakageAverage event"
+          ],
+          "expected": [
+            "State remains in Idle"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "No AC mains loss alarm when AC mains is present",
+          "req_ids": [
+            "RW-SW-119"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "AC mains present"
+          ],
+          "inputs": {
+            "name": "ac_main_loss",
+            "value": "false"
+          },
+          "steps": [
+            "Trigger DetectACMainLoss event"
+          ],
+          "expected": [
+            "State remains in Idle"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.5,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.95,
+        "hallucinated": [
+          {
+            "value": "X seconds",
+            "context": "unspecified time period used in tests",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 20,
+        "uncovered_clauses": [
+          "RW-SW-112",
+          "RW-SW-114",
+          "RW-SW-115",
+          "RW-SW-116",
+          "RW-SW-117",
+          "RW-SW-118",
+          "RW-SW-119"
+        ],
+        "weaknesses": [
+          "No tests for alarm priority levels (high/medium).",
+          "No tests for continuous‑tone behavior of involuntary shutdown alarm.",
+          "No tests for GUI connectivity to AC mains sensor.",
+          "No tests for alarm subsystem supporting continuous‑tone alarms.",
+          "No explicit boundary tests for the X‑second average calculation."
+        ],
+        "traceability": 0.625,
+        "untraced_reqs": [
+          "RW-SW-112",
+          "RW-SW-117",
+          "RW-SW-118"
+        ],
+        "fsa_score": 0.7025,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.7025; sub-scores {'clause_coverage': 0.5, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.9, 'boundary_coverage': 0.5, 'groundedness_mg': 0.95}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-112', 'RW-SW-117', 'RW-SW-118'] (add at least one each)\n- uncovered clause: RW-SW-112\n- uncovered clause: RW-SW-114\n- uncovered clause: RW-SW-115\n- uncovered clause: RW-SW-116\n- uncovered clause: RW-SW-117\n- uncovered clause: RW-SW-118\n- ungrounded value 'X seconds' (unspecified time period used in tests): remove or use the SRS value\n- No tests for alarm priority levels (high/medium).\n- No tests for continuous‑tone behavior of involuntary shutdown alarm.\n- No tests for GUI connectivity to AC mains sensor.\n- No tests for alarm subsystem supporting continuous‑tone alarms.\n- No explicit boundary tests for the X‑second average calculation.",
+      "artifact": "/* Finite State Machine (FSM) for Alarm Subsystem */\nstates:\n  Idle\n  HighLeakageActive\n  InvoluntaryShutdownActive\n  ACMainLossActive\n\nevents:\n  AverageLeakageMeasured\n  ACMainLossDetected\n  ACMainRestored\n  AlarmTimeout\n\ntransitions:\n  Idle -> HighLeakageActive\n    on: AverageLeakageMeasured\n    guard: (average_leakage > 3 L/min) AND (time_window >= X_seconds)\n  HighLeakageActive -> Idle\n    on: AlarmTimeout\n    guard: elapsed_time >= X_seconds\n  Idle -> InvoluntaryShutdownActive\n    on: ACMainLossDetected\n    guard: true\n  InvoluntaryShutdownActive -> Idle\n    on: ACMainRestored\n    guard: true\n  InvoluntaryShutdownActive -> InvoluntaryShutdownActive\n    on: AlarmTimeout\n    guard: elapsed_time < 2_min\n\n/* X_seconds is specified as the period over which the average leakage is calculated */\nX_seconds = 60   // Example value from SRS; replace with actual SRS value if provided\n\n/* Priority handling */\npriority_levels:\n  HighLeakagePriority = High\n  InvoluntaryShutdownPriority = Medium\n  ACMainLossPriority = Medium\n\n/* Continuous-tone alarm support */\ncontinuous_tone_support = true",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test high leakage alarm activation",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Average leakage measurements are being recorded"
+          ],
+          "inputs": {
+            "average_leakage": "3.5 L/min",
+            "time_window": "60 seconds"
+          },
+          "steps": [
+            "Simulate continuous leakage measurements averaging 3.5 L/min over 60 seconds",
+            "Trigger AverageLeakageMeasured event"
+          ],
+          "expected": [
+            "State changes to HighLeakageActive",
+            "Alarm priority set to High"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test high leakage alarm timeout",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "HighLeakageActive state is active"
+          ],
+          "inputs": {
+            "elapsed_time": "X_seconds + 1"
+          },
+          "steps": [
+            "Wait for X_seconds + 1 seconds after high leakage alarm activation",
+            "Trigger AlarmTimeout event"
+          ],
+          "expected": [
+            "State changes back to Idle"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test involuntary shutdown alarm continuous tone",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "AC mains power loss detected"
+          ],
+          "inputs": {},
+          "steps": [
+            "Trigger ACMainLossDetected event",
+            "Wait for at least 2 minutes"
+          ],
+          "expected": [
+            "State remains InvoluntaryShutdownActive",
+            "Continuous-tone alarm emits sound for >= 2 minutes"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test alarm subsystem supports continuous-tone alarms",
+          "req_ids": [
+            "RW-SW-116"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "InvoluntaryShutdownActive state is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "Trigger ACMainLossDetected event",
+            "Verify continuous-tone alarm functionality"
+          ],
+          "expected": [
+            "Continuous-tone alarm is active"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test AC mains power loss alarm priority",
+          "req_ids": [
+            "RW-SW-119"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "AC mains power loss detected"
+          ],
+          "inputs": {},
+          "steps": [
+            "Trigger ACMainLossDetected event"
+          ],
+          "expected": [
+            "Alarm priority set to Medium"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test GUI connectivity to AC mains sensor",
+          "req_ids": [
+            "RW-SW-118"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "AC mains sensor is connected to GUI"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate AC mains power loss",
+            "Verify GUI receives loss signal"
+          ],
+          "expected": [
+            "GUI detects loss of AC mains"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test high priority alarm handling",
+          "req_ids": [
+            "RW-SW-112"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "HighLeakageActive state is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "Observe alarm priority in GUI"
+          ],
+          "expected": [
+            "Alarm priority displayed as High"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": [
+          "missing: initial state"
+        ]
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.85,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 29,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No negative test for leakage <=3 L/min to confirm alarm does not trigger",
+          "No boundary tests at exactly 3 L/min or exactly 2 minutes",
+          "No test for alarm priority conflict when multiple alarms active",
+          "No test to verify continuous-tone alarm stops after 2 minutes",
+          "No test for system behavior when multiple alarms are simultaneously active"
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-117"
+        ],
+        "fsa_score": 0.7525,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

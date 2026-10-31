@@ -1,0 +1,1458 @@
+{
+  "unit_id": "U03_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.875,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.3333,
+    "hallucinated": [
+      {
+        "value": "15",
+        "context": "threshold for LOW VTI alarm",
+        "grounded": false
+      },
+      {
+        "value": "20",
+        "context": "threshold for LOW VTI alarm",
+        "grounded": false
+      },
+      {
+        "value": "25",
+        "context": "threshold for LOW VTI alarm",
+        "grounded": false
+      },
+      {
+        "value": "10",
+        "context": "threshold for LOW VTI alarm",
+        "grounded": false
+      },
+      {
+        "value": "30",
+        "context": "threshold for LOW VTI alarm",
+        "grounded": false
+      },
+      {
+        "value": "5",
+        "context": "threshold for LOW VTI alarm",
+        "grounded": false
+      },
+      {
+        "value": "35",
+        "context": "threshold for LOW VTI alarm",
+        "grounded": false
+      },
+      {
+        "value": "20",
+        "context": "current VTI",
+        "grounded": false
+      },
+      {
+        "value": "30",
+        "context": "current VTI",
+        "grounded": false
+      },
+      {
+        "value": "18",
+        "context": "current VTI",
+        "grounded": false
+      },
+      {
+        "value": "20",
+        "context": "current VTE",
+        "grounded": false
+      },
+      {
+        "value": "18",
+        "context": "current VTE",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 18,
+    "uncovered_clauses": [
+      "RW-SW-40"
+    ],
+    "weaknesses": [
+      "Threshold range (RW-SW-40) not verified due to unspecified bounds",
+      "No explicit test for VTI computation logic (RW-SW-165) beyond alarm trigger",
+      "Priority enumeration not fully validated",
+      "GUI control existence and UI elements not directly tested",
+      "Error handling for unset or invalid threshold values not covered"
+    ],
+    "traceability": 0.75,
+    "untraced_reqs": [
+      "RW-SW-165",
+      "RW-SW-79"
+    ],
+    "fsa_score": 0.76,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Alarms in GUI\n\n  Scenario: Compute and display LOW VTI alarm\n    Given the VTI threshold is set to 15\n    And the current VTI is 20\n    When the GUI computes the VTI for the current breath\n    Then a \"LOW VTI\" alarm should be computed and displayed\n    And the alarm should be of medium priority\n\n  Scenario: Compute and display HIGH VTI alarm\n    Given the VTI threshold is set to 25\n    And the current VTI is 30\n    When the GUI computes the VTI for the current breath\n    Then a \"HIGH VTI\" alarm should be computed and displayed\n    And the alarm should be of medium priority\n\n  Scenario: Compute and display LOW VTE alarm\n    Given the VTE threshold is set to 15\n    And the current VTE is 20\n    When the GUI computes the VTE for the current breath\n    Then a \"LOW VTE\" alarm should be computed and displayed\n\n  Scenario: No alarm when VTI is within threshold\n    Given the VTI threshold is set to 20\n    And the current VTI is 18\n    When the GUI computes the VTI for the current breath\n    Then no alarm should be computed and displayed\n\n  Scenario: No alarm when VTE is within threshold\n    Given the VTE threshold is set to 20\n    And the current VTE is 18\n    When the GUI computes the VTE for the current breath\n    Then no alarm should be computed and displayed\n\n  Scenario: Boundary test for VTI equal to threshold\n    Given the VTI threshold is set to 20\n    And the current VTI is 20\n    When the GUI computes the VTI for the current breath\n    Then no alarm should be computed and displayed\n\n  Scenario: Boundary test for VTE equal to threshold\n    Given the VTE threshold is set to 20\n    And the current VTE is 20\n    When the GUI computes the VTE for the current breath\n    Then no alarm should be computed and displayed\n\n  Scenario Outline: Set threshold for LOW VTI alarm\n    Given the VTI threshold is set to <threshold>\n    When the GUI computes the VTI for the current breath\n    Then a \"LOW VTI\" alarm should be computed and displayed\n    And the alarm should be of medium priority\n\n    Examples:\n      | threshold |\n      | 10        |\n      | 15        |\n      | 20        |\n      | 25        |\n      | 30        |\n\n  Scenario Outline: Set threshold for HIGH VTI alarm\n    Given the VTI threshold is set to <threshold>\n    When the GUI computes the VTI for the current breath\n    Then a \"HIGH VTI\" alarm should be computed and displayed\n    And the alarm should be of medium priority\n\n    Examples:\n      | threshold |\n      | 10        |\n      | 15        |\n      | 20        |\n      | 25        |\n      | 30        |\n\n  Scenario Outline: Set threshold for LOW VTE alarm\n    Given the VTE threshold is set to <threshold>\n    When the GUI computes the VTE for the current breath\n    Then a \"LOW VTE\" alarm should be computed and displayed\n\n    Examples:\n      | threshold |\n      | 10        |\n      | 15        |\n      | 20        |\n      | 25        |\n      | 30        |\n\n  Scenario Outline: Negative test for threshold out-of-range\n    Given the VTI threshold is set to <threshold>\n    When the GUI computes the VTI for the current breath\n    Then no alarm should be computed and displayed\n\n    Examples:\n      | threshold |\n      | 5         |\n      | 35        |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Compute and display LOW VTI alarm",
+      "req_ids": [
+        "RW-SW-37"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "VTI threshold is set to 15",
+        "current VTI is 20"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI computes the VTI for the current breath"
+      ],
+      "expected": [
+        "a 'LOW VTI' alarm should be computed and displayed",
+        "the alarm should be of medium priority"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Compute and display HIGH VTI alarm",
+      "req_ids": [
+        "RW-SW-163"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "VTI threshold is set to 25",
+        "current VTI is 30"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI computes the VTI for the current breath"
+      ],
+      "expected": [
+        "a 'HIGH VTI' alarm should be computed and displayed",
+        "the alarm should be of medium priority"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Compute and display LOW VTE alarm",
+      "req_ids": [
+        "RW-SW-14"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "VTE threshold is set to 15",
+        "current VTE is 20"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI computes the VTE for the current breath"
+      ],
+      "expected": [
+        "a 'LOW VTE' alarm should be computed and displayed"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "No alarm when VTI is within threshold",
+      "req_ids": [
+        "RW-SW-37"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "VTI threshold is set to 20",
+        "current VTI is 18"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI computes the VTI for the current breath"
+      ],
+      "expected": [
+        "no alarm should be computed and displayed"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "No alarm when VTE is within threshold",
+      "req_ids": [
+        "RW-SW-14"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "VTE threshold is set to 20",
+        "current VTE is 18"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI computes the VTE for the current breath"
+      ],
+      "expected": [
+        "no alarm should be computed and displayed"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Boundary test for VTI equal to threshold",
+      "req_ids": [
+        "RW-SW-37"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "VTI threshold is set to 20",
+        "current VTI is 20"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI computes the VTI for the current breath"
+      ],
+      "expected": [
+        "no alarm should be computed and displayed"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Boundary test for VTE equal to threshold",
+      "req_ids": [
+        "RW-SW-14"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "VTE threshold is set to 20",
+        "current VTE is 20"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI computes the VTE for the current breath"
+      ],
+      "expected": [
+        "no alarm should be computed and displayed"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Set threshold for LOW VTI alarm",
+      "req_ids": [
+        "RW-SW-38",
+        "RW-SW-40"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "VTI threshold is set to <threshold>"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI computes the VTI for the current breath"
+      ],
+      "expected": [
+        "a 'LOW VTI' alarm should be computed and displayed",
+        "the alarm should be of medium priority"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Set threshold for HIGH VTI alarm",
+      "req_ids": [
+        "RW-SW-163",
+        "RW-SW-164"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "VTI threshold is set to <threshold>"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI computes the VTI for the current breath"
+      ],
+      "expected": [
+        "a 'HIGH VTI' alarm should be computed and displayed",
+        "the alarm should be of medium priority"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Set threshold for LOW VTE alarm",
+      "req_ids": [
+        "RW-SW-14",
+        "RW-SW-40"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "VTE threshold is set to <threshold>"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI computes the VTE for the current breath"
+      ],
+      "expected": [
+        "a 'LOW VTE' alarm should be computed and displayed"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Negative test for threshold out-of-range",
+      "req_ids": [
+        "RW-SW-40"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "VTI threshold is set to <threshold>"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI computes the VTI for the current breath"
+      ],
+      "expected": [
+        "no alarm should be computed and displayed"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarms in GUI\n\n  Scenario Outline: Compute and display LOW VTI alarm\n    Given the VTI threshold is set to <threshold>\n    And the current VTI is <vti>\n    When the GUI computes the VTI for the current breath\n    Then the GUI should display a \"LOW VTI\" alarm if <vti> is above <threshold>\n    And the alarm should be of medium priority\n\n    Examples:\n      | threshold | vti |\n      | 10        | 15  |\n      | 20        | 25  |\n      | 30        | 35  |\n\n  Scenario Outline: Compute and display HIGH VTI alarm\n    Given the VTI threshold is set to <threshold>\n    And the current VTI is <vti>\n    When the GUI computes the VTI for the current breath\n    Then the GUI should display a \"HIGH VTI\" alarm if <vti> is above <threshold>\n    And the alarm should be of medium priority\n\n    Examples:\n      | threshold | vti |\n      | 10        | 15  |\n      | 20        | 25  |\n      | 30        | 35  |\n\n  Scenario Outline: Compute and display LOW VTE alarm\n    Given the VTE threshold is set to <threshold>\n    And the current VTE is <vte>\n    When the GUI computes the VTE for the current breath\n    Then the GUI should display a \"LOW VTE\" alarm if <vte> is above <threshold>\n\n    Examples:\n      | threshold | vte |\n      | 10        | 15  |\n      | 20        | 25  |\n      | 30        | 35  |\n\n  Scenario Outline: Set and validate VTI threshold\n    Given the GUI is open\n    When the user sets the VTI threshold to <threshold>\n    Then the GUI should display the new threshold value as <threshold>\n\n    Examples:\n      | threshold |\n      | 10        |\n      | 20        |\n      | 30        |\n\n  Scenario Outline: Set and validate VTE threshold\n    Given the GUI is open\n    When the user sets the VTE threshold to <threshold>\n    Then the GUI should display the new threshold value as <threshold>\n\n    Examples:\n      | threshold |\n      | 10        |\n      | 20        |\n      | 30        |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Compute and display LOW VTI alarm with normal values",
+          "req_ids": [
+            "RW-SW-37"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI threshold is set to 10",
+            "Current VTI is 15"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes VTI for the current breath"
+          ],
+          "expected": [
+            "GUI displays a 'LOW VTI' alarm",
+            "Alarm is of medium priority"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Compute and display HIGH VTI alarm with normal values",
+          "req_ids": [
+            "RW-SW-163"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI threshold is set to 20",
+            "Current VTI is 25"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes VTI for the current breath"
+          ],
+          "expected": [
+            "GUI displays a 'HIGH VTI' alarm",
+            "Alarm is of medium priority"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Compute and display LOW VTE alarm with normal values",
+          "req_ids": [
+            "RW-SW-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTE threshold is set to 10",
+            "Current VTE is 15"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes VTE for the current breath"
+          ],
+          "expected": [
+            "GUI displays a 'LOW VTE' alarm"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Set and validate VTI threshold with normal values",
+          "req_ids": [
+            "RW-SW-38"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is open"
+          ],
+          "inputs": {
+            "name": "VTI threshold",
+            "value": "10"
+          },
+          "steps": [
+            "User sets the VTI threshold"
+          ],
+          "expected": [
+            "GUI displays the new threshold value as 10"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Set and validate VTE threshold with normal values",
+          "req_ids": [
+            "RW-SW-38"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is open"
+          ],
+          "inputs": {
+            "name": "VTE threshold",
+            "value": "10"
+          },
+          "steps": [
+            "User sets the VTE threshold"
+          ],
+          "expected": [
+            "GUI displays the new threshold value as 10"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.3333,
+        "hallucinated": [
+          {
+            "value": "10",
+            "context": "VTI threshold value",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "VTI threshold value",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "VTI threshold value",
+            "grounded": false
+          },
+          {
+            "value": "15",
+            "context": "VTI value",
+            "grounded": false
+          },
+          {
+            "value": "25",
+            "context": "VTI value",
+            "grounded": false
+          },
+          {
+            "value": "35",
+            "context": "VTI value",
+            "grounded": false
+          },
+          {
+            "value": "15",
+            "context": "VTE value",
+            "grounded": false
+          },
+          {
+            "value": "25",
+            "context": "VTE value",
+            "grounded": false
+          },
+          {
+            "value": "35",
+            "context": "VTE value",
+            "grounded": false
+          },
+          {
+            "value": "VTE threshold",
+            "context": "control name",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 15,
+        "uncovered_clauses": [
+          "RW-SW-40"
+        ],
+        "weaknesses": [
+          "No negative test cases for threshold limits",
+          "Threshold boundary values not tested, RW-SW-40 not covered",
+          "No verification that alarms are not triggered when VTI/VTE <= threshold",
+          "No tests for correctness of computed VTI values",
+          "No tests for VTE threshold control as it is not specified in SRS"
+        ],
+        "traceability": 0.5,
+        "untraced_reqs": [
+          "RW-SW-164",
+          "RW-SW-165",
+          "RW-SW-40",
+          "RW-SW-79"
+        ],
+        "fsa_score": 0.685,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.685; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.9, 'boundary_coverage': 1.0, 'groundedness_mg': 0.3333}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-164', 'RW-SW-165', 'RW-SW-40', 'RW-SW-79'] (add at least one each)\n- uncovered clause: RW-SW-40\n- ungrounded value '10' (VTI threshold value): remove or use the SRS value\n- ungrounded value '20' (VTI threshold value): remove or use the SRS value\n- ungrounded value '30' (VTI threshold value): remove or use the SRS value\n- ungrounded value '15' (VTI value): remove or use the SRS value\n- ungrounded value '25' (VTI value): remove or use the SRS value\n- ungrounded value '35' (VTI value): remove or use the SRS value\n- No negative test cases for threshold limits\n- Threshold boundary values not tested, RW-SW-40 not covered\n- No verification that alarms are not triggered when VTI/VTE <= threshold\n- No tests for correctness of computed VTI values\n- No tests for VTE threshold control as it is not specified in SRS",
+      "artifact": "Feature: Alarms in GUI\n\n  Scenario: Compute and trigger LOW VTI alarm\n    Given the VTI threshold is set to 15\n    And the current VTI is 20\n    When the GUI computes the VTI\n    Then a \"LOW VTI\" alarm should be triggered\n    And the alarm should be of medium priority\n\n  Scenario: Compute and trigger HIGH VTI alarm\n    Given the VTI threshold is set to 25\n    And the current VTI is 30\n    When the GUI computes the VTI\n    Then a \"HIGH VTI\" alarm should be triggered\n    And the alarm should be of medium priority\n\n  Scenario: Compute and trigger LOW VTE alarm\n    Given the VTE threshold is set to 15\n    And the current VTE is 20\n    When the GUI computes the VTE\n    Then a \"LOW VTE\" alarm should be triggered\n\n  Scenario: Compute VTI for each breath\n    Given the current VTI is 25\n    When the GUI computes the VTI\n    Then the VTI should be 25\n\n  Scenario: Set VTI threshold control\n    Given the VTI threshold control is enabled\n    When the user sets the VTI threshold to 30\n    Then the VTI threshold should be 30\n\n  Scenario Outline: Set VTI threshold control with invalid values\n    Given the VTI threshold control is enabled\n    When the user sets the VTI threshold to <threshold>\n    Then the VTI threshold should remain unchanged\n\n    Examples:\n      | threshold |\n      | 10        |\n      | 20        |\n      | 30        |\n      | -5        |\n      | 100       |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Compute and trigger LOW VTI alarm",
+          "req_ids": [
+            "RW-SW-37"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI threshold is set to 15",
+            "current VTI is 20"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the VTI"
+          ],
+          "expected": [
+            "LOW VTI alarm should be triggered",
+            "alarm should be of medium priority"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Compute and trigger HIGH VTI alarm",
+          "req_ids": [
+            "RW-SW-163"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI threshold is set to 25",
+            "current VTI is 30"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the VTI"
+          ],
+          "expected": [
+            "HIGH VTI alarm should be triggered",
+            "alarm should be of medium priority"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Compute and trigger LOW VTE alarm",
+          "req_ids": [
+            "RW-SW-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTE threshold is set to 15",
+            "current VTE is 20"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the VTE"
+          ],
+          "expected": [
+            "LOW VTE alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Compute VTI for each breath",
+          "req_ids": [
+            "RW-SW-165"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "current VTI is 25"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the VTI"
+          ],
+          "expected": [
+            "VTI should be 25"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Set VTI threshold control",
+          "req_ids": [
+            "RW-SW-38"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI threshold control is enabled"
+          ],
+          "inputs": {
+            "name": "30"
+          },
+          "steps": [
+            "user sets the VTI threshold"
+          ],
+          "expected": [
+            "VTI threshold should be 30"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Set VTI threshold control with invalid values",
+          "req_ids": [
+            "RW-SW-40"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "VTI threshold control is enabled"
+          ],
+          "inputs": {
+            "name": "<threshold>"
+          },
+          "steps": [
+            "user sets the VTI threshold"
+          ],
+          "expected": [
+            "VTI threshold should remain unchanged"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 0.5,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.4118,
+        "hallucinated": [
+          {
+            "value": "15",
+            "context": "VTI threshold set to 15",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "current VTI is 20",
+            "grounded": false
+          },
+          {
+            "value": "25",
+            "context": "VTI threshold set to 25",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "current VTI is 30",
+            "grounded": false
+          },
+          {
+            "value": "15",
+            "context": "VTE threshold set to 15",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "current VTE is 20",
+            "grounded": false
+          },
+          {
+            "value": "25",
+            "context": "current VTI is 25",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "user sets VTI threshold to 30",
+            "grounded": false
+          },
+          {
+            "value": "10,20,30,-5,100",
+            "context": "threshold values in examples",
+            "grounded": false
+          },
+          {
+            "value": "unchanged",
+            "context": "VTI threshold should remain unchanged",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [
+          "RW-SW-40"
+        ],
+        "weaknesses": [
+          "No test covers RW-SW-40 (threshold range).",
+          "Negative test for threshold out-of-range contradicts requirement; threshold values used are not grounded.",
+          "No test verifies that no alarm triggers when VTI <= threshold.",
+          "No boundary tests for VTI equal to threshold.",
+          "Threshold values in tests are arbitrary; no defined range, making tests ambiguous."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "RW-SW-164",
+          "RW-SW-79"
+        ],
+        "fsa_score": 0.6218,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.6218; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 0.5, 'oracle_assertiveness': 0.9, 'boundary_coverage': 0.0, 'groundedness_mg': 0.4118}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-164', 'RW-SW-79'] (add at least one each)\n- uncovered clause: RW-SW-40\n- ungrounded value '15' (VTI threshold set to 15): remove or use the SRS value\n- ungrounded value '20' (current VTI is 20): remove or use the SRS value\n- ungrounded value '25' (VTI threshold set to 25): remove or use the SRS value\n- ungrounded value '30' (current VTI is 30): remove or use the SRS value\n- ungrounded value '15' (VTE threshold set to 15): remove or use the SRS value\n- ungrounded value '20' (current VTE is 20): remove or use the SRS value\n- No test covers RW-SW-40 (threshold range).\n- Negative test for threshold out-of-range contradicts requirement; threshold values used are not grounded.\n- No test verifies that no alarm triggers when VTI <= threshold.\n- No boundary tests for VTI equal to threshold.\n- Threshold values in tests are arbitrary; no defined range, making tests ambiguous.",
+      "artifact": "Feature: Alarms in GUI\n\n  Scenario: Compute and display LOW VTI alarm\n    Given the VTI threshold is set to 15\n    And the current VTI is 20\n    When the GUI computes the VTI for the current breath\n    Then a \"LOW VTI\" alarm should be computed and displayed\n    And the alarm should be of medium priority\n\n  Scenario: Compute and display HIGH VTI alarm\n    Given the VTI threshold is set to 25\n    And the current VTI is 30\n    When the GUI computes the VTI for the current breath\n    Then a \"HIGH VTI\" alarm should be computed and displayed\n    And the alarm should be of medium priority\n\n  Scenario: Compute and display LOW VTE alarm\n    Given the VTE threshold is set to 15\n    And the current VTE is 20\n    When the GUI computes the VTE for the current breath\n    Then a \"LOW VTE\" alarm should be computed and displayed\n\n  Scenario: No alarm when VTI is within threshold\n    Given the VTI threshold is set to 20\n    And the current VTI is 18\n    When the GUI computes the VTI for the current breath\n    Then no alarm should be computed and displayed\n\n  Scenario: No alarm when VTE is within threshold\n    Given the VTE threshold is set to 20\n    And the current VTE is 18\n    When the GUI computes the VTE for the current breath\n    Then no alarm should be computed and displayed\n\n  Scenario: Boundary test for VTI equal to threshold\n    Given the VTI threshold is set to 20\n    And the current VTI is 20\n    When the GUI computes the VTI for the current breath\n    Then no alarm should be computed and displayed\n\n  Scenario: Boundary test for VTE equal to threshold\n    Given the VTE threshold is set to 20\n    And the current VTE is 20\n    When the GUI computes the VTE for the current breath\n    Then no alarm should be computed and displayed\n\n  Scenario Outline: Set threshold for LOW VTI alarm\n    Given the VTI threshold is set to <threshold>\n    When the GUI computes the VTI for the current breath\n    Then a \"LOW VTI\" alarm should be computed and displayed\n    And the alarm should be of medium priority\n\n    Examples:\n      | threshold |\n      | 10        |\n      | 15        |\n      | 20        |\n      | 25        |\n      | 30        |\n\n  Scenario Outline: Set threshold for HIGH VTI alarm\n    Given the VTI threshold is set to <threshold>\n    When the GUI computes the VTI for the current breath\n    Then a \"HIGH VTI\" alarm should be computed and displayed\n    And the alarm should be of medium priority\n\n    Examples:\n      | threshold |\n      | 10        |\n      | 15        |\n      | 20        |\n      | 25        |\n      | 30        |\n\n  Scenario Outline: Set threshold for LOW VTE alarm\n    Given the VTE threshold is set to <threshold>\n    When the GUI computes the VTE for the current breath\n    Then a \"LOW VTE\" alarm should be computed and displayed\n\n    Examples:\n      | threshold |\n      | 10        |\n      | 15        |\n      | 20        |\n      | 25        |\n      | 30        |\n\n  Scenario Outline: Negative test for threshold out-of-range\n    Given the VTI threshold is set to <threshold>\n    When the GUI computes the VTI for the current breath\n    Then no alarm should be computed and displayed\n\n    Examples:\n      | threshold |\n      | 5         |\n      | 35        |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Compute and display LOW VTI alarm",
+          "req_ids": [
+            "RW-SW-37"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI threshold is set to 15",
+            "current VTI is 20"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI computes the VTI for the current breath"
+          ],
+          "expected": [
+            "a 'LOW VTI' alarm should be computed and displayed",
+            "the alarm should be of medium priority"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Compute and display HIGH VTI alarm",
+          "req_ids": [
+            "RW-SW-163"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI threshold is set to 25",
+            "current VTI is 30"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI computes the VTI for the current breath"
+          ],
+          "expected": [
+            "a 'HIGH VTI' alarm should be computed and displayed",
+            "the alarm should be of medium priority"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Compute and display LOW VTE alarm",
+          "req_ids": [
+            "RW-SW-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTE threshold is set to 15",
+            "current VTE is 20"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI computes the VTE for the current breath"
+          ],
+          "expected": [
+            "a 'LOW VTE' alarm should be computed and displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "No alarm when VTI is within threshold",
+          "req_ids": [
+            "RW-SW-37"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "VTI threshold is set to 20",
+            "current VTI is 18"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI computes the VTI for the current breath"
+          ],
+          "expected": [
+            "no alarm should be computed and displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "No alarm when VTE is within threshold",
+          "req_ids": [
+            "RW-SW-14"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "VTE threshold is set to 20",
+            "current VTE is 18"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI computes the VTE for the current breath"
+          ],
+          "expected": [
+            "no alarm should be computed and displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Boundary test for VTI equal to threshold",
+          "req_ids": [
+            "RW-SW-37"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "VTI threshold is set to 20",
+            "current VTI is 20"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI computes the VTI for the current breath"
+          ],
+          "expected": [
+            "no alarm should be computed and displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Boundary test for VTE equal to threshold",
+          "req_ids": [
+            "RW-SW-14"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "VTE threshold is set to 20",
+            "current VTE is 20"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI computes the VTE for the current breath"
+          ],
+          "expected": [
+            "no alarm should be computed and displayed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Set threshold for LOW VTI alarm",
+          "req_ids": [
+            "RW-SW-38",
+            "RW-SW-40"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI threshold is set to <threshold>"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI computes the VTI for the current breath"
+          ],
+          "expected": [
+            "a 'LOW VTI' alarm should be computed and displayed",
+            "the alarm should be of medium priority"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Set threshold for HIGH VTI alarm",
+          "req_ids": [
+            "RW-SW-163",
+            "RW-SW-164"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI threshold is set to <threshold>"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI computes the VTI for the current breath"
+          ],
+          "expected": [
+            "a 'HIGH VTI' alarm should be computed and displayed",
+            "the alarm should be of medium priority"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Set threshold for LOW VTE alarm",
+          "req_ids": [
+            "RW-SW-14",
+            "RW-SW-40"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTE threshold is set to <threshold>"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI computes the VTE for the current breath"
+          ],
+          "expected": [
+            "a 'LOW VTE' alarm should be computed and displayed"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Negative test for threshold out-of-range",
+          "req_ids": [
+            "RW-SW-40"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "VTI threshold is set to <threshold>"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI computes the VTI for the current breath"
+          ],
+          "expected": [
+            "no alarm should be computed and displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.3333,
+        "hallucinated": [
+          {
+            "value": "15",
+            "context": "threshold for LOW VTI alarm",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "threshold for LOW VTI alarm",
+            "grounded": false
+          },
+          {
+            "value": "25",
+            "context": "threshold for LOW VTI alarm",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "threshold for LOW VTI alarm",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "threshold for LOW VTI alarm",
+            "grounded": false
+          },
+          {
+            "value": "5",
+            "context": "threshold for LOW VTI alarm",
+            "grounded": false
+          },
+          {
+            "value": "35",
+            "context": "threshold for LOW VTI alarm",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "current VTI",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "current VTI",
+            "grounded": false
+          },
+          {
+            "value": "18",
+            "context": "current VTI",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "current VTE",
+            "grounded": false
+          },
+          {
+            "value": "18",
+            "context": "current VTE",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 18,
+        "uncovered_clauses": [
+          "RW-SW-40"
+        ],
+        "weaknesses": [
+          "Threshold range (RW-SW-40) not verified due to unspecified bounds",
+          "No explicit test for VTI computation logic (RW-SW-165) beyond alarm trigger",
+          "Priority enumeration not fully validated",
+          "GUI control existence and UI elements not directly tested",
+          "Error handling for unset or invalid threshold values not covered"
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "RW-SW-165",
+          "RW-SW-79"
+        ],
+        "fsa_score": 0.76,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.76; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.9, 'boundary_coverage': 0.5, 'groundedness_mg': 0.3333}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-165', 'RW-SW-79'] (add at least one each)\n- uncovered clause: RW-SW-40\n- ungrounded value '15' (threshold for LOW VTI alarm): remove or use the SRS value\n- ungrounded value '20' (threshold for LOW VTI alarm): remove or use the SRS value\n- ungrounded value '25' (threshold for LOW VTI alarm): remove or use the SRS value\n- ungrounded value '10' (threshold for LOW VTI alarm): remove or use the SRS value\n- ungrounded value '30' (threshold for LOW VTI alarm): remove or use the SRS value\n- ungrounded value '5' (threshold for LOW VTI alarm): remove or use the SRS value\n- Threshold range (RW-SW-40) not verified due to unspecified bounds\n- No explicit test for VTI computation logic (RW-SW-165) beyond alarm trigger\n- Priority enumeration not fully validated\n- GUI control existence and UI elements not directly tested\n- Error handling for unset or invalid threshold values not covered",
+      "artifact": "Feature: Alarms in GUI\n\n  Scenario: Compute and trigger LOW VTI alarm\n    Given the VTI threshold is set to 15\n    When the VTI for the current breath is 20\n    Then a \"LOW VTI\" alarm should be triggered\n    And the alarm should be of medium priority\n\n  Scenario: Compute and trigger HIGH VTI alarm\n    Given the VTI threshold is set to 25\n    When the VTI for the current breath is 30\n    Then a \"HIGH VTI\" alarm should be triggered\n    And the alarm should be of medium priority\n\n  Scenario: Compute and trigger LOW VTE alarm\n    Given the VTE threshold is set to 10\n    When the VTE for the current breath is 15\n    Then a \"LOW VTE\" alarm should be triggered\n\n  Scenario: Set threshold for LOW VTI alarm\n    Given the GUI has a control for setting the threshold for the LOW VTI alarm\n    When the threshold is set to 20\n    Then the threshold should be updated to 20\n\n  Scenario: Set threshold for LOW VTI alarm with invalid value\n    Given the GUI has a control for setting the threshold for the LOW VTI alarm\n    When the threshold is set to -5\n    Then an error message should be displayed\n\n  Scenario: Set threshold for LOW VTI alarm with boundary value\n    Given the GUI has a control for setting the threshold for the LOW VTI alarm\n    When the threshold is set to 0\n    Then the threshold should be updated to 0\n\n  Scenario: Compute VTI for each breath\n    Given the GUI can compute VTI for each breath\n    When a breath is completed\n    Then the VTI for that breath should be computed and displayed\n\n  Scenario Outline: Set threshold for LOW VTI alarm with various values\n    Given the GUI has a control for setting the threshold for the LOW VTI alarm\n    When the threshold is set to <threshold>\n    Then the threshold should be updated to <threshold>\n\n    Examples:\n      | threshold |\n      | 15        |\n      | 20        |\n      | 25        |\n      | 10        |\n      | 30        |\n      | 5         |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Compute and trigger LOW VTI alarm",
+          "req_ids": [
+            "RW-SW-37"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI threshold is set to 15"
+          ],
+          "inputs": {
+            "name": "VTI for the current breath",
+            "value": 20
+          },
+          "steps": [
+            "Compute VTI for the current breath"
+          ],
+          "expected": [
+            "A 'LOW VTI' alarm should be triggered",
+            "The alarm should be of medium priority"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Compute and trigger HIGH VTI alarm",
+          "req_ids": [
+            "RW-SW-163"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI threshold is set to 25"
+          ],
+          "inputs": {
+            "name": "VTI for the current breath",
+            "value": 30
+          },
+          "steps": [
+            "Compute VTI for the current breath"
+          ],
+          "expected": [
+            "A 'HIGH VTI' alarm should be triggered",
+            "The alarm should be of medium priority"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Compute and trigger LOW VTE alarm",
+          "req_ids": [
+            "RW-SW-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTE threshold is set to 10"
+          ],
+          "inputs": {
+            "name": "VTE for the current breath",
+            "value": 15
+          },
+          "steps": [
+            "Compute VTE for the current breath"
+          ],
+          "expected": [
+            "A 'LOW VTE' alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Set threshold for LOW VTI alarm",
+          "req_ids": [
+            "RW-SW-38"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI has a control for setting the threshold for the LOW VTI alarm"
+          ],
+          "inputs": {
+            "name": "threshold",
+            "value": 20
+          },
+          "steps": [
+            "Set threshold for the LOW VTI alarm"
+          ],
+          "expected": [
+            "The threshold should be updated to 20"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Set threshold for LOW VTI alarm with invalid value",
+          "req_ids": [
+            "RW-SW-40"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "GUI has a control for setting the threshold for the LOW VTI alarm"
+          ],
+          "inputs": {
+            "name": "threshold",
+            "value": -5
+          },
+          "steps": [
+            "Set threshold for the LOW VTI alarm"
+          ],
+          "expected": [
+            "An error message should be displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Set threshold for LOW VTI alarm with boundary value",
+          "req_ids": [
+            "RW-SW-40"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI has a control for setting the threshold for the LOW VTI alarm"
+          ],
+          "inputs": {
+            "name": "threshold",
+            "value": 0
+          },
+          "steps": [
+            "Set threshold for the LOW VTI alarm"
+          ],
+          "expected": [
+            "The threshold should be updated to 0"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Compute VTI for each breath",
+          "req_ids": [
+            "RW-SW-165"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI can compute VTI for each breath"
+          ],
+          "inputs": {
+            "name": "breath completed"
+          },
+          "steps": [
+            "Compute VTI for each breath"
+          ],
+          "expected": [
+            "The VTI for that breath should be computed and displayed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Set threshold for LOW VTI alarm with various values",
+          "req_ids": [
+            "RW-SW-40"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI has a control for setting the threshold for the LOW VTI alarm"
+          ],
+          "inputs": {
+            "name": "threshold",
+            "value": "<threshold>"
+          },
+          "steps": [
+            "Set threshold for the LOW VTI alarm"
+          ],
+          "expected": [
+            "The threshold should be updated to <threshold>"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.5,
+        "oracle_assertiveness": 0.6,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "15",
+            "context": "VTI threshold",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "VTI current breath",
+            "grounded": false
+          },
+          {
+            "value": "LOW VTI",
+            "context": "alarm type",
+            "grounded": false
+          },
+          {
+            "value": "medium priority",
+            "context": "alarm priority",
+            "grounded": false
+          },
+          {
+            "value": "25",
+            "context": "VTI threshold",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "VTI current breath",
+            "grounded": false
+          },
+          {
+            "value": "HIGH VTI",
+            "context": "alarm type",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "VTE threshold",
+            "grounded": false
+          },
+          {
+            "value": "15",
+            "context": "VTE current breath",
+            "grounded": false
+          },
+          {
+            "value": "LOW VTE",
+            "context": "alarm type",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "threshold set",
+            "grounded": false
+          },
+          {
+            "value": "error message",
+            "context": "error display",
+            "grounded": false
+          },
+          {
+            "value": "-5",
+            "context": "threshold set",
+            "grounded": false
+          },
+          {
+            "value": "0",
+            "context": "threshold set",
+            "grounded": false
+          },
+          {
+            "value": "VTI computed and displayed",
+            "context": "display",
+            "grounded": false
+          },
+          {
+            "value": "15",
+            "context": "threshold set",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "threshold set",
+            "grounded": false
+          },
+          {
+            "value": "25",
+            "context": "threshold set",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "threshold set",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "threshold set",
+            "grounded": false
+          },
+          {
+            "value": "5",
+            "context": "threshold set",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 21,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Threshold range (X,Y) is unspecified; tests use arbitrary values without confirming bounds",
+          "Only one invalid threshold value tested; add non‑numeric and out‑of‑range cases",
+          "Alarm priority assertion is vague; verify specific priority code or enum",
+          "Error message content is not asserted; check exact message",
+          "No test for alarm not triggered when VTI is below threshold"
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "RW-SW-164",
+          "RW-SW-79"
+        ],
+        "fsa_score": 0.64,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

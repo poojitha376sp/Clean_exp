@@ -1,0 +1,1217 @@
+{
+  "unit_id": "U07_2",
+  "representation": "Decision Tables",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "distributed_concurrent",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 1.0,
+    "representation_score": 0.3333,
+    "sfv_score": 0.6667,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "Table syntax is inconsistent."
+    ]
+  },
+  "fsa": null,
+  "artifact": "Decision Table for Requirement VIRTUA-2.5-2 (Patient Appointment File)\nConditions:\n- Appointment Type: Scheduled | Rescheduled | Cancelled\n- Patient Status: Active | Inactive | Archived\nActions:\n- Create File: Yes | No\nRules:\n1. Scheduled, Active → Create File: Yes\n2. Rescheduled, Active → Create File: Yes\n3. Cancelled, Active → Create File: No\n4. Any, Inactive → Create File: No\n5. Any, Archived → Create File: No\n\nDecision Table for Requirement VIRTUA-2.5-3 (Workflow Routing to Doctors)\nConditions:\n- Consultation Type: General | Specialized\n- Doctor Availability: Available | Unavailable\n- Patient Preference: Same Doctor | Any Doctor\nActions:\n- Route to Doctor: Yes | No\nRules:\n1. General, Available, Same Doctor → Route to Doctor: Yes\n2. General, Unavailable, Same Doctor → Route to Doctor: No\n3. Specialized, Available, Any Doctor → Route to Doctor: Yes\n4. Specialized, Unavailable, Any Doctor → Route to Doctor: No\n\nDecision Table for Requirement VIRTUA-2.5-4 (Routing to Chemist and Labs)\nConditions:\n- Patient Pincode: Matches Chemist | Does Not Match\n- Chemist Availability: Available | Unavailable\n- Lab Pincode: Matches Lab | Does Not Match\n- Lab Availability: Available | Unavailable\nActions:\n- Route to Chemist: Yes | No\n- Route to Lab: Yes | No\nRules:\n1. Matches Chemist, Available → Route to Chemist: Yes\n2. Does Not Match, Available → Route to Chemist: No\n3. Matches Lab, Available → Route to Lab: Yes\n4. Does Not Match, Available → Route to Lab: No\n\nDecision Table for Requirement VIRTUA-2.5-5 (ML Algorithm for Disease Prediction)\nConditions:\n- Symptom Set Completeness: Complete | Incomplete\n- Training Data Availability: Available | Not Available\n- Model Confidence: High | Low\nActions:\n- Predict Disease: Yes | No\nRules:\n1. Complete, Available, High → Predict Disease: Yes\n2. Complete, Not Available, High → Predict Disease: No\n3. Incomplete, Available, Low → Predict Disease: No\n4. Incomplete, Not Available, Low → Predict Disease: No\n\nDecision Table for Requirement VIRTUA-2.5-6 (Continuous Training of ML Algorithm)\nConditions:\n- New Data Set Availability: Yes | No\n- Model Performance: Improving | Deteriorating\nActions:\n- Retrain Model: Yes | No\nRules:\n1. Yes, Improving → Retrain Model: Yes\n2. Yes, Deteriorating → Retrain Model: Yes\n3. No, Improving → Retrain Model: No\n4. No, Deteriorating → Retrain Model: No\n\nDecision Table for Requirement VIRTUA-2.5-7 (Database Maintenance)\nConditions:\n- Maintenance Request Type: Backup | Update | Repair\n- Administration Status: Available | Unavailable\nActions:\n- Perform Maintenance: Yes | No\nRules:\n1. Backup, Available → Perform Maintenance: Yes\n2. Update, Available → Perform Maintenance: Yes\n3. Repair, Available → Perform Maintenance: Yes\n4. Any, Unavailable → Perform Maintenance: No\n\nDecision Table for Requirement VIRTUA-2.5-8 (Archiving Inactive Patients)\nConditions:\n- Consultation Frequency: >3 Years | ≤3 Years\nActions:\n- Archive Patient: Yes | No\nRules:\n1. ≤3 Years → Archive Patient: Yes\n2. >3 Years → Archive Patient: No\n\nDecision Table for Requirement VIRTUA-2.5-9 (Consultation Request Volume)\nConditions:\n- Weekly Requests: <25,000 | ≥25,000\n- Yearly Requests: <1.3M | ≥1.3M\nActions:\n- System Performance: Adequate | Overloaded\nRules:\n1. ≥25,000, ≥1.3M → System Performance: Overloaded\n2. <25,000, <1.3M → System Performance: Adequate",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test creation of Patient Appointment file for scheduled active patient",
+      "req_ids": [
+        "VIRTUA-2.5-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Appointment Type = Scheduled",
+        "Patient Status = Active"
+      ],
+      "inputs": {
+        "Appointment Type": "Scheduled",
+        "Patient Status": "Active"
+      },
+      "steps": [
+        "Initiate appointment creation process",
+        "Verify patient status",
+        "Execute creation logic"
+      ],
+      "expected": [
+        "Patient Appointment file is created"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test routing to doctor for general consultation with available doctor",
+      "req_ids": [
+        "VIRTUA-2.5-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Consultation Type = General",
+        "Doctor Availability = Available",
+        "Patient Preference = Same Doctor"
+      ],
+      "inputs": {
+        "Consultation Type": "General",
+        "Doctor Availability": "Available",
+        "Patient Preference": "Same Doctor"
+      },
+      "steps": [
+        "Submit consultation request",
+        "Check doctor availability",
+        "Route request"
+      ],
+      "expected": [
+        "Request is routed to the doctor"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test routing to chemist when patient pincode matches",
+      "req_ids": [
+        "VIRTUA-2.5-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient Pincode = Matches Chemist",
+        "Chemist Availability = Available"
+      ],
+      "inputs": {
+        "Patient Pincode": "Matches Chemist",
+        "Chemist Availability": "Available"
+      },
+      "steps": [
+        "Submit request to chemist",
+        "Verify pincode match",
+        "Route request"
+      ],
+      "expected": [
+        "Request is routed to the chemist"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test ML algorithm prediction with complete symptoms and available training data",
+      "req_ids": [
+        "VIRTUA-2.5-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Symptom Set Completeness = Complete",
+        "Training Data Availability = Available",
+        "Model Confidence = High"
+      ],
+      "inputs": {
+        "Symptom Set Completeness": "Complete",
+        "Training Data Availability": "Available",
+        "Model Confidence": "High"
+      },
+      "steps": [
+        "Input symptoms to ML model",
+        "Execute prediction",
+        "Validate output"
+      ],
+      "expected": [
+        "Disease is predicted successfully"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test continuous training of ML algorithm with new data set",
+      "req_ids": [
+        "VIRTUA-2.5-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "New Data Set Availability = Yes",
+        "Model Performance = Improving"
+      ],
+      "inputs": {
+        "New Data Set Availability": "Yes",
+        "Model Performance": "Improving"
+      },
+      "steps": [
+        "Introduce new data set",
+        "Trigger retraining process",
+        "Check model performance"
+      ],
+      "expected": [
+        "Model is retrained successfully"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Test database maintenance when administration is available",
+      "req_ids": [
+        "VIRTUA-2.5-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Maintenance Request Type = Backup",
+        "Administration Status = Available"
+      ],
+      "inputs": {
+        "Maintenance Request Type": "Backup",
+        "Administration Status": "Available"
+      },
+      "steps": [
+        "Initiate backup maintenance",
+        "Verify administration availability",
+        "Execute backup"
+      ],
+      "expected": [
+        "Database backup is performed"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Test archiving of patient who has not consulted for 3 years",
+      "req_ids": [
+        "VIRTUA-2.5-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Consultation Frequency = ≤3 Years"
+      ],
+      "inputs": {
+        "Consultation Frequency": "≤3 Years"
+      },
+      "steps": [
+        "Check consultation history",
+        "Determine inactivity period",
+        "Archive patient"
+      ],
+      "expected": [
+        "Patient is archived successfully"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Test system performance under high consultation volume",
+      "req_ids": [
+        "VIRTUA-2.5-9"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Weekly Requests = ≥25,000",
+        "Yearly Requests = ≥1.3M"
+      ],
+      "inputs": {
+        "Weekly Requests": "≥25,000",
+        "Yearly Requests": "≥1.3M"
+      },
+      "steps": [
+        "Simulate consultation requests",
+        "Monitor system performance",
+        "Validate response times"
+      ],
+      "expected": [
+        "System performance is degraded (Overloaded)"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Decision Table for Requirement VIRTUA-2.5-2 (Patient Appointment File)\nConditions:\n- Patient ID: Valid/Invalid\n- Appointment Date: Future/Present/Past\nActions:\n- Create Appointment File: Yes/No\nRules:\n1. Patient ID: Valid, Appointment Date: Future  → Create Appointment File: Yes\n2. Patient ID: Invalid, Appointment Date: Present → Create Appointment File: No\n3. Patient ID: Valid, Appointment Date: Past    → Create Appointment File: No\n\nDecision Table for Requirement VIRTUA-2.5-3 (Workflow Routing to Doctors)\nConditions:\n- Consultation Request Type: Consultation/Other\n- Doctor Availability: Available/Unavailable\n- Patient Preference: Same Doctor/Different Doctor\nActions:\n- Route to Doctor: Yes/No\nRules:\n1. Consultation Request Type: Consultation, Doctor Availability: Available, Patient Preference: Same Doctor → Route to Doctor: Yes\n2. Consultation Request Type: Consultation, Doctor Availability: Unavailable, Patient Preference: Different Doctor → Route to Doctor: Yes\n3. Consultation Request Type: Other, Doctor Availability: Available, Patient Preference: Same Doctor → Route to Doctor: No\n\nDecision Table for Requirement VIRTUA-2.5-4 (Routing to Chemist and Labs)\nConditions:\n- Patient Pincode: Matches Chemist Pincode/Mismatch\n- Lab Pincode: Matches Patient Pincode/Mismatch\n- Request Type: Chemist/Lab/Both\nActions:\n- Route to Chemist: Yes/No\n- Route to Lab: Yes/No\nRules:\n1. Patient Pincode: Matches Chemist Pincode, Request Type: Chemist → Route to Chemist: Yes\n2. Patient Pincode: Mismatch, Request Type: Chemist → Route to Chemist: No\n3. Lab Pincode: Matches Patient Pincode, Request Type: Lab → Route to Lab: Yes\n4. Lab Pincode: Mismatch, Request Type: Lab → Route to Lab: No\n5. Request Type: Both, Matches both Pincodes → Route to Chemist: Yes, Route to Lab: Yes\n\nDecision Table for Requirement VIRTUA-2.5-5 (Machine Learning Disease Prediction)\nConditions:\n- Symptom Set: Matches Training Data/Partial Match/No Match\n- Training Data Availability: Available/Unavailable\nActions:\n- Predict Disease: Yes/No\nRules:\n1. Symptom Set: Matches Training Data, Training Data Availability: Available → Predict Disease: Yes\n2. Symptom Set: Partial Match, Training Data Availability: Available → Predict Disease: No\n3. Symptom Set: No Match, Training Data Availability: Unavailable → Predict Disease: No\n\nDecision Table for Requirement VIRTUA-2.5-6 (Continuous Training of ML Algorithm)\nConditions:\n- New Data Set Availability: Yes/No\n- Algorithm Performance: Above Threshold/Below Threshold\nActions:\n- Retrain Algorithm: Yes/No\nRules:\n1. New Data Set Availability: Yes, Algorithm Performance: Below Threshold → Retrain Algorithm: Yes\n2. New Data Set Availability: No, Algorithm Performance: Above Threshold → Retrain Algorithm: No\n\nDecision Table for Requirement VIRTUA-2.5-8 (Archiving Inactive Patients)\nConditions:\n- Last Consultation Date: Within 3 Years/Age > 3 Years\nActions:\n- Archive Patient: Yes/No\nRules:\n1. Last Consultation Date: Age > 3 Years → Archive Patient: Yes\n2. Last Consultation Date: Within 3 Years → Archive Patient: No\n\nDecision Table for Requirement VIRTUA-2.5-9 (Consultation Request Volume)\nConditions:\n- Weekly Requests: <25000/25000/>25000\nActions:\n- System Performance: Acceptable/Needs Optimization/Overloaded\nRules:\n1. Weekly Requests: <25000 → System Performance: Acceptable\n2. Weekly Requests: =25000 → System Performance: Acceptable\n3. Weekly Requests: >25000 → System Performance: Needs Optimization",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Create Patient Appointment File for valid patient with future appointment",
+          "req_ids": [
+            "VIRTUA-2.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient ID is valid",
+            "Appointment Date is in the future"
+          ],
+          "inputs": {
+            "Patient ID": "Valid",
+            "Appointment Date": "Future"
+          },
+          "steps": [
+            "Attempt to create Patient Appointment File"
+          ],
+          "expected": [
+            "Appointment File is created successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Fail to create Patient Appointment File for invalid patient",
+          "req_ids": [
+            "VIRTUA-2.5-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient ID is invalid",
+            "Appointment Date is present"
+          ],
+          "inputs": {
+            "Patient ID": "Invalid",
+            "Appointment Date": "Present"
+          },
+          "steps": [
+            "Attempt to create Patient Appointment File"
+          ],
+          "expected": [
+            "Appointment File is not created"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Route consultation request to doctor when available",
+          "req_ids": [
+            "VIRTUA-2.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation Request Type is Consultation",
+            "Doctor Availability is Available",
+            "Patient Preference is Same Doctor"
+          ],
+          "inputs": {
+            "Consultation Request Type": "Consultation",
+            "Doctor Availability": "Available",
+            "Patient Preference": "Same Doctor"
+          },
+          "steps": [
+            "Route consultation request to doctor"
+          ],
+          "expected": [
+            "Request is routed to the doctor"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Route consultation request to different doctor when unavailable",
+          "req_ids": [
+            "VIRTUA-2.5-3"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Consultation Request Type is Consultation",
+            "Doctor Availability is Unavailable",
+            "Patient Preference is Different Doctor"
+          ],
+          "inputs": {
+            "Consultation Request Type": "Consultation",
+            "Doctor Availability": "Unavailable",
+            "Patient Preference": "Different Doctor"
+          },
+          "steps": [
+            "Route consultation request to doctor"
+          ],
+          "expected": [
+            "Request is routed to a different doctor"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Route to chemist when patient pincode matches",
+          "req_ids": [
+            "VIRTUA-2.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Pincode matches Chemist Pincode",
+            "Request Type is Chemist"
+          ],
+          "inputs": {
+            "Patient Pincode": "Matches",
+            "Lab Pincode": "-",
+            "Request Type": "Chemist"
+          },
+          "steps": [
+            "Route request to chemist"
+          ],
+          "expected": [
+            "Request is routed to the chemist"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Fail to route to chemist when pincode mismatch",
+          "req_ids": [
+            "VIRTUA-2.5-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient Pincode does not match Chemist Pincode",
+            "Request Type is Chemist"
+          ],
+          "inputs": {
+            "Patient Pincode": "Mismatch",
+            "Lab Pincode": "-",
+            "Request Type": "Chemist"
+          },
+          "steps": [
+            "Route request to chemist"
+          ],
+          "expected": [
+            "Request is not routed to the chemist"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Route to lab when patient pincode matches",
+          "req_ids": [
+            "VIRTUA-2.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab Pincode matches Patient Pincode",
+            "Request Type is Lab"
+          ],
+          "inputs": {
+            "Patient Pincode": "-",
+            "Lab Pincode": "Matches",
+            "Request Type": "Lab"
+          },
+          "steps": [
+            "Route request to lab"
+          ],
+          "expected": [
+            "Request is routed to the lab"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Fail to route to lab when pincode mismatch",
+          "req_ids": [
+            "VIRTUA-2.5-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Lab Pincode does not match Patient Pincode",
+            "Request Type is Lab"
+          ],
+          "inputs": {
+            "Patient Pincode": "-",
+            "Lab Pincode": "Mismatch",
+            "Request Type": "Lab"
+          },
+          "steps": [
+            "Route request to lab"
+          ],
+          "expected": [
+            "Request is not routed to the lab"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Predict disease when symptom set matches training data",
+          "req_ids": [
+            "VIRTUA-2.5-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom Set matches Training Data",
+            "Training Data Availability is Available"
+          ],
+          "inputs": {
+            "Symptom Set": "Matches",
+            "Training Data Availability": "Available"
+          },
+          "steps": [
+            "Run disease prediction algorithm"
+          ],
+          "expected": [
+            "Disease is predicted successfully"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Fail to predict disease when symptom set partially matches",
+          "req_ids": [
+            "VIRTUA-2.5-5"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom Set partially matches Training Data",
+            "Training Data Availability is Available"
+          ],
+          "inputs": {
+            "Symptom Set": "Partial Match",
+            "Training Data Availability": "Available"
+          },
+          "steps": [
+            "Run disease prediction algorithm"
+          ],
+          "expected": [
+            "Disease prediction fails"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Retrain ML algorithm when new data set available and performance below threshold",
+          "req_ids": [
+            "VIRTUA-2.5-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "New Data Set Availability is Yes",
+            "Algorithm Performance is Below Threshold"
+          ],
+          "inputs": {
+            "New Data Set Availability": "Yes",
+            "Algorithm Performance": "Below Threshold"
+          },
+          "steps": [
+            "Initiate retraining of ML algorithm"
+          ],
+          "expected": [
+            "Algorithm is retrained successfully"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Do not retrain ML algorithm when new data set unavailable and performance above threshold",
+          "req_ids": [
+            "VIRTUA-2.5-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "New Data Set Availability is No",
+            "Algorithm Performance is Above Threshold"
+          ],
+          "inputs": {
+            "New Data Set Availability": "No",
+            "Algorithm Performance": "Above Threshold"
+          },
+          "steps": [
+            "Attempt to retrain ML algorithm"
+          ],
+          "expected": [
+            "Retraining does not occur"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Archive patient when last consultation date exceeds 3 years",
+          "req_ids": [
+            "VIRTUA-2.5-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Last Consultation Date is greater than 3 years ago"
+          ],
+          "inputs": {
+            "Last Consultation Date": "Age > 3 Years"
+          },
+          "steps": [
+            "Archive patient"
+          ],
+          "expected": [
+            "Patient is archived successfully"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Do not archive patient when last consultation date within 3 years",
+          "req_ids": [
+            "VIRTUA-2.5-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Last Consultation Date is within 3 years"
+          ],
+          "inputs": {
+            "Last Consultation Date": "Within 3 Years"
+          },
+          "steps": [
+            "Attempt to archive patient"
+          ],
+          "expected": [
+            "Patient is not archived"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "System performance acceptable for weekly consultation requests equal to 25,000",
+          "req_ids": [
+            "VIRTUA-2.5-9"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Weekly Requests are exactly 25,000"
+          ],
+          "inputs": {
+            "Weekly Requests": "25000"
+          },
+          "steps": [
+            "Evaluate system performance"
+          ],
+          "expected": [
+            "System performance is acceptable"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "System performance needs optimization for weekly consultation requests exceeding 25,000",
+          "req_ids": [
+            "VIRTUA-2.5-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Weekly Requests are greater than 25,000"
+          ],
+          "inputs": {
+            "Weekly Requests": ">25000"
+          },
+          "steps": [
+            "Evaluate system performance"
+          ],
+          "expected": [
+            "System performance needs optimization"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "System performance acceptable for weekly consultation requests less than 25,000",
+          "req_ids": [
+            "VIRTUA-2.5-9"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Weekly Requests are less than 25,000"
+          ],
+          "inputs": {
+            "Weekly Requests": "<25000"
+          },
+          "steps": [
+            "Evaluate system performance"
+          ],
+          "expected": [
+            "System performance is acceptable"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No table structure detected."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No table structure detected.",
+      "artifact": "Decision Table for Requirement VIRTUA-2.5-2 (Patient Appointment File)\nConditions:\n- Appointment Type: Scheduled | Rescheduled | Cancelled\n- Patient Status: Active | Inactive | Archived\nActions:\n- Create File: Yes | No\nRules:\n1. Scheduled, Active → Create File: Yes\n2. Rescheduled, Active → Create File: Yes\n3. Cancelled, Active → Create File: No\n4. Any, Inactive → Create File: No\n5. Any, Archived → Create File: No\n\nDecision Table for Requirement VIRTUA-2.5-3 (Workflow Routing to Doctors)\nConditions:\n- Consultation Type: General | Specialized\n- Doctor Availability: Available | Unavailable\n- Patient Preference: Same Doctor | Any Doctor\nActions:\n- Route to Doctor: Yes | No\nRules:\n1. General, Available, Same Doctor → Route to Doctor: Yes\n2. General, Unavailable, Same Doctor → Route to Doctor: No\n3. Specialized, Available, Any Doctor → Route to Doctor: Yes\n4. Specialized, Unavailable, Any Doctor → Route to Doctor: No\n\nDecision Table for Requirement VIRTUA-2.5-4 (Routing to Chemist and Labs)\nConditions:\n- Patient Pincode: Matches Chemist | Does Not Match\n- Chemist Availability: Available | Unavailable\n- Lab Pincode: Matches Lab | Does Not Match\n- Lab Availability: Available | Unavailable\nActions:\n- Route to Chemist: Yes | No\n- Route to Lab: Yes | No\nRules:\n1. Matches Chemist, Available → Route to Chemist: Yes\n2. Does Not Match, Available → Route to Chemist: No\n3. Matches Lab, Available → Route to Lab: Yes\n4. Does Not Match, Available → Route to Lab: No\n\nDecision Table for Requirement VIRTUA-2.5-5 (ML Algorithm for Disease Prediction)\nConditions:\n- Symptom Set Completeness: Complete | Incomplete\n- Training Data Availability: Available | Not Available\n- Model Confidence: High | Low\nActions:\n- Predict Disease: Yes | No\nRules:\n1. Complete, Available, High → Predict Disease: Yes\n2. Complete, Not Available, High → Predict Disease: No\n3. Incomplete, Available, Low → Predict Disease: No\n4. Incomplete, Not Available, Low → Predict Disease: No\n\nDecision Table for Requirement VIRTUA-2.5-6 (Continuous Training of ML Algorithm)\nConditions:\n- New Data Set Availability: Yes | No\n- Model Performance: Improving | Deteriorating\nActions:\n- Retrain Model: Yes | No\nRules:\n1. Yes, Improving → Retrain Model: Yes\n2. Yes, Deteriorating → Retrain Model: Yes\n3. No, Improving → Retrain Model: No\n4. No, Deteriorating → Retrain Model: No\n\nDecision Table for Requirement VIRTUA-2.5-7 (Database Maintenance)\nConditions:\n- Maintenance Request Type: Backup | Update | Repair\n- Administration Status: Available | Unavailable\nActions:\n- Perform Maintenance: Yes | No\nRules:\n1. Backup, Available → Perform Maintenance: Yes\n2. Update, Available → Perform Maintenance: Yes\n3. Repair, Available → Perform Maintenance: Yes\n4. Any, Unavailable → Perform Maintenance: No\n\nDecision Table for Requirement VIRTUA-2.5-8 (Archiving Inactive Patients)\nConditions:\n- Consultation Frequency: >3 Years | ≤3 Years\nActions:\n- Archive Patient: Yes | No\nRules:\n1. ≤3 Years → Archive Patient: Yes\n2. >3 Years → Archive Patient: No\n\nDecision Table for Requirement VIRTUA-2.5-9 (Consultation Request Volume)\nConditions:\n- Weekly Requests: <25,000 | ≥25,000\n- Yearly Requests: <1.3M | ≥1.3M\nActions:\n- System Performance: Adequate | Overloaded\nRules:\n1. ≥25,000, ≥1.3M → System Performance: Overloaded\n2. <25,000, <1.3M → System Performance: Adequate",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test creation of Patient Appointment file for scheduled active patient",
+          "req_ids": [
+            "VIRTUA-2.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Appointment Type = Scheduled",
+            "Patient Status = Active"
+          ],
+          "inputs": {
+            "Appointment Type": "Scheduled",
+            "Patient Status": "Active"
+          },
+          "steps": [
+            "Initiate appointment creation process",
+            "Verify patient status",
+            "Execute creation logic"
+          ],
+          "expected": [
+            "Patient Appointment file is created"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test routing to doctor for general consultation with available doctor",
+          "req_ids": [
+            "VIRTUA-2.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation Type = General",
+            "Doctor Availability = Available",
+            "Patient Preference = Same Doctor"
+          ],
+          "inputs": {
+            "Consultation Type": "General",
+            "Doctor Availability": "Available",
+            "Patient Preference": "Same Doctor"
+          },
+          "steps": [
+            "Submit consultation request",
+            "Check doctor availability",
+            "Route request"
+          ],
+          "expected": [
+            "Request is routed to the doctor"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test routing to chemist when patient pincode matches",
+          "req_ids": [
+            "VIRTUA-2.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Pincode = Matches Chemist",
+            "Chemist Availability = Available"
+          ],
+          "inputs": {
+            "Patient Pincode": "Matches Chemist",
+            "Chemist Availability": "Available"
+          },
+          "steps": [
+            "Submit request to chemist",
+            "Verify pincode match",
+            "Route request"
+          ],
+          "expected": [
+            "Request is routed to the chemist"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test ML algorithm prediction with complete symptoms and available training data",
+          "req_ids": [
+            "VIRTUA-2.5-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom Set Completeness = Complete",
+            "Training Data Availability = Available",
+            "Model Confidence = High"
+          ],
+          "inputs": {
+            "Symptom Set Completeness": "Complete",
+            "Training Data Availability": "Available",
+            "Model Confidence": "High"
+          },
+          "steps": [
+            "Input symptoms to ML model",
+            "Execute prediction",
+            "Validate output"
+          ],
+          "expected": [
+            "Disease is predicted successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test continuous training of ML algorithm with new data set",
+          "req_ids": [
+            "VIRTUA-2.5-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "New Data Set Availability = Yes",
+            "Model Performance = Improving"
+          ],
+          "inputs": {
+            "New Data Set Availability": "Yes",
+            "Model Performance": "Improving"
+          },
+          "steps": [
+            "Introduce new data set",
+            "Trigger retraining process",
+            "Check model performance"
+          ],
+          "expected": [
+            "Model is retrained successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test database maintenance when administration is available",
+          "req_ids": [
+            "VIRTUA-2.5-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Maintenance Request Type = Backup",
+            "Administration Status = Available"
+          ],
+          "inputs": {
+            "Maintenance Request Type": "Backup",
+            "Administration Status": "Available"
+          },
+          "steps": [
+            "Initiate backup maintenance",
+            "Verify administration availability",
+            "Execute backup"
+          ],
+          "expected": [
+            "Database backup is performed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test archiving of patient who has not consulted for 3 years",
+          "req_ids": [
+            "VIRTUA-2.5-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation Frequency = ≤3 Years"
+          ],
+          "inputs": {
+            "Consultation Frequency": "≤3 Years"
+          },
+          "steps": [
+            "Check consultation history",
+            "Determine inactivity period",
+            "Archive patient"
+          ],
+          "expected": [
+            "Patient is archived successfully"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test system performance under high consultation volume",
+          "req_ids": [
+            "VIRTUA-2.5-9"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Weekly Requests = ≥25,000",
+            "Yearly Requests = ≥1.3M"
+          ],
+          "inputs": {
+            "Weekly Requests": "≥25,000",
+            "Yearly Requests": "≥1.3M"
+          },
+          "steps": [
+            "Simulate consultation requests",
+            "Monitor system performance",
+            "Validate response times"
+          ],
+          "expected": [
+            "System performance is degraded (Overloaded)"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.3333,
+        "sfv_score": 0.6667,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Table syntax is inconsistent."
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.67). Fix these problems and output the full corrected suite:\n- Table syntax is inconsistent.",
+      "artifact": "Decision Table 1: Patient Appointment File Design\nConditions:\n- Requirement ID: VIRTUA-2.5-2\nInputs:\n- Entity Type: Patient Appointment\nActions:\n- Design Derived Entity: Yes\n\nDecision Table 2: Workflow System for Patient Consultation Requests\nConditions:\n- Requirement ID: VIRTUA-2.5-3\nInputs:\n- Request Type: Patient Consultation\nActions:\n- Route to Doctors: Yes\n\nDecision Table 3: Routing to Chemist and Labs Based on Pincode\nConditions:\n- Requirement ID: VIRTUA-2.5-4\nInputs:\n- Patient Pincode: <valid_pincode>\n- Chemist Pincode: <valid_pincode>\n- Lab Pincode: <valid_pincode>\nActions:\n- Route to Chemist: Yes\n- Route to Lab: Yes\n\nDecision Table 4: Machine Learning Algorithm for Disease Prediction\nConditions:\n- Requirement ID: VIRTUA-2.5-5\nInputs:\n- Symptom Data: <patient_symptoms>\nActions:\n- Predict Disease: Yes\n\nDecision Table 5: Continuous Training of ML Algorithm\nConditions:\n- Requirement ID: VIRTUA-2.5-6\nInputs:\n- New Data Set: <emerging_data>\nActions:\n- Retrain Algorithm: Yes\n\nDecision Table 6: Database Maintenance by Administration\nConditions:\n- Requirement ID: VIRTUA-2.5-7\nInputs:\n- Maintenance Task: Database\nActions:\n- Perform Maintenance: Yes\n\nDecision Table 7: Archiving Inactive Patients\nConditions:\n- Requirement ID: VIRTUA-2.5-8\nInputs:\n- Last Consultation Date: >3_years_ago\nActions:\n- Archive Patient: Yes\n\nDecision Table 8: Consultation Request Volume\nConditions:\n- Requirement ID: VIRTUA-2.5-9\nInputs:\n- Weekly Requests: 25000\n- Annual Requests: 1300000\nActions:\n- System Capacity: Sufficient",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Design Patient Appointment File",
+          "req_ids": [
+            "VIRTUA-2.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "entity_type": "Patient Appointment"
+          },
+          "steps": [
+            "Design derived entity as Patient Appointment file"
+          ],
+          "expected": [
+            "Derived entity is created successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Route Patient Consultation Requests to Doctors",
+          "req_ids": [
+            "VIRTUA-2.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "request_type": "Patient Consultation"
+          },
+          "steps": [
+            "Initiate workflow system",
+            "Route request to doctors"
+          ],
+          "expected": [
+            "Requests are routed to the appropriate doctors"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Route to Chemist and Labs Based on Pincode",
+          "req_ids": [
+            "VIRTUA-2.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_pincode": "12345",
+            "chemist_pincode": "12345",
+            "lab_pincode": "67890"
+          },
+          "steps": [
+            "Check patient and chemist pincode",
+            "Check patient and lab pincode",
+            "Route requests accordingly"
+          ],
+          "expected": [
+            "Requests are routed to the correct chemist and lab"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Predict Diseases Using ML Algorithm",
+          "req_ids": [
+            "VIRTUA-2.5-5"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptom_data": "fever, cough"
+          },
+          "steps": [
+            "Feed symptom data to ML algorithm",
+            "Obtain disease prediction"
+          ],
+          "expected": [
+            "Algorithm predicts the correct disease"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Continuous Training of ML Algorithm",
+          "req_ids": [
+            "VIRTUA-2.5-6"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "new_data_set": "recent_patient_data"
+          },
+          "steps": [
+            "Integrate new data set",
+            "Retrain ML algorithm"
+          ],
+          "expected": [
+            "Algorithm quality improves with new data"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Database Maintenance by Administration",
+          "req_ids": [
+            "VIRTUA-2.5-7"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "maintenance_task": "Database"
+          },
+          "steps": [
+            "Administration performs database maintenance"
+          ],
+          "expected": [
+            "Database is maintained successfully"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Archive Inactive Patients",
+          "req_ids": [
+            "VIRTUA-2.5-8"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "last_consultation_date": "2020-01-01"
+          },
+          "steps": [
+            "Check last consultation date",
+            "Archive patient if >3 years"
+          ],
+          "expected": [
+            "Inactive patient is archived successfully"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Consultation Request Volume Handling",
+          "req_ids": [
+            "VIRTUA-2.5-9"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "weekly_requests": 25000,
+            "annual_requests": 1300000
+          },
+          "steps": [
+            "Simulate consultation request volume",
+            "Verify system capacity"
+          ],
+          "expected": [
+            "System handles the volume without degradation"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No table structure detected."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No table structure detected.",
+      "artifact": "Decision Table for Requirement VIRTUA-2.5-2 (Patient Appointment File)\nConditions:\n- Appointment Type: Scheduled | Rescheduled | Cancelled\n- Patient Status: Active | Inactive | Archived\nActions:\n- Create File: Yes | No\nRules:\n1. Scheduled, Active → Create File: Yes\n2. Rescheduled, Active → Create File: Yes\n3. Cancelled, Active → Create File: No\n4. Any, Inactive → Create File: No\n5. Any, Archived → Create File: No\n\nDecision Table for Requirement VIRTUA-2.5-3 (Workflow Routing to Doctors)\nConditions:\n- Consultation Type: General | Specialized\n- Doctor Availability: Available | Unavailable\n- Patient Preference: Same Doctor | Any Doctor\nActions:\n- Route to Doctor: Yes | No\nRules:\n1. General, Available, Same Doctor → Route to Doctor: Yes\n2. General, Unavailable, Same Doctor → Route to Doctor: No\n3. Specialized, Available, Any Doctor → Route to Doctor: Yes\n4. Specialized, Unavailable, Any Doctor → Route to Doctor: No\n\nDecision Table for Requirement VIRTUA-2.5-4 (Routing to Chemist and Labs)\nConditions:\n- Patient Pincode: Matches Chemist | Does Not Match\n- Chemist Availability: Available | Unavailable\n- Lab Pincode: Matches Lab | Does Not Match\n- Lab Availability: Available | Unavailable\nActions:\n- Route to Chemist: Yes | No\n- Route to Lab: Yes | No\nRules:\n1. Matches Chemist, Available → Route to Chemist: Yes\n2. Does Not Match, Available → Route to Chemist: No\n3. Matches Lab, Available → Route to Lab: Yes\n4. Does Not Match, Available → Route to Lab: No\n\nDecision Table for Requirement VIRTUA-2.5-5 (ML Algorithm for Disease Prediction)\nConditions:\n- Symptom Set Completeness: Complete | Incomplete\n- Training Data Availability: Available | Not Available\n- Model Confidence: High | Low\nActions:\n- Predict Disease: Yes | No\nRules:\n1. Complete, Available, High → Predict Disease: Yes\n2. Complete, Not Available, High → Predict Disease: No\n3. Incomplete, Available, Low → Predict Disease: No\n4. Incomplete, Not Available, Low → Predict Disease: No\n\nDecision Table for Requirement VIRTUA-2.5-6 (Continuous Training of ML Algorithm)\nConditions:\n- New Data Set Availability: Yes | No\n- Model Performance: Improving | Deteriorating\nActions:\n- Retrain Model: Yes | No\nRules:\n1. Yes, Improving → Retrain Model: Yes\n2. Yes, Deteriorating → Retrain Model: Yes\n3. No, Improving → Retrain Model: No\n4. No, Deteriorating → Retrain Model: No\n\nDecision Table for Requirement VIRTUA-2.5-7 (Database Maintenance)\nConditions:\n- Maintenance Request Type: Backup | Update | Repair\n- Administration Status: Available | Unavailable\nActions:\n- Perform Maintenance: Yes | No\nRules:\n1. Backup, Available → Perform Maintenance: Yes\n2. Update, Available → Perform Maintenance: Yes\n3. Repair, Available → Perform Maintenance: Yes\n4. Any, Unavailable → Perform Maintenance: No\n\nDecision Table for Requirement VIRTUA-2.5-8 (Archiving Inactive Patients)\nConditions:\n- Consultation Frequency: >3 Years | ≤3 Years\nActions:\n- Archive Patient: Yes | No\nRules:\n1. ≤3 Years → Archive Patient: Yes\n2. >3 Years → Archive Patient: No\n\nDecision Table for Requirement VIRTUA-2.5-9 (Consultation Request Volume)\nConditions:\n- Weekly Requests: <25,000 | ≥25,000\n- Yearly Requests: <1.3M | ≥1.3M\nActions:\n- System Performance: Adequate | Overloaded\nRules:\n1. ≥25,000, ≥1.3M → System Performance: Overloaded\n2. <25,000, <1.3M → System Performance: Adequate",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test creation of Patient Appointment file for scheduled active patient",
+          "req_ids": [
+            "VIRTUA-2.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Appointment Type = Scheduled",
+            "Patient Status = Active"
+          ],
+          "inputs": {
+            "Appointment Type": "Scheduled",
+            "Patient Status": "Active"
+          },
+          "steps": [
+            "Initiate appointment creation process",
+            "Verify patient status",
+            "Execute creation logic"
+          ],
+          "expected": [
+            "Patient Appointment file is created"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test routing to doctor for general consultation with available doctor",
+          "req_ids": [
+            "VIRTUA-2.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation Type = General",
+            "Doctor Availability = Available",
+            "Patient Preference = Same Doctor"
+          ],
+          "inputs": {
+            "Consultation Type": "General",
+            "Doctor Availability": "Available",
+            "Patient Preference": "Same Doctor"
+          },
+          "steps": [
+            "Submit consultation request",
+            "Check doctor availability",
+            "Route request"
+          ],
+          "expected": [
+            "Request is routed to the doctor"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test routing to chemist when patient pincode matches",
+          "req_ids": [
+            "VIRTUA-2.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Pincode = Matches Chemist",
+            "Chemist Availability = Available"
+          ],
+          "inputs": {
+            "Patient Pincode": "Matches Chemist",
+            "Chemist Availability": "Available"
+          },
+          "steps": [
+            "Submit request to chemist",
+            "Verify pincode match",
+            "Route request"
+          ],
+          "expected": [
+            "Request is routed to the chemist"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test ML algorithm prediction with complete symptoms and available training data",
+          "req_ids": [
+            "VIRTUA-2.5-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom Set Completeness = Complete",
+            "Training Data Availability = Available",
+            "Model Confidence = High"
+          ],
+          "inputs": {
+            "Symptom Set Completeness": "Complete",
+            "Training Data Availability": "Available",
+            "Model Confidence": "High"
+          },
+          "steps": [
+            "Input symptoms to ML model",
+            "Execute prediction",
+            "Validate output"
+          ],
+          "expected": [
+            "Disease is predicted successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test continuous training of ML algorithm with new data set",
+          "req_ids": [
+            "VIRTUA-2.5-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "New Data Set Availability = Yes",
+            "Model Performance = Improving"
+          ],
+          "inputs": {
+            "New Data Set Availability": "Yes",
+            "Model Performance": "Improving"
+          },
+          "steps": [
+            "Introduce new data set",
+            "Trigger retraining process",
+            "Check model performance"
+          ],
+          "expected": [
+            "Model is retrained successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test database maintenance when administration is available",
+          "req_ids": [
+            "VIRTUA-2.5-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Maintenance Request Type = Backup",
+            "Administration Status = Available"
+          ],
+          "inputs": {
+            "Maintenance Request Type": "Backup",
+            "Administration Status": "Available"
+          },
+          "steps": [
+            "Initiate backup maintenance",
+            "Verify administration availability",
+            "Execute backup"
+          ],
+          "expected": [
+            "Database backup is performed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test archiving of patient who has not consulted for 3 years",
+          "req_ids": [
+            "VIRTUA-2.5-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation Frequency = ≤3 Years"
+          ],
+          "inputs": {
+            "Consultation Frequency": "≤3 Years"
+          },
+          "steps": [
+            "Check consultation history",
+            "Determine inactivity period",
+            "Archive patient"
+          ],
+          "expected": [
+            "Patient is archived successfully"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test system performance under high consultation volume",
+          "req_ids": [
+            "VIRTUA-2.5-9"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Weekly Requests = ≥25,000",
+            "Yearly Requests = ≥1.3M"
+          ],
+          "inputs": {
+            "Weekly Requests": "≥25,000",
+            "Yearly Requests": "≥1.3M"
+          },
+          "steps": [
+            "Simulate consultation requests",
+            "Monitor system performance",
+            "Validate response times"
+          ],
+          "expected": [
+            "System performance is degraded (Overloaded)"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.3333,
+        "sfv_score": 0.6667,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Table syntax is inconsistent."
+        ]
+      }
+    }
+  ]
+}

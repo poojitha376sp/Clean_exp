@@ -22,7 +22,7 @@
 16. **Small vs large SRS** (same models: CodeGemma-7B, DeepSeek-Coder-V2-Lite, Granite-4.1-8B, Llama-3.1-8B, Phi-3.5-MoE, Phi-3.5-mini, Qwen2.5-Coder-32B, Qwen2.5-Coder-7B, Qwen3-30B-A3B): doorstop: FSA 0.61, both-gates 42%, tests/req 1.15; ventilator: FSA 0.71, both-gates 49%, tests/req 1.20; virtual_clinic: FSA 0.66, both-gates 38%, tests/req 1.36.
 17. **Hallucinated specifics:** 243 of 496 judged suites asserted at least one value not grounded in the SRS (mean 6.1 per suite).
 18. **Against the real code:** the highest share of SRS requirements whose tests reach implemented behaviour is 54% (DeepSeek-Coder-V2-Lite on doorstop).
-19. **SRS-vs-code discrepancies flagged:** 173 test cases across all pairs were judged to contradict the implementation (execution failures triaged as code_mismatch + audit 'violated'); these need a manual check before being claimed.
+19. **SRS-vs-code discrepancies flagged:** 190 test cases across all pairs were judged to contradict the implementation (execution failures triaged as code_mismatch + audit 'violated'); these need a manual check before being claimed.
 20. **Audit validity:** on doorstop, where tests were also executed, the code audit agreed with real execution on 18% of 11 cases.
 21. **Do gates predict code behaviour?** ρ(FSA, execution pass rate) = 0.433 (n=15).
 
@@ -247,6 +247,7 @@
 | virtual_clinic | Llama-3.1-8B | 369 | 37 | 16 | 122 | 190 | 10% | 9% | 4% | 92% | 15% |
 | virtual_clinic | CodeGemma-7B | 191 | 19 | 9 | 43 | 117 | 10% | 23% | 0% | 60% | 10% |
 | virtual_clinic | Granite-4.1-8B | 365 | 20 | 23 | 104 | 215 | 6% | 6% | 8% | 88% | 11% |
+| virtual_clinic | Phi-3.5-mini | 269 | 13 | 17 | 101 | 136 | 5% | – | – | 33% | 2% |
 | virtual_clinic | Qwen3-30B-A3B | 74 | 10 | 0 | 23 | 39 | 14% | 21% | 0% | 23% | 2% |
 | virtual_clinic | Qwen2.5-Coder-32B | 418 | 41 | 32 | 133 | 205 | 10% | 11% | 9% | 95% | 14% |
 | virtual_clinic | Phi-3.5-MoE | 298 | 25 | 23 | 96 | 147 | 8% | 8% | 13% | 82% | 12% |

@@ -1,0 +1,390 @@
+{
+  "unit_id": "U08_Alarms",
+  "representation": "GUI Event Graphs",
+  "generator": "ollama:hf.co/bartowski/Phi-3.5-MoE-instruct-GGUF:Q4_K_M",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "GUI Event Graphs",
+    "group": 3,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.25,
+    "boundary_coverage": 0.1,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 20,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "TC-002 does not test the 3+ consecutive breaths requirement; add steps to simulate 3 consecutive high-pressure breaths.",
+      "TC-002 and TC-003 do not verify sound emission while alarm is active; add explicit check for sound output.",
+      "TC-004 and TC-005 incorrectly expect audible alarms when requirement specifies visible but not audible; adjust expected outcomes.",
+      "TC-006 does not verify high priority of PIP too high alarm; add priority check.",
+      "None of the tests cover boundary conditions (exact threshold values, just above/below); add boundary tests."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.6025,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Test Suite for GUI Event Graphs - U08_Alarms\n\n1. Low Pressure Alarm Onset and Reset\n   - Graph: Low Pressure Alarm Onset\n   - Graph: Low Pressure Alarm Reset\n\n2. Pressure High Alarm Activation and Deactivation\n   - Graph: Pressure High Alarm Activation\n   - Graph: Pressure High Alarm Deactivation\n\n3. Pressure High Alarm Sound Emission\n   - Graph: Pressure High Alarm Sound Emission\n\n4. Pressure High Alarm Display and Cancellation\n   - Graph: Pressure High Alarm Display\n   - Graph: Pressure High Alarm Cancellation\n\n5. Alarm Management Subsystem Visibility and Audibility\n   - Graph: Alarm Management Subsystem Visibility\n   - Graph: Alarm Management Subsystem Audibility\n\n6. PIP Too High Alarm Activation and Default Value\n   - Graph: PIP Too High Alarm Activation\n   - Graph: PIP Too High Alarm Default Value",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Low Pressure Alarm Onset and Reset",
+      "req_ids": [
+        "RW-SW-85",
+        "RW-SW-86"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System operational",
+        "Pressure below threshold"
+      ],
+      "inputs": {
+        "name": "Pressure"
+      },
+      "steps": [
+        "Pressure detected",
+        "Alarm triggered",
+        "Pressure above threshold"
+      ],
+      "expected": [
+        "Alarm onset",
+        "Alarm reset"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Pressure High Alarm Activation",
+      "req_ids": [
+        "RW-SW-88",
+        "RW-SW-89"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Pressure high alarm threshold",
+        "3 consecutive breaths above threshold"
+      ],
+      "inputs": {
+        "name": "Pressure"
+      },
+      "steps": [
+        "Pressure above threshold",
+        "Alarm triggered",
+        "Pressure below threshold"
+      ],
+      "expected": [
+        "Alarm activation",
+        "Alarm deactivation"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Pressure High Alarm Sound Emission",
+      "req_ids": [
+        "RW-SW-89"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Pressure high alarm active"
+      ],
+      "inputs": {
+        "name": "Pressure"
+      },
+      "steps": [
+        "Pressure above threshold",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Sound emission"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Pressure High Alarm Display and Cancellation",
+      "req_ids": [
+        "RW-SW-90",
+        "RW-SW-91"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Pressure high alarm active",
+        "Pressure below threshold"
+      ],
+      "inputs": {
+        "name": "Pressure"
+      },
+      "steps": [
+        "Pressure above threshold",
+        "Alarm triggered",
+        "Pressure below threshold"
+      ],
+      "expected": [
+        "Alarm display",
+        "Alarm cancellation"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Alarm Management Subsystem Visibility and Audibility",
+      "req_ids": [
+        "RW-SW-91"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Alarm active",
+        "Alarm inactive"
+      ],
+      "inputs": {
+        "name": "Alarm state"
+      },
+      "steps": [
+        "Alarm triggered",
+        "Alarm inactive"
+      ],
+      "expected": [
+        "Subsystem visible",
+        "Subsystem audible"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "PIP Too High Alarm Activation and Default Value",
+      "req_ids": [
+        "RW-SW-93",
+        "RW-SW-94"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System operational",
+        "PIP above commanded value + 5cm H2O"
+      ],
+      "inputs": {
+        "name": "PIP"
+      },
+      "steps": [
+        "PIP above commanded value + 5cm H2O",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm activation",
+        "Default value"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Test Suite for GUI Event Graphs - U08_Alarms\n\n1. Low Pressure Alarm Onset and Reset\n   - Graph: Low Pressure Alarm Onset\n   - Graph: Low Pressure Alarm Reset\n\n2. Pressure High Alarm Activation and Deactivation\n   - Graph: Pressure High Alarm Activation\n   - Graph: Pressure High Alarm Deactivation\n\n3. Pressure High Alarm Sound Emission\n   - Graph: Pressure High Alarm Sound Emission\n\n4. Pressure High Alarm Display and Cancellation\n   - Graph: Pressure High Alarm Display\n   - Graph: Pressure High Alarm Cancellation\n\n5. Alarm Management Subsystem Visibility and Audibility\n   - Graph: Alarm Management Subsystem Visibility\n   - Graph: Alarm Management Subsystem Audibility\n\n6. PIP Too High Alarm Activation and Default Value\n   - Graph: PIP Too High Alarm Activation\n   - Graph: PIP Too High Alarm Default Value",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Low Pressure Alarm Onset and Reset",
+          "req_ids": [
+            "RW-SW-85",
+            "RW-SW-86"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System operational",
+            "Pressure below threshold"
+          ],
+          "inputs": {
+            "name": "Pressure"
+          },
+          "steps": [
+            "Pressure detected",
+            "Alarm triggered",
+            "Pressure above threshold"
+          ],
+          "expected": [
+            "Alarm onset",
+            "Alarm reset"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Pressure High Alarm Activation",
+          "req_ids": [
+            "RW-SW-88",
+            "RW-SW-89"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure high alarm threshold",
+            "3 consecutive breaths above threshold"
+          ],
+          "inputs": {
+            "name": "Pressure"
+          },
+          "steps": [
+            "Pressure above threshold",
+            "Alarm triggered",
+            "Pressure below threshold"
+          ],
+          "expected": [
+            "Alarm activation",
+            "Alarm deactivation"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Pressure High Alarm Sound Emission",
+          "req_ids": [
+            "RW-SW-89"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure high alarm active"
+          ],
+          "inputs": {
+            "name": "Pressure"
+          },
+          "steps": [
+            "Pressure above threshold",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Sound emission"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Pressure High Alarm Display and Cancellation",
+          "req_ids": [
+            "RW-SW-90",
+            "RW-SW-91"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure high alarm active",
+            "Pressure below threshold"
+          ],
+          "inputs": {
+            "name": "Pressure"
+          },
+          "steps": [
+            "Pressure above threshold",
+            "Alarm triggered",
+            "Pressure below threshold"
+          ],
+          "expected": [
+            "Alarm display",
+            "Alarm cancellation"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Alarm Management Subsystem Visibility and Audibility",
+          "req_ids": [
+            "RW-SW-91"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Alarm active",
+            "Alarm inactive"
+          ],
+          "inputs": {
+            "name": "Alarm state"
+          },
+          "steps": [
+            "Alarm triggered",
+            "Alarm inactive"
+          ],
+          "expected": [
+            "Subsystem visible",
+            "Subsystem audible"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "PIP Too High Alarm Activation and Default Value",
+          "req_ids": [
+            "RW-SW-93",
+            "RW-SW-94"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System operational",
+            "PIP above commanded value + 5cm H2O"
+          ],
+          "inputs": {
+            "name": "PIP"
+          },
+          "steps": [
+            "PIP above commanded value + 5cm H2O",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm activation",
+            "Default value"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "GUI Event Graphs",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.25,
+        "boundary_coverage": 0.1,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 20,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "TC-002 does not test the 3+ consecutive breaths requirement; add steps to simulate 3 consecutive high-pressure breaths.",
+          "TC-002 and TC-003 do not verify sound emission while alarm is active; add explicit check for sound output.",
+          "TC-004 and TC-005 incorrectly expect audible alarms when requirement specifies visible but not audible; adjust expected outcomes.",
+          "TC-006 does not verify high priority of PIP too high alarm; add priority check.",
+          "None of the tests cover boundary conditions (exact threshold values, just above/below); add boundary tests."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.6025,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

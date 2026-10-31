@@ -1,0 +1,1516 @@
+{
+  "unit_id": "U28_misc",
+  "representation": "Decision Tables",
+  "generator": "ollama:codegemma:7b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.75,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 1.0,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.2,
+    "hallucinated": [
+      {
+        "value": "123",
+        "context": "Chemist/Lab Id",
+        "grounded": false
+      },
+      {
+        "value": "999",
+        "context": "Chemist/Lab Id",
+        "grounded": false
+      },
+      {
+        "value": "John Doe",
+        "context": "Name",
+        "grounded": false
+      },
+      {
+        "value": "123 Main St",
+        "context": "Address",
+        "grounded": false
+      },
+      {
+        "value": "555-123-4567",
+        "context": "Contact details",
+        "grounded": false
+      },
+      {
+        "value": "ABC123",
+        "context": "Symptom Code",
+        "grounded": false
+      },
+      {
+        "value": "Headache",
+        "context": "Symptom Description",
+        "grounded": false
+      },
+      {
+        "value": "XYZ789",
+        "context": "Symptom Code",
+        "grounded": false
+      },
+      {
+        "value": "Chemist or Lab details updated successfully",
+        "context": "Success message",
+        "grounded": false
+      },
+      {
+        "value": "Chemist/Lab deleted successfully",
+        "context": "Success message",
+        "grounded": false
+      },
+      {
+        "value": "Symptom Code added successfully",
+        "context": "Success message",
+        "grounded": false
+      },
+      {
+        "value": "Symptom details updated successfully",
+        "context": "Success message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 15,
+    "uncovered_clauses": [
+      "VCMSYM01",
+      "VCMPA01",
+      "VCDPA02"
+    ],
+    "weaknesses": [
+      "No test for the Administrators Menu Screen (VCMSYM01).",
+      "No tests for patient profile update (VCMPA01) or patient registration (VCDPA02).",
+      "No boundary or format validation tests for input fields.",
+      "Decision table includes a confirmation message condition but no test case asserts the confirmation dialog.",
+      "Hardcoded IDs and values are not grounded; dynamic or known valid IDs should be used."
+    ],
+    "traceability": 0.625,
+    "untraced_reqs": [
+      "VCDPA02",
+      "VCMPA01",
+      "VCMSYM01"
+    ],
+    "fsa_score": 0.78,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "## Decision Table Test Suite for U28_misc\n\n| Condition | Action |\n|---|---|\n| Chemist/Lab Id exists | Display details, allow modification or deletion |\n| Chemist/Lab Id doesn't exist | Display error message \"Chemist or Lab does not exist\" |\n| Open prescriptions exist | Display error message \"Chemist or Lab has open Prescription Requests - cannot delete\" |\n| Open prescriptions don't exist | Delete Chemist/Lab details successfully |\n| Symptom Code exists | Display details, allow modification or deletion |\n| Symptom Code doesn't exist | Display error message \"Symptom does not exist\" |\n| Add new Symptom Code | Display success message \"Symptom Code added successfully\" |\n| Update Symptom Code | Display success message \"Symptom details updated successfully\" |\n| Confirmation message displayed | Confirm deletion of Chemist/Lab |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Edit/Update Chemist/Labs - Valid Inputs",
+      "req_ids": [
+        "VCMCL03-1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "chemist_lab_id": "123",
+        "name": "John Doe",
+        "address": "123 Main St",
+        "contact_details": "555-123-4567"
+      },
+      "steps": [
+        "Open Edit/Update screen",
+        "Enter valid inputs",
+        "Submit changes"
+      ],
+      "expected": [
+        "Chemist/Lab details updated successfully"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Edit/Update Chemist/Labs - Invalid Chemist/Lab Id",
+      "req_ids": [
+        "VCMCL03-2"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "chemist_lab_id": "999",
+        "name": "John Doe",
+        "address": "123 Main St",
+        "contact_details": "555-123-4567"
+      },
+      "steps": [
+        "Open Edit/Update screen",
+        "Enter invalid Chemist/Lab Id",
+        "Submit changes"
+      ],
+      "expected": [
+        "Error message 'Chemist or Lab does not exist'"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Delete Chemist/Labs - Open Prescriptions",
+      "req_ids": [
+        "VCMCL03-3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Open prescription for the selected Chemist/Lab"
+      ],
+      "inputs": {
+        "chemist_lab_id": "123"
+      },
+      "steps": [
+        "Open Delete screen",
+        "Select Chemist/Lab",
+        "Confirm deletion"
+      ],
+      "expected": [
+        "Error message 'Chemist or Lab has open Prescription Requests - cannot delete'"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Delete Chemist/Labs - No Open Prescriptions",
+      "req_ids": [
+        "VCMCL03-3"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "chemist_lab_id": "123"
+      },
+      "steps": [
+        "Open Delete screen",
+        "Select Chemist/Lab",
+        "Confirm deletion"
+      ],
+      "expected": [
+        "Chemist/Lab deleted successfully"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Add Symptom Code - Valid Inputs",
+      "req_ids": [
+        "VCMSYM02"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "symptom_code": "ABC123",
+        "symptom_description": "Headache"
+      },
+      "steps": [
+        "Open Add Symptom Code screen",
+        "Enter valid inputs",
+        "Submit changes"
+      ],
+      "expected": [
+        "Symptom Code added successfully"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Edit/Update Symptom - Valid Inputs",
+      "req_ids": [
+        "VCMSYM03"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "symptom_code": "ABC123",
+        "symptom_description": "Headache"
+      },
+      "steps": [
+        "Open Edit/Update Symptom screen",
+        "Enter valid inputs",
+        "Submit changes"
+      ],
+      "expected": [
+        "Symptom details updated successfully"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Edit/Update Symptom - Invalid Symptom Code",
+      "req_ids": [
+        "VCMSYM03"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "symptom_code": "XYZ789",
+        "symptom_description": "Headache"
+      },
+      "steps": [
+        "Open Edit/Update Symptom screen",
+        "Enter invalid Symptom Code",
+        "Submit changes"
+      ],
+      "expected": [
+        "Error message 'Symptom does not exist'"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "## Decision Table Test Suite for U28_misc\n\n| Condition | Action |\n|---|---|\n| Chemist/Lab Id exists | Display Chemist/Lab details |\n| Chemist/Lab Id does not exist | Display \"Chemist or Lab does not exist\" error |\n| Open Prescription Requests exist | Display \"Chemist or Lab has open Prescription Requests - cannot delete\" error |\n| Open Prescription Requests do not exist | Delete Chemist/Lab details |\n| Symptom Code exists | Display Symptom details |\n| Symptom Code does not exist | Display \"Symptom does not exist\" error |\n| Patient Id generated | Display Patient profile |\n| Patient Id not generated | Display error message |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Edit/Update Chemist/Labs - Valid Inputs",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "chemist_lab_id": "123",
+            "chemist_lab_name": "John Doe",
+            "address": "123 Main St",
+            "contact_details": "555-123-4567"
+          },
+          "steps": [
+            "Edit/Update Chemist/Labs screen",
+            "Submit changes"
+          ],
+          "expected": [
+            "Chemist/Lab details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Edit/Update Chemist/Labs - Invalid Chemist/Lab Id",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "chemist_lab_id": "999",
+            "chemist_lab_name": "John Doe",
+            "address": "123 Main St",
+            "contact_details": "555-123-4567"
+          },
+          "steps": [
+            "Edit/Update Chemist/Labs screen",
+            "Submit changes"
+          ],
+          "expected": [
+            "Chemist or Lab does not exist error message displayed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Chemist/Labs - Open Prescription Requests",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "chemist_lab_id": "123"
+          },
+          "steps": [
+            "Delete Chemist/Labs screen",
+            "Confirm deletion"
+          ],
+          "expected": [
+            "Chemist or Lab has open Prescription Requests - cannot delete error message displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add Symptom Code - Valid Inputs",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptom_code": "ABC123",
+            "symptom_description": "Headache"
+          },
+          "steps": [
+            "Add Symptom Code screen",
+            "Submit changes"
+          ],
+          "expected": [
+            "Symptom code added successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Edit/Update Symptom - Invalid Symptom Code",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "symptom_code": "XYZ789",
+            "symptom_description": "Back pain"
+          },
+          "steps": [
+            "Edit/Update Symptom screen",
+            "Submit changes"
+          ],
+          "expected": [
+            "Symptom does not exist error message displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Update Patient Profile - Valid Inputs",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_id": "123",
+            "name": "John Doe",
+            "age": "30",
+            "sex": "M",
+            "address": "123 Main St",
+            "contact_details": "555-123-4567"
+          },
+          "steps": [
+            "Update Patient Profile screen",
+            "Submit changes"
+          ],
+          "expected": [
+            "Patient profile updated successfully"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Update Patient Profile - Invalid Patient Id",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "patient_id": "999",
+            "name": "John Doe",
+            "age": "30",
+            "sex": "M",
+            "address": "123 Main St",
+            "contact_details": "555-123-4567"
+          },
+          "steps": [
+            "Update Patient Profile screen",
+            "Submit changes"
+          ],
+          "expected": [
+            "Error message displayed indicating invalid patient ID"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.625,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.143,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.1429,
+        "hallucinated": [
+          {
+            "value": "123",
+            "context": "Chemist/Lab Id",
+            "grounded": false
+          },
+          {
+            "value": "999",
+            "context": "Chemist/Lab Id",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "Chemist/Lab Name",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "Address",
+            "grounded": false
+          },
+          {
+            "value": "555-123-4567",
+            "context": "Contact details",
+            "grounded": false
+          },
+          {
+            "value": "ABC123",
+            "context": "Symptom Code",
+            "grounded": false
+          },
+          {
+            "value": "XYZ789",
+            "context": "Symptom Code",
+            "grounded": false
+          },
+          {
+            "value": "Headache",
+            "context": "Symptom Description",
+            "grounded": false
+          },
+          {
+            "value": "Back pain",
+            "context": "Symptom Description",
+            "grounded": false
+          },
+          {
+            "value": "123",
+            "context": "Patient Id",
+            "grounded": false
+          },
+          {
+            "value": "999",
+            "context": "Patient Id",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "Patient Name",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "Patient Age",
+            "grounded": false
+          },
+          {
+            "value": "M",
+            "context": "Patient Sex",
+            "grounded": false
+          },
+          {
+            "value": "Error message displayed indicating invalid patient ID",
+            "context": "Error message",
+            "grounded": false
+          },
+          {
+            "value": "Chemist/Lab details updated successfully",
+            "context": "Success message",
+            "grounded": false
+          },
+          {
+            "value": "Symptom code added successfully",
+            "context": "Success message",
+            "grounded": false
+          },
+          {
+            "value": "Patient profile updated successfully",
+            "context": "Success message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 21,
+        "uncovered_clauses": [
+          "VCMSYM03",
+          "VCMPA01",
+          "VCDPA02"
+        ],
+        "weaknesses": [
+          "Missing test for symptom edit/update success path",
+          "No test for patient registration (VCDPA02)",
+          "No test for raising consultation/appointment request, view/generate prescription reports, print invoice (VCMPA01)",
+          "Oracle assertions are vague; need precise expected values",
+          "Concrete test data not grounded; use realistic or requirement‑derived values"
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VCDPA02",
+          "VCMSYM01"
+        ],
+        "fsa_score": 0.5929,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.5929; sub-scores {'clause_coverage': 0.625, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.143, 'boundary_coverage': 1.0, 'groundedness_mg': 0.1429}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCDPA02', 'VCMSYM01'] (add at least one each)\n- uncovered clause: VCMSYM03\n- uncovered clause: VCMPA01\n- uncovered clause: VCDPA02\n- ungrounded value '123' (Chemist/Lab Id): remove or use the SRS value\n- ungrounded value '999' (Chemist/Lab Id): remove or use the SRS value\n- ungrounded value 'John Doe' (Chemist/Lab Name): remove or use the SRS value\n- ungrounded value '123 Main St' (Address): remove or use the SRS value\n- ungrounded value '555-123-4567' (Contact details): remove or use the SRS value\n- ungrounded value 'ABC123' (Symptom Code): remove or use the SRS value\n- Missing test for symptom edit/update success path\n- No test for patient registration (VCDPA02)\n- No test for raising consultation/appointment request, view/generate prescription reports, print invoice (VCMPA01)\n- Oracle assertions are vague; need precise expected values\n- Concrete test data not grounded; use realistic or requirement‑derived values",
+      "artifact": "## Decision Table Test Suite for U28_misc\n\n| Condition | Action |\n|---|---|\n| Chemist/Lab Id exists | Display details, allow modification or deletion |\n| Chemist/Lab Id does not exist | Display error message \"Chemist or Lab does not exist\" |\n| Open Prescription Requests exist | Display error message \"Chemist or Lab has open Prescription Requests - cannot delete\" |\n| Symptom Code exists | Display details, allow modification or deletion |\n| Symptom Code does not exist | Display error message \"Symptom does not exist\" |\n| Patient Id generated | Display Patient Profile screen |\n| Consultation/Appointment Request | Raise Consultation/Appointment Request View/Generate Prescription Reports/Print Invoice |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Edit/Update Chemist/Labs - Valid Data",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist/Lab with valid data exists"
+          ],
+          "inputs": {
+            "chemist_lab_id": "123",
+            "chemist_lab_name": "John Doe",
+            "address": "123 Main St",
+            "contact_details": "555-123-4567"
+          },
+          "steps": [
+            "Edit/Update screen",
+            "Save changes"
+          ],
+          "expected": [
+            "Chemist/Lab details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Edit/Update Chemist/Labs - Invalid Chemist/Lab Id",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "chemist_lab_id": "999",
+            "chemist_lab_name": "John Doe",
+            "address": "123 Main St",
+            "contact_details": "555-123-4567"
+          },
+          "steps": [
+            "Edit/Update screen"
+          ],
+          "expected": [
+            "Error message 'Chemist or Lab does not exist' displayed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Chemist/Labs - Open Prescription Requests",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist/Lab with open prescription requests exists"
+          ],
+          "inputs": {
+            "chemist_lab_id": "123"
+          },
+          "steps": [
+            "Delete Chemist/Lab"
+          ],
+          "expected": [
+            "Error message 'Chemist or Lab has open Prescription Requests - cannot delete' displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add Symptom Code",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptom_code": "ABC123",
+            "symptom_description": "Sample Symptom"
+          },
+          "steps": [
+            "Add Symptom Code screen",
+            "Save changes"
+          ],
+          "expected": [
+            "Symptom Code added successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Edit/Update Symptom - Valid Data",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom with valid data exists"
+          ],
+          "inputs": {
+            "symptom_code": "ABC123",
+            "symptom_description": "Updated Symptom"
+          },
+          "steps": [
+            "Edit/Update Symptom screen",
+            "Save changes"
+          ],
+          "expected": [
+            "Symptom details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Edit/Update Symptom - Invalid Symptom Code",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "symptom_code": "XYZ789",
+            "symptom_description": "Updated Symptom"
+          },
+          "steps": [
+            "Edit/Update Symptom screen"
+          ],
+          "expected": [
+            "Error message 'Symptom does not exist' displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient Registration",
+          "req_ids": [
+            "VCDPA02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_name": "John Doe",
+            "patient_age": 30,
+            "patient_sex": "M",
+            "patient_address": "123 Main St",
+            "patient_contact_details": "555-123-4567"
+          },
+          "steps": [
+            "Patient Registration screen",
+            "Submit form"
+          ],
+          "expected": [
+            "Patient Profile screen displayed with generated Patient Id"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Raise Consultation/Appointment Request",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient profile created"
+          ],
+          "inputs": {
+            "patient_id": "123",
+            "appointment_date": "2023-10-26",
+            "appointment_time": "14:00"
+          },
+          "steps": [
+            "Raise Consultation/Appointment Request screen",
+            "Submit request"
+          ],
+          "expected": [
+            "Confirmation message displayed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Generate Prescription Reports",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription created"
+          ],
+          "inputs": {
+            "prescription_id": "456"
+          },
+          "steps": [
+            "Generate Prescription Report screen",
+            "Generate report"
+          ],
+          "expected": [
+            "Prescription report downloaded"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Print Invoice",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Invoice created"
+          ],
+          "inputs": {
+            "invoice_id": "789"
+          },
+          "steps": [
+            "Print Invoice screen",
+            "Print invoice"
+          ],
+          "expected": [
+            "Invoice printed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0789,
+        "hallucinated": [
+          {
+            "value": "Symptom Code added successfully",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Symptom details updated successfully",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Chemist/Lab details updated successfully",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Patient Profile screen displayed with generated Patient Id",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Confirmation message displayed",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Prescription report downloaded",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Invoice printed",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "123",
+            "context": "chemist_lab_id",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "chemist_lab_name",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "address",
+            "grounded": false
+          },
+          {
+            "value": "555-123-4567",
+            "context": "contact_details",
+            "grounded": false
+          },
+          {
+            "value": "ABC123",
+            "context": "symptom_code",
+            "grounded": false
+          },
+          {
+            "value": "Sample Symptom",
+            "context": "symptom_description",
+            "grounded": false
+          },
+          {
+            "value": "Updated Symptom",
+            "context": "symptom_description",
+            "grounded": false
+          },
+          {
+            "value": "XYZ789",
+            "context": "symptom_code",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "patient_name",
+            "grounded": false
+          },
+          {
+            "value": 30,
+            "context": "patient_age",
+            "grounded": false
+          },
+          {
+            "value": "M",
+            "context": "patient_sex",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "patient_address",
+            "grounded": false
+          },
+          {
+            "value": "555-123-4567",
+            "context": "patient_contact_details",
+            "grounded": false
+          },
+          {
+            "value": "123",
+            "context": "patient_id",
+            "grounded": false
+          },
+          {
+            "value": "2023-10-26",
+            "context": "appointment_date",
+            "grounded": false
+          },
+          {
+            "value": "14:00",
+            "context": "appointment_time",
+            "grounded": false
+          },
+          {
+            "value": "456",
+            "context": "prescription_id",
+            "grounded": false
+          },
+          {
+            "value": "789",
+            "context": "invoice_id",
+            "grounded": false
+          },
+          {
+            "value": "TC-001",
+            "context": "test case id",
+            "grounded": false
+          },
+          {
+            "value": "TC-002",
+            "context": "test case id",
+            "grounded": false
+          },
+          {
+            "value": "TC-003",
+            "context": "test case id",
+            "grounded": false
+          },
+          {
+            "value": "TC-004",
+            "context": "test case id",
+            "grounded": false
+          },
+          {
+            "value": "TC-005",
+            "context": "test case id",
+            "grounded": false
+          },
+          {
+            "value": "TC-006",
+            "context": "test case id",
+            "grounded": false
+          },
+          {
+            "value": "TC-007",
+            "context": "test case id",
+            "grounded": false
+          },
+          {
+            "value": "TC-008",
+            "context": "test case id",
+            "grounded": false
+          },
+          {
+            "value": "TC-009",
+            "context": "test case id",
+            "grounded": false
+          },
+          {
+            "value": "TC-010",
+            "context": "test case id",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 38,
+        "uncovered_clauses": [
+          "VCMPA01 (update patient profile)",
+          "VCMSYM01 (menu screen)"
+        ],
+        "weaknesses": [
+          "No test for updating patient profile functionality",
+          "No test for administrators menu screen existence",
+          "Oracle assertions are vague; need more precise expected results",
+          "No boundary or edge case testing for input values (e.g., max length, invalid formats)",
+          "Decision table lacks coverage for combined conditions (e.g., chemist exists but open prescriptions)"
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "VCMSYM01"
+        ],
+        "fsa_score": 0.7068,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.7068; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.3, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0789}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCMSYM01'] (add at least one each)\n- uncovered clause: VCMPA01 (update patient profile)\n- uncovered clause: VCMSYM01 (menu screen)\n- ungrounded value 'Symptom Code added successfully' (expected message): remove or use the SRS value\n- ungrounded value 'Symptom details updated successfully' (expected message): remove or use the SRS value\n- ungrounded value 'Chemist/Lab details updated successfully' (expected message): remove or use the SRS value\n- ungrounded value 'Patient Profile screen displayed with generated Patient Id' (expected message): remove or use the SRS value\n- ungrounded value 'Confirmation message displayed' (expected message): remove or use the SRS value\n- ungrounded value 'Prescription report downloaded' (expected message): remove or use the SRS value\n- No test for updating patient profile functionality\n- No test for administrators menu screen existence\n- Oracle assertions are vague; need more precise expected results\n- No boundary or edge case testing for input values (e.g., max length, invalid formats)\n- Decision table lacks coverage for combined conditions (e.g., chemist exists but open prescriptions)",
+      "artifact": "## Decision Table Test Suite for U28_misc\n\n| Condition | Action | Expected Result |\n|---|---|---|\n| Chemist/Lab Id exists | Edit/Update | Chemist/Lab details updated successfully |\n| Chemist/Lab Id doesn't exist | Exception | \"Chemist or Lab does not exist\" |\n| Open prescriptions exist | Exception | \"Chemist or Lab has open Prescription Requests - cannot delete\" |\n| Symptom Code exists | Edit/Update | Symptom details updated successfully |\n| Symptom Code doesn't exist | Exception | \"Symptom does not exist\" |\n| Patient Id generated | Display | Patient Profile screen displayed with generated Patient Id |\n| Consultation/Appointment request raised | Confirmation message displayed | Consultation/Appointment request created successfully |\n| Prescription report downloaded | Confirmation message displayed | Prescription report downloaded |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Edit Chemist/Lab details with valid data",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "chemist_lab_id": "123",
+            "chemist_lab_name": "John Smith",
+            "address": "123 Main Street",
+            "contact_details": "555-123-4567"
+          },
+          "steps": [
+            "Edit Chemist/Lab details"
+          ],
+          "expected": [
+            "Chemist/Lab details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Edit Chemist/Lab details with missing Chemist/Lab Id",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "chemist_lab_name": "John Smith",
+            "address": "123 Main Street",
+            "contact_details": "555-123-4567"
+          },
+          "steps": [
+            "Edit Chemist/Lab details"
+          ],
+          "expected": [
+            "Chemist or Lab does not exist"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Chemist/Lab with open prescriptions",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "chemist_lab_id": "123"
+          },
+          "steps": [
+            "Delete Chemist/Lab"
+          ],
+          "expected": [
+            "Chemist or Lab has open Prescription Requests - cannot delete"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add new Symptom Code",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptom_code": "ABC123",
+            "symptom_description": "Headache"
+          },
+          "steps": [
+            "Add new Symptom Code"
+          ],
+          "expected": [
+            "Symptom Code added successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Edit existing Symptom Code",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptom_code": "ABC123",
+            "symptom_description": "Migraine"
+          },
+          "steps": [
+            "Edit Symptom Code"
+          ],
+          "expected": [
+            "Symptom details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Raise Consultation/Appointment request",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_id": "123",
+            "appointment_date": "2023-10-26",
+            "symptoms": [
+              "Headache"
+            ]
+          },
+          "steps": [
+            "Raise Consultation/Appointment request"
+          ],
+          "expected": [
+            "Confirmation message displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Download Prescription report",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_id": "123"
+          },
+          "steps": [
+            "Download Prescription report"
+          ],
+          "expected": [
+            "Prescription report downloaded"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 0.6666666666666666,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.2,
+        "hallucinated": [
+          {
+            "value": "123",
+            "context": "Chemist/Lab Id",
+            "grounded": false
+          },
+          {
+            "value": "ABC123",
+            "context": "Symptom Code",
+            "grounded": false
+          },
+          {
+            "value": "Symptom does not exist",
+            "context": "Error message",
+            "grounded": false
+          },
+          {
+            "value": "Symptom Code added successfully",
+            "context": "Success message",
+            "grounded": false
+          },
+          {
+            "value": "Symptom details updated successfully",
+            "context": "Success message",
+            "grounded": false
+          },
+          {
+            "value": "Confirmation message displayed",
+            "context": "Generic confirmation",
+            "grounded": false
+          },
+          {
+            "value": "Prescription report downloaded",
+            "context": "Success message",
+            "grounded": false
+          },
+          {
+            "value": "Patient Profile screen displayed with generated Patient Id",
+            "context": "Screen display message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 10,
+        "uncovered_clauses": [
+          "VCDPA02",
+          "VCMSYM03"
+        ],
+        "weaknesses": [
+          "Add test for deleting Chemist/Lab when no open prescriptions",
+          "Add test for symptom not existing scenario",
+          "Add test for patient registration to cover VCDPA02",
+          "Improve oracle assertions to include exact messages or status codes",
+          "Include boundary tests for input lengths and numeric ranges"
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VCDPA02",
+          "VCMSYM01"
+        ],
+        "fsa_score": 0.675,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.675; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 0.6666666666666666, 'oracle_assertiveness': 0.3, 'boundary_coverage': 1.0, 'groundedness_mg': 0.2}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCDPA02', 'VCMSYM01'] (add at least one each)\n- uncovered clause: VCDPA02\n- uncovered clause: VCMSYM03\n- ungrounded value '123' (Chemist/Lab Id): remove or use the SRS value\n- ungrounded value 'ABC123' (Symptom Code): remove or use the SRS value\n- ungrounded value 'Symptom does not exist' (Error message): remove or use the SRS value\n- ungrounded value 'Symptom Code added successfully' (Success message): remove or use the SRS value\n- ungrounded value 'Symptom details updated successfully' (Success message): remove or use the SRS value\n- ungrounded value 'Confirmation message displayed' (Generic confirmation): remove or use the SRS value\n- Add test for deleting Chemist/Lab when no open prescriptions\n- Add test for symptom not existing scenario\n- Add test for patient registration to cover VCDPA02\n- Improve oracle assertions to include exact messages or status codes\n- Include boundary tests for input lengths and numeric ranges",
+      "artifact": "## Decision Table Test Suite for U28_misc\n\n| Condition | Action |\n|---|---|\n| Chemist/Lab Id exists | Display details, allow modification or deletion |\n| Chemist/Lab Id doesn't exist | Display error message \"Chemist or Lab does not exist\" |\n| Open prescriptions exist | Display error message \"Chemist or Lab has open Prescription Requests - cannot delete\" |\n| Open prescriptions don't exist | Delete Chemist/Lab details successfully |\n| Symptom Code exists | Display details, allow modification or deletion |\n| Symptom Code doesn't exist | Display error message \"Symptom does not exist\" |\n| Add new Symptom Code | Display success message \"Symptom Code added successfully\" |\n| Update Symptom Code | Display success message \"Symptom details updated successfully\" |\n| Confirmation message displayed | Confirm deletion of Chemist/Lab |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Edit/Update Chemist/Labs - Valid Inputs",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "chemist_lab_id": "123",
+            "name": "John Doe",
+            "address": "123 Main St",
+            "contact_details": "555-123-4567"
+          },
+          "steps": [
+            "Open Edit/Update screen",
+            "Enter valid inputs",
+            "Submit changes"
+          ],
+          "expected": [
+            "Chemist/Lab details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Edit/Update Chemist/Labs - Invalid Chemist/Lab Id",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "chemist_lab_id": "999",
+            "name": "John Doe",
+            "address": "123 Main St",
+            "contact_details": "555-123-4567"
+          },
+          "steps": [
+            "Open Edit/Update screen",
+            "Enter invalid Chemist/Lab Id",
+            "Submit changes"
+          ],
+          "expected": [
+            "Error message 'Chemist or Lab does not exist'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Chemist/Labs - Open Prescriptions",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Open prescription for the selected Chemist/Lab"
+          ],
+          "inputs": {
+            "chemist_lab_id": "123"
+          },
+          "steps": [
+            "Open Delete screen",
+            "Select Chemist/Lab",
+            "Confirm deletion"
+          ],
+          "expected": [
+            "Error message 'Chemist or Lab has open Prescription Requests - cannot delete'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete Chemist/Labs - No Open Prescriptions",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "chemist_lab_id": "123"
+          },
+          "steps": [
+            "Open Delete screen",
+            "Select Chemist/Lab",
+            "Confirm deletion"
+          ],
+          "expected": [
+            "Chemist/Lab deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Add Symptom Code - Valid Inputs",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptom_code": "ABC123",
+            "symptom_description": "Headache"
+          },
+          "steps": [
+            "Open Add Symptom Code screen",
+            "Enter valid inputs",
+            "Submit changes"
+          ],
+          "expected": [
+            "Symptom Code added successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Edit/Update Symptom - Valid Inputs",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptom_code": "ABC123",
+            "symptom_description": "Headache"
+          },
+          "steps": [
+            "Open Edit/Update Symptom screen",
+            "Enter valid inputs",
+            "Submit changes"
+          ],
+          "expected": [
+            "Symptom details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Edit/Update Symptom - Invalid Symptom Code",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "symptom_code": "XYZ789",
+            "symptom_description": "Headache"
+          },
+          "steps": [
+            "Open Edit/Update Symptom screen",
+            "Enter invalid Symptom Code",
+            "Submit changes"
+          ],
+          "expected": [
+            "Error message 'Symptom does not exist'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.2,
+        "hallucinated": [
+          {
+            "value": "123",
+            "context": "Chemist/Lab Id",
+            "grounded": false
+          },
+          {
+            "value": "999",
+            "context": "Chemist/Lab Id",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "Name",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "Address",
+            "grounded": false
+          },
+          {
+            "value": "555-123-4567",
+            "context": "Contact details",
+            "grounded": false
+          },
+          {
+            "value": "ABC123",
+            "context": "Symptom Code",
+            "grounded": false
+          },
+          {
+            "value": "Headache",
+            "context": "Symptom Description",
+            "grounded": false
+          },
+          {
+            "value": "XYZ789",
+            "context": "Symptom Code",
+            "grounded": false
+          },
+          {
+            "value": "Chemist or Lab details updated successfully",
+            "context": "Success message",
+            "grounded": false
+          },
+          {
+            "value": "Chemist/Lab deleted successfully",
+            "context": "Success message",
+            "grounded": false
+          },
+          {
+            "value": "Symptom Code added successfully",
+            "context": "Success message",
+            "grounded": false
+          },
+          {
+            "value": "Symptom details updated successfully",
+            "context": "Success message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 15,
+        "uncovered_clauses": [
+          "VCMSYM01",
+          "VCMPA01",
+          "VCDPA02"
+        ],
+        "weaknesses": [
+          "No test for the Administrators Menu Screen (VCMSYM01).",
+          "No tests for patient profile update (VCMPA01) or patient registration (VCDPA02).",
+          "No boundary or format validation tests for input fields.",
+          "Decision table includes a confirmation message condition but no test case asserts the confirmation dialog.",
+          "Hardcoded IDs and values are not grounded; dynamic or known valid IDs should be used."
+        ],
+        "traceability": 0.625,
+        "untraced_reqs": [
+          "VCDPA02",
+          "VCMPA01",
+          "VCMSYM01"
+        ],
+        "fsa_score": 0.78,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

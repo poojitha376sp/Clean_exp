@@ -1,0 +1,382 @@
+{
+  "unit_id": "U18_GUI",
+  "representation": "GUI Event Graphs",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "GUI Event Graphs",
+    "group": 3,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.33,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 5,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add boundary tests for PIP minimum and maximum values (5 and 55 cmH2O).",
+      "Include explicit expected values for FiO2 display to improve assertiveness.",
+      "Verify exact shutdown notification message text and blocking behavior.",
+      "Test negative scenario for setting PIP outside allowed range to ensure validation.",
+      "Add timing checks for rise time parameter to ensure correct duration from PEEP to PIP."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.8245,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "// GUI Event Graphs for unit U18_GUI\n\n// Graph nodes and edges representing UI events and follow-on events\n// Nodes: Screen states, Widget interactions\n// Edges: Triggered by user actions or system events\n\n// 1. Display FiO2 prior to patient inhale limb\nNode DisplayFiO2 {\n    Event: ShowFiO2Screen\n    Follows: LoginSuccess\n    Outputs: FiO2ValueDisplayed\n}\n\n// 2. Set PIP from 5-55 cmH2O with increments of 1 cmH2O\nNode SetPIP {\n    Event: OpenPIPSettings\n    Follows: DisplayFiO2\n    Outputs: PIPSliderVisible\n    Inputs: SliderMin=5, SliderMax=55, Step=1\n}\n\n// 3. Detect controller shutdown\nNode DetectShutdown {\n    Event: ControllerShutdown\n    Follows: AnyScreen\n    Outputs: ShutdownNotificationDisplayed\n}\n\n// 4. \"Rise time\" parameter in specific modes\nNode RiseTimeControl {\n    Event: EnterModeAssistControlPCV\n    Follows: SetPIP\n    Outputs: RiseTimeParameterVisible\n    Inputs: Mode=\"Assist/Control PCV\"\n}\n\n// 5. Set \"rise parameter\" in range 0..20% of breath cycle time\nNode SetRiseParameter {\n    Event: AdjustRiseTime\n    Follows: RiseTimeControl\n    Outputs: RiseTimeSet\n    Inputs: ParameterRange=0..20\n}\n\n// 6. Specify assist/control with pressure controlled ventilation mode\nNode AssistControlPCV {\n    Event: SelectAssistControlPCVMode\n    Follows: SetRiseParameter\n    Outputs: AssistControlModeActive\n}\n\n// Navigation and blocking modal boxes\nEdge LoginSuccess -> ShowFiO2Screen\nEdge ShowFiO2Screen -> OpenPIPSettings\nEdge OpenPIPSettings -> RiseTimeControl\nEdge RiseTimeControl -> AdjustRiseTime\nEdge AdjustRiseTime -> SelectAssistControlPCVMode\nEdge AnyScreen -> ShutdownNotificationDisplayed (on ControllerShutdown)\n\n// Modal box blocking background interactions\nModalBox ShutdownNotification {\n    Trigger: ControllerShutdown\n    Blocks: AllScreensExcept(ShutdownNotification)\n}",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Display FiO2 prior to patient inhale limb",
+      "req_ids": [
+        "RW-SW-96"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User logged in successfully"
+      ],
+      "inputs": {
+        "name": "FiO2Value",
+        "value": "as specified"
+      },
+      "steps": [
+        "User logs in successfully",
+        "System transitions to ShowFiO2Screen",
+        "FiO2 value is displayed"
+      ],
+      "expected": [
+        "FiO2 value is shown correctly on the screen"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Set PIP from 5-55 cmH2O with increments of 1 cmH2O",
+      "req_ids": [
+        "RW-SW-99"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "DisplayFiO2 screen is active"
+      ],
+      "inputs": {
+        "name": "PIPValue",
+        "value": "as specified"
+      },
+      "steps": [
+        "User opens PIP settings",
+        "PIP slider is visible",
+        "User adjusts slider to a value between 5 and 55 cmH2O",
+        "System updates PIP value"
+      ],
+      "expected": [
+        "PIP value is set within the range 5-55 cmH2O with 1 cmH2O increments"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Detect controller shutdown",
+      "req_ids": [
+        "RW-SW-113"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "name": "ShutdownEvent",
+        "value": "controller_shutdown"
+      },
+      "steps": [
+        "Controller shutdown event occurs",
+        "System transitions to ShutdownNotificationDisplayed"
+      ],
+      "expected": [
+        "Shutdown notification is displayed, blocking all other interactions"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Set 'rise time' parameter in Assist/Control PCV mode",
+      "req_ids": [
+        "RW-SW-139"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Assist/Control PCV mode is selected"
+      ],
+      "inputs": {
+        "name": "RiseTime",
+        "value": "as specified"
+      },
+      "steps": [
+        "User enters Assist/Control PCV mode",
+        "Rise time parameter becomes visible",
+        "User sets rise time value",
+        "System applies rise time setting"
+      ],
+      "expected": [
+        "Rise time parameter is set correctly within the mode"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Set 'rise parameter' in range 0..20% of breath cycle time",
+      "req_ids": [
+        "RW-SW-141"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Rise time control is active"
+      ],
+      "inputs": {
+        "name": "RiseParameter",
+        "value": "0, 20"
+      },
+      "steps": [
+        "User adjusts rise parameter",
+        "System checks parameter range",
+        "User sets rise parameter to boundary values"
+      ],
+      "expected": [
+        "Rise parameter is set to 0% and 20% of breath cycle time without error"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Specify assist/control with pressure controlled ventilation mode",
+      "req_ids": [
+        "RW-SW-155"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Rise parameter is set"
+      ],
+      "inputs": {
+        "name": "ModeSelection",
+        "value": "Assist/Control PCV"
+      },
+      "steps": [
+        "User selects Assist/Control PCV mode",
+        "System activates assist/control mode",
+        "Pressure controlled ventilation is enabled"
+      ],
+      "expected": [
+        "Assist/control mode is active with pressure controlled ventilation"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "// GUI Event Graphs for unit U18_GUI\n\n// Graph nodes and edges representing UI events and follow-on events\n// Nodes: Screen states, Widget interactions\n// Edges: Triggered by user actions or system events\n\n// 1. Display FiO2 prior to patient inhale limb\nNode DisplayFiO2 {\n    Event: ShowFiO2Screen\n    Follows: LoginSuccess\n    Outputs: FiO2ValueDisplayed\n}\n\n// 2. Set PIP from 5-55 cmH2O with increments of 1 cmH2O\nNode SetPIP {\n    Event: OpenPIPSettings\n    Follows: DisplayFiO2\n    Outputs: PIPSliderVisible\n    Inputs: SliderMin=5, SliderMax=55, Step=1\n}\n\n// 3. Detect controller shutdown\nNode DetectShutdown {\n    Event: ControllerShutdown\n    Follows: AnyScreen\n    Outputs: ShutdownNotificationDisplayed\n}\n\n// 4. \"Rise time\" parameter in specific modes\nNode RiseTimeControl {\n    Event: EnterModeAssistControlPCV\n    Follows: SetPIP\n    Outputs: RiseTimeParameterVisible\n    Inputs: Mode=\"Assist/Control PCV\"\n}\n\n// 5. Set \"rise parameter\" in range 0..20% of breath cycle time\nNode SetRiseParameter {\n    Event: AdjustRiseTime\n    Follows: RiseTimeControl\n    Outputs: RiseTimeSet\n    Inputs: ParameterRange=0..20\n}\n\n// 6. Specify assist/control with pressure controlled ventilation mode\nNode AssistControlPCV {\n    Event: SelectAssistControlPCVMode\n    Follows: SetRiseParameter\n    Outputs: AssistControlModeActive\n}\n\n// Navigation and blocking modal boxes\nEdge LoginSuccess -> ShowFiO2Screen\nEdge ShowFiO2Screen -> OpenPIPSettings\nEdge OpenPIPSettings -> RiseTimeControl\nEdge RiseTimeControl -> AdjustRiseTime\nEdge AdjustRiseTime -> SelectAssistControlPCVMode\nEdge AnyScreen -> ShutdownNotificationDisplayed (on ControllerShutdown)\n\n// Modal box blocking background interactions\nModalBox ShutdownNotification {\n    Trigger: ControllerShutdown\n    Blocks: AllScreensExcept(ShutdownNotification)\n}",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Display FiO2 prior to patient inhale limb",
+          "req_ids": [
+            "RW-SW-96"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User logged in successfully"
+          ],
+          "inputs": {
+            "name": "FiO2Value",
+            "value": "as specified"
+          },
+          "steps": [
+            "User logs in successfully",
+            "System transitions to ShowFiO2Screen",
+            "FiO2 value is displayed"
+          ],
+          "expected": [
+            "FiO2 value is shown correctly on the screen"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Set PIP from 5-55 cmH2O with increments of 1 cmH2O",
+          "req_ids": [
+            "RW-SW-99"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "DisplayFiO2 screen is active"
+          ],
+          "inputs": {
+            "name": "PIPValue",
+            "value": "as specified"
+          },
+          "steps": [
+            "User opens PIP settings",
+            "PIP slider is visible",
+            "User adjusts slider to a value between 5 and 55 cmH2O",
+            "System updates PIP value"
+          ],
+          "expected": [
+            "PIP value is set within the range 5-55 cmH2O with 1 cmH2O increments"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Detect controller shutdown",
+          "req_ids": [
+            "RW-SW-113"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "name": "ShutdownEvent",
+            "value": "controller_shutdown"
+          },
+          "steps": [
+            "Controller shutdown event occurs",
+            "System transitions to ShutdownNotificationDisplayed"
+          ],
+          "expected": [
+            "Shutdown notification is displayed, blocking all other interactions"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Set 'rise time' parameter in Assist/Control PCV mode",
+          "req_ids": [
+            "RW-SW-139"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Assist/Control PCV mode is selected"
+          ],
+          "inputs": {
+            "name": "RiseTime",
+            "value": "as specified"
+          },
+          "steps": [
+            "User enters Assist/Control PCV mode",
+            "Rise time parameter becomes visible",
+            "User sets rise time value",
+            "System applies rise time setting"
+          ],
+          "expected": [
+            "Rise time parameter is set correctly within the mode"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Set 'rise parameter' in range 0..20% of breath cycle time",
+          "req_ids": [
+            "RW-SW-141"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Rise time control is active"
+          ],
+          "inputs": {
+            "name": "RiseParameter",
+            "value": "0, 20"
+          },
+          "steps": [
+            "User adjusts rise parameter",
+            "System checks parameter range",
+            "User sets rise parameter to boundary values"
+          ],
+          "expected": [
+            "Rise parameter is set to 0% and 20% of breath cycle time without error"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Specify assist/control with pressure controlled ventilation mode",
+          "req_ids": [
+            "RW-SW-155"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Rise parameter is set"
+          ],
+          "inputs": {
+            "name": "ModeSelection",
+            "value": "Assist/Control PCV"
+          },
+          "steps": [
+            "User selects Assist/Control PCV mode",
+            "System activates assist/control mode",
+            "Pressure controlled ventilation is enabled"
+          ],
+          "expected": [
+            "Assist/control mode is active with pressure controlled ventilation"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "GUI Event Graphs",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.33,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 5,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add boundary tests for PIP minimum and maximum values (5 and 55 cmH2O).",
+          "Include explicit expected values for FiO2 display to improve assertiveness.",
+          "Verify exact shutdown notification message text and blocking behavior.",
+          "Test negative scenario for setting PIP outside allowed range to ensure validation.",
+          "Add timing checks for rise time parameter to ensure correct duration from PEEP to PIP."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.8245,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

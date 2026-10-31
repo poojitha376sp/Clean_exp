@@ -1,0 +1,544 @@
+{
+  "unit_id": "U16_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "standard",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 0.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "John Doe",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": "30",
+        "context": "patient age",
+        "grounded": false
+      },
+      {
+        "value": "Male",
+        "context": "patient gender",
+        "grounded": false
+      },
+      {
+        "value": "1234567890",
+        "context": "contact number",
+        "grounded": false
+      },
+      {
+        "value": "P001",
+        "context": "patient ID",
+        "grounded": false
+      },
+      {
+        "value": "P002",
+        "context": "patient ID",
+        "grounded": false
+      },
+      {
+        "value": "current month",
+        "context": "backup month",
+        "grounded": false
+      },
+      {
+        "value": "previous month",
+        "context": "backup month",
+        "grounded": false
+      },
+      {
+        "value": "25 KM",
+        "context": "distance",
+        "grounded": false
+      },
+      {
+        "value": "Paracetamol",
+        "context": "medicine name",
+        "grounded": false
+      },
+      {
+        "value": "500mg",
+        "context": "dosage",
+        "grounded": false
+      },
+      {
+        "value": "2 times a day",
+        "context": "frequency",
+        "grounded": false
+      },
+      {
+        "value": "5 days",
+        "context": "duration",
+        "grounded": false
+      },
+      {
+        "value": "Aspirin",
+        "context": "medicine name",
+        "grounded": false
+      },
+      {
+        "value": "100mg",
+        "context": "dosage",
+        "grounded": false
+      },
+      {
+        "value": "3 times a day",
+        "context": "frequency",
+        "grounded": false
+      },
+      {
+        "value": "3 days",
+        "context": "duration",
+        "grounded": false
+      },
+      {
+        "value": "Ibuprofen",
+        "context": "medicine name",
+        "grounded": false
+      },
+      {
+        "value": "200mg",
+        "context": "dosage",
+        "grounded": false
+      },
+      {
+        "value": "1 time a day",
+        "context": "frequency",
+        "grounded": false
+      },
+      {
+        "value": "7 days",
+        "context": "duration",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 21,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Multiple requirements (VIRTUA-5.5-1 to 4) are tested in a single scenario, violating the unique scenario rule.",
+      "Assertions are vague; no concrete state checks or expected values are asserted.",
+      "No boundary value testing (e.g., age limits, dosage limits, 3‑year boundary).",
+      "Missing negative test cases for other requirements (e.g., invalid patient data, invalid prescription).",
+      "Scenario Outline for medicines lacks edge and invalid values; only normal values are provided."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.53,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Medicines Delivery and Patient Management\n\n  Scenario: Register a new Patient\n    Given the system is up and running\n    When a new patient is registered with the following details:\n      | Name     | Age | Gender | Contact Number |\n      | John Doe | 30  | Male   | 1234567890     |\n    Then the patient should be registered successfully\n    And the patient's details should be stored in the system\n\n  Scenario: View and Update the details of an existing Patient\n    Given a patient with ID \"P001\" exists in the system\n    When the details of the patient with ID \"P001\" are viewed\n    Then the patient's details should be displayed\n    And when the patient's details are updated with the following information:\n      | Name     | Age | Gender | Contact Number |\n      | Jane Doe | 32  | Female | 0987654321     |\n    Then the patient's details should be updated successfully\n    And the latest details should be maintained by the system\n\n  Scenario: Delete the Patient Details - A Patient cannot be deleted if there is one or more Consultation Requests in last 3 years\n    Given a patient with ID \"P002\" exists in the system and has one consultation request in the last 3 years\n    When an attempt is made to delete the patient with ID \"P002\"\n    Then the deletion should be denied\n    And an error message should be displayed indicating that the patient cannot be deleted due to active consultation requests\n\n  Scenario: Rollback by a month\n    Given a backup exists for the current month\n    When a rollback by a month is initiated\n    Then the backup for the previous month should be restored\n    And the dummy production database should be purged\n    And the backup should be maintained in a fireproof cabinet 25 KM away from the Hospital\n\n  Scenario Outline: Medicines are delivered as prescribed by the doctor (offline)\n    Given a prescription with the following details:\n      | Medicine Name | Dosage | Frequency | Duration |\n      | <Medicine Name> | <Dosage> | <Frequency> | <Duration> |\n    When the prescription is submitted offline\n    Then the medicines should be delivered as prescribed\n    Examples:\n      | Medicine Name | Dosage | Frequency | Duration |\n      | Paracetamol   | 500mg  | 2 times a day | 5 days    |\n      | Aspirin       | 100mg  | 3 times a day | 3 days    |\n      | Ibuprofen     | 200mg  | 1 time a day  | 7 days    |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Register a new Patient",
+      "req_ids": [
+        "Req-5/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "The system is up and running"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "age": "30",
+        "gender": "Male",
+        "contact_number": "1234567890"
+      },
+      "steps": [
+        "A new patient is registered with the provided details"
+      ],
+      "expected": [
+        "The patient should be registered successfully",
+        "The patient's details should be stored in the system"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "View and Update the details of an existing Patient",
+      "req_ids": [
+        "Req-5/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A patient with ID 'P001' exists in the system"
+      ],
+      "inputs": {
+        "patient_id": "P001"
+      },
+      "steps": [
+        "The details of the patient with ID 'P001' are viewed",
+        "The patient's details are updated with the provided information"
+      ],
+      "expected": [
+        "The patient's details should be displayed",
+        "The patient's details should be updated successfully",
+        "The latest details should be maintained by the system"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Delete the Patient Details - A Patient cannot be deleted if there is one or more Consultation Requests in last 3 years",
+      "req_ids": [
+        "Req-5/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "A patient with ID 'P002' exists in the system and has one consultation request in the last 3 years"
+      ],
+      "inputs": {
+        "patient_id": "P002"
+      },
+      "steps": [
+        "An attempt is made to delete the patient with ID 'P002'"
+      ],
+      "expected": [
+        "The deletion should be denied",
+        "An error message should be displayed indicating that the patient cannot be deleted due to active consultation requests"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Rollback by a month",
+      "req_ids": [
+        "VIRTUA-5.5-1",
+        "VIRTUA-5.5-2",
+        "VIRTUA-5.5-3",
+        "VIRTUA-5.5-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A backup exists for the current month"
+      ],
+      "inputs": {},
+      "steps": [
+        "A rollback by a month is initiated"
+      ],
+      "expected": [
+        "The backup for the previous month should be restored",
+        "The dummy production database should be purged",
+        "The backup should be maintained in a fireproof cabinet 25 KM away from the Hospital"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Medicines are delivered as prescribed by the doctor (offline)",
+      "req_ids": [
+        "VIRTUA-5-17"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A prescription with the provided details exists"
+      ],
+      "inputs": {
+        "medicine_name": "Paracetamol",
+        "dosage": "500mg",
+        "frequency": "2 times a day",
+        "duration": "5 days"
+      },
+      "steps": [
+        "The prescription is submitted offline"
+      ],
+      "expected": [
+        "The medicines should be delivered as prescribed"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Medicines Delivery and Patient Management\n\n  Scenario: Register a new Patient\n    Given the system is up and running\n    When a new patient is registered with the following details:\n      | Name     | Age | Gender | Contact Number |\n      | John Doe | 30  | Male   | 1234567890     |\n    Then the patient should be registered successfully\n    And the patient's details should be stored in the system\n\n  Scenario: View and Update the details of an existing Patient\n    Given a patient with ID \"P001\" exists in the system\n    When the details of the patient with ID \"P001\" are viewed\n    Then the patient's details should be displayed\n    And when the patient's details are updated with the following information:\n      | Name     | Age | Gender | Contact Number |\n      | Jane Doe | 32  | Female | 0987654321     |\n    Then the patient's details should be updated successfully\n    And the latest details should be maintained by the system\n\n  Scenario: Delete the Patient Details - A Patient cannot be deleted if there is one or more Consultation Requests in last 3 years\n    Given a patient with ID \"P002\" exists in the system and has one consultation request in the last 3 years\n    When an attempt is made to delete the patient with ID \"P002\"\n    Then the deletion should be denied\n    And an error message should be displayed indicating that the patient cannot be deleted due to active consultation requests\n\n  Scenario: Rollback by a month\n    Given a backup exists for the current month\n    When a rollback by a month is initiated\n    Then the backup for the previous month should be restored\n    And the dummy production database should be purged\n    And the backup should be maintained in a fireproof cabinet 25 KM away from the Hospital\n\n  Scenario Outline: Medicines are delivered as prescribed by the doctor (offline)\n    Given a prescription with the following details:\n      | Medicine Name | Dosage | Frequency | Duration |\n      | <Medicine Name> | <Dosage> | <Frequency> | <Duration> |\n    When the prescription is submitted offline\n    Then the medicines should be delivered as prescribed\n    Examples:\n      | Medicine Name | Dosage | Frequency | Duration |\n      | Paracetamol   | 500mg  | 2 times a day | 5 days    |\n      | Aspirin       | 100mg  | 3 times a day | 3 days    |\n      | Ibuprofen     | 200mg  | 1 time a day  | 7 days    |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Register a new Patient",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The system is up and running"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": "30",
+            "gender": "Male",
+            "contact_number": "1234567890"
+          },
+          "steps": [
+            "A new patient is registered with the provided details"
+          ],
+          "expected": [
+            "The patient should be registered successfully",
+            "The patient's details should be stored in the system"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update the details of an existing Patient",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient with ID 'P001' exists in the system"
+          ],
+          "inputs": {
+            "patient_id": "P001"
+          },
+          "steps": [
+            "The details of the patient with ID 'P001' are viewed",
+            "The patient's details are updated with the provided information"
+          ],
+          "expected": [
+            "The patient's details should be displayed",
+            "The patient's details should be updated successfully",
+            "The latest details should be maintained by the system"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete the Patient Details - A Patient cannot be deleted if there is one or more Consultation Requests in last 3 years",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient with ID 'P002' exists in the system and has one consultation request in the last 3 years"
+          ],
+          "inputs": {
+            "patient_id": "P002"
+          },
+          "steps": [
+            "An attempt is made to delete the patient with ID 'P002'"
+          ],
+          "expected": [
+            "The deletion should be denied",
+            "An error message should be displayed indicating that the patient cannot be deleted due to active consultation requests"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Rollback by a month",
+          "req_ids": [
+            "VIRTUA-5.5-1",
+            "VIRTUA-5.5-2",
+            "VIRTUA-5.5-3",
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A backup exists for the current month"
+          ],
+          "inputs": {},
+          "steps": [
+            "A rollback by a month is initiated"
+          ],
+          "expected": [
+            "The backup for the previous month should be restored",
+            "The dummy production database should be purged",
+            "The backup should be maintained in a fireproof cabinet 25 KM away from the Hospital"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Medicines are delivered as prescribed by the doctor (offline)",
+          "req_ids": [
+            "VIRTUA-5-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A prescription with the provided details exists"
+          ],
+          "inputs": {
+            "medicine_name": "Paracetamol",
+            "dosage": "500mg",
+            "frequency": "2 times a day",
+            "duration": "5 days"
+          },
+          "steps": [
+            "The prescription is submitted offline"
+          ],
+          "expected": [
+            "The medicines should be delivered as prescribed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "patient age",
+            "grounded": false
+          },
+          {
+            "value": "Male",
+            "context": "patient gender",
+            "grounded": false
+          },
+          {
+            "value": "1234567890",
+            "context": "contact number",
+            "grounded": false
+          },
+          {
+            "value": "P001",
+            "context": "patient ID",
+            "grounded": false
+          },
+          {
+            "value": "P002",
+            "context": "patient ID",
+            "grounded": false
+          },
+          {
+            "value": "current month",
+            "context": "backup month",
+            "grounded": false
+          },
+          {
+            "value": "previous month",
+            "context": "backup month",
+            "grounded": false
+          },
+          {
+            "value": "25 KM",
+            "context": "distance",
+            "grounded": false
+          },
+          {
+            "value": "Paracetamol",
+            "context": "medicine name",
+            "grounded": false
+          },
+          {
+            "value": "500mg",
+            "context": "dosage",
+            "grounded": false
+          },
+          {
+            "value": "2 times a day",
+            "context": "frequency",
+            "grounded": false
+          },
+          {
+            "value": "5 days",
+            "context": "duration",
+            "grounded": false
+          },
+          {
+            "value": "Aspirin",
+            "context": "medicine name",
+            "grounded": false
+          },
+          {
+            "value": "100mg",
+            "context": "dosage",
+            "grounded": false
+          },
+          {
+            "value": "3 times a day",
+            "context": "frequency",
+            "grounded": false
+          },
+          {
+            "value": "3 days",
+            "context": "duration",
+            "grounded": false
+          },
+          {
+            "value": "Ibuprofen",
+            "context": "medicine name",
+            "grounded": false
+          },
+          {
+            "value": "200mg",
+            "context": "dosage",
+            "grounded": false
+          },
+          {
+            "value": "1 time a day",
+            "context": "frequency",
+            "grounded": false
+          },
+          {
+            "value": "7 days",
+            "context": "duration",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 21,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Multiple requirements (VIRTUA-5.5-1 to 4) are tested in a single scenario, violating the unique scenario rule.",
+          "Assertions are vague; no concrete state checks or expected values are asserted.",
+          "No boundary value testing (e.g., age limits, dosage limits, 3‑year boundary).",
+          "Missing negative test cases for other requirements (e.g., invalid patient data, invalid prescription).",
+          "Scenario Outline for medicines lacks edge and invalid values; only normal values are provided."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.53,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

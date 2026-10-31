@@ -1,0 +1,954 @@
+{
+  "unit_id": "U19_Embedded",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 0.9,
+    "groundedness_mg": 0.9091,
+    "hallucinated": [
+      {
+        "value": "end_of_inspiration",
+        "context": "expiration trigger condition",
+        "grounded": false
+      },
+      {
+        "value": "time_elapsed",
+        "context": "expiration trigger condition",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 22,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Oracles are vague; no concrete value checks",
+      "Missing timing bounds for RW-SW-4",
+      "Triggers for RW-SW-56 and RW-SW-57 are unspecified; tests use invented conditions",
+      "Boundary tests lack exact boundary values (e.g., -4cm, 5cm, 55cm, 1breath, 0breath, 100breath)",
+      "No verification of actual measured values (PEEP, PIP, breath rate) against targets"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.8464,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Controller Functional Requirements\n\n  Scenario: Controller responds fast enough to prevent pressure dropping below -4cm\n    Given the controller is initialized\n    When the pressure drops below -4cm\n    Then the controller responds within the specified time to prevent pressure dropping below -4cm\n\n  Scenario Outline: Controller should never command pressure to go above 60\n    Given the controller is initialized\n    When the controller commands a pressure of <pressure>cmH2O\n    Then the controller does not command a pressure above 60cmH2O\n    Examples:\n      | pressure |\n      | 60       |\n      | 61       |\n      | 59       |\n\n  Scenario: Controller measures PEEP over each breath\n    Given the controller is initialized\n    When a breath cycle is completed\n    Then the controller measures the PEEP at the end of the breath\n\n  Scenario Outline: Controller hits commanded values within 10%\n    Given the controller is initialized\n    When the controller commands a value of <commanded_value>cmH2O\n    Then the controller achieves the commanded value within 10%\n    Examples:\n      | commanded_value |\n      | 50              |\n      | 60              |\n      | 10              |\n\n  Scenario: Controller triggers an inspiration cycle (NEED TO CLARIFY)\n    Given the controller is initialized\n    When the inspiration trigger condition is met\n    Then the controller triggers an inspiration cycle\n\n  Scenario Outline: Controller triggers an expiration cycle\n    Given the controller is initialized\n    When the expiration trigger condition is met\n    Then the controller triggers an expiration cycle\n    Examples:\n      | expiration_trigger_condition |\n      | end_of_inspiration         |\n      | time_elapsed               |\n\n  Scenario Outline: Controller meets PIP targets in the range 5-55cmH2O +/- 5cm\n    Given the controller is initialized\n    When the controller commands a PIP of <pip>cmH2O\n    Then the controller meets the PIP target within the range 5-55cmH2O +/- 5cm\n    Examples:\n      | pip  |\n      | 5    |\n      | 55   |\n      | 30   |\n      | 0    |\n      | 60   |\n\n  Scenario Outline: Controller meets commanded breath rate within +- 1 breath\n    Given the controller is initialized\n    When the controller commands a breath rate of <breath_rate>breaths/min\n    Then the controller meets the commanded breath rate within +- 1 breath\n    Examples:\n      | breath_rate |\n      | 10          |\n      | 30          |\n      | 1           |\n      | 0           |\n      | 100         |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Controller responds fast enough to prevent pressure dropping below -4cm",
+      "req_ids": [
+        "RW-SW-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "When the pressure drops below -4cm"
+      ],
+      "expected": [
+        "the controller responds within the specified time to prevent pressure dropping below -4cm"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Controller should never command pressure to go above 60",
+      "req_ids": [
+        "RW-SW-7"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "pressure": 60
+      },
+      "steps": [
+        "When the controller commands a pressure of 60cmH2O"
+      ],
+      "expected": [
+        "the controller does not command a pressure above 60cmH2O"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Controller should never command pressure to go above 60",
+      "req_ids": [
+        "RW-SW-7"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "pressure": 61
+      },
+      "steps": [
+        "When the controller commands a pressure of 61cmH2O"
+      ],
+      "expected": [
+        "the controller does not command a pressure above 60cmH2O"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Controller should never command pressure to go above 60",
+      "req_ids": [
+        "RW-SW-7"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "pressure": 59
+      },
+      "steps": [
+        "When the controller commands a pressure of 59cmH2O"
+      ],
+      "expected": [
+        "the controller does not command a pressure above 60cmH2O"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Controller measures PEEP over each breath",
+      "req_ids": [
+        "RW-SW-52"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "When a breath cycle is completed"
+      ],
+      "expected": [
+        "the controller measures the PEEP at the end of the breath"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Controller hits commanded values within 10%",
+      "req_ids": [
+        "RW-SW-55"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "commanded_value": 50
+      },
+      "steps": [
+        "When the controller commands a value of 50cmH2O"
+      ],
+      "expected": [
+        "the controller achieves the commanded value within 10%"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Controller hits commanded values within 10%",
+      "req_ids": [
+        "RW-SW-55"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "commanded_value": 60
+      },
+      "steps": [
+        "When the controller commands a value of 60cmH2O"
+      ],
+      "expected": [
+        "the controller achieves the commanded value within 10%"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Controller hits commanded values within 10%",
+      "req_ids": [
+        "RW-SW-55"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "commanded_value": 10
+      },
+      "steps": [
+        "When the controller commands a value of 10cmH2O"
+      ],
+      "expected": [
+        "the controller achieves the commanded value within 10%"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Controller triggers an inspiration cycle (NEED TO CLARIFY)",
+      "req_ids": [
+        "RW-SW-56"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "When the inspiration trigger condition is met"
+      ],
+      "expected": [
+        "the controller triggers an inspiration cycle"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Controller triggers an expiration cycle",
+      "req_ids": [
+        "RW-SW-57"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "expiration_trigger_condition": "end_of_inspiration"
+      },
+      "steps": [
+        "When the expiration trigger condition is met"
+      ],
+      "expected": [
+        "the controller triggers an expiration cycle"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Controller triggers an expiration cycle",
+      "req_ids": [
+        "RW-SW-57"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "expiration_trigger_condition": "time_elapsed"
+      },
+      "steps": [
+        "When the expiration trigger condition is met"
+      ],
+      "expected": [
+        "the controller triggers an expiration cycle"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Controller meets PIP targets in the range 5-55cmH2O +/- 5cm",
+      "req_ids": [
+        "RW-SW-59"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "pip": 5
+      },
+      "steps": [
+        "When the controller commands a PIP of 5cmH2O"
+      ],
+      "expected": [
+        "the controller meets the PIP target within the range 5-55cmH2O +/- 5cm"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Controller meets PIP targets in the range 5-55cmH2O +/- 5cm",
+      "req_ids": [
+        "RW-SW-59"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "pip": 55
+      },
+      "steps": [
+        "When the controller commands a PIP of 55cmH2O"
+      ],
+      "expected": [
+        "the controller meets the PIP target within the range 5-55cmH2O +/- 5cm"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Controller meets PIP targets in the range 5-55cmH2O +/- 5cm",
+      "req_ids": [
+        "RW-SW-59"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "pip": 30
+      },
+      "steps": [
+        "When the controller commands a PIP of 30cmH2O"
+      ],
+      "expected": [
+        "the controller meets the PIP target within the range 5-55cmH2O +/- 5cm"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "Controller meets PIP targets in the range 5-55cmH2O +/- 5cm",
+      "req_ids": [
+        "RW-SW-59"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "pip": 0
+      },
+      "steps": [
+        "When the controller commands a PIP of 0cmH2O"
+      ],
+      "expected": [
+        "the controller meets the PIP target within the range 5-55cmH2O +/- 5cm"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "Controller meets PIP targets in the range 5-55cmH2O +/- 5cm",
+      "req_ids": [
+        "RW-SW-59"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "pip": 60
+      },
+      "steps": [
+        "When the controller commands a PIP of 60cmH2O"
+      ],
+      "expected": [
+        "the controller meets the PIP target within the range 5-55cmH2O +/- 5cm"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "Controller meets commanded breath rate within +- 1 breath",
+      "req_ids": [
+        "RW-SW-62"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "breath_rate": 10
+      },
+      "steps": [
+        "When the controller commands a breath rate of 10breaths/min"
+      ],
+      "expected": [
+        "the controller meets the commanded breath rate within +- 1 breath"
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "Controller meets commanded breath rate within +- 1 breath",
+      "req_ids": [
+        "RW-SW-62"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "breath_rate": 30
+      },
+      "steps": [
+        "When the controller commands a breath rate of 30breaths/min"
+      ],
+      "expected": [
+        "the controller meets the commanded breath rate within +- 1 breath"
+      ]
+    },
+    {
+      "id": "TC-019",
+      "title": "Controller meets commanded breath rate within +- 1 breath",
+      "req_ids": [
+        "RW-SW-62"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "breath_rate": 1
+      },
+      "steps": [
+        "When the controller commands a breath rate of 1breaths/min"
+      ],
+      "expected": [
+        "the controller meets the commanded breath rate within +- 1 breath"
+      ]
+    },
+    {
+      "id": "TC-020",
+      "title": "Controller meets commanded breath rate within +- 1 breath",
+      "req_ids": [
+        "RW-SW-62"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "breath_rate": 0
+      },
+      "steps": [
+        "When the controller commands a breath rate of 0breaths/min"
+      ],
+      "expected": [
+        "the controller meets the commanded breath rate within +- 1 breath"
+      ]
+    },
+    {
+      "id": "TC-021",
+      "title": "Controller meets commanded breath rate within +- 1 breath",
+      "req_ids": [
+        "RW-SW-62"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "breath_rate": 100
+      },
+      "steps": [
+        "When the controller commands a breath rate of 100breaths/min"
+      ],
+      "expected": [
+        "the controller meets the commanded breath rate within +- 1 breath"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Controller Functional Requirements\n\n  Scenario: Controller responds fast enough to prevent pressure dropping below -4cm\n    Given the controller is initialized\n    When the pressure drops below -4cm\n    Then the controller responds within the specified time to prevent pressure dropping below -4cm\n\n  Scenario Outline: Controller should never command pressure to go above 60\n    Given the controller is initialized\n    When the controller commands a pressure of <pressure>cmH2O\n    Then the controller does not command a pressure above 60cmH2O\n    Examples:\n      | pressure |\n      | 60       |\n      | 61       |\n      | 59       |\n\n  Scenario: Controller measures PEEP over each breath\n    Given the controller is initialized\n    When a breath cycle is completed\n    Then the controller measures the PEEP at the end of the breath\n\n  Scenario Outline: Controller hits commanded values within 10%\n    Given the controller is initialized\n    When the controller commands a value of <commanded_value>cmH2O\n    Then the controller achieves the commanded value within 10%\n    Examples:\n      | commanded_value |\n      | 50              |\n      | 60              |\n      | 10              |\n\n  Scenario: Controller triggers an inspiration cycle (NEED TO CLARIFY)\n    Given the controller is initialized\n    When the inspiration trigger condition is met\n    Then the controller triggers an inspiration cycle\n\n  Scenario Outline: Controller triggers an expiration cycle\n    Given the controller is initialized\n    When the expiration trigger condition is met\n    Then the controller triggers an expiration cycle\n    Examples:\n      | expiration_trigger_condition |\n      | end_of_inspiration         |\n      | time_elapsed               |\n\n  Scenario Outline: Controller meets PIP targets in the range 5-55cmH2O +/- 5cm\n    Given the controller is initialized\n    When the controller commands a PIP of <pip>cmH2O\n    Then the controller meets the PIP target within the range 5-55cmH2O +/- 5cm\n    Examples:\n      | pip  |\n      | 5    |\n      | 55   |\n      | 30   |\n      | 0    |\n      | 60   |\n\n  Scenario Outline: Controller meets commanded breath rate within +- 1 breath\n    Given the controller is initialized\n    When the controller commands a breath rate of <breath_rate>breaths/min\n    Then the controller meets the commanded breath rate within +- 1 breath\n    Examples:\n      | breath_rate |\n      | 10          |\n      | 30          |\n      | 1           |\n      | 0           |\n      | 100         |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller responds fast enough to prevent pressure dropping below -4cm",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "When the pressure drops below -4cm"
+          ],
+          "expected": [
+            "the controller responds within the specified time to prevent pressure dropping below -4cm"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller should never command pressure to go above 60",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "pressure": 60
+          },
+          "steps": [
+            "When the controller commands a pressure of 60cmH2O"
+          ],
+          "expected": [
+            "the controller does not command a pressure above 60cmH2O"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Controller should never command pressure to go above 60",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "pressure": 61
+          },
+          "steps": [
+            "When the controller commands a pressure of 61cmH2O"
+          ],
+          "expected": [
+            "the controller does not command a pressure above 60cmH2O"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Controller should never command pressure to go above 60",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "pressure": 59
+          },
+          "steps": [
+            "When the controller commands a pressure of 59cmH2O"
+          ],
+          "expected": [
+            "the controller does not command a pressure above 60cmH2O"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller measures PEEP over each breath",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "When a breath cycle is completed"
+          ],
+          "expected": [
+            "the controller measures the PEEP at the end of the breath"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller hits commanded values within 10%",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_value": 50
+          },
+          "steps": [
+            "When the controller commands a value of 50cmH2O"
+          ],
+          "expected": [
+            "the controller achieves the commanded value within 10%"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller hits commanded values within 10%",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_value": 60
+          },
+          "steps": [
+            "When the controller commands a value of 60cmH2O"
+          ],
+          "expected": [
+            "the controller achieves the commanded value within 10%"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Controller hits commanded values within 10%",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_value": 10
+          },
+          "steps": [
+            "When the controller commands a value of 10cmH2O"
+          ],
+          "expected": [
+            "the controller achieves the commanded value within 10%"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Controller triggers an inspiration cycle (NEED TO CLARIFY)",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "When the inspiration trigger condition is met"
+          ],
+          "expected": [
+            "the controller triggers an inspiration cycle"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Controller triggers an expiration cycle",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "expiration_trigger_condition": "end_of_inspiration"
+          },
+          "steps": [
+            "When the expiration trigger condition is met"
+          ],
+          "expected": [
+            "the controller triggers an expiration cycle"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Controller triggers an expiration cycle",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "expiration_trigger_condition": "time_elapsed"
+          },
+          "steps": [
+            "When the expiration trigger condition is met"
+          ],
+          "expected": [
+            "the controller triggers an expiration cycle"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Controller meets PIP targets in the range 5-55cmH2O +/- 5cm",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "pip": 5
+          },
+          "steps": [
+            "When the controller commands a PIP of 5cmH2O"
+          ],
+          "expected": [
+            "the controller meets the PIP target within the range 5-55cmH2O +/- 5cm"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Controller meets PIP targets in the range 5-55cmH2O +/- 5cm",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "pip": 55
+          },
+          "steps": [
+            "When the controller commands a PIP of 55cmH2O"
+          ],
+          "expected": [
+            "the controller meets the PIP target within the range 5-55cmH2O +/- 5cm"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Controller meets PIP targets in the range 5-55cmH2O +/- 5cm",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "pip": 30
+          },
+          "steps": [
+            "When the controller commands a PIP of 30cmH2O"
+          ],
+          "expected": [
+            "the controller meets the PIP target within the range 5-55cmH2O +/- 5cm"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Controller meets PIP targets in the range 5-55cmH2O +/- 5cm",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "pip": 0
+          },
+          "steps": [
+            "When the controller commands a PIP of 0cmH2O"
+          ],
+          "expected": [
+            "the controller meets the PIP target within the range 5-55cmH2O +/- 5cm"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Controller meets PIP targets in the range 5-55cmH2O +/- 5cm",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "pip": 60
+          },
+          "steps": [
+            "When the controller commands a PIP of 60cmH2O"
+          ],
+          "expected": [
+            "the controller meets the PIP target within the range 5-55cmH2O +/- 5cm"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Controller meets commanded breath rate within +- 1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "breath_rate": 10
+          },
+          "steps": [
+            "When the controller commands a breath rate of 10breaths/min"
+          ],
+          "expected": [
+            "the controller meets the commanded breath rate within +- 1 breath"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Controller meets commanded breath rate within +- 1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "breath_rate": 30
+          },
+          "steps": [
+            "When the controller commands a breath rate of 30breaths/min"
+          ],
+          "expected": [
+            "the controller meets the commanded breath rate within +- 1 breath"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Controller meets commanded breath rate within +- 1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "breath_rate": 1
+          },
+          "steps": [
+            "When the controller commands a breath rate of 1breaths/min"
+          ],
+          "expected": [
+            "the controller meets the commanded breath rate within +- 1 breath"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Controller meets commanded breath rate within +- 1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "breath_rate": 0
+          },
+          "steps": [
+            "When the controller commands a breath rate of 0breaths/min"
+          ],
+          "expected": [
+            "the controller meets the commanded breath rate within +- 1 breath"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "Controller meets commanded breath rate within +- 1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "breath_rate": 100
+          },
+          "steps": [
+            "When the controller commands a breath rate of 100breaths/min"
+          ],
+          "expected": [
+            "the controller meets the commanded breath rate within +- 1 breath"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.9,
+        "groundedness_mg": 0.9091,
+        "hallucinated": [
+          {
+            "value": "end_of_inspiration",
+            "context": "expiration trigger condition",
+            "grounded": false
+          },
+          {
+            "value": "time_elapsed",
+            "context": "expiration trigger condition",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 22,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Oracles are vague; no concrete value checks",
+          "Missing timing bounds for RW-SW-4",
+          "Triggers for RW-SW-56 and RW-SW-57 are unspecified; tests use invented conditions",
+          "Boundary tests lack exact boundary values (e.g., -4cm, 5cm, 55cm, 1breath, 0breath, 100breath)",
+          "No verification of actual measured values (PEEP, PIP, breath rate) against targets"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.8464,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,954 @@
+{
+  "unit_id": "U10_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.8,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.9231,
+    "hallucinated": [
+      {
+        "value": "average leakage over 10 seconds is \"n/a\"",
+        "context": "precondition",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 13,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Duplicate scenarios for edge and invalid values; use Scenario Outline with Examples.",
+      "No negative tests for involuntary shutdown and AC mains power loss alarms.",
+      "Sensor connectivity (RW-SW-118) not explicitly asserted.",
+      "Boundary for 2‑minute duration not tested; only 'at least 2 minutes' asserted.",
+      "Threshold just above 3 L/min (e.g., 3.1 L/min) not tested."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.8835,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Alarms\n\n  Scenario: High Leakage Alarm\n    Given the average leakage over 10 seconds is 4 L/min\n    When the GUI computes the alarm\n    Then the \"high leakage\" alarm should be active\n    And the alarm should be high priority\n\n  Scenario: High Leakage Alarm with Edge Value\n    Given the average leakage over 10 seconds is 3 L/min\n    When the GUI computes the alarm\n    Then the \"high leakage\" alarm should not be active\n\n  Scenario: High Leakage Alarm with Invalid Value\n    Given the average leakage over 10 seconds is \"n/a\"\n    When the GUI computes the alarm\n    Then the \"high leakage\" alarm should not be active\n\n  Scenario: Involuntary Shutdown Alarm\n    Given the system detects an involuntary shutdown\n    When the GUI computes the alarm\n    Then the \"involuntary shutdown\" alarm should be active\n    And the alarm should be a continuous-tone alarm\n    And the alarm should emit a sound tone for at least 2 minutes\n\n  Scenario: Involuntary Shutdown Alarm with Edge Value\n    Given the system detects an involuntary shutdown\n    When the GUI computes the alarm\n    Then the \"involuntary shutdown\" alarm should be active\n    And the alarm should be a continuous-tone alarm\n    And the alarm should emit a sound tone for at least 2 minutes\n\n  Scenario: Involuntary Shutdown Alarm with Invalid Value\n    Given the system detects an involuntary shutdown\n    When the GUI computes the alarm\n    Then the \"involuntary shutdown\" alarm should be active\n    And the alarm should be a continuous-tone alarm\n    And the alarm should emit a sound tone for at least 2 minutes\n\n  Scenario: AC Mains Power Loss Alarm\n    Given the AC mains power loss sensor detects a loss\n    When the GUI computes the alarm\n    Then the AC mains power loss alarm should be active\n    And the alarm should be medium priority\n\n  Scenario: AC Mains Power Loss Alarm with Edge Value\n    Given the AC mains power loss sensor detects a loss\n    When the GUI computes the alarm\n    Then the AC mains power loss alarm should be active\n    And the alarm should be medium priority\n\n  Scenario: AC Mains Power Loss Alarm with Invalid Value\n    Given the AC mains power loss sensor detects a loss\n    When the GUI computes the alarm\n    Then the AC mains power loss alarm should be active\n    And the alarm should be medium priority",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "High Leakage Alarm",
+      "req_ids": [
+        "RW-SW-111",
+        "RW-SW-112"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "average leakage over 10 seconds is 4 L/min"
+      ],
+      "inputs": {},
+      "steps": [
+        "GUI computes the alarm"
+      ],
+      "expected": [
+        "high leakage alarm is active",
+        "alarm is high priority"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "High Leakage Alarm with Edge Value",
+      "req_ids": [
+        "RW-SW-111"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "average leakage over 10 seconds is 3 L/min"
+      ],
+      "inputs": {},
+      "steps": [
+        "GUI computes the alarm"
+      ],
+      "expected": [
+        "high leakage alarm is not active"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "High Leakage Alarm with Invalid Value",
+      "req_ids": [
+        "RW-SW-111"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "average leakage over 10 seconds is 'n/a'"
+      ],
+      "inputs": {},
+      "steps": [
+        "GUI computes the alarm"
+      ],
+      "expected": [
+        "high leakage alarm is not active"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Involuntary Shutdown Alarm",
+      "req_ids": [
+        "RW-SW-114",
+        "RW-SW-115",
+        "RW-SW-116"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system detects an involuntary shutdown"
+      ],
+      "inputs": {},
+      "steps": [
+        "GUI computes the alarm"
+      ],
+      "expected": [
+        "involuntary shutdown alarm is active",
+        "alarm is a continuous-tone alarm",
+        "alarm emits a sound tone for at least 2 minutes"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "AC Mains Power Loss Alarm",
+      "req_ids": [
+        "RW-SW-117",
+        "RW-SW-118",
+        "RW-SW-119"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "AC mains power loss sensor detects a loss"
+      ],
+      "inputs": {},
+      "steps": [
+        "GUI computes the alarm"
+      ],
+      "expected": [
+        "AC mains power loss alarm is active",
+        "alarm is medium priority"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarms System Testing\n\n  Scenario: High Leakage Alarm\n    Given the average leakage over 10 seconds is 4 L/min\n    When the system computes the average leakage\n    Then the \"high leakage\" alarm should be active\n    And the alarm should be high priority\n\n  Scenario: High Leakage Alarm Boundary\n    Given the average leakage over 10 seconds is 3 L/min\n    When the system computes the average leakage\n    Then the \"high leakage\" alarm should not be active\n\n  Scenario: Involuntary Shutdown Alarm\n    Given the system detects an involuntary shutdown\n    When the system triggers the involuntary shutdown alarm\n    Then the alarm should be a continuous-tone alarm\n    And the alarm should emit a sound tone for at least 2 minutes\n\n  Scenario: AC Mains Power Loss Alarm\n    Given the system detects a loss of AC mains\n    When the system triggers the AC mains power loss alarm\n    Then the alarm should be medium priority",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "High Leakage Alarm",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "average leakage over 10 seconds is 4 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "system computes the average leakage"
+          ],
+          "expected": [
+            "high leakage alarm should be active",
+            "alarm should be high priority"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "High Leakage Alarm Boundary",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "average leakage over 10 seconds is 3 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "system computes the average leakage"
+          ],
+          "expected": [
+            "high leakage alarm should not be active"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Involuntary Shutdown Alarm",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system detects an involuntary shutdown"
+          ],
+          "inputs": {},
+          "steps": [
+            "system triggers the involuntary shutdown alarm"
+          ],
+          "expected": [
+            "alarm should be a continuous-tone alarm",
+            "alarm should emit a sound tone for at least 2 minutes"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "AC Mains Power Loss Alarm",
+          "req_ids": [
+            "RW-SW-117",
+            "RW-SW-118",
+            "RW-SW-119"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system detects a loss of AC mains"
+          ],
+          "inputs": {},
+          "steps": [
+            "system triggers the AC mains power loss alarm"
+          ],
+          "expected": [
+            "alarm should be medium priority"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.8333,
+        "hallucinated": [
+          {
+            "value": "10 seconds",
+            "context": "time window for leakage averaging",
+            "grounded": false
+          },
+          {
+            "value": "system detects an involuntary shutdown",
+            "context": "system detection capability",
+            "grounded": false
+          },
+          {
+            "value": "X seconds",
+            "context": "time window for leakage averaging",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 18,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Lacks Scenario Outline with Examples covering normal, edge, and invalid values",
+          "No negative test for continuous-tone alarm not being continuous-tone",
+          "No test for AC mains sensor disconnection or failure to detect",
+          "No explicit timing verification for 2‑minute sound duration",
+          "Uses hardcoded 10 seconds which is not specified in the SRS"
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-112"
+        ],
+        "fsa_score": 0.945,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.945; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.8, 'boundary_coverage': 1.0, 'groundedness_mg': 0.8333}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-112'] (add at least one each)\n- ungrounded value '10 seconds' (time window for leakage averaging): remove or use the SRS value\n- ungrounded value 'system detects an involuntary shutdown' (system detection capability): remove or use the SRS value\n- ungrounded value 'X seconds' (time window for leakage averaging): remove or use the SRS value\n- Lacks Scenario Outline with Examples covering normal, edge, and invalid values\n- No negative test for continuous-tone alarm not being continuous-tone\n- No test for AC mains sensor disconnection or failure to detect\n- No explicit timing verification for 2‑minute sound duration\n- Uses hardcoded 10 seconds which is not specified in the SRS",
+      "artifact": "Feature: Alarms System Testing\n\n  Scenario: High Leakage Alarm\n    Given the average leakage over X seconds is greater than 3 L/min\n    When the GUI computes the alarm\n    Then the \"high leakage\" alarm should be active\n    And the \"high leakage\" alarm should be high priority\n\n  Scenario: Involuntary Shutdown Alarm\n    Given the system detects an involuntary shutdown\n    When the GUI computes the alarm\n    Then the \"involuntary shutdown\" alarm should be active\n    And the \"involuntary shutdown\" alarm should be a continuous-tone alarm\n    And the \"involuntary shutdown\" alarm should emit a sound tone for at least 2 minutes\n\n  Scenario: Continuous-Tone Alarm Support\n    Given the alarm subsystem supports continuous-tone alarms\n    When the GUI computes a continuous-tone alarm\n    Then the alarm should be a continuous-tone alarm\n\n  Scenario: AC Mains Power Loss Alarm\n    Given the GUI is connected to the \"AC mains power loss\" sensor\n    And the AC mains power is lost\n    When the GUI computes the alarm\n    Then the AC mains power loss alarm should be active\n    And the AC mains power loss alarm should be medium priority\n\n  Scenario Outline: High Leakage Alarm with Different Leakage Values\n    Given the average leakage over X seconds is <leakage_value> L/min\n    When the GUI computes the alarm\n    Then the \"high leakage\" alarm should be <alarm_status>\n    And the \"high leakage\" alarm should be high priority\n\n    Examples:\n      | leakage_value | alarm_status |\n      |---------------|--------------|\n      | 2.5           | inactive     |\n      | 3.5           | active       |\n      | 4.0           | active       |\n\n  Scenario Outline: Involuntary Shutdown Alarm with Different Detection States\n    Given the system detects an involuntary shutdown is <shutdown_state>\n    When the GUI computes the alarm\n    Then the \"involuntary shutdown\" alarm should be <alarm_status>\n    And the \"involuntary shutdown\" alarm should be a continuous-tone alarm\n    And the \"involuntary shutdown\" alarm should emit a sound tone for at least 2 minutes\n\n    Examples:\n      | shutdown_state | alarm_status |\n      |----------------|--------------|\n      | true           | active       |\n      | false          | inactive     |\n\n  Scenario Outline: AC Mains Power Loss Alarm with Different Power States\n    Given the AC mains power is <power_state>\n    When the GUI computes the alarm\n    Then the AC mains power loss alarm should be <alarm_status>\n    And the AC mains power loss alarm should be medium priority\n\n    Examples:\n      | power_state | alarm_status |\n      |-------------|--------------|\n      | lost        | active       |\n      | present     | inactive     |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "High Leakage Alarm",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given the average leakage over X seconds is greater than 3 L/min",
+            "When the GUI computes the alarm",
+            "Then the \"high leakage\" alarm should be active",
+            "And the \"high leakage\" alarm should be high priority"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-002",
+          "title": "Involuntary Shutdown Alarm",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given the system detects an involuntary shutdown",
+            "When the GUI computes the alarm",
+            "Then the \"involuntary shutdown\" alarm should be active",
+            "And the \"involuntary shutdown\" alarm should be a continuous-tone alarm",
+            "And the \"involuntary shutdown\" alarm should emit a sound tone for at least 2 minutes"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-003",
+          "title": "Continuous-Tone Alarm Support",
+          "req_ids": [
+            "RW-SW-116"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given the alarm subsystem supports continuous-tone alarms",
+            "When the GUI computes a continuous-tone alarm",
+            "Then the alarm should be a continuous-tone alarm"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-004",
+          "title": "AC Mains Power Loss Alarm",
+          "req_ids": [
+            "RW-SW-117",
+            "RW-SW-118",
+            "RW-SW-119"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given the GUI is connected to the \"AC mains power loss\" sensor",
+            "And the AC mains power is lost",
+            "When the GUI computes the alarm",
+            "Then the AC mains power loss alarm should be active",
+            "And the AC mains power loss alarm should be medium priority"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-005",
+          "title": "High Leakage Alarm with Different Leakage Values",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "leakage_value": "2.5"
+          },
+          "steps": [
+            "Given the average leakage over X seconds is 2.5 L/min",
+            "When the GUI computes the alarm",
+            "Then the \"high leakage\" alarm should be inactive",
+            "And the \"high leakage\" alarm should be high priority"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-006",
+          "title": "High Leakage Alarm with Different Leakage Values",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "leakage_value": "3.5"
+          },
+          "steps": [
+            "Given the average leakage over X seconds is 3.5 L/min",
+            "When the GUI computes the alarm",
+            "Then the \"high leakage\" alarm should be active",
+            "And the \"high leakage\" alarm should be high priority"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-007",
+          "title": "High Leakage Alarm with Different Leakage Values",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "leakage_value": "4.0"
+          },
+          "steps": [
+            "Given the average leakage over X seconds is 4.0 L/min",
+            "When the GUI computes the alarm",
+            "Then the \"high leakage\" alarm should be active",
+            "And the \"high leakage\" alarm should be high priority"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-008",
+          "title": "Involuntary Shutdown Alarm with Different Detection States",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "shutdown_state": "true"
+          },
+          "steps": [
+            "Given the system detects an involuntary shutdown is true",
+            "When the GUI computes the alarm",
+            "Then the \"involuntary shutdown\" alarm should be active",
+            "And the \"involuntary shutdown\" alarm should be a continuous-tone alarm",
+            "And the \"involuntary shutdown\" alarm should emit a sound tone for at least 2 minutes"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-009",
+          "title": "Involuntary Shutdown Alarm with Different Detection States",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "shutdown_state": "false"
+          },
+          "steps": [
+            "Given the system detects an involuntary shutdown is false",
+            "When the GUI computes the alarm",
+            "Then the \"involuntary shutdown\" alarm should be inactive"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-010",
+          "title": "AC Mains Power Loss Alarm with Different Power States",
+          "req_ids": [
+            "RW-SW-117",
+            "RW-SW-118",
+            "RW-SW-119"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "power_state": "lost"
+          },
+          "steps": [
+            "Given the AC mains power is lost",
+            "When the GUI computes the alarm",
+            "Then the AC mains power loss alarm should be active",
+            "And the AC mains power loss alarm should be medium priority"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-011",
+          "title": "AC Mains Power Loss Alarm with Different Power States",
+          "req_ids": [
+            "RW-SW-117",
+            "RW-SW-118",
+            "RW-SW-119"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "power_state": "present"
+          },
+          "steps": [
+            "Given the AC mains power is present",
+            "When the GUI computes the alarm",
+            "Then the AC mains power loss alarm should be inactive"
+          ],
+          "expected": []
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): [] should be non-empty",
+          "test case #2 (TC-002): [] should be non-empty",
+          "test case #3 (TC-003): [] should be non-empty",
+          "test case #4 (TC-004): [] should be non-empty",
+          "test case #5 (TC-005): [] should be non-empty",
+          "test case #6 (TC-006): [] should be non-empty",
+          "test case #7 (TC-007): [] should be non-empty",
+          "test case #8 (TC-008): [] should be non-empty",
+          "test case #9 (TC-009): [] should be non-empty",
+          "test case #10 (TC-010): [] should be non-empty"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): [] should be non-empty\n- test case #2 (TC-002): [] should be non-empty\n- test case #3 (TC-003): [] should be non-empty\n- test case #4 (TC-004): [] should be non-empty\n- test case #5 (TC-005): [] should be non-empty\n- test case #6 (TC-006): [] should be non-empty\n- test case #7 (TC-007): [] should be non-empty\n- test case #8 (TC-008): [] should be non-empty\n- test case #9 (TC-009): [] should be non-empty\n- test case #10 (TC-010): [] should be non-empty",
+      "artifact": "Feature: Alarms System Testing\n\n  Scenario: High Leakage Alarm\n    Given the average leakage over X seconds is greater than 3 L/min\n    When the GUI computes the alarm\n    Then the \"high leakage\" alarm should be active\n    And the alarm should be high priority\n\n  Scenario: Involuntary Shutdown Alarm\n    Given the system detects an involuntary shutdown\n    When the GUI computes the alarm\n    Then the \"involuntary shutdown\" alarm should be active\n    And the alarm should be a continuous-tone alarm\n    And the alarm should emit a sound tone for at least 2 minutes\n\n  Scenario: AC Mains Power Loss Alarm\n    Given the AC mains power is lost\n    When the GUI detects the loss\n    Then the \"AC mains power loss\" alarm should be active\n    And the alarm should be medium priority\n\n  Scenario Outline: High Leakage Alarm with Boundary Values\n    Given the average leakage over X seconds is <leakage>\n    When the GUI computes the alarm\n    Then the \"high leakage\" alarm should be <expected_state>\n    And the alarm should be <expected_priority>\n\n    Examples:\n      | leakage | expected_state | expected_priority |\n      | 2.5     | inactive       | n/a               |\n      | 3.0     | inactive       | n/a               |\n      | 3.1     | active         | high              |\n      | 4.0     | active         | high              |\n\n  Scenario Outline: Involuntary Shutdown Alarm with Boundary Values\n    Given the system detects an involuntary shutdown\n    When the GUI computes the alarm\n    Then the \"involuntary shutdown\" alarm should be <expected_state>\n    And the alarm should be a continuous-tone alarm\n    And the alarm should emit a sound tone for at least 2 minutes\n\n    Examples:\n      | expected_state |\n      | inactive       |\n      | active         |\n\n  Scenario Outline: AC Mains Power Loss Alarm with Boundary Values\n    Given the AC mains power is <power_state>\n    When the GUI detects the loss\n    Then the \"AC mains power loss\" alarm should be <expected_state>\n    And the alarm should be medium priority\n\n    Examples:\n      | power_state | expected_state |\n      | connected   | inactive       |\n      | disconnected| active         |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "High Leakage Alarm",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "average leakage over X seconds is greater than 3 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "high leakage alarm should be active",
+            "alarm should be high priority"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Involuntary Shutdown Alarm",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system detects an involuntary shutdown"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "involuntary shutdown alarm should be active",
+            "alarm should be a continuous-tone alarm",
+            "alarm should emit a sound tone for at least 2 minutes"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "AC Mains Power Loss Alarm",
+          "req_ids": [
+            "RW-SW-117",
+            "RW-SW-118",
+            "RW-SW-119"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "AC mains power is lost"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI detects the loss"
+          ],
+          "expected": [
+            "AC mains power loss alarm should be active",
+            "alarm should be medium priority"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "High Leakage Alarm with Boundary Values",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "average leakage over X seconds is 2.5 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "high leakage alarm should be inactive",
+            "alarm should be n/a"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "High Leakage Alarm with Boundary Values",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "average leakage over X seconds is 3.0 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "high leakage alarm should be inactive",
+            "alarm should be n/a"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "High Leakage Alarm with Boundary Values",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "average leakage over X seconds is 3.1 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "high leakage alarm should be active",
+            "alarm should be high"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "High Leakage Alarm with Boundary Values",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "average leakage over X seconds is 4.0 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "high leakage alarm should be active",
+            "alarm should be high"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Involuntary Shutdown Alarm with Boundary Values",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system detects an involuntary shutdown"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "involuntary shutdown alarm should be inactive"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "AC Mains Power Loss Alarm with Boundary Values",
+          "req_ids": [
+            "RW-SW-117",
+            "RW-SW-118",
+            "RW-SW-119"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "AC mains power is connected"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI detects the loss"
+          ],
+          "expected": [
+            "AC mains power loss alarm should be inactive"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "AC Mains Power Loss Alarm with Boundary Values",
+          "req_ids": [
+            "RW-SW-117",
+            "RW-SW-118",
+            "RW-SW-119"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "AC mains power is disconnected"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI detects the loss"
+          ],
+          "expected": [
+            "AC mains power loss alarm should be active"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.6666666667,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.9444,
+        "hallucinated": [
+          {
+            "value": "n/a",
+            "context": "priority when alarm inactive",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 18,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "TC-001 combines two requirements (111 and 112) in a single scenario, violating the uniqueness rule.",
+          "TC-008 incorrectly tests an inactive alarm when a shutdown is detected; it should test inactivity when no shutdown occurs.",
+          "The \"n/a\" priority value is not defined in the SRS; tests should use explicit values or omit the priority assertion when the alarm is inactive.",
+          "The test suite does not explicitly verify that the alarm subsystem supports continuous-tone alarms (requirement 116) beyond asserting the property.",
+          "The AC mains power loss sensor connection (requirement 118) is not directly verified; tests only detect loss but do not confirm sensor linkage."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-112"
+        ],
+        "fsa_score": 0.9267,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.9267; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.6666666667, 'oracle_assertiveness': 0.9, 'boundary_coverage': 1.0, 'groundedness_mg': 0.9444}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-112'] (add at least one each)\n- ungrounded value 'n/a' (priority when alarm inactive): remove or use the SRS value\n- TC-001 combines two requirements (111 and 112) in a single scenario, violating the uniqueness rule.\n- TC-008 incorrectly tests an inactive alarm when a shutdown is detected; it should test inactivity when no shutdown occurs.\n- The \"n/a\" priority value is not defined in the SRS; tests should use explicit values or omit the priority assertion when the alarm is inactive.\n- The test suite does not explicitly verify that the alarm subsystem supports continuous-tone alarms (requirement 116) beyond asserting the property.\n- The AC mains power loss sensor connection (requirement 118) is not directly verified; tests only detect loss but do not confirm sensor linkage.",
+      "artifact": "Feature: Alarms\n\n  Scenario: High Leakage Alarm\n    Given the average leakage over 10 seconds is 4 L/min\n    When the GUI computes the alarm\n    Then the \"high leakage\" alarm should be active\n    And the alarm should be high priority\n\n  Scenario: High Leakage Alarm with Edge Value\n    Given the average leakage over 10 seconds is 3 L/min\n    When the GUI computes the alarm\n    Then the \"high leakage\" alarm should not be active\n\n  Scenario: High Leakage Alarm with Invalid Value\n    Given the average leakage over 10 seconds is \"n/a\"\n    When the GUI computes the alarm\n    Then the \"high leakage\" alarm should not be active\n\n  Scenario: Involuntary Shutdown Alarm\n    Given the system detects an involuntary shutdown\n    When the GUI computes the alarm\n    Then the \"involuntary shutdown\" alarm should be active\n    And the alarm should be a continuous-tone alarm\n    And the alarm should emit a sound tone for at least 2 minutes\n\n  Scenario: Involuntary Shutdown Alarm with Edge Value\n    Given the system detects an involuntary shutdown\n    When the GUI computes the alarm\n    Then the \"involuntary shutdown\" alarm should be active\n    And the alarm should be a continuous-tone alarm\n    And the alarm should emit a sound tone for at least 2 minutes\n\n  Scenario: Involuntary Shutdown Alarm with Invalid Value\n    Given the system detects an involuntary shutdown\n    When the GUI computes the alarm\n    Then the \"involuntary shutdown\" alarm should be active\n    And the alarm should be a continuous-tone alarm\n    And the alarm should emit a sound tone for at least 2 minutes\n\n  Scenario: AC Mains Power Loss Alarm\n    Given the AC mains power loss sensor detects a loss\n    When the GUI computes the alarm\n    Then the AC mains power loss alarm should be active\n    And the alarm should be medium priority\n\n  Scenario: AC Mains Power Loss Alarm with Edge Value\n    Given the AC mains power loss sensor detects a loss\n    When the GUI computes the alarm\n    Then the AC mains power loss alarm should be active\n    And the alarm should be medium priority\n\n  Scenario: AC Mains Power Loss Alarm with Invalid Value\n    Given the AC mains power loss sensor detects a loss\n    When the GUI computes the alarm\n    Then the AC mains power loss alarm should be active\n    And the alarm should be medium priority",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "High Leakage Alarm",
+          "req_ids": [
+            "RW-SW-111",
+            "RW-SW-112"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "average leakage over 10 seconds is 4 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "high leakage alarm is active",
+            "alarm is high priority"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "High Leakage Alarm with Edge Value",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "average leakage over 10 seconds is 3 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "high leakage alarm is not active"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "High Leakage Alarm with Invalid Value",
+          "req_ids": [
+            "RW-SW-111"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "average leakage over 10 seconds is 'n/a'"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "high leakage alarm is not active"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Involuntary Shutdown Alarm",
+          "req_ids": [
+            "RW-SW-114",
+            "RW-SW-115",
+            "RW-SW-116"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system detects an involuntary shutdown"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "involuntary shutdown alarm is active",
+            "alarm is a continuous-tone alarm",
+            "alarm emits a sound tone for at least 2 minutes"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "AC Mains Power Loss Alarm",
+          "req_ids": [
+            "RW-SW-117",
+            "RW-SW-118",
+            "RW-SW-119"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "AC mains power loss sensor detects a loss"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI computes the alarm"
+          ],
+          "expected": [
+            "AC mains power loss alarm is active",
+            "alarm is medium priority"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.9231,
+        "hallucinated": [
+          {
+            "value": "average leakage over 10 seconds is \"n/a\"",
+            "context": "precondition",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 13,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Duplicate scenarios for edge and invalid values; use Scenario Outline with Examples.",
+          "No negative tests for involuntary shutdown and AC mains power loss alarms.",
+          "Sensor connectivity (RW-SW-118) not explicitly asserted.",
+          "Boundary for 2‑minute duration not tested; only 'at least 2 minutes' asserted.",
+          "Threshold just above 3 L/min (e.g., 3.1 L/min) not tested."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.8835,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

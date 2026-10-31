@@ -1,0 +1,753 @@
+{
+  "unit_id": "U30_27",
+  "representation": "FSM Path-Based Representations",
+  "generator": "ollama:codegemma:7b",
+  "system_type": "safety_critical",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "FSM Path-Based Representations",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.8,
+    "sfv_score": 0.9,
+    "threshold": 0.7,
+    "sfv_pass": true,
+    "issues": [
+      "missing: transitions (>=2)"
+    ]
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 0.75,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 0.0,
+    "groundedness_mg": 0.2143,
+    "hallucinated": [
+      {
+        "value": "Headache, Nausea",
+        "context": "symptoms",
+        "grounded": false
+      },
+      {
+        "value": "Medical Report.pdf",
+        "context": "report file",
+        "grounded": false
+      },
+      {
+        "value": "Fever, Cough",
+        "context": "symptoms",
+        "grounded": false
+      },
+      {
+        "value": "Patient Consultation File",
+        "context": "file",
+        "grounded": false
+      },
+      {
+        "value": "Disease prediction fails",
+        "context": "message",
+        "grounded": false
+      },
+      {
+        "value": "Flu",
+        "context": "diagnosis",
+        "grounded": false
+      },
+      {
+        "value": "Consultation File",
+        "context": "file",
+        "grounded": false
+      },
+      {
+        "value": "Paracetamol",
+        "context": "medicine",
+        "grounded": false
+      },
+      {
+        "value": "Blood Test",
+        "context": "lab request",
+        "grounded": false
+      },
+      {
+        "value": "Ready for pickup",
+        "context": "status",
+        "grounded": false
+      },
+      {
+        "value": "Medicine is delivered to patient",
+        "context": "message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 14,
+    "uncovered_clauses": [
+      "Req-6/3",
+      "VCSYSS03"
+    ],
+    "weaknesses": [
+      "Add tests for batch appointment creation (Req-6/3) and purging",
+      "Include negative tests for invalid symptom input or missing reports",
+      "Assert concrete values (file names, status codes) instead of vague messages",
+      "Cover boundary conditions such as appointment for next day vs later days",
+      "Add tests for reporting requirements (VCSYSS03) like consultation counts and revenue"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.4989,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "## FSM Path-Based Representations Test Suite for U30_27\n\n**States:**\n\n* Patient Home\n* Consultation Request\n* Appointment Request\n* Offline Consultation Request\n* Disease Prediction\n* Diagnosis\n* Prescription\n* Lab Request\n* Chemist View\n* Medicine Delivery\n\n**Transitions:**\n\n* Patient submits Consultation Request\n* System predicts disease\n* Doctor provides diagnosis\n* Doctor prescribes medicine\n* Doctor suggests lab request\n* Chemist updates prescription status\n* System delivers medicine\n\n**Initial State:** Patient Home\n\n**Events/Guards:**\n\n* Patient clicks \"Raise Consultation Request\"\n* Patient enters symptoms and uploads reports\n* Patient selects mode of request\n* System creates Consultation Request\n* System creates Appointment Request if mode is Appointment\n* System creates Offline Consultation Request if mode is Offline\n* System predicts disease based on machine learning\n* Doctor provides diagnosis\n* Doctor prescribes medicine\n* Doctor suggests lab request\n* Chemist updates prescription status\n* System delivers medicine\n\n**Test Cases:**",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Patient raises Appointment Consultation Request",
+      "req_ids": [
+        "VCSYSS03",
+        "Req-6",
+        "Req-6/1",
+        "Req-6/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient is registered"
+      ],
+      "inputs": {
+        "symptoms": "Headache, Nausea",
+        "reports": [
+          "Medical Report.pdf"
+        ],
+        "mode": "Appointment"
+      },
+      "steps": [
+        "Patient submits Consultation Request",
+        "System creates Appointment Request"
+      ],
+      "expected": [
+        "Appointment request is created in Patient Appointment File"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Patient raises Offline Consultation Request",
+      "req_ids": [
+        "VCSYSS03",
+        "Req-6",
+        "Req-6/1",
+        "Req-6/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient is registered"
+      ],
+      "inputs": {
+        "symptoms": "Fever, Cough",
+        "reports": [
+          "Medical Report.pdf"
+        ],
+        "mode": "Offline"
+      },
+      "steps": [
+        "Patient submits Consultation Request",
+        "System creates Offline Consultation Request"
+      ],
+      "expected": [
+        "Offline consultation request is created in Patient Consultation File"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Disease prediction fails",
+      "req_ids": [
+        "VCSYSS03",
+        "Req-7"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Consultation request is created"
+      ],
+      "inputs": {},
+      "steps": [
+        "System predicts disease"
+      ],
+      "expected": [
+        "Disease prediction fails"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Doctor provides diagnosis",
+      "req_ids": [
+        "VCSYSS03",
+        "Req-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Disease is predicted"
+      ],
+      "inputs": {
+        "diagnosis": "Flu"
+      },
+      "steps": [
+        "Doctor provides diagnosis"
+      ],
+      "expected": [
+        "Diagnosis is recorded in Consultation File"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Doctor prescribes medicine",
+      "req_ids": [
+        "VCSYSS03",
+        "Req-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Diagnosis is provided"
+      ],
+      "inputs": {
+        "medicine": "Paracetamol"
+      },
+      "steps": [
+        "Doctor prescribes medicine"
+      ],
+      "expected": [
+        "Medicine is recorded in Consultation File"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Doctor suggests lab request",
+      "req_ids": [
+        "VCSYSS03",
+        "Req-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Medicine is prescribed"
+      ],
+      "inputs": {
+        "lab_request": "Blood Test"
+      },
+      "steps": [
+        "Doctor suggests lab request"
+      ],
+      "expected": [
+        "Lab request is recorded in Consultation File"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Chemist updates prescription status",
+      "req_ids": [
+        "VCSYSS03",
+        "Req-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Prescription is created"
+      ],
+      "inputs": {
+        "status": "Ready for pickup"
+      },
+      "steps": [
+        "Chemist updates prescription status"
+      ],
+      "expected": [
+        "Prescription status is updated in Consultation File"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Medicine is delivered",
+      "req_ids": [
+        "VCSYSS03",
+        "Req-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Prescription is ready for pickup"
+      ],
+      "inputs": {},
+      "steps": [
+        "System delivers medicine"
+      ],
+      "expected": [
+        "Medicine is delivered to patient"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "## FSM Path-Based Representations Test Suite for U30_27\n\n**States:**\n\n* Patient Home\n* Consultation Request\n* Appointment Request\n* Offline Consultation Request\n* Diagnosis\n* Prescription\n* Lab Request\n* Chemist Dashboard\n* Medicine Delivery\n\n**Transitions:**\n\n* Patient submits Consultation Request\n* System prioritizes Consultation Request\n* Doctor provides Diagnosis\n* Doctor prescribes Medicine\n* Doctor suggests Lab Request\n* Chemist receives Prescription\n* Chemist updates Prescription Status\n* System delivers Medicine\n\n**Test Paths:**\n\n**1. Positive Path:**\n\n* Patient submits Consultation Request for Appointment.\n* System creates Appointment Request in Patient Appointment File.\n* Doctor provides Diagnosis.\n* Doctor prescribes Medicine.\n* Doctor suggests Lab Request.\n* Chemist receives Prescription.\n* Chemist updates Prescription Status.\n* System delivers Medicine.\n\n**2. Negative Path:**\n\n* Patient submits Consultation Request for Offline Consultation.\n* System fails to create Offline Consultation Request.\n\n**3. Boundary Value:**\n\n* Patient submits Consultation Request with maximum number of symptoms.\n\n**4. Error Path:**\n\n* Patient submits Consultation Request with invalid mode.\n\n**5. Loop:**\n\n* Patient revisits Consultation Request page.\n\n**JSON Test Cases:**",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "FSM Path-Based Representations",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.4,
+        "sfv_score": 0.2,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: transitions (>=2)",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.20). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- missing: transitions (>=2)\n- missing: initial state\n- missing: events/guards",
+      "artifact": "## FSM Path-Based Representations Test Suite for U30_27\n\n**States:**\n\n* Patient Home\n* Consultation Request\n* Appointment Request\n* Offline Consultation Request\n* Disease Prediction\n* Diagnosis\n* Prescription\n* Lab Request\n* Chemist View\n* Medicine Delivery\n\n**Transitions:**\n\n* Patient submits Consultation Request\n* System predicts disease\n* Doctor provides diagnosis\n* Doctor prescribes medicine\n* Doctor suggests lab request\n* Chemist updates prescription status\n* System delivers medicine\n\n**Initial State:** Patient Home\n\n**Events/Guards:**\n\n* Patient clicks \"Raise Consultation Request\"\n* Patient enters symptoms and uploads reports\n* Patient selects mode of request\n* System creates Consultation Request\n* System creates Appointment Request if mode is Appointment\n* System creates Offline Consultation Request if mode is Offline\n* System predicts disease based on machine learning\n* Doctor provides diagnosis\n* Doctor prescribes medicine\n* Doctor suggests lab request\n* Chemist updates prescription status\n* System delivers medicine\n\n**Test Cases:**",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient raises Appointment Consultation Request",
+          "req_ids": [
+            "VCSYSS03",
+            "Req-6",
+            "Req-6/1",
+            "Req-6/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "symptoms": "Headache, Nausea",
+            "reports": [
+              "Medical Report.pdf"
+            ],
+            "mode": "Appointment"
+          },
+          "steps": [
+            "Patient submits Consultation Request",
+            "System creates Appointment Request"
+          ],
+          "expected": [
+            "Appointment request is created in Patient Appointment File"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient raises Offline Consultation Request",
+          "req_ids": [
+            "VCSYSS03",
+            "Req-6",
+            "Req-6/1",
+            "Req-6/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "symptoms": "Fever, Cough",
+            "reports": [
+              "Medical Report.pdf"
+            ],
+            "mode": "Offline"
+          },
+          "steps": [
+            "Patient submits Consultation Request",
+            "System creates Offline Consultation Request"
+          ],
+          "expected": [
+            "Offline consultation request is created in Patient Consultation File"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Disease prediction fails",
+          "req_ids": [
+            "VCSYSS03",
+            "Req-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Consultation request is created"
+          ],
+          "inputs": {},
+          "steps": [
+            "System predicts disease"
+          ],
+          "expected": [
+            "Disease prediction fails"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Doctor provides diagnosis",
+          "req_ids": [
+            "VCSYSS03",
+            "Req-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Disease is predicted"
+          ],
+          "inputs": {
+            "diagnosis": "Flu"
+          },
+          "steps": [
+            "Doctor provides diagnosis"
+          ],
+          "expected": [
+            "Diagnosis is recorded in Consultation File"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor prescribes medicine",
+          "req_ids": [
+            "VCSYSS03",
+            "Req-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Diagnosis is provided"
+          ],
+          "inputs": {
+            "medicine": "Paracetamol"
+          },
+          "steps": [
+            "Doctor prescribes medicine"
+          ],
+          "expected": [
+            "Medicine is recorded in Consultation File"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Doctor suggests lab request",
+          "req_ids": [
+            "VCSYSS03",
+            "Req-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Medicine is prescribed"
+          ],
+          "inputs": {
+            "lab_request": "Blood Test"
+          },
+          "steps": [
+            "Doctor suggests lab request"
+          ],
+          "expected": [
+            "Lab request is recorded in Consultation File"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Chemist updates prescription status",
+          "req_ids": [
+            "VCSYSS03",
+            "Req-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription is created"
+          ],
+          "inputs": {
+            "status": "Ready for pickup"
+          },
+          "steps": [
+            "Chemist updates prescription status"
+          ],
+          "expected": [
+            "Prescription status is updated in Consultation File"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Medicine is delivered",
+          "req_ids": [
+            "VCSYSS03",
+            "Req-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription is ready for pickup"
+          ],
+          "inputs": {},
+          "steps": [
+            "System delivers medicine"
+          ],
+          "expected": [
+            "Medicine is delivered to patient"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "FSM Path-Based Representations",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": [
+          "missing: transitions (>=2)"
+        ]
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.2143,
+        "hallucinated": [
+          {
+            "value": "Headache, Nausea",
+            "context": "symptoms",
+            "grounded": false
+          },
+          {
+            "value": "Medical Report.pdf",
+            "context": "report file",
+            "grounded": false
+          },
+          {
+            "value": "Fever, Cough",
+            "context": "symptoms",
+            "grounded": false
+          },
+          {
+            "value": "Patient Consultation File",
+            "context": "file",
+            "grounded": false
+          },
+          {
+            "value": "Disease prediction fails",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Flu",
+            "context": "diagnosis",
+            "grounded": false
+          },
+          {
+            "value": "Consultation File",
+            "context": "file",
+            "grounded": false
+          },
+          {
+            "value": "Paracetamol",
+            "context": "medicine",
+            "grounded": false
+          },
+          {
+            "value": "Blood Test",
+            "context": "lab request",
+            "grounded": false
+          },
+          {
+            "value": "Ready for pickup",
+            "context": "status",
+            "grounded": false
+          },
+          {
+            "value": "Medicine is delivered to patient",
+            "context": "message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 14,
+        "uncovered_clauses": [
+          "Req-6/3",
+          "VCSYSS03"
+        ],
+        "weaknesses": [
+          "Add tests for batch appointment creation (Req-6/3) and purging",
+          "Include negative tests for invalid symptom input or missing reports",
+          "Assert concrete values (file names, status codes) instead of vague messages",
+          "Cover boundary conditions such as appointment for next day vs later days",
+          "Add tests for reporting requirements (VCSYSS03) like consultation counts and revenue"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.4989,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.4989; sub-scores {'clause_coverage': 0.75, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.0, 'groundedness_mg': 0.2143}). Output the full improved suite addressing:\n- uncovered clause: Req-6/3\n- uncovered clause: VCSYSS03\n- ungrounded value 'Headache, Nausea' (symptoms): remove or use the SRS value\n- ungrounded value 'Medical Report.pdf' (report file): remove or use the SRS value\n- ungrounded value 'Fever, Cough' (symptoms): remove or use the SRS value\n- ungrounded value 'Patient Consultation File' (file): remove or use the SRS value\n- ungrounded value 'Disease prediction fails' (message): remove or use the SRS value\n- ungrounded value 'Flu' (diagnosis): remove or use the SRS value\n- Add tests for batch appointment creation (Req-6/3) and purging\n- Include negative tests for invalid symptom input or missing reports\n- Assert concrete values (file names, status codes) instead of vague messages\n- Cover boundary conditions such as appointment for next day vs later days\n- Add tests for reporting requirements (VCSYSS03) like consultation counts and revenue",
+      "artifact": "## FSM Path-Based Test Suite for U30_27\n\n**States:**\n\n* Patient Home\n* Consultation Request\n* Appointment Booking\n* Offline Consultation\n* Disease Prediction\n* Diagnosis\n* Prescription\n* Lab Request\n* Chemist Dashboard\n* Patient Consultation File\n\n**Transitions:**\n\n* Patient submits Consultation Request\n* System predicts disease\n* Doctor diagnoses patient\n* Doctor prescribes medicine\n* Doctor suggests lab request\n* Chemist receives prescription\n* Chemist updates prescription status\n* Patient receives medicine\n\n**Test Paths:**\n\n**1. Consultation Request:**\n\n* Patient submits Consultation Request with symptoms, reports, and Offline mode.\n* System predicts disease.\n* Doctor diagnoses patient.\n* Doctor prescribes medicine.\n* Doctor suggests lab request.\n* Patient receives medicine.\n\n**2. Appointment Booking:**\n\n* Patient submits Consultation Request with symptoms, reports, and Appointment mode.\n* System creates Appointment Booking entry for next day.\n\n**3. Offline Consultation:**\n\n* Patient submits Consultation Request with symptoms, reports, and Offline mode.\n* Patient receives medicine.\n\n**4. Disease Prediction Failure:**\n\n* System predicts disease fails.\n* Doctor diagnoses patient with alternative diagnosis.\n\n**5. Boundary Condition:**\n\n* Appointment Booking entry is created for next day vs. later day.\n\n**JSON Test Cases:**",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Submit Offline Consultation Request",
+          "req_ids": [
+            "Req-6",
+            "Req-6/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "symptoms": "Headache, Nausea",
+            "reports": "Medical Report.pdf",
+            "mode": "Offline"
+          },
+          "steps": [
+            "Submit Consultation Request"
+          ],
+          "expected": [
+            "Medicine is received"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Create Appointment Booking",
+          "req_ids": [
+            "Req-6",
+            "Req-6/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "symptoms": "Fever, Cough",
+            "mode": "Appointment"
+          },
+          "steps": [
+            "Submit Consultation Request"
+          ],
+          "expected": [
+            "Appointment Booking entry is created for next day"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Submit Offline Consultation Request with Missing Report",
+          "req_ids": [
+            "Req-6",
+            "Req-6/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "symptoms": "Headache, Nausea",
+            "reports": "",
+            "mode": "Offline"
+          },
+          "steps": [
+            "Submit Consultation Request"
+          ],
+          "expected": [
+            "Error message is displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Disease Prediction Failure",
+          "req_ids": [
+            "Req-7",
+            "Req-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient submits Consultation Request"
+          ],
+          "inputs": {},
+          "steps": [
+            "Disease prediction fails"
+          ],
+          "expected": [
+            "Alternative diagnosis is provided"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Appointment Booking for Later Day",
+          "req_ids": [
+            "Req-6/3"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Patient submits Consultation Request"
+          ],
+          "inputs": {
+            "mode": "Appointment"
+          },
+          "steps": [
+            "Appointment Booking entry is created for later day"
+          ],
+          "expected": [
+            "Appointment Booking entry is created for later day"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "FSM Path-Based Representations",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.4,
+        "sfv_score": 0.7,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.70). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: initial state\n- missing: events/guards",
+      "artifact": "## FSM Path-Based Representations Test Suite for U30_27\n\n**States:**\n\n* `Initial`\n* `PatientRequestCreated`\n* `AppointmentCreated`\n* `DiagnosisProvided`\n* `PrescriptionCreated`\n* `LabRequestSuggested`\n* `PrescriptionDelivered`\n\n**Transitions:**\n\n* `Initial` -> `PatientRequestCreated` (Patient submits consultation request)\n* `PatientRequestCreated` -> `AppointmentCreated` (Appointment request is created)\n* `PatientRequestCreated` -> `DiagnosisProvided` (Offline consultation request is submitted)\n* `AppointmentCreated` -> `DiagnosisProvided` (Doctor provides diagnosis)\n* `DiagnosisProvided` -> `PrescriptionCreated` (Doctor prescribes medicines)\n* `DiagnosisProvided` -> `LabRequestSuggested` (Doctor suggests lab tests)\n* `PrescriptionCreated` -> `PrescriptionDelivered` (Chemist delivers medicines)\n\n**Initial State:** `Initial`\n\n**Events/Guards:**\n\n* `PatientSubmitsRequest` (patient submits consultation request)\n* `DoctorProvidesDiagnosis` (doctor provides diagnosis)\n* `ChemistDeliversMedicines` (chemist delivers medicines)\n\n**Test Cases:**\n\n| ID | Title | Req IDs | Kind | Preconditions | Inputs | Steps | Expected |\n|---|---|---|---|---|---|---|---|\n| TC-001 | Create Appointment Request | [Req-6, Req-6/1, Req-6/2] | Positive | Patient is registered | Symptoms, reports, appointment mode | Submit consultation request | Appointment request is created in Patient Appointment File |\n| TC-002 | Create Offline Consultation Request | [Req-6, Req-6/1] | Positive | Patient is registered | Symptoms, reports, offline mode | Submit consultation request | Consultation request is created in Patient Consultation File |\n| TC-003 | Invalid Appointment Mode | [Req-6/1] | Negative | Patient is registered | Symptoms, reports, invalid mode | Submit consultation request | Error message is displayed |\n| TC-004 | Create Appointment Request for Next Day | [Req-6/2] | Positive | Patient is registered | Symptoms, reports, appointment mode, next day date | Submit consultation request | Appointment request is created in Patient Appointment File |\n| TC-005 | Create Consultation Request with Missing Symptoms | [Req-6/1] | Negative | Patient is registered | Missing symptoms, reports, mode | Submit consultation request | Error message is displayed |\n| TC-006 | Create Consultation Request with Missing Reports | [Req-6/1] | Negative | Patient is registered | Symptoms, missing reports, mode | Submit consultation request | Error message is displayed |\n| TC-007 | Create Consultation Request with Missing Mode | [Req-6/1] | Negative | Patient is registered | Symptoms, reports, missing mode | Submit consultation request | Error message is displayed |\n| TC-008 | Doctor Provides Diagnosis | [Req-7, Req-8] | Positive | Consultation request is created | Patient symptoms, reports | Provide diagnosis | Diagnosis is provided in Patient Consultation File |\n| TC-009 | Doctor Prescribes Medicines | [Req-7, Req-8] | Positive | Diagnosis is provided | Patient diagnosis | Create prescription | Prescription is created in Patient Consultation File |\n| TC-010 | Doctor Suggests Lab Tests | [Req-7, Req-8] | Positive | Diagnosis is provided | Patient diagnosis | Suggest lab tests | Lab tests are suggested in Patient Consultation File |\n| TC-011 | Chemist Delivers Medicines | [Req-9] | Positive | Prescription is created | Patient prescription | Deliver medicines | Medicines are delivered to patient |",
+      "test_cases": [],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "FSM Path-Based Representations",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.4,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: transitions (>=2)"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,1263 @@
+{
+  "unit_id": "U16_5",
+  "representation": "Use-Cases & User Stories",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Use-Cases & User Stories",
+    "group": 1,
+    "schema_score": 0.8,
+    "representation_score": 1.0,
+    "sfv_score": 0.9,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']"
+    ]
+  },
+  "fsa": null,
+  "artifact": "**Use-Cases & User Stories**\n\n*Actor:* Patient Registration Officer (PRO)\n\n---\n\n### Use-Case: Register a New Patient (Req-5/1)\n\n**Primary Success Flow:**\n1. PRO enters patient details (name, DOB, contact info, etc.).\n2. System validates input fields.\n3. System stores patient details in the database.\n4. System returns confirmation of successful registration.\n\n**Alternative Flow:**\n1. If the patient ID already exists, system prompts PRO to update existing record.\n2. PRO chooses to update; system navigates to Update Patient Details use-case.\n\n**Exception Flow:**\n1. If validation fails (e.g., missing mandatory fields), system displays error message.\n2. PRO corrects input and retries registration.\n\n---\n\n### Use-Case: View and Update Existing Patient Details (Req-5/2)\n\n**Primary Success Flow:**\n1. PRO enters patient ID.\n2. System retrieves latest patient details from database.\n3. PRO views details on screen.\n4. PRO selects \"Update\" to modify any fields.\n5. System validates updated fields and saves changes.\n6. System confirms update success.\n\n**Alternative Flow:**\n1. If the patient ID does not exist, system informs PRO and prompts to register a new patient.\n\n**Exception Flow:**\n1. If update validation fails (e.g., invalid date format), system displays specific error.\n2. PRO corrects input and retries update.\n\n---\n\n### Use-Case: Delete Patient Details (Req-5/3)\n\n**Primary Success Flow:**\n1. PRO enters patient ID.\n2. System checks consultation request history for the last 3 years.\n3. If no recent consultation requests, system deletes patient details.\n4. System confirms deletion.\n\n**Alternative Flow:**\n1. If consultation requests exist within the last 3 years, system informs PRO that deletion is prohibited.\n\n**Exception Flow:**\n1. If system encounters a database error during deletion, it rolls back and informs PRO.\n\n---\n\n### Use-Case: Rollback by a Month (VIRTUA-5.5-1)\n\n**Primary Success Flow:**\n1. PRO selects \"Rollback\" option.\n2. System calculates the date one month prior.\n3. System retrieves data as of that date from backup.\n4. System restores data to production system.\n5. System confirms successful rollback.\n\n**Alternative Flow:**\n1. If no backup exists for the target month, system prompts PRO to initiate backup first.\n\n**Exception Flow:**\n1. If rollback fails due to corrupted backup, system alerts PRO and suggests manual data recovery.\n\n---\n\n### Use-Case: Restore Backup on Dummy Production System (VIRTUA-5.5-2)\n\n**Primary Success Flow:**\n1. PRO initiates backup restoration on dummy system.\n2. System validates backup integrity.\n3. System restores backup to dummy production database.\n4. System confirms restoration success.\n\n**Alternative Flow:**\n1. If backup is incomplete, system prompts PRO to verify backup process.\n\n**Exception Flow:**\n1. If restoration fails due to file corruption, system logs error and requires manual intervention.\n\n---\n\n### Use-Case: Purge Dummy Production Database (VIRTUA-5.5-3)\n\n**Primary Success Flow:**\n1. PRO triggers purge operation.\n2. System verifies that all data is backed up.\n3. System deletes all records from dummy production database.\n4. System confirms purge completion.\n\n**Alternative Flow:**\n1. If backup verification fails, system aborts purge and notifies PRO.\n\n**Exception Flow:**\n1. If purge operation encounters a system error, it rolls back and alerts PRO.\n\n---\n\n### Use-Case: Maintain Backup in Fire-Proof Cabinet (VIRTUA-5.5-4)\n\n**Primary Success Flow:**\n1. Backup media is stored in the designated fire-proof cabinet at Mangalore HQ.\n2. System logs storage location and timestamp.\n3. System confirms physical storage compliance.\n\n**Alternative Flow:**\n1. If cabinet is unavailable, system logs a warning and schedules alternative storage.\n\n**Exception Flow:**\n1. If cabinet inspection reveals damage, system triggers immediate replacement and alerts facility management.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Register a New Patient",
+      "req_ids": [
+        "Req-5/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "PRO has access to registration interface"
+      ],
+      "inputs": {
+        "patient_details": "John Doe, 01/01/1990, john.doe@example.com"
+      },
+      "steps": [
+        "PRO enters patient details",
+        "System validates input",
+        "System stores details",
+        "System confirms registration"
+      ],
+      "expected": [
+        "Registration confirmation message"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "View and Update Existing Patient Details",
+      "req_ids": [
+        "Req-5/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient ID exists in system"
+      ],
+      "inputs": {
+        "patient_id": "PAT123"
+      },
+      "steps": [
+        "PRO enters patient ID",
+        "System retrieves details",
+        "PRO views details",
+        "PRO updates fields",
+        "System validates and saves update"
+      ],
+      "expected": [
+        "Updated patient details displayed"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Delete Patient Details (Prohibited with Recent Consultations)",
+      "req_ids": [
+        "Req-5/3"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "Patient has consultation requests within last 3 years"
+      ],
+      "inputs": {
+        "patient_id": "PAT123"
+      },
+      "steps": [
+        "PRO attempts deletion",
+        "System checks consultation history",
+        "System denies deletion"
+      ],
+      "expected": [
+        "Deletion denied message"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Rollback by a Month",
+      "req_ids": [
+        "VIRTUA-5.5-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Backup for target month exists"
+      ],
+      "inputs": {
+        "target_month": "2023-02-01"
+      },
+      "steps": [
+        "PRO selects rollback",
+        "System calculates prior month",
+        "System restores data",
+        "System confirms rollback"
+      ],
+      "expected": [
+        "Rollback confirmation message"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Restore Backup on Dummy Production System",
+      "req_ids": [
+        "VIRTUA-5.5-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Valid backup available"
+      ],
+      "inputs": {
+        "backup_file": "backup_2023_01"
+      },
+      "steps": [
+        "PRO initiates restoration",
+        "System validates backup",
+        "System restores to dummy DB",
+        "System confirms restoration"
+      ],
+      "expected": [
+        "Restoration confirmation message"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Purge Dummy Production Database",
+      "req_ids": [
+        "VIRTUA-5.5-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Backup verified"
+      ],
+      "inputs": {},
+      "steps": [
+        "PRO triggers purge",
+        "System verifies backup",
+        "System deletes records",
+        "System confirms purge"
+      ],
+      "expected": [
+        "Purge confirmation message"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Maintain Backup in Fire-Proof Cabinet",
+      "req_ids": [
+        "VIRTUA-5.5-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Cabinet available at Mangalore HQ"
+      ],
+      "inputs": {
+        "cabinet_location": "Mangalore HQ, Fire-Proof Cabinet"
+      },
+      "steps": [
+        "System logs storage location",
+        "System confirms physical storage",
+        "System logs compliance"
+      ],
+      "expected": [
+        "Storage compliance confirmation"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Validate Backup Integrity Before Rollback",
+      "req_ids": [
+        "VIRTUA-5.5-1"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Backup exists for target month"
+      ],
+      "inputs": {
+        "backup_checksum": "valid_checksum"
+      },
+      "steps": [
+        "System checks backup integrity",
+        "System proceeds if valid",
+        "System logs validation result"
+      ],
+      "expected": [
+        "Validation success message"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Handle Missing Backup for Rollback",
+      "req_ids": [
+        "VIRTUA-5.5-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Backup missing for target month"
+      ],
+      "inputs": {},
+      "steps": [
+        "PRO attempts rollback",
+        "System detects missing backup",
+        "System prompts PRO to initiate backup"
+      ],
+      "expected": [
+        "Backup initiation prompt message"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Detect Corrupted Backup During Restoration",
+      "req_ids": [
+        "VIRTUA-5.5-2"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "Backup file corrupted"
+      ],
+      "inputs": {
+        "backup_file": "corrupted_backup"
+      },
+      "steps": [
+        "PRO initiates restoration",
+        "System validates backup",
+        "System detects corruption",
+        "System alerts PRO"
+      ],
+      "expected": [
+        "Corruption alert message"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "**Use-Cases & User Stories for Requirements U16_5, Req-5/1, Req-5/2, VIRTUA-5-17, VIRTUA-5.5-1, VIRTUA-5.5-2, VIRTUA-5.5-3, VIRTUA-5.5-4**\n\n---\n\n### Use-Case: Register a New Patient (Req-5/1)\n\n**Actor:** Healthcare Administrator  \n**Goal:** Register a new patient in the system.\n\n**Primary Success Flow:**\n1. Administrator logs into the system with valid credentials.\n2. Navigate to the “Patient Registration” module.\n3. Enter patient details (e.g., name, DOB, contact information, medical history).\n4. Submit the registration form.\n5. System validates the input data.\n6. System creates a new patient record and assigns a unique patient ID.\n7. Confirmation message displays: “Patient registered successfully.”\n\n**Alternative Flow:**\n- If the patient ID already exists, display an error: “Patient ID already exists. Please try again with a different ID.”\n\n**Exception Flow:**\n- If the system fails to save the patient record due to a database error, display: “Failed to register patient. Please contact system administrator.”\n\n---\n\n### Use-Case: View and Update Existing Patient Details (Req-5/2)\n\n**Actor:** Healthcare Administrator  \n**Goal:** View and update the latest details of an existing patient.\n\n**Primary Success Flow:**\n1. Administrator logs into the system.\n2. Search for the patient using the patient ID or name.\n3. System displays the patient’s current details.\n4. Administrator selects “Update” to modify any fields (e.g., address, contact number).\n5. Enter updated details and submit.\n6. System validates the new data and updates the patient record.\n7. Confirmation message: “Patient details updated successfully.”\n\n**Alternative Flow:**\n- If the patient ID is not found, display: “Patient ID not found. Please verify the ID and try again.”\n\n**Exception Flow:**\n- If the update fails due to a system error, display: “Failed to update patient details. Please contact system administrator.”\n\n---\n\n### Use-Case: Deliver Medicines as Prescribed (VIRTUA-5-17)\n\n**Actor:** Pharmacy Technician  \n**Goal:** Deliver medicines to a patient as prescribed by a doctor (offline).\n\n**Primary Success Flow:**\n1. Technician logs into the system.\n2. Retrieve the prescription list for the day.\n3. Select the patient’s prescription.\n4. Verify the medication list against the prescription.\n5. Pack the medicines securely.\n6. Deliver the medicines to the patient’s location as per the prescription.\n7. Record the delivery in the system with a status “Delivered.”\n\n**Alternative Flow:**\n- If the prescription is missing or invalid, display: “Prescription not found. Please check with the doctor.”\n\n**Exception Flow:**\n- If the delivery fails due to a logistical issue (e.g., patient unavailable), record the status “Failed” and notify the supervisor.\n\n---\n\n### Use-Case: Rollback by a Month (VIRTUA-5.5-1)\n\n**Actor:** System Administrator  \n**Goal:** Roll back the system database by one month to recover from a data corruption incident.\n\n**Primary Success Flow:**\n1. Administrator logs into the system with administrative privileges.\n2. Navigate to the “Database Management” module.\n3. Select the option “Rollback Database by One Month.”\n4. System prompts for confirmation: “Are you sure you want to rollback the database by one month?”\n5. Confirm the rollback.\n6. System retrieves the backup from the previous month and restores the database.\n7. Confirmation message: “Database rolled back successfully.”\n\n**Alternative Flow:**\n- If no backup for the previous month exists, display: “No backup available for the previous month. Please check the backup schedule.”\n\n**Exception Flow:**\n- If the rollback process fails due to an error, display: “Failed to rollback database. Please contact system administrator.”\n\n---\n\n### Use-Case: Restore Backup on Dummy Production System (VIRTUA-5.5-2)\n\n**Actor:** System Administrator  \n**Goal:** Restore the latest backup on a dummy production system to ensure completeness and correctness.\n\n**Primary Success Flow:**\n1. Administrator logs into the system.\n2. Navigate to the “Backup Management” module.\n3. Select the latest backup file.\n4. Choose the dummy production system as the target.\n5. Initiate the restore process.\n6. System validates the backup integrity.\n7. Confirmation message: “Backup restored successfully on dummy production system.”\n\n**Alternative Flow:**\n- If the backup file is corrupted, display: “Backup file is corrupted. Please verify the backup source.”\n\n**Exception Flow:**\n- If the restore fails due to a system error, display: “Failed to restore backup. Please contact system administrator.”\n\n---\n\n### Use-Case: Purge Dummy Production Database (VIRTUA-5.5-3)\n\n**Actor:** System Administrator  \n**Goal:** Purge the dummy production database after backup restoration to clear temporary data.\n\n**Primary Success Flow:**\n1. Administrator logs into the system.\n2. Navigate to the “Database Management” module.\n3. Select the dummy production system.\n4. Choose the “Purge Database” option.\n5. System prompts for confirmation: “Are you sure you want to purge the dummy production database?”\n6. Confirm the purge.\n7. System deletes all temporary data and confirms: “Dummy production database purged successfully.”\n\n**Alternative Flow:**\n- If the dummy production system is not accessible, display: “Dummy production system is unavailable. Please check the connection.”\n\n**Exception Flow:**\n- If the purge fails due to a system error, display: “Failed to purge dummy production database. Please contact system administrator.”\n\n---\n\n### Use-Case: Maintain Backup in Fire-Proof Cabinet (VIRTUA-5.5-4)\n\n**Actor:** Facility Manager  \n**Goal:** Ensure backups are stored securely in a fire-proof cabinet located 25 KM away from the hospital.\n\n**Primary Success Flow:**\n1. Manager verifies the location of the fire-proof cabinet.\n2. Physically checks that the backup media (e.g., hard drives, tapes) are placed inside the cabinet.\n3. Confirm the distance from the hospital is 25 KM as per the requirement.\n4. Record the verification in the maintenance log.\n5. Status: “Backup stored securely in fire-proof cabinet.”\n\n**Alternative Flow:**\n- If the cabinet is not available, display: “Fire-proof cabinet is unavailable. Please arrange for alternative secure storage.”\n\n**Exception Flow:**\n- If the verification fails due to a security breach, record: “Security breach detected. Immediate action required.”\n\n---\n\n**Note:** All test cases will trace back to the respective requirement IDs as specified above.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Register a New Patient",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Administrator logged in successfully"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "dob": "1990-01-01",
+            "contact": "1234567890",
+            "medical_history": "None"
+          },
+          "steps": [
+            "Navigate to Patient Registration module",
+            "Enter patient details",
+            "Submit registration form",
+            "Verify confirmation message"
+          ],
+          "expected": [
+            "Patient registered successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update Existing Patient Details",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient ID exists in system"
+          ],
+          "inputs": {
+            "patient_id": "P001",
+            "new_address": "123 New St"
+          },
+          "steps": [
+            "Search for patient using ID",
+            "Display current details",
+            "Select Update",
+            "Enter new address",
+            "Submit update",
+            "Verify confirmation message"
+          ],
+          "expected": [
+            "Patient details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Deliver Medicines as Prescribed",
+          "req_ids": [
+            "VIRTUA-5-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription exists and is valid"
+          ],
+          "inputs": {
+            "patient_id": "P001",
+            "medication_list": [
+              "DrugA",
+              "DrugB"
+            ]
+          },
+          "steps": [
+            "Retrieve prescription",
+            "Verify medication list",
+            "Pack medicines",
+            "Deliver to patient",
+            "Record delivery status"
+          ],
+          "expected": [
+            "Delivery recorded as 'Delivered'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Rollback Database by One Month",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Backup for previous month exists"
+          ],
+          "inputs": {},
+          "steps": [
+            "Navigate to Database Management",
+            "Select Rollback Database by One Month",
+            "Confirm rollback",
+            "Verify confirmation message"
+          ],
+          "expected": [
+            "Database rolled back successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Restore Backup on Dummy Production System",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Latest backup file available"
+          ],
+          "inputs": {
+            "backup_file": "latest_backup.bak"
+          },
+          "steps": [
+            "Select latest backup",
+            "Choose dummy production system",
+            "Initiate restore",
+            "Verify backup integrity",
+            "Confirm restoration"
+          ],
+          "expected": [
+            "Backup restored successfully on dummy production system"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Purge Dummy Production Database",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Dummy production system accessible"
+          ],
+          "inputs": {},
+          "steps": [
+            "Select dummy production system",
+            "Choose Purge Database",
+            "Confirm purge",
+            "Verify purge confirmation"
+          ],
+          "expected": [
+            "Dummy production database purged successfully"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Maintain Backup in Fire-Proof Cabinet",
+          "req_ids": [
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Fire-proof cabinet located 25 KM away"
+          ],
+          "inputs": {
+            "cabinet_location": "25 KM from Hospital"
+          },
+          "steps": [
+            "Verify cabinet location",
+            "Check backup media placement",
+            "Confirm distance",
+            "Record verification"
+          ],
+          "expected": [
+            "Backup stored securely in fire-proof cabinet"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Delete Patient with Consultation Requests in Last 3 Years (Exception)",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient has consultation requests in last 3 years"
+          ],
+          "inputs": {
+            "patient_id": "P002"
+          },
+          "steps": [
+            "Attempt to delete patient",
+            "System checks consultation requests"
+          ],
+          "expected": [
+            "Deletion blocked: Patient has consultation requests in last 3 years"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Rollback Database with Missing Backup (Alternative)",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Backup for previous month missing"
+          ],
+          "inputs": {},
+          "steps": [
+            "Select Rollback Database by One Month",
+            "System checks backup availability"
+          ],
+          "expected": [
+            "No backup available for the previous month. Please verify the backup schedule."
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Restore Backup on Unavailable Dummy System (Exception)",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Dummy production system unavailable"
+          ],
+          "inputs": {},
+          "steps": [
+            "Select latest backup",
+            "Choose dummy production system",
+            "Initiate restore",
+            "System reports unavailability"
+          ],
+          "expected": [
+            "Dummy production system is unavailable. Please check the connection."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.7,
+        "representation_score": 1.0,
+        "sfv_score": 0.85,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.85). Fix these problems and output the full corrected suite:\n- test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #9 (TC-009): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories**\n\n*Actor:* Patient Registration Officer (PRO)\n\n---\n\n### Use-Case: Register a New Patient (Req-5/1)\n\n**Primary Success Flow:**\n1. PRO enters patient details (name, DOB, contact info, etc.).\n2. System validates input fields.\n3. System stores patient details in the database.\n4. System returns confirmation of successful registration.\n\n**Alternative Flow:**\n1. If the patient ID already exists, system prompts PRO to update existing record.\n2. PRO chooses to update; system navigates to Update Patient Details use-case.\n\n**Exception Flow:**\n1. If validation fails (e.g., missing mandatory fields), system displays error message.\n2. PRO corrects input and retries registration.\n\n---\n\n### Use-Case: View and Update Existing Patient Details (Req-5/2)\n\n**Primary Success Flow:**\n1. PRO enters patient ID.\n2. System retrieves latest patient details from database.\n3. PRO views details on screen.\n4. PRO selects \"Update\" to modify any fields.\n5. System validates updated fields and saves changes.\n6. System confirms update success.\n\n**Alternative Flow:**\n1. If the patient ID does not exist, system informs PRO and prompts to register a new patient.\n\n**Exception Flow:**\n1. If update validation fails (e.g., invalid date format), system displays specific error.\n2. PRO corrects input and retries update.\n\n---\n\n### Use-Case: Delete Patient Details (Req-5/3)\n\n**Primary Success Flow:**\n1. PRO enters patient ID.\n2. System checks consultation request history for the last 3 years.\n3. If no recent consultation requests, system deletes patient details.\n4. System confirms deletion.\n\n**Alternative Flow:**\n1. If consultation requests exist within the last 3 years, system informs PRO that deletion is prohibited.\n\n**Exception Flow:**\n1. If system encounters a database error during deletion, it rolls back and informs PRO.\n\n---\n\n### Use-Case: Rollback by a Month (VIRTUA-5.5-1)\n\n**Primary Success Flow:**\n1. PRO selects \"Rollback\" option.\n2. System calculates the date one month prior.\n3. System retrieves data as of that date from backup.\n4. System restores data to production system.\n5. System confirms successful rollback.\n\n**Alternative Flow:**\n1. If no backup exists for the target month, system prompts PRO to initiate backup first.\n\n**Exception Flow:**\n1. If rollback fails due to corrupted backup, system alerts PRO and suggests manual data recovery.\n\n---\n\n### Use-Case: Restore Backup on Dummy Production System (VIRTUA-5.5-2)\n\n**Primary Success Flow:**\n1. PRO initiates backup restoration on dummy system.\n2. System validates backup integrity.\n3. System restores backup to dummy production database.\n4. System confirms restoration success.\n\n**Alternative Flow:**\n1. If backup is incomplete, system prompts PRO to verify backup process.\n\n**Exception Flow:**\n1. If restoration fails due to file corruption, system logs error and requires manual intervention.\n\n---\n\n### Use-Case: Purge Dummy Production Database (VIRTUA-5.5-3)\n\n**Primary Success Flow:**\n1. PRO triggers purge operation.\n2. System verifies that all data is backed up.\n3. System deletes all records from dummy production database.\n4. System confirms purge completion.\n\n**Alternative Flow:**\n1. If backup verification fails, system aborts purge and notifies PRO.\n\n**Exception Flow:**\n1. If purge operation encounters a system error, it rolls back and alerts PRO.\n\n---\n\n### Use-Case: Maintain Backup in Fire-Proof Cabinet (VIRTUA-5.5-4)\n\n**Primary Success Flow:**\n1. Backup media is stored in the designated fire-proof cabinet at Mangalore HQ.\n2. System logs storage location and timestamp.\n3. System confirms physical storage compliance.\n\n**Alternative Flow:**\n1. If cabinet is unavailable, system logs a warning and schedules alternative storage.\n\n**Exception Flow:**\n1. If cabinet inspection reveals damage, system triggers immediate replacement and alerts facility management.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Register a New Patient",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PRO has access to registration interface"
+          ],
+          "inputs": {
+            "patient_details": "John Doe, 01/01/1990, john.doe@example.com"
+          },
+          "steps": [
+            "PRO enters patient details",
+            "System validates input",
+            "System stores details",
+            "System confirms registration"
+          ],
+          "expected": [
+            "Registration confirmation message"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update Existing Patient Details",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient ID exists in system"
+          ],
+          "inputs": {
+            "patient_id": "PAT123"
+          },
+          "steps": [
+            "PRO enters patient ID",
+            "System retrieves details",
+            "PRO views details",
+            "PRO updates fields",
+            "System validates and saves update"
+          ],
+          "expected": [
+            "Updated patient details displayed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Patient Details (Prohibited with Recent Consultations)",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient has consultation requests within last 3 years"
+          ],
+          "inputs": {
+            "patient_id": "PAT123"
+          },
+          "steps": [
+            "PRO attempts deletion",
+            "System checks consultation history",
+            "System denies deletion"
+          ],
+          "expected": [
+            "Deletion denied message"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Rollback by a Month",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Backup for target month exists"
+          ],
+          "inputs": {
+            "target_month": "2023-02-01"
+          },
+          "steps": [
+            "PRO selects rollback",
+            "System calculates prior month",
+            "System restores data",
+            "System confirms rollback"
+          ],
+          "expected": [
+            "Rollback confirmation message"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Restore Backup on Dummy Production System",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Valid backup available"
+          ],
+          "inputs": {
+            "backup_file": "backup_2023_01"
+          },
+          "steps": [
+            "PRO initiates restoration",
+            "System validates backup",
+            "System restores to dummy DB",
+            "System confirms restoration"
+          ],
+          "expected": [
+            "Restoration confirmation message"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Purge Dummy Production Database",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Backup verified"
+          ],
+          "inputs": {},
+          "steps": [
+            "PRO triggers purge",
+            "System verifies backup",
+            "System deletes records",
+            "System confirms purge"
+          ],
+          "expected": [
+            "Purge confirmation message"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Maintain Backup in Fire-Proof Cabinet",
+          "req_ids": [
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Cabinet available at Mangalore HQ"
+          ],
+          "inputs": {
+            "cabinet_location": "Mangalore HQ, Fire-Proof Cabinet"
+          },
+          "steps": [
+            "System logs storage location",
+            "System confirms physical storage",
+            "System logs compliance"
+          ],
+          "expected": [
+            "Storage compliance confirmation"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Validate Backup Integrity Before Rollback",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Backup exists for target month"
+          ],
+          "inputs": {
+            "backup_checksum": "valid_checksum"
+          },
+          "steps": [
+            "System checks backup integrity",
+            "System proceeds if valid",
+            "System logs validation result"
+          ],
+          "expected": [
+            "Validation success message"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Handle Missing Backup for Rollback",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Backup missing for target month"
+          ],
+          "inputs": {},
+          "steps": [
+            "PRO attempts rollback",
+            "System detects missing backup",
+            "System prompts PRO to initiate backup"
+          ],
+          "expected": [
+            "Backup initiation prompt message"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Detect Corrupted Backup During Restoration",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Backup file corrupted"
+          ],
+          "inputs": {
+            "backup_file": "corrupted_backup"
+          },
+          "steps": [
+            "PRO initiates restoration",
+            "System validates backup",
+            "System detects corruption",
+            "System alerts PRO"
+          ],
+          "expected": [
+            "Corruption alert message"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.8,
+        "representation_score": 1.0,
+        "sfv_score": 0.9,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.90). Fix these problems and output the full corrected suite:\n- test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories**\n\n*Actor:* Patient Registration Officer (PRO)\n\n---\n\n**UC-01: Register a New Patient**\n\n*Goal:* To create a new patient record in the system.\n\n*Primary Success Flow:*\n1. PRO enters patient details (name, DOB, contact info, etc.).\n2. System validates the input data.\n3. System creates a new patient record.\n4. System displays a confirmation message with the patient ID.\n\n*Alternative Flow:*\n1. If the patient ID already exists, the system prompts PRO to update the existing record.\n\n*Exception Flow:*\n1. If any mandatory field is missing, the system displays an error message and prompts PRO to re-enter the data.\n\n*Preconditions:* PRO has the privilege to register patients.\n\n*Postconditions:* A new patient record is created in the database.\n\n---\n\n**UC-02: View and Update Existing Patient Details**\n\n*Goal:* To view and modify the details of an existing patient.\n\n*Primary Success Flow:*\n1. PRO enters the patient ID.\n2. System retrieves the patient details.\n3. PRO views the details on the screen.\n4. PRO updates any required fields.\n5. System saves the updated details and displays a confirmation message.\n\n*Alternative Flow:*\n1. If the patient ID does not exist, the system displays a \"Patient not found\" message.\n\n*Exception Flow:*\n1. If the system detects a conflict (e.g., duplicate entry), it prompts PRO to resolve the conflict before saving.\n\n*Preconditions:* PRO has the privilege to view and update patient records.\n\n*Postconditions:* The patient record is updated in the database.\n\n---\n\n**UC-03: Delete Patient Details**\n\n*Goal:* To remove a patient record from the system, subject to constraints.\n\n*Primary Success Flow:*\n1. PRO enters the patient ID.\n2. System checks the consultation request history for the last 3 years.\n3. If no consultation requests exist in the last 3 years, the system deletes the patient record and displays a confirmation message.\n\n*Alternative Flow:*\n1. If consultation requests exist within the last 3 years, the system informs PRO that deletion is not permitted and prompts to choose another action.\n\n*Exception Flow:*\n1. If the patient ID does not exist, the system displays a \"Patient not found\" message.\n\n*Preconditions:* PRO has the privilege to delete patient records.\n\n*Postconditions:* The patient record is deleted from the database, if permissible.\n\n---\n\n**UC-04: Rollback Medicines by a Month**\n\n*Goal:* To adjust the delivery schedule of medicines by rolling back one month.\n\n*Primary Success Flow:*\n1. PRO selects the medicine delivery schedule.\n2. System calculates the rollback and updates the schedule to the previous month.\n3. System displays a confirmation message with the new schedule.\n\n*Alternative Flow:*\n1. If the rollback would result in a date before the initial delivery date, the system prompts PRO to confirm the action.\n\n*Exception Flow:*\n1. If the selected medicine schedule does not exist, the system displays an error message.\n\n*Preconditions:* PRO has the privilege to modify medicine delivery schedules.\n\n*Postconditions:* The medicine delivery schedule is updated in the system.\n\n---\n\n**UC-05: Restore Backup on Dummy Production System**\n\n*Goal:* To ensure the completeness and correctness of a system backup by restoring it on a dummy production system.\n\n*Primary Success Flow:*\n1. PRO initiates the backup restoration process.\n2. System retrieves the backup file from the storage location.\n3. System restores the backup to the dummy production system.\n4. System verifies the integrity of the restored data.\n5. System displays a confirmation message indicating success.\n\n*Alternative Flow:*\n1. If the backup file is corrupted, the system prompts PRO to select another backup file.\n\n*Exception Flow:*\n1. If the dummy production system is unavailable, the system displays an error message and prompts PRO to try again later.\n\n*Preconditions:* PRO has the privilege to restore backups.\n\n*Postconditions:* The dummy production system contains the restored data.\n\n---\n\n**UC-06: Purge Dummy Production Database**\n\n*Goal:* To clear the dummy production database after backup restoration.\n\n*Primary Success Flow:*\n1. PRO initiates the purge process.\n2. System verifies that all necessary data has been restored.\n3. System purges the dummy production database.\n4. System displays a confirmation message indicating the purge was successful.\n\n*Alternative Flow:*\n1. If any critical data is still present, the system prompts PRO to confirm the purge.\n\n*Exception Flow:*\n1. If the purge operation fails, the system displays an error message and logs the failure for investigation.\n\n*Preconditions:* PRO has the privilege to purge the dummy production database.\n\n*Postconditions:* The dummy production database is empty, ready for the next restoration.\n\n---\n\n**UC-07: Maintain Backup in Fire-Proof Cabinet**\n\n*Goal:* To ensure the physical security of system backups.\n\n*Primary Success Flow:*\n1. PRO places the backup media in the fire-proof cabinet located 25 KM away from the Hospital.\n2. System logs the placement event in the maintenance records.\n\n*Alternative Flow:*\n1. If the cabinet is unavailable, PRO is prompted to select an alternate secure location.\n\n*Exception Flow:*\n1. If the backup media is damaged during placement, the system alerts PRO to replace the media and log the incident.\n\n*Preconditions:* PRO has access to the fire-proof cabinet.\n\n*Postconditions:* The backup media is securely stored in the cabinet.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Register a New Patient",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PRO has the privilege to register patients"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "dob": "2000-01-01",
+            "contact": "1234567890"
+          },
+          "steps": [
+            "PRO enters patient details",
+            "System validates input",
+            "System creates new patient record",
+            "System displays confirmation message"
+          ],
+          "expected": [
+            "Patient record created with ID 'PAT-001'",
+            "Confirmation message displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update Existing Patient Details",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient record 'PAT-001' exists"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001",
+            "new_contact": "0987654321"
+          },
+          "steps": [
+            "PRO enters patient ID",
+            "System retrieves details",
+            "PRO views details",
+            "PRO updates contact info",
+            "System saves updated details"
+          ],
+          "expected": [
+            "Updated contact info displayed",
+            "Confirmation message displayed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Patient Details",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient 'PAT-001' has no consultation requests in the last 3 years"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001"
+          },
+          "steps": [
+            "PRO enters patient ID",
+            "System checks consultation request history",
+            "System deletes patient record",
+            "System displays confirmation message"
+          ],
+          "expected": [
+            "Patient record deleted",
+            "Confirmation message displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Rollback Medicines by a Month",
+          "req_ids": [
+            "VIRTUA-5-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Medicine delivery schedule exists"
+          ],
+          "inputs": {
+            "schedule_id": "MED-001"
+          },
+          "steps": [
+            "PRO selects medicine schedule",
+            "System calculates rollback",
+            "System updates schedule",
+            "System displays confirmation message"
+          ],
+          "expected": [
+            "Schedule updated to previous month",
+            "Confirmation message displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Restore Backup on Dummy Production System",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Backup file available"
+          ],
+          "inputs": {
+            "backup_file": "backup_2023_10.bak"
+          },
+          "steps": [
+            "PRO initiates restoration",
+            "System retrieves backup",
+            "System restores to dummy production",
+            "System verifies integrity",
+            "System displays confirmation message"
+          ],
+          "expected": [
+            "Data restored successfully",
+            "Confirmation message displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Purge Dummy Production Database",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Dummy production system available"
+          ],
+          "inputs": {},
+          "steps": [
+            "PRO initiates purge",
+            "System verifies restored data",
+            "System purges database",
+            "System displays confirmation message"
+          ],
+          "expected": [
+            "Database purged",
+            "Confirmation message displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Maintain Backup in Fire-Proof Cabinet",
+          "req_ids": [
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Fire-proof cabinet accessible"
+          ],
+          "inputs": {
+            "backup_media": "USB-001"
+          },
+          "steps": [
+            "PRO places backup media in cabinet",
+            "System logs placement event"
+          ],
+          "expected": [
+            "Backup media stored securely",
+            "Placement logged"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Delete Patient with Recent Consultation Requests",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient 'PAT-002' has consultation requests in the last 3 years"
+          ],
+          "inputs": {
+            "patient_id": "PAT-002"
+          },
+          "steps": [
+            "PRO attempts to delete patient",
+            "System checks consultation request history",
+            "System denies deletion"
+          ],
+          "expected": [
+            "Deletion denied",
+            "Message indicating recent consultation requests"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Restore Corrupted Backup",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Corrupted backup file present"
+          ],
+          "inputs": {
+            "backup_file": "corrupted_backup.bak"
+          },
+          "steps": [
+            "PRO initiates restoration",
+            "System attempts to retrieve backup",
+            "System detects corruption",
+            "System prompts for alternate file"
+          ],
+          "expected": [
+            "Restoration fails",
+            "Prompt for alternate backup file"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Purge Unavailable Dummy Production System",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Dummy production system unavailable"
+          ],
+          "inputs": {},
+          "steps": [
+            "PRO initiates purge",
+            "System attempts to purge",
+            "System detects unavailability",
+            "System displays error message"
+          ],
+          "expected": [
+            "Purge operation fails",
+            "Error message displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.7,
+        "representation_score": 1.0,
+        "sfv_score": 0.85,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.85). Fix these problems and output the full corrected suite:\n- test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories**\n\n*Actor:* Patient Registration Officer (PRO)\n\n---\n\n### Use-Case: Register a New Patient (Req-5/1)\n\n**Primary Success Flow:**\n1. PRO enters patient details (name, DOB, contact info, etc.).\n2. System validates input fields.\n3. System stores patient details in the database.\n4. System returns confirmation of successful registration.\n\n**Alternative Flow:**\n- If the patient ID already exists, the system prompts PRO to update the existing record.\n\n**Exception Flow:**\n- If any mandatory field is missing, the system displays an error message and prompts PRO to re-enter the data.\n\n---\n\n### Use-Case: View and Update Existing Patient Details (Req-5/2)\n\n**Primary Success Flow:**\n1. PRO enters the patient ID.\n2. System retrieves the latest patient details from the database.\n3. PRO views the details on the screen.\n4. PRO updates any fields as necessary.\n5. System saves the updated details, ensuring they are the latest.\n6. System confirms the update to PRO.\n\n**Alternative Flow:**\n- If the patient ID does not exist, the system informs PRO and prompts to register a new patient.\n\n**Exception Flow:**\n- If the system encounters a database error during retrieval or update, it displays an error message and logs the incident for later resolution.\n\n---\n\n### Use-Case: Delete Patient Details (Req-5/3)\n\n**Primary Success Flow:**\n1. PRO enters the patient ID.\n2. System checks for any Consultation Requests in the last 3 years.\n3. If no recent requests exist, the system deletes the patient details.\n4. System confirms deletion to PRO.\n\n**Alternative Flow:**\n- If recent Consultation Requests exist, the system informs PRO that deletion is not permitted and provides an option to view the request details.\n\n**Exception Flow:**\n- If the system fails to delete due to a database error, it displays an error message and logs the incident.\n\n---\n\n### Use-Case: Rollback by a Month (VIRTUA-5.5-1)\n\n**Primary Success Flow:**\n1. PRO initiates a rollback operation.\n2. System retrieves data from the previous month.\n3. System updates the current database with the rolled-back data.\n4. System confirms successful rollback to PRO.\n\n**Alternative Flow:**\n- If no data exists for the previous month, the system informs PRO and suggests checking data availability.\n\n**Exception Flow:**\n- If the rollback operation fails due to a system error, the system displays an error message and logs the incident.\n\n---\n\n### Use-Case: Restore Backup on Dummy Production System (VIRTUA-5.5-2)\n\n**Primary Success Flow:**\n1. PRO initiates backup restoration.\n2. System reads the backup file from the fireproof cabinet.\n3. System restores the data to the dummy production database.\n4. System confirms successful restoration to PRO.\n\n**Alternative Flow:**\n- If the backup file is corrupted, the system informs PRO and suggests verifying the backup integrity.\n\n**Exception Flow:**\n- If the restoration fails due to a system error, the system displays an error message and logs the incident.\n\n---\n\n### Use-Case: Purge Dummy Production Database (VIRTUA-5.5-3)\n\n**Primary Success Flow:**\n1. PRO initiates the purge operation.\n2. System deletes all data from the dummy production database.\n3. System confirms successful purge to PRO.\n\n**Alternative Flow:**\n- If the database is currently in use, the system informs PRO and suggests scheduling the purge during off-peak hours.\n\n**Exception Flow:**\n- If the purge operation fails due to a system error, the system displays an error message and logs the incident.\n\n---\n\n### Use-Case: Maintain Backup in Fireproof Cabinet (VIRTUA-5.5-4)\n\n**Primary Success Flow:**\n1. System automatically backs up data to the designated fireproof cabinet located 25 KM away from the Hospital.\n2. System logs the backup completion time and status.\n\n**Alternative Flow:**\n- If the cabinet is temporarily unavailable, the system retries the backup after a specified interval.\n\n**Exception Flow:**\n- If the backup fails repeatedly, the system alerts PRO and suggests manual intervention to resolve the cabinet access issue.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Register a New Patient",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PRO has access to the registration system"
+          ],
+          "inputs": {
+            "patient_details": "John Doe, 01/01/1990, john.doe@example.com"
+          },
+          "steps": [
+            "PRO enters patient details",
+            "System validates input",
+            "System stores patient details",
+            "System returns confirmation"
+          ],
+          "expected": [
+            "Confirmation message indicating successful registration"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update Existing Patient Details",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient ID exists in the database"
+          ],
+          "inputs": {
+            "patient_id": "PAT123"
+          },
+          "steps": [
+            "PRO enters patient ID",
+            "System retrieves latest details",
+            "PRO views details",
+            "PRO updates fields",
+            "System saves updated details"
+          ],
+          "expected": [
+            "Updated patient details displayed and confirmed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Patient Details with Recent Consultation Requests",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient ID exists and has consultation requests in the last 3 years"
+          ],
+          "inputs": {
+            "patient_id": "PAT456"
+          },
+          "steps": [
+            "PRO enters patient ID",
+            "System checks for recent consultation requests",
+            "System informs deletion is not permitted"
+          ],
+          "expected": [
+            "Message indicating deletion is not allowed due to recent consultation requests"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Rollback by a Month",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Data for the previous month exists"
+          ],
+          "inputs": {},
+          "steps": [
+            "PRO initiates rollback",
+            "System retrieves previous month data",
+            "System updates current database",
+            "System confirms rollback"
+          ],
+          "expected": [
+            "Confirmation message indicating successful rollback"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Restore Backup on Dummy Production System",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Backup file is available in the fireproof cabinet"
+          ],
+          "inputs": {},
+          "steps": [
+            "PRO initiates backup restoration",
+            "System reads backup file",
+            "System restores data to dummy production database",
+            "System confirms restoration"
+          ],
+          "expected": [
+            "Confirmation message indicating successful restoration"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Purge Dummy Production Database",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Dummy production database is not in use"
+          ],
+          "inputs": {},
+          "steps": [
+            "PRO initiates purge",
+            "System deletes all data",
+            "System confirms purge"
+          ],
+          "expected": [
+            "Confirmation message indicating successful purge"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Maintain Backup in Fireproof Cabinet",
+          "req_ids": [
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Backup process is scheduled"
+          ],
+          "inputs": {},
+          "steps": [
+            "System automatically backs up data",
+            "System logs backup completion"
+          ],
+          "expected": [
+            "Log entry indicating successful backup"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Rollback Fails Due to System Error",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "System error occurs during rollback"
+          ],
+          "inputs": {},
+          "steps": [
+            "PRO initiates rollback",
+            "System encounters error",
+            "System displays error message and logs incident"
+          ],
+          "expected": [
+            "Error message and log entry indicating rollback failure"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Restore Backup Fails Due to Corrupted File",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Backup file is corrupted"
+          ],
+          "inputs": {},
+          "steps": [
+            "PRO initiates backup restoration",
+            "System detects corrupted file",
+            "System informs PRO and suggests verification"
+          ],
+          "expected": [
+            "Message indicating corrupted backup file and suggestion to verify backup integrity"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Purge Fails Due to System Error",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "System error occurs during purge"
+          ],
+          "inputs": {},
+          "steps": [
+            "PRO initiates purge",
+            "System encounters error",
+            "System displays error message and logs incident"
+          ],
+          "expected": [
+            "Error message and log entry indicating purge failure"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Backup Fails Due to Cabinet Unavailability",
+          "req_ids": [
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Fireproof cabinet is temporarily unavailable"
+          ],
+          "inputs": {},
+          "steps": [
+            "System attempts backup",
+            "System retries after interval",
+            "System alerts PRO if failure persists"
+          ],
+          "expected": [
+            "Alert message to PRO indicating backup failure due to cabinet unavailability"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.5455,
+        "representation_score": 1.0,
+        "sfv_score": 0.7727,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    }
+  ]
+}

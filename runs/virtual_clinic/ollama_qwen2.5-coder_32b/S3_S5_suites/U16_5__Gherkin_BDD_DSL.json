@@ -1,0 +1,1153 @@
+{
+  "unit_id": "U16_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 3,
+  "repairs_used": 2,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.5,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.25,
+    "hallucinated": [
+      {
+        "value": "John Doe",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": 30,
+        "context": "patient age",
+        "grounded": false
+      },
+      {
+        "value": "12345",
+        "context": "patient ID",
+        "grounded": false
+      },
+      {
+        "value": "Jane Smith",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": 25,
+        "context": "patient age",
+        "grounded": false
+      },
+      {
+        "value": "67890",
+        "context": "patient ID",
+        "grounded": false
+      },
+      {
+        "value": "Cannot delete patient with recent consultation requests.",
+        "context": "error message",
+        "grounded": false
+      },
+      {
+        "value": "empty",
+        "context": "dummy production database state",
+        "grounded": false
+      },
+      {
+        "value": "same data as the backup",
+        "context": "dummy production system state",
+        "grounded": false
+      },
+      {
+        "value": "delivered as per the doctor's prescription",
+        "context": "medicine delivery state",
+        "grounded": false
+      },
+      {
+        "value": "patient successfully registered",
+        "context": "registration state",
+        "grounded": false
+      },
+      {
+        "value": "patient details updated to {name, age}",
+        "context": "update state",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 16,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add negative test to verify patient deletion succeeds when no recent consultation requests exist.",
+      "Include boundary tests for rollback beyond one month to ensure correct behavior.",
+      "Assert that only the latest patient details are retained by checking that older records are not present.",
+      "Verify backup storage location and cabinet fireproof status programmatically.",
+      "Replace vague assertions with concrete status codes, messages, and data integrity checks."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.7125,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Patient Management and Medicine Delivery\n\n  Scenario: Medicines are delivered as prescribed by the doctor (offline)\n    Given the doctor has prescribed medicines for a patient\n    When the system processes the prescription offline\n    Then the medicines should be delivered as per the doctor's prescription\n\n  Scenario: Register a new Patient\n    Given the system is ready to accept new patient registrations\n    When a new patient details are provided\n    Then the patient should be successfully registered in the system\n\n  Scenario Outline: View and Update the details of an existing Patient\n    Given the patient with ID <patient_id> exists in the system\n    When the patient details are updated with <new_details>\n    Then the patient details should be updated to <new_details>\n    Examples:\n      | patient_id | new_details                |\n      | 12345      | {\"name\": \"John Doe\", \"age\": 30} |\n      | 67890      | {\"name\": \"Jane Smith\", \"age\": 25} |\n\n  Scenario Outline: Delete the Patient Details - A Patient cannot be deleted if there is one or more Consultation Requests in last 3 years\n    Given the patient with ID <patient_id> has consultation requests in the last <years> years\n    When the system attempts to delete the patient details\n    Then the system should not delete the patient details and should return an error message \"<error_message>\"\n    Examples:\n      | patient_id | years | error_message |\n      | 12345      | 2     | \"Cannot delete patient with recent consultation requests.\" |\n      | 67890      | 3     | \"Cannot delete patient with recent consultation requests.\" |\n\n  Scenario: There will be a provision to rollback by a month\n    Given the system has a backup of the database\n    When the rollback operation is initiated\n    Then the system should revert to the state of the database one month ago\n\n  Scenario: The back-up shall be restored on a dummy production system to ensure completeness and correctness of back-up\n    Given the system has a backup of the database\n    When the backup is restored on a dummy production system\n    Then the dummy production system should have the same data as the backup\n\n  Scenario: The dummy production database shall be purged\n    Given the dummy production system has data\n    When the purging operation is initiated\n    Then the dummy production database should be empty\n\n  Scenario: It will be maintained in Mangalore HQ in a fire proof cabinet 25 KM away from the Hospital\n    Given the system has a backup of the database\n    When the backup is stored\n    Then the backup should be stored in Mangalore HQ in a fire proof cabinet 25 KM away from the Hospital",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Medicines are delivered as prescribed by the doctor (offline)",
+      "req_ids": [
+        "VIRTUA-5-17"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the doctor has prescribed medicines for a patient"
+      ],
+      "inputs": {},
+      "steps": [
+        "the system processes the prescription offline"
+      ],
+      "expected": [
+        "the medicines should be delivered as per the doctor's prescription"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Register a new Patient",
+      "req_ids": [
+        "Req-5/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is ready to accept new patient registrations"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "age": 30
+      },
+      "steps": [
+        "a new patient details are provided"
+      ],
+      "expected": [
+        "the patient should be successfully registered in the system"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "View and Update the details of an existing Patient",
+      "req_ids": [
+        "Req-5/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient with ID 12345 exists in the system"
+      ],
+      "inputs": {
+        "new_details": {
+          "name": "John Doe",
+          "age": 30
+        }
+      },
+      "steps": [
+        "the patient details are updated with {\"name\": \"John Doe\", \"age\": 30}"
+      ],
+      "expected": [
+        "the patient details should be updated to {\"name\": \"John Doe\", \"age\": 30}"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "View and Update the details of an existing Patient",
+      "req_ids": [
+        "Req-5/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient with ID 67890 exists in the system"
+      ],
+      "inputs": {
+        "new_details": {
+          "name": "Jane Smith",
+          "age": 25
+        }
+      },
+      "steps": [
+        "the patient details are updated with {\"name\": \"Jane Smith\", \"age\": 25}"
+      ],
+      "expected": [
+        "the patient details should be updated to {\"name\": \"Jane Smith\", \"age\": 25}"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Delete the Patient Details - A Patient cannot be deleted if there is one or more Consultation Requests in last 3 years",
+      "req_ids": [
+        "Req-5/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the patient with ID 12345 has consultation requests in the last 2 years"
+      ],
+      "inputs": {},
+      "steps": [
+        "the system attempts to delete the patient details"
+      ],
+      "expected": [
+        "the system should not delete the patient details and should return an error message \"Cannot delete patient with recent consultation requests.\""
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Delete the Patient Details - A Patient cannot be deleted if there is one or more Consultation Requests in last 3 years",
+      "req_ids": [
+        "Req-5/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the patient with ID 67890 has consultation requests in the last 3 years"
+      ],
+      "inputs": {},
+      "steps": [
+        "the system attempts to delete the patient details"
+      ],
+      "expected": [
+        "the system should not delete the patient details and should return an error message \"Cannot delete patient with recent consultation requests.\""
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "There will be a provision to rollback by a month",
+      "req_ids": [
+        "VIRTUA-5.5-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system has a backup of the database"
+      ],
+      "inputs": {},
+      "steps": [
+        "the rollback operation is initiated"
+      ],
+      "expected": [
+        "the system should revert to the state of the database one month ago"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "The back-up shall be restored on a dummy production system to ensure completeness and correctness of back-up",
+      "req_ids": [
+        "VIRTUA-5.5-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system has a backup of the database"
+      ],
+      "inputs": {},
+      "steps": [
+        "the backup is restored on a dummy production system"
+      ],
+      "expected": [
+        "the dummy production system should have the same data as the backup"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "The dummy production database shall be purged",
+      "req_ids": [
+        "VIRTUA-5.5-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the dummy production system has data"
+      ],
+      "inputs": {},
+      "steps": [
+        "the purging operation is initiated"
+      ],
+      "expected": [
+        "the dummy production database should be empty"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "It will be maintained in Mangalore HQ in a fire proof cabinet 25 KM away from the Hospital",
+      "req_ids": [
+        "VIRTUA-5.5-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system has a backup of the database"
+      ],
+      "inputs": {},
+      "steps": [
+        "the backup is stored"
+      ],
+      "expected": [
+        "the backup should be stored in Mangalore HQ in a fire proof cabinet 25 KM away from the Hospital"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Patient Management and Medicine Delivery\n\n  Scenario: Medicines are delivered as prescribed by the doctor (offline)\n    Given the doctor has prescribed medicines for a patient\n    When the system processes the prescription offline\n    Then the medicines should be delivered as per the doctor's prescription\n\n  Scenario: Register a new Patient\n    Given the system is ready to accept new patient registrations\n    When a new patient details are provided\n    Then the patient should be successfully registered in the system\n\n  Scenario Outline: View and Update the details of an existing Patient\n    Given the patient with ID <patient_id> exists in the system\n    When the patient details are updated with <new_details>\n    Then the patient details should be updated to <new_details>\n    Examples:\n      | patient_id | new_details             |\n      | 123        | {\"name\": \"John Doe\"}    |\n      | 456        | {\"age\": 30}             |\n      | 789        | {\"name\": \"Jane Smith\", \"age\": 25} |\n\n  Scenario: Delete the Patient Details - No Consultation Requests in last 3 years\n    Given the patient with ID <patient_id> has no consultation requests in the last 3 years\n    When the system attempts to delete the patient details\n    Then the patient details should be successfully deleted\n    Examples:\n      | patient_id |\n      | 123        |\n      | 456        |\n\n  Scenario: Delete the Patient Details - Consultation Requests in last 3 years\n    Given the patient with ID <patient_id> has consultation requests in the last 3 years\n    When the system attempts to delete the patient details\n    Then the system should not delete the patient details and should return an error message \"Cannot delete patient with recent consultation requests\"\n    Examples:\n      | patient_id |\n      | 789        |\n\n  Scenario: Rollback by a month\n    Given the system has data for the current month\n    When the system performs a rollback by a month\n    Then the system should revert to the state of the previous month\n\n  Scenario: Restore backup on dummy production system\n    Given a backup of the system data exists\n    When the backup is restored on the dummy production system\n    Then the dummy production system should have the same data as the backup\n\n  Scenario: Purge dummy production database\n    Given the dummy production database contains data\n    When the system purges the dummy production database\n    Then the dummy production database should be empty",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Medicines are delivered as prescribed by the doctor (offline)",
+          "req_ids": [
+            "VIRTUA-5-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the doctor has prescribed medicines for a patient"
+          ],
+          "inputs": {},
+          "steps": [
+            "the system processes the prescription offline"
+          ],
+          "expected": [
+            "the medicines should be delivered as per the doctor's prescription"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Register a new Patient",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is ready to accept new patient registrations"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": 25
+          },
+          "steps": [
+            "a new patient details are provided"
+          ],
+          "expected": [
+            "the patient should be successfully registered in the system"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "View and Update the details of an existing Patient",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient with ID 123 exists in the system"
+          ],
+          "inputs": {
+            "patient_id": "123",
+            "new_details": {
+              "name": "John Doe"
+            }
+          },
+          "steps": [
+            "the patient details are updated with new details"
+          ],
+          "expected": [
+            "the patient details should be updated to new details"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "View and Update the details of an existing Patient",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient with ID 456 exists in the system"
+          ],
+          "inputs": {
+            "patient_id": "456",
+            "new_details": {
+              "age": 30
+            }
+          },
+          "steps": [
+            "the patient details are updated with new details"
+          ],
+          "expected": [
+            "the patient details should be updated to new details"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "View and Update the details of an existing Patient",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient with ID 789 exists in the system"
+          ],
+          "inputs": {
+            "patient_id": "789",
+            "new_details": {
+              "name": "Jane Smith",
+              "age": 25
+            }
+          },
+          "steps": [
+            "the patient details are updated with new details"
+          ],
+          "expected": [
+            "the patient details should be updated to new details"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete the Patient Details - No Consultation Requests in last 3 years",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient with ID 123 has no consultation requests in the last 3 years"
+          ],
+          "inputs": {
+            "patient_id": "123"
+          },
+          "steps": [
+            "the system attempts to delete the patient details"
+          ],
+          "expected": [
+            "the patient details should be successfully deleted"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Delete the Patient Details - No Consultation Requests in last 3 years",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient with ID 456 has no consultation requests in the last 3 years"
+          ],
+          "inputs": {
+            "patient_id": "456"
+          },
+          "steps": [
+            "the system attempts to delete the patient details"
+          ],
+          "expected": [
+            "the patient details should be successfully deleted"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Delete the Patient Details - Consultation Requests in last 3 years",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient with ID 789 has consultation requests in the last 3 years"
+          ],
+          "inputs": {
+            "patient_id": "789"
+          },
+          "steps": [
+            "the system attempts to delete the patient details"
+          ],
+          "expected": [
+            "the system should not delete the patient details and should return an error message 'Cannot delete patient with recent consultation requests'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Rollback by a month",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system has data for the current month"
+          ],
+          "inputs": {},
+          "steps": [
+            "the system performs a rollback by a month"
+          ],
+          "expected": [
+            "the system should revert to the state of the previous month"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Restore backup on dummy production system",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a backup of the system data exists"
+          ],
+          "inputs": {},
+          "steps": [
+            "the backup is restored on the dummy production system"
+          ],
+          "expected": [
+            "the dummy production system should have the same data as the backup"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Purge dummy production database",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the dummy production database contains data"
+          ],
+          "inputs": {},
+          "steps": [
+            "the system purges the dummy production database"
+          ],
+          "expected": [
+            "the dummy production database should be empty"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.1,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": 25,
+            "context": "patient age",
+            "grounded": false
+          },
+          {
+            "value": "123",
+            "context": "patient ID",
+            "grounded": false
+          },
+          {
+            "value": "456",
+            "context": "patient ID",
+            "grounded": false
+          },
+          {
+            "value": "789",
+            "context": "patient ID",
+            "grounded": false
+          },
+          {
+            "value": "Jane Smith",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "Cannot delete patient with recent consultation requests",
+            "context": "error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 7,
+        "uncovered_clauses": [
+          "VIRTUA-5.5-4"
+        ],
+        "weaknesses": [
+          "Add test for VIRTUA-5.5-4 (location constraint).",
+          "Include boundary tests for 3‑year consultation constraint (exact 3‑year boundary).",
+          "Assert concrete expected values (e.g., specific patient details after update).",
+          "Verify error message content for delete constraint.",
+          "Add tests for rollback boundary (exact month boundary)."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "VIRTUA-5.5-4"
+        ],
+        "fsa_score": 0.4775,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.4775; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.1, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-5.5-4'] (add at least one each)\n- uncovered clause: VIRTUA-5.5-4\n- ungrounded value 'John Doe' (patient name): remove or use the SRS value\n- ungrounded value '25' (patient age): remove or use the SRS value\n- ungrounded value '123' (patient ID): remove or use the SRS value\n- ungrounded value '456' (patient ID): remove or use the SRS value\n- ungrounded value '789' (patient ID): remove or use the SRS value\n- ungrounded value 'Jane Smith' (patient name): remove or use the SRS value\n- Add test for VIRTUA-5.5-4 (location constraint).\n- Include boundary tests for 3‑year consultation constraint (exact 3‑year boundary).\n- Assert concrete expected values (e.g., specific patient details after update).\n- Verify error message content for delete constraint.\n- Add tests for rollback boundary (exact month boundary).",
+      "artifact": "Feature: Patient Management and Consultation Requests\n\n  Scenario: Medicines are delivered as prescribed by the doctor (offline)\n    Given the doctor has prescribed medicines for a patient\n    When the system processes the prescription offline\n    Then the medicines are delivered as per the doctor's prescription\n\n  Scenario: Register a new Patient\n    Given the system is ready to accept new patient registrations\n    When a new patient details are provided\n    Then the patient is registered with the system\n\n  Scenario Outline: View and Update the details of an existing Patient\n    Given the patient with ID <patient_id> exists in the system\n    When the patient details are updated with <new_name> and <new_age>\n    Then the patient details are updated to <new_name> and <new_age>\n    Examples:\n      | patient_id | new_name | new_age |\n      | 1          | Alice    | 30      |\n      | 2          | Bob      | 40      |\n      | 3          | Charlie  | 50      |\n\n  Scenario: Delete the Patient Details - No Consultation Requests in last 3 years\n    Given the patient with ID 1 has no consultation requests in the last 3 years\n    When the system attempts to delete the patient details\n    Then the patient details are successfully deleted\n\n  Scenario: Delete the Patient Details - Consultation Requests in last 3 years\n    Given the patient with ID 2 has consultation requests in the last 3 years\n    When the system attempts to delete the patient details\n    Then the system displays an error message \"Cannot delete patient with recent consultation requests\"\n\n  Scenario: Rollback by a month - Exact month boundary\n    Given the system has data for the current month and the previous month\n    When the system performs a rollback by a month\n    Then the system reverts to the state of the previous month\n\n  Scenario: Restore backup on dummy production system\n    Given a backup of the production database exists\n    When the backup is restored on the dummy production system\n    Then the dummy production system contains the complete and correct data from the backup\n\n  Scenario: Purge dummy production database\n    Given the dummy production database contains data\n    When the system purges the dummy production database\n    Then the dummy production database is empty\n\n  Scenario: Location constraint for backup storage\n    Given the system requires a secure location for backup storage\n    When the system checks the backup storage location\n    Then the backup is stored in Mangalore HQ in a fire proof cabinet 25 KM away from the Hospital",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Medicines are delivered as prescribed by the doctor (offline)",
+          "req_ids": [
+            "VIRTUA-5-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor has prescribed medicines for a patient"
+          ],
+          "inputs": {},
+          "steps": [
+            "System processes the prescription offline"
+          ],
+          "expected": [
+            "Medicines are delivered as per the doctor's prescription"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Register a new Patient",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is ready to accept new patient registrations"
+          ],
+          "inputs": {},
+          "steps": [
+            "New patient details are provided"
+          ],
+          "expected": [
+            "Patient is registered with the system"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "View and Update the details of an existing Patient",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient with ID 1 exists in the system"
+          ],
+          "inputs": {
+            "name": "Alice",
+            "age": "30"
+          },
+          "steps": [
+            "Patient details are updated with Alice and 30"
+          ],
+          "expected": [
+            "Patient details are updated to Alice and 30"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "View and Update the details of an existing Patient",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient with ID 2 exists in the system"
+          ],
+          "inputs": {
+            "name": "Bob",
+            "age": "40"
+          },
+          "steps": [
+            "Patient details are updated with Bob and 40"
+          ],
+          "expected": [
+            "Patient details are updated to Bob and 40"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "View and Update the details of an existing Patient",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient with ID 3 exists in the system"
+          ],
+          "inputs": {
+            "name": "Charlie",
+            "age": "50"
+          },
+          "steps": [
+            "Patient details are updated with Charlie and 50"
+          ],
+          "expected": [
+            "Patient details are updated to Charlie and 50"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete the Patient Details - No Consultation Requests in last 3 years",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient with ID 1 has no consultation requests in the last 3 years"
+          ],
+          "inputs": {},
+          "steps": [
+            "System attempts to delete the patient details"
+          ],
+          "expected": [
+            "Patient details are successfully deleted"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Delete the Patient Details - Consultation Requests in last 3 years",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient with ID 2 has consultation requests in the last 3 years"
+          ],
+          "inputs": {},
+          "steps": [
+            "System attempts to delete the patient details"
+          ],
+          "expected": [
+            "System displays an error message 'Cannot delete patient with recent consultation requests'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Rollback by a month - Exact month boundary",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System has data for the current month and the previous month"
+          ],
+          "inputs": {},
+          "steps": [
+            "System performs a rollback by a month"
+          ],
+          "expected": [
+            "System reverts to the state of the previous month"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Restore backup on dummy production system",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Backup of the production database exists"
+          ],
+          "inputs": {},
+          "steps": [
+            "Backup is restored on the dummy production system"
+          ],
+          "expected": [
+            "Dummy production system contains the complete and correct data from the backup"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Purge dummy production database",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Dummy production database contains data"
+          ],
+          "inputs": {},
+          "steps": [
+            "System purges the dummy production database"
+          ],
+          "expected": [
+            "Dummy production database is empty"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Location constraint for backup storage",
+          "req_ids": [
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System requires a secure location for backup storage"
+          ],
+          "inputs": {},
+          "steps": [
+            "System checks the backup storage location"
+          ],
+          "expected": [
+            "Backup is stored in Mangalore HQ in a fire proof cabinet 25 KM away from the Hospital"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "error": "ollama:gpt-oss:20b returned an empty response",
+        "fsa_pass": false,
+        "fsa_score": 0.0
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.0; sub-scores {'clause_coverage': None, 'negative_coverage': None, 'oracle_assertiveness': None, 'boundary_coverage': None, 'groundedness_mg': None}). Output the full improved suite addressing:",
+      "artifact": "Feature: Patient Management and Medicine Delivery\n\n  Scenario: Medicines are delivered as prescribed by the doctor (offline)\n    Given the doctor has prescribed medicines for a patient\n    When the system processes the prescription offline\n    Then the medicines should be delivered as per the doctor's prescription\n\n  Scenario: Register a new Patient\n    Given the system is ready to accept new patient registrations\n    When a new patient details are provided\n    Then the patient should be successfully registered in the system\n\n  Scenario Outline: View and Update the details of an existing Patient\n    Given the patient with ID <patient_id> exists in the system\n    When the patient details are updated with <new_details>\n    Then the patient details should be updated to <new_details>\n    Examples:\n      | patient_id | new_details                |\n      | 12345      | {\"name\": \"John Doe\", \"age\": 30} |\n      | 67890      | {\"name\": \"Jane Smith\", \"age\": 25} |\n\n  Scenario Outline: Delete the Patient Details - A Patient cannot be deleted if there is one or more Consultation Requests in last 3 years\n    Given the patient with ID <patient_id> has consultation requests in the last <years> years\n    When the system attempts to delete the patient details\n    Then the system should not delete the patient details and should return an error message \"<error_message>\"\n    Examples:\n      | patient_id | years | error_message |\n      | 12345      | 2     | \"Cannot delete patient with recent consultation requests.\" |\n      | 67890      | 3     | \"Cannot delete patient with recent consultation requests.\" |\n\n  Scenario: There will be a provision to rollback by a month\n    Given the system has a backup of the database\n    When the rollback operation is initiated\n    Then the system should revert to the state of the database one month ago\n\n  Scenario: The back-up shall be restored on a dummy production system to ensure completeness and correctness of back-up\n    Given the system has a backup of the database\n    When the backup is restored on a dummy production system\n    Then the dummy production system should have the same data as the backup\n\n  Scenario: The dummy production database shall be purged\n    Given the dummy production system has data\n    When the purging operation is initiated\n    Then the dummy production database should be empty\n\n  Scenario: It will be maintained in Mangalore HQ in a fire proof cabinet 25 KM away from the Hospital\n    Given the system has a backup of the database\n    When the backup is stored\n    Then the backup should be stored in Mangalore HQ in a fire proof cabinet 25 KM away from the Hospital",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Medicines are delivered as prescribed by the doctor (offline)",
+          "req_ids": [
+            "VIRTUA-5-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the doctor has prescribed medicines for a patient"
+          ],
+          "inputs": {},
+          "steps": [
+            "the system processes the prescription offline"
+          ],
+          "expected": [
+            "the medicines should be delivered as per the doctor's prescription"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Register a new Patient",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is ready to accept new patient registrations"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": 30
+          },
+          "steps": [
+            "a new patient details are provided"
+          ],
+          "expected": [
+            "the patient should be successfully registered in the system"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "View and Update the details of an existing Patient",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient with ID 12345 exists in the system"
+          ],
+          "inputs": {
+            "new_details": {
+              "name": "John Doe",
+              "age": 30
+            }
+          },
+          "steps": [
+            "the patient details are updated with {\"name\": \"John Doe\", \"age\": 30}"
+          ],
+          "expected": [
+            "the patient details should be updated to {\"name\": \"John Doe\", \"age\": 30}"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "View and Update the details of an existing Patient",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient with ID 67890 exists in the system"
+          ],
+          "inputs": {
+            "new_details": {
+              "name": "Jane Smith",
+              "age": 25
+            }
+          },
+          "steps": [
+            "the patient details are updated with {\"name\": \"Jane Smith\", \"age\": 25}"
+          ],
+          "expected": [
+            "the patient details should be updated to {\"name\": \"Jane Smith\", \"age\": 25}"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete the Patient Details - A Patient cannot be deleted if there is one or more Consultation Requests in last 3 years",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient with ID 12345 has consultation requests in the last 2 years"
+          ],
+          "inputs": {},
+          "steps": [
+            "the system attempts to delete the patient details"
+          ],
+          "expected": [
+            "the system should not delete the patient details and should return an error message \"Cannot delete patient with recent consultation requests.\""
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete the Patient Details - A Patient cannot be deleted if there is one or more Consultation Requests in last 3 years",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient with ID 67890 has consultation requests in the last 3 years"
+          ],
+          "inputs": {},
+          "steps": [
+            "the system attempts to delete the patient details"
+          ],
+          "expected": [
+            "the system should not delete the patient details and should return an error message \"Cannot delete patient with recent consultation requests.\""
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "There will be a provision to rollback by a month",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system has a backup of the database"
+          ],
+          "inputs": {},
+          "steps": [
+            "the rollback operation is initiated"
+          ],
+          "expected": [
+            "the system should revert to the state of the database one month ago"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "The back-up shall be restored on a dummy production system to ensure completeness and correctness of back-up",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system has a backup of the database"
+          ],
+          "inputs": {},
+          "steps": [
+            "the backup is restored on a dummy production system"
+          ],
+          "expected": [
+            "the dummy production system should have the same data as the backup"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "The dummy production database shall be purged",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the dummy production system has data"
+          ],
+          "inputs": {},
+          "steps": [
+            "the purging operation is initiated"
+          ],
+          "expected": [
+            "the dummy production database should be empty"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "It will be maintained in Mangalore HQ in a fire proof cabinet 25 KM away from the Hospital",
+          "req_ids": [
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system has a backup of the database"
+          ],
+          "inputs": {},
+          "steps": [
+            "the backup is stored"
+          ],
+          "expected": [
+            "the backup should be stored in Mangalore HQ in a fire proof cabinet 25 KM away from the Hospital"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.5,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.25,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": 30,
+            "context": "patient age",
+            "grounded": false
+          },
+          {
+            "value": "12345",
+            "context": "patient ID",
+            "grounded": false
+          },
+          {
+            "value": "Jane Smith",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": 25,
+            "context": "patient age",
+            "grounded": false
+          },
+          {
+            "value": "67890",
+            "context": "patient ID",
+            "grounded": false
+          },
+          {
+            "value": "Cannot delete patient with recent consultation requests.",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "empty",
+            "context": "dummy production database state",
+            "grounded": false
+          },
+          {
+            "value": "same data as the backup",
+            "context": "dummy production system state",
+            "grounded": false
+          },
+          {
+            "value": "delivered as per the doctor's prescription",
+            "context": "medicine delivery state",
+            "grounded": false
+          },
+          {
+            "value": "patient successfully registered",
+            "context": "registration state",
+            "grounded": false
+          },
+          {
+            "value": "patient details updated to {name, age}",
+            "context": "update state",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 16,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test to verify patient deletion succeeds when no recent consultation requests exist.",
+          "Include boundary tests for rollback beyond one month to ensure correct behavior.",
+          "Assert that only the latest patient details are retained by checking that older records are not present.",
+          "Verify backup storage location and cabinet fireproof status programmatically.",
+          "Replace vague assertions with concrete status codes, messages, and data integrity checks."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.7125,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

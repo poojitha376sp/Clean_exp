@@ -1,0 +1,872 @@
+{
+  "unit_id": "U33_13",
+  "representation": "Decision Tables",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 1.0,
+    "representation_score": 0.6667,
+    "sfv_score": 0.8333,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": [
+      "Table syntax is inconsistent."
+    ]
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 14,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Expected results are vague; add concrete status codes or messages",
+      "No boundary test at exactly 3-year limit for patient history",
+      "Missing tests for API failure or network errors",
+      "No scalability tests beyond 10,000 concurrent users",
+      "No performance tests for bulk or concurrent prescription, lab, or look-up requests"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.88,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Decision Table for Requirement VIRTUA-13-3.4 (Patient History File)\nConditions:\n- PatientID: valid | invalid\n- ConsultationDate: within 3 years | older than 3 years\nActions:\n- RetrieveHistory: Yes | No\n\n| PatientID | ConsultationDate | RetrieveHistory |\n|-----------|------------------|------------------|\n| valid     | within 3 years   | Yes              |\n| valid     | older than 3 years| No               |\n| invalid   | within 3 years   | No               |\n| invalid   | older than 3 years| No               |\n\nDecision Table for Requirement VIRTUA-13-4 (System Scalability)\nConditions:\n- ConcurrentUsers: <=10000 | >10000\nActions:\n- SystemOperational: Yes | No\n\n| ConcurrentUsers | SystemOperational |\n|-----------------|--------------------|\n| <=10000         | Yes                |\n| >10000          | No                 |\n\nDecision Table for Requirement VIRTUA-13-5 (Patient Registration Time)\nConditions:\n- RegistrationProcess: <=4s | >4s\nActions:\n- RegistrationSuccess: Yes | No\n\n| RegistrationProcess | RegistrationSuccess |\n|---------------------|----------------------|\n| <=4s                | Yes                  |\n| >4s                 | No                   |\n\nDecision Table for Requirement VIRTUA-13-6 (Patient Consultation Request Time)\nConditions:\n- RequestProcessingTime: <=2s | >2s\nActions:\n- ConsultationGranted: Yes | No\n\n| RequestProcessingTime | ConsultationGranted |\n|-----------------------|----------------------|\n| <=2s                  | Yes                  |\n| >2s                   | No                   |\n\nDecision Table for Requirement VIRTUA-13-7 (Chemist Prescription Request Time)\nConditions:\n- PrescriptionRequestTime: <=2s | >2s\nActions:\n- PrescriptionIssued: Yes | No\n\n| PrescriptionRequestTime | PrescriptionIssued |\n|-------------------------|---------------------|\n| <=2s                    | Yes                 |\n| >2s                     | No                  |\n\nDecision Table for Requirement VIRTUA-13-8 (Labs Lab Request Time)\nConditions:\n- LabRequestTime: <=4s | >4s\nActions:\n- LabResultsAvailable: Yes | No\n\n| LabRequestTime | LabResultsAvailable |\n|----------------|----------------------|\n| <=4s           | Yes                  |\n| >4s            | No                   |\n\nDecision Table for Requirement VIRTUA-13-9 (Patient Prescription & Invoice Look-up Time)\nConditions:\n- LookUpTime: <=4s | >4s\nActions:\n- LookUpSuccessful: Yes | No\n\n| LookUpTime | LookUpSuccessful |\n|------------|-------------------|\n| <=4s       | Yes               |\n| >4s        | No                |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test Patient History File for valid recent consultations",
+      "req_ids": [
+        "VIRTUA-13-3.4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "PatientID is valid",
+        "ConsultationDate is within 3 years"
+      ],
+      "inputs": {
+        "PatientID": "valid",
+        "ConsultationDate": "within 3 years"
+      },
+      "steps": [
+        "Invoke Patient History File API",
+        "Check returned history"
+      ],
+      "expected": [
+        "History contains recent consultations"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test Patient History File for invalid or outdated consultations",
+      "req_ids": [
+        "VIRTUA-13-3.4"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "PatientID is invalid",
+        "ConsultationDate is older than 3 years"
+      ],
+      "inputs": {
+        "PatientID": "invalid",
+        "ConsultationDate": "older than 3 years"
+      },
+      "steps": [
+        "Invoke Patient History File API",
+        "Check returned history"
+      ],
+      "expected": [
+        "History is empty or indicates no recent data"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test System Scalability at peak load",
+      "req_ids": [
+        "VIRTUA-13-4"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "ConcurrentUsers is exactly 10000"
+      ],
+      "inputs": {
+        "ConcurrentUsers": "10000"
+      },
+      "steps": [
+        "Simulate 10000 concurrent user sessions",
+        "Monitor system response"
+      ],
+      "expected": [
+        "System remains operational"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test System Scalability beyond peak load",
+      "req_ids": [
+        "VIRTUA-13-4"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "ConcurrentUsers is greater than 10000"
+      ],
+      "inputs": {
+        "ConcurrentUsers": ">10000"
+      },
+      "steps": [
+        "Simulate 10001 concurrent user sessions",
+        "Monitor system response"
+      ],
+      "expected": [
+        "System degrades or fails gracefully"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test Patient Registration within 4 seconds",
+      "req_ids": [
+        "VIRTUA-13-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "RegistrationProcess is initiated"
+      ],
+      "inputs": {
+        "RegistrationProcess": "<=4s"
+      },
+      "steps": [
+        "Initiate patient registration",
+        "Measure time to completion"
+      ],
+      "expected": [
+        "Registration completes within 4 seconds"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Test Patient Registration exceeding 4 seconds",
+      "req_ids": [
+        "VIRTUA-13-5"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "RegistrationProcess is initiated"
+      ],
+      "inputs": {
+        "RegistrationProcess": ">4s"
+      },
+      "steps": [
+        "Initiate patient registration",
+        "Measure time to completion"
+      ],
+      "expected": [
+        "Registration exceeds 4 seconds"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Test Patient Consultation Request within 2 seconds",
+      "req_ids": [
+        "VIRTUA-13-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "ConsultationRequest is submitted"
+      ],
+      "inputs": {
+        "RequestProcessingTime": "<=2s"
+      },
+      "steps": [
+        "Submit consultation request",
+        "Measure response time"
+      ],
+      "expected": [
+        "Consultation is granted within 2 seconds"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Test Patient Consultation Request exceeding 2 seconds",
+      "req_ids": [
+        "VIRTUA-13-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "ConsultationRequest is submitted"
+      ],
+      "inputs": {
+        "RequestProcessingTime": ">2s"
+      },
+      "steps": [
+        "Submit consultation request",
+        "Measure response time"
+      ],
+      "expected": [
+        "Consultation is not granted within 2 seconds"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Test Chemist Prescription Request within 2 seconds",
+      "req_ids": [
+        "VIRTUA-13-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "PrescriptionRequest is submitted"
+      ],
+      "inputs": {
+        "PrescriptionRequestTime": "<=2s"
+      },
+      "steps": [
+        "Submit prescription request",
+        "Measure response time"
+      ],
+      "expected": [
+        "Prescription is issued within 2 seconds"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Test Chemist Prescription Request exceeding 2 seconds",
+      "req_ids": [
+        "VIRTUA-13-7"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "PrescriptionRequest is submitted"
+      ],
+      "inputs": {
+        "PrescriptionRequestTime": ">2s"
+      },
+      "steps": [
+        "Submit prescription request",
+        "Measure response time"
+      ],
+      "expected": [
+        "Prescription is not issued within 2 seconds"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Test Labs Lab Request within 4 seconds",
+      "req_ids": [
+        "VIRTUA-13-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "LabRequest is submitted"
+      ],
+      "inputs": {
+        "LabRequestTime": "<=4s"
+      },
+      "steps": [
+        "Submit lab request",
+        "Measure response time"
+      ],
+      "expected": [
+        "Lab results are available within 4 seconds"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Test Labs Lab Request exceeding 4 seconds",
+      "req_ids": [
+        "VIRTUA-13-8"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "LabRequest is submitted"
+      ],
+      "inputs": {
+        "LabRequestTime": ">4s"
+      },
+      "steps": [
+        "Submit lab request",
+        "Measure response time"
+      ],
+      "expected": [
+        "Lab results are not available within 4 seconds"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Test Patient Prescription & Invoice Look-up within 4 seconds",
+      "req_ids": [
+        "VIRTUA-13-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "LookUpRequest is submitted"
+      ],
+      "inputs": {
+        "LookUpTime": "<=4s"
+      },
+      "steps": [
+        "Submit prescription and invoice look-up request",
+        "Measure response time"
+      ],
+      "expected": [
+        "Look-up is successful within 4 seconds"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Test Patient Prescription & Invoice Look-up exceeding 4 seconds",
+      "req_ids": [
+        "VIRTUA-13-9"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "LookUpRequest is submitted"
+      ],
+      "inputs": {
+        "LookUpTime": ">4s"
+      },
+      "steps": [
+        "Submit prescription and invoice look-up request",
+        "Measure response time"
+      ],
+      "expected": [
+        "Look-up fails or exceeds 4 seconds"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Decision Table for Requirement VIRTUA-13-3.4 (Patient History File)\nConditions:\n- Patient ID: Valid\n- Consultation Date: Within last 3 years\nActions:\n- Retrieve Consultation History: Success\n\nDecision Table for Requirement VIRTUA-13-4 (System Scalability)\nConditions:\n- Concurrent Users: <= 10000\nActions:\n- System Accepts Users: Success\n\nDecision Table for Requirement VIRTUA-13-5 (Patient Registration Time)\nConditions:\n- Registration Request: Initiated\nActions:\n- Registration Completion Time: <= 4 seconds\n\nDecision Table for Requirement VIRTUA-13-6 (Patient Consultation Request Time)\nConditions:\n- Consultation Request: Initiated\nActions:\n- Consultation Response Time: <= 2 seconds\n\nDecision Table for Requirement VIRTUA-13-7 (Chemist Prescription Request Time)\nConditions:\n- Prescription Request: Initiated\nActions:\n- Prescription Response Time: <= 2 seconds\n\nDecision Table for Requirement VIRTUA-13-8 (Labs Lab Request Time)\nConditions:\n- Lab Request: Initiated\nActions:\n- Lab Response Time: <= 4 seconds\n\nDecision Table for Requirement VIRTUA-13-9 (Patient Prescription & Invoice Look-up Time)\nConditions:\n- Look-up Request: Initiated\nActions:\n- Look-up Response Time: <= 4 seconds",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Patient History File retrieval within 3 years",
+          "req_ids": [
+            "VIRTUA-13-3.4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient ID is valid"
+          ],
+          "inputs": {
+            "Patient ID": "12345",
+            "Consultation Date": "2023-05-01"
+          },
+          "steps": [
+            "Initiate patient history retrieval request for Patient ID 12345",
+            "Verify consultation dates returned are within the last 3 years"
+          ],
+          "expected": [
+            "Consultation history retrieved successfully within the last 3 years"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test system scalability to 10,000+ concurrent users",
+          "req_ids": [
+            "VIRTUA-13-4"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is idle"
+          ],
+          "inputs": {
+            "Concurrent Users": "10000"
+          },
+          "steps": [
+            "Simulate 10,000 concurrent user logins",
+            "Monitor system response"
+          ],
+          "expected": [
+            "System accepts all 10,000 users without failure"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Patient Registration time <= 4 seconds",
+          "req_ids": [
+            "VIRTUA-13-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient registration request initiated"
+          ],
+          "inputs": {
+            "Registration Request": "Initiated"
+          },
+          "steps": [
+            "Initiate patient registration",
+            "Measure time from request to completion"
+          ],
+          "expected": [
+            "Registration completes in <= 4 seconds"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Patient Consultation Request time <= 2 seconds",
+          "req_ids": [
+            "VIRTUA-13-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation request initiated"
+          ],
+          "inputs": {
+            "Consultation Request": "Initiated"
+          },
+          "steps": [
+            "Initiate consultation request",
+            "Measure response time"
+          ],
+          "expected": [
+            "Consultation response received in <= 2 seconds"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Chemist Prescription Request time <= 2 seconds",
+          "req_ids": [
+            "VIRTUA-13-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription request initiated"
+          ],
+          "inputs": {
+            "Prescription Request": "Initiated"
+          },
+          "steps": [
+            "Initiate prescription request",
+            "Measure response time"
+          ],
+          "expected": [
+            "Prescription response received in <= 2 seconds"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Labs Lab Request time <= 4 seconds",
+          "req_ids": [
+            "VIRTUA-13-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab request initiated"
+          ],
+          "inputs": {
+            "Lab Request": "Initiated"
+          },
+          "steps": [
+            "Initiate lab request",
+            "Measure response time"
+          ],
+          "expected": [
+            "Lab response received in <= 4 seconds"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Patient Prescription & Invoice Look-up time <= 4 seconds",
+          "req_ids": [
+            "VIRTUA-13-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Look-up request initiated"
+          ],
+          "inputs": {
+            "Look-up Request": "Initiated"
+          },
+          "steps": [
+            "Initiate prescription and invoice look-up",
+            "Measure response time"
+          ],
+          "expected": [
+            "Look-up response received in <= 4 seconds"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No table structure detected."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No table structure detected.",
+      "artifact": "Decision Table for Requirement VIRTUA-13-3.4 (Patient History File)\nConditions:\n- PatientID: valid | invalid\n- ConsultationDate: within 3 years | older than 3 years\nActions:\n- RetrieveHistory: Yes | No\n\n| PatientID | ConsultationDate | RetrieveHistory |\n|-----------|------------------|------------------|\n| valid     | within 3 years   | Yes              |\n| valid     | older than 3 years| No               |\n| invalid   | within 3 years   | No               |\n| invalid   | older than 3 years| No               |\n\nDecision Table for Requirement VIRTUA-13-4 (System Scalability)\nConditions:\n- ConcurrentUsers: <=10000 | >10000\nActions:\n- SystemOperational: Yes | No\n\n| ConcurrentUsers | SystemOperational |\n|-----------------|--------------------|\n| <=10000         | Yes                |\n| >10000          | No                 |\n\nDecision Table for Requirement VIRTUA-13-5 (Patient Registration Time)\nConditions:\n- RegistrationProcess: <=4s | >4s\nActions:\n- RegistrationSuccess: Yes | No\n\n| RegistrationProcess | RegistrationSuccess |\n|---------------------|----------------------|\n| <=4s                | Yes                  |\n| >4s                 | No                   |\n\nDecision Table for Requirement VIRTUA-13-6 (Patient Consultation Request Time)\nConditions:\n- RequestProcessingTime: <=2s | >2s\nActions:\n- ConsultationGranted: Yes | No\n\n| RequestProcessingTime | ConsultationGranted |\n|-----------------------|----------------------|\n| <=2s                  | Yes                  |\n| >2s                   | No                   |\n\nDecision Table for Requirement VIRTUA-13-7 (Chemist Prescription Request Time)\nConditions:\n- PrescriptionRequestTime: <=2s | >2s\nActions:\n- PrescriptionIssued: Yes | No\n\n| PrescriptionRequestTime | PrescriptionIssued |\n|-------------------------|---------------------|\n| <=2s                    | Yes                 |\n| >2s                     | No                  |\n\nDecision Table for Requirement VIRTUA-13-8 (Labs Lab Request Time)\nConditions:\n- LabRequestTime: <=4s | >4s\nActions:\n- LabResultsAvailable: Yes | No\n\n| LabRequestTime | LabResultsAvailable |\n|----------------|----------------------|\n| <=4s           | Yes                  |\n| >4s            | No                   |\n\nDecision Table for Requirement VIRTUA-13-9 (Patient Prescription & Invoice Look-up Time)\nConditions:\n- LookUpTime: <=4s | >4s\nActions:\n- LookUpSuccessful: Yes | No\n\n| LookUpTime | LookUpSuccessful |\n|------------|-------------------|\n| <=4s       | Yes               |\n| >4s        | No                |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Patient History File for valid recent consultations",
+          "req_ids": [
+            "VIRTUA-13-3.4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PatientID is valid",
+            "ConsultationDate is within 3 years"
+          ],
+          "inputs": {
+            "PatientID": "valid",
+            "ConsultationDate": "within 3 years"
+          },
+          "steps": [
+            "Invoke Patient History File API",
+            "Check returned history"
+          ],
+          "expected": [
+            "History contains recent consultations"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Patient History File for invalid or outdated consultations",
+          "req_ids": [
+            "VIRTUA-13-3.4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "PatientID is invalid",
+            "ConsultationDate is older than 3 years"
+          ],
+          "inputs": {
+            "PatientID": "invalid",
+            "ConsultationDate": "older than 3 years"
+          },
+          "steps": [
+            "Invoke Patient History File API",
+            "Check returned history"
+          ],
+          "expected": [
+            "History is empty or indicates no recent data"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test System Scalability at peak load",
+          "req_ids": [
+            "VIRTUA-13-4"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "ConcurrentUsers is exactly 10000"
+          ],
+          "inputs": {
+            "ConcurrentUsers": "10000"
+          },
+          "steps": [
+            "Simulate 10000 concurrent user sessions",
+            "Monitor system response"
+          ],
+          "expected": [
+            "System remains operational"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test System Scalability beyond peak load",
+          "req_ids": [
+            "VIRTUA-13-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "ConcurrentUsers is greater than 10000"
+          ],
+          "inputs": {
+            "ConcurrentUsers": ">10000"
+          },
+          "steps": [
+            "Simulate 10001 concurrent user sessions",
+            "Monitor system response"
+          ],
+          "expected": [
+            "System degrades or fails gracefully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Patient Registration within 4 seconds",
+          "req_ids": [
+            "VIRTUA-13-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "RegistrationProcess is initiated"
+          ],
+          "inputs": {
+            "RegistrationProcess": "<=4s"
+          },
+          "steps": [
+            "Initiate patient registration",
+            "Measure time to completion"
+          ],
+          "expected": [
+            "Registration completes within 4 seconds"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Patient Registration exceeding 4 seconds",
+          "req_ids": [
+            "VIRTUA-13-5"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "RegistrationProcess is initiated"
+          ],
+          "inputs": {
+            "RegistrationProcess": ">4s"
+          },
+          "steps": [
+            "Initiate patient registration",
+            "Measure time to completion"
+          ],
+          "expected": [
+            "Registration exceeds 4 seconds"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Patient Consultation Request within 2 seconds",
+          "req_ids": [
+            "VIRTUA-13-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ConsultationRequest is submitted"
+          ],
+          "inputs": {
+            "RequestProcessingTime": "<=2s"
+          },
+          "steps": [
+            "Submit consultation request",
+            "Measure response time"
+          ],
+          "expected": [
+            "Consultation is granted within 2 seconds"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Patient Consultation Request exceeding 2 seconds",
+          "req_ids": [
+            "VIRTUA-13-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "ConsultationRequest is submitted"
+          ],
+          "inputs": {
+            "RequestProcessingTime": ">2s"
+          },
+          "steps": [
+            "Submit consultation request",
+            "Measure response time"
+          ],
+          "expected": [
+            "Consultation is not granted within 2 seconds"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test Chemist Prescription Request within 2 seconds",
+          "req_ids": [
+            "VIRTUA-13-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PrescriptionRequest is submitted"
+          ],
+          "inputs": {
+            "PrescriptionRequestTime": "<=2s"
+          },
+          "steps": [
+            "Submit prescription request",
+            "Measure response time"
+          ],
+          "expected": [
+            "Prescription is issued within 2 seconds"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test Chemist Prescription Request exceeding 2 seconds",
+          "req_ids": [
+            "VIRTUA-13-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "PrescriptionRequest is submitted"
+          ],
+          "inputs": {
+            "PrescriptionRequestTime": ">2s"
+          },
+          "steps": [
+            "Submit prescription request",
+            "Measure response time"
+          ],
+          "expected": [
+            "Prescription is not issued within 2 seconds"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Test Labs Lab Request within 4 seconds",
+          "req_ids": [
+            "VIRTUA-13-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "LabRequest is submitted"
+          ],
+          "inputs": {
+            "LabRequestTime": "<=4s"
+          },
+          "steps": [
+            "Submit lab request",
+            "Measure response time"
+          ],
+          "expected": [
+            "Lab results are available within 4 seconds"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Test Labs Lab Request exceeding 4 seconds",
+          "req_ids": [
+            "VIRTUA-13-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "LabRequest is submitted"
+          ],
+          "inputs": {
+            "LabRequestTime": ">4s"
+          },
+          "steps": [
+            "Submit lab request",
+            "Measure response time"
+          ],
+          "expected": [
+            "Lab results are not available within 4 seconds"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Test Patient Prescription & Invoice Look-up within 4 seconds",
+          "req_ids": [
+            "VIRTUA-13-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "LookUpRequest is submitted"
+          ],
+          "inputs": {
+            "LookUpTime": "<=4s"
+          },
+          "steps": [
+            "Submit prescription and invoice look-up request",
+            "Measure response time"
+          ],
+          "expected": [
+            "Look-up is successful within 4 seconds"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Test Patient Prescription & Invoice Look-up exceeding 4 seconds",
+          "req_ids": [
+            "VIRTUA-13-9"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "LookUpRequest is submitted"
+          ],
+          "inputs": {
+            "LookUpTime": ">4s"
+          },
+          "steps": [
+            "Submit prescription and invoice look-up request",
+            "Measure response time"
+          ],
+          "expected": [
+            "Look-up fails or exceeds 4 seconds"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.6667,
+        "sfv_score": 0.8333,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": [
+          "Table syntax is inconsistent."
+        ]
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 14,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Expected results are vague; add concrete status codes or messages",
+          "No boundary test at exactly 3-year limit for patient history",
+          "Missing tests for API failure or network errors",
+          "No scalability tests beyond 10,000 concurrent users",
+          "No performance tests for bulk or concurrent prescription, lab, or look-up requests"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.88,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

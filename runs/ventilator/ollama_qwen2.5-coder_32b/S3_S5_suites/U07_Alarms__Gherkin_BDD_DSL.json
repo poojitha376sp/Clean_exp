@@ -1,0 +1,800 @@
+{
+  "unit_id": "U07_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.95,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.4615,
+    "hallucinated": [
+      {
+        "value": "5",
+        "context": "apnea time interval example",
+        "grounded": false
+      },
+      {
+        "value": "10",
+        "context": "apnea time interval example",
+        "grounded": false
+      },
+      {
+        "value": "15",
+        "context": "apnea time interval example",
+        "grounded": false
+      },
+      {
+        "value": "20",
+        "context": "breath rate setting example",
+        "grounded": false
+      },
+      {
+        "value": "30",
+        "context": "breath rate setting example",
+        "grounded": false
+      },
+      {
+        "value": "40",
+        "context": "breath rate setting example",
+        "grounded": false
+      },
+      {
+        "value": "21",
+        "context": "current breath rate example",
+        "grounded": false
+      },
+      {
+        "value": "31",
+        "context": "current breath rate example",
+        "grounded": false
+      },
+      {
+        "value": "41",
+        "context": "current breath rate example",
+        "grounded": false
+      },
+      {
+        "value": "40",
+        "context": "maximum breath rate setting example",
+        "grounded": false
+      },
+      {
+        "value": "50",
+        "context": "maximum breath rate setting example",
+        "grounded": false
+      },
+      {
+        "value": "60",
+        "context": "maximum breath rate setting example",
+        "grounded": false
+      },
+      {
+        "value": "51",
+        "context": "current breath rate example",
+        "grounded": false
+      },
+      {
+        "value": "61",
+        "context": "current breath rate example",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 26,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No negative test coverage for error or out‑of‑range inputs",
+      "No boundary value testing for numeric thresholds such as apnea interval or breath rate limits",
+      "Several concrete values (apnea intervals, breath rate settings) are not grounded in the SRS and should be aligned with the specification or documented as assumptions",
+      "RW‑SW‑77 duplicates RW‑SW‑76; tests should clarify the intended difference",
+      "Timing accuracy for flashing frequency and pulse duration is not verified, only existence is asserted"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.7617,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Alarms\n  As a user of the ventilator system\n  I want the alarms to behave according to the specified requirements\n  So that I can be properly informed of any issues\n\n  Scenario: Medium severity alarms are indicated with a yellow color and flashing frequency of 0.5Hz with a 50% duty cycle\n    Given the system is in a state that triggers a medium severity alarm\n    When the alarm is activated\n    Then the alarm indicator color is yellow\n    And the alarm indicator flashes with a frequency of 0.5Hz and a 50% duty cycle\n\n  Scenario: High severity alarms have an auditory signal of 10 pulses with each pulse lasting 200ms and a pulse frequency of 500Hz\n    Given the system is in a state that triggers a high severity alarm\n    When the alarm is activated\n    Then the auditory signal consists of 10 pulses\n    And each pulse lasts 200ms\n    And the pulse frequency is 500Hz\n\n  Scenario: High severity alarms have an auditory signal of 4 pulses with each pulse lasting 200ms and a pulse frequency of 500Hz\n    Given the system is in a state that triggers a high severity alarm with a different condition\n    When the alarm is activated\n    Then the auditory signal consists of 4 pulses\n    And each pulse lasts 200ms\n    And the pulse frequency is 500Hz\n\n  Scenario: Pressing the AUDIO PAUSE / ALARM PAUSE key initiates a 60-second pause of all active alarms\n    Given there are active alarms\n    When the AUDIO PAUSE / ALARM PAUSE key is pressed\n    Then all active alarms are paused for 60 seconds\n    And the alarm activation symbol displays the IEC 60417-5576 symbol during the inactivation state\n\n  Scenario Outline: Apnea alarm is triggered if no breath is detected within the specified apnea time interval\n    Given the apnea time interval is set to <apnea_time>\n    And no breath is detected within the apnea time interval\n    When the system checks for apnea\n    Then a medium priority alarm is triggered\n    And the display text is \"APNEA ALARM\"\n    Examples:\n      | apnea_time |\n      | 5          |\n      | 10         |\n      | 15         |\n\n  Scenario Outline: High breath rate alarm is triggered when the breath rate exceeds the breath rate setting\n    Given the breath rate setting is <breath_rate_setting>\n    And the current breath rate is <current_breath_rate>\n    When the system checks the breath rate\n    Then a medium level alarm is triggered\n    And the display text is \"HIGH BREATH RATE\"\n    Examples:\n      | breath_rate_setting | current_breath_rate |\n      | 20                  | 21                  |\n      | 30                  | 31                  |\n      | 40                  | 41                  |\n\n  Scenario: Maximum breath rate setting acts as an alarm threshold\n    Given the maximum breath rate setting is <max_breath_rate>\n    And the current breath rate is <current_breath_rate>\n    When the system checks the breath rate\n    Then a medium level alarm is triggered\n    And the display text is \"HIGH BREATH RATE\"\n    Examples:\n      | max_breath_rate | current_breath_rate |\n      | 40              | 41                  |\n      | 50              | 51                  |\n      | 60              | 61                  |\n\n  Scenario: Low pressure alarm triggers a high severity alarm with the text \"LOW INSP P\"\n    Given the system detects low pressure\n    When the low pressure condition is confirmed\n    Then a high severity alarm is triggered\n    And the display text is \"LOW INSP P\"",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Medium severity alarms are indicated with a yellow color and flashing frequency of 0.5Hz with a 50% duty cycle",
+      "req_ids": [
+        "RW-SW-75"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system triggers a medium severity alarm"
+      ],
+      "inputs": {},
+      "steps": [
+        "alarm is activated"
+      ],
+      "expected": [
+        "alarm indicator color is yellow",
+        "alarm indicator flashes with a frequency of 0.5Hz and a 50% duty cycle"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "High severity alarms have an auditory signal of 10 pulses with each pulse lasting 200ms and a pulse frequency of 500Hz",
+      "req_ids": [
+        "RW-SW-76"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system triggers a high severity alarm"
+      ],
+      "inputs": {},
+      "steps": [
+        "alarm is activated"
+      ],
+      "expected": [
+        "auditory signal consists of 10 pulses",
+        "each pulse lasts 200ms",
+        "pulse frequency is 500Hz"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "High severity alarms have an auditory signal of 4 pulses with each pulse lasting 200ms and a pulse frequency of 500Hz",
+      "req_ids": [
+        "RW-SW-77"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system triggers a high severity alarm with a different condition"
+      ],
+      "inputs": {},
+      "steps": [
+        "alarm is activated"
+      ],
+      "expected": [
+        "auditory signal consists of 4 pulses",
+        "each pulse lasts 200ms",
+        "pulse frequency is 500Hz"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Pressing the AUDIO PAUSE / ALARM PAUSE key initiates a 60-second pause of all active alarms",
+      "req_ids": [
+        "RW-SW-78"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "there are active alarms"
+      ],
+      "inputs": {},
+      "steps": [
+        "AUDIO PAUSE / ALARM PAUSE key is pressed"
+      ],
+      "expected": [
+        "all active alarms are paused for 60 seconds",
+        "alarm activation symbol displays the IEC 60417-5576 symbol during the inactivation state"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Apnea alarm is triggered if no breath is detected within the specified apnea time interval",
+      "req_ids": [
+        "RW-SW-80"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "apnea time interval is set to 5"
+      ],
+      "inputs": {},
+      "steps": [
+        "no breath is detected within the apnea time interval",
+        "system checks for apnea"
+      ],
+      "expected": [
+        "medium priority alarm is triggered",
+        "display text is APNEA ALARM"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Apnea alarm is triggered if no breath is detected within the specified apnea time interval",
+      "req_ids": [
+        "RW-SW-80"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "apnea time interval is set to 10"
+      ],
+      "inputs": {},
+      "steps": [
+        "no breath is detected within the apnea time interval",
+        "system checks for apnea"
+      ],
+      "expected": [
+        "medium priority alarm is triggered",
+        "display text is APNEA ALARM"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Apnea alarm is triggered if no breath is detected within the specified apnea time interval",
+      "req_ids": [
+        "RW-SW-80"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "apnea time interval is set to 15"
+      ],
+      "inputs": {},
+      "steps": [
+        "no breath is detected within the apnea time interval",
+        "system checks for apnea"
+      ],
+      "expected": [
+        "medium priority alarm is triggered",
+        "display text is APNEA ALARM"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "High breath rate alarm is triggered when the breath rate exceeds the breath rate setting",
+      "req_ids": [
+        "RW-SW-82"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "breath rate setting is 20"
+      ],
+      "inputs": {},
+      "steps": [
+        "current breath rate is 21",
+        "system checks the breath rate"
+      ],
+      "expected": [
+        "medium level alarm is triggered",
+        "display text is HIGH BREATH RATE"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "High breath rate alarm is triggered when the breath rate exceeds the breath rate setting",
+      "req_ids": [
+        "RW-SW-82"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "breath rate setting is 30"
+      ],
+      "inputs": {},
+      "steps": [
+        "current breath rate is 31",
+        "system checks the breath rate"
+      ],
+      "expected": [
+        "medium level alarm is triggered",
+        "display text is HIGH BREATH RATE"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "High breath rate alarm is triggered when the breath rate exceeds the breath rate setting",
+      "req_ids": [
+        "RW-SW-82"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "breath rate setting is 40"
+      ],
+      "inputs": {},
+      "steps": [
+        "current breath rate is 41",
+        "system checks the breath rate"
+      ],
+      "expected": [
+        "medium level alarm is triggered",
+        "display text is HIGH BREATH RATE"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Maximum breath rate setting acts as an alarm threshold",
+      "req_ids": [
+        "RW-SW-83"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "maximum breath rate setting is 40"
+      ],
+      "inputs": {},
+      "steps": [
+        "current breath rate is 41",
+        "system checks the breath rate"
+      ],
+      "expected": [
+        "medium level alarm is triggered",
+        "display text is HIGH BREATH RATE"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Maximum breath rate setting acts as an alarm threshold",
+      "req_ids": [
+        "RW-SW-83"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "maximum breath rate setting is 50"
+      ],
+      "inputs": {},
+      "steps": [
+        "current breath rate is 51",
+        "system checks the breath rate"
+      ],
+      "expected": [
+        "medium level alarm is triggered",
+        "display text is HIGH BREATH RATE"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Maximum breath rate setting acts as an alarm threshold",
+      "req_ids": [
+        "RW-SW-83"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "maximum breath rate setting is 60"
+      ],
+      "inputs": {},
+      "steps": [
+        "current breath rate is 61",
+        "system checks the breath rate"
+      ],
+      "expected": [
+        "medium level alarm is triggered",
+        "display text is HIGH BREATH RATE"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Low pressure alarm triggers a high severity alarm with the text LOW INSP P",
+      "req_ids": [
+        "RW-SW-84"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system detects low pressure"
+      ],
+      "inputs": {},
+      "steps": [
+        "low pressure condition is confirmed"
+      ],
+      "expected": [
+        "high severity alarm is triggered",
+        "display text is LOW INSP P"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarms\n  As a user of the ventilator system\n  I want the alarms to behave according to the specified requirements\n  So that I can be properly informed of any issues\n\n  Scenario: Medium severity alarms are indicated with a yellow color and flashing frequency of 0.5Hz with a 50% duty cycle\n    Given the system is in a state that triggers a medium severity alarm\n    When the alarm is activated\n    Then the alarm indicator color is yellow\n    And the alarm indicator flashes with a frequency of 0.5Hz and a 50% duty cycle\n\n  Scenario: High severity alarms have an auditory signal of 10 pulses with each pulse lasting 200ms and a pulse frequency of 500Hz\n    Given the system is in a state that triggers a high severity alarm\n    When the alarm is activated\n    Then the auditory signal consists of 10 pulses\n    And each pulse lasts 200ms\n    And the pulse frequency is 500Hz\n\n  Scenario: High severity alarms have an auditory signal of 4 pulses with each pulse lasting 200ms and a pulse frequency of 500Hz\n    Given the system is in a state that triggers a high severity alarm with a different condition\n    When the alarm is activated\n    Then the auditory signal consists of 4 pulses\n    And each pulse lasts 200ms\n    And the pulse frequency is 500Hz\n\n  Scenario: Pressing the AUDIO PAUSE / ALARM PAUSE key initiates a 60-second pause of all active alarms\n    Given there are active alarms\n    When the AUDIO PAUSE / ALARM PAUSE key is pressed\n    Then all active alarms are paused for 60 seconds\n    And the alarm activation symbol displays the IEC 60417-5576 symbol during the inactivation state\n\n  Scenario Outline: Apnea alarm is triggered if no breath is detected within the specified apnea time interval\n    Given the apnea time interval is set to <apnea_time>\n    And no breath is detected within the apnea time interval\n    When the system checks for apnea\n    Then a medium priority alarm is triggered\n    And the display text is \"APNEA ALARM\"\n    Examples:\n      | apnea_time |\n      | 5          |\n      | 10         |\n      | 15         |\n\n  Scenario Outline: High breath rate alarm is triggered when the breath rate exceeds the breath rate setting\n    Given the breath rate setting is <breath_rate_setting>\n    And the current breath rate is <current_breath_rate>\n    When the system checks the breath rate\n    Then a medium level alarm is triggered\n    And the display text is \"HIGH BREATH RATE\"\n    Examples:\n      | breath_rate_setting | current_breath_rate |\n      | 20                  | 21                  |\n      | 30                  | 31                  |\n      | 40                  | 41                  |\n\n  Scenario: Maximum breath rate setting acts as an alarm threshold\n    Given the maximum breath rate setting is <max_breath_rate>\n    And the current breath rate is <current_breath_rate>\n    When the system checks the breath rate\n    Then a medium level alarm is triggered\n    And the display text is \"HIGH BREATH RATE\"\n    Examples:\n      | max_breath_rate | current_breath_rate |\n      | 40              | 41                  |\n      | 50              | 51                  |\n      | 60              | 61                  |\n\n  Scenario: Low pressure alarm triggers a high severity alarm with the text \"LOW INSP P\"\n    Given the system detects low pressure\n    When the low pressure condition is confirmed\n    Then a high severity alarm is triggered\n    And the display text is \"LOW INSP P\"",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Medium severity alarms are indicated with a yellow color and flashing frequency of 0.5Hz with a 50% duty cycle",
+          "req_ids": [
+            "RW-SW-75"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system triggers a medium severity alarm"
+          ],
+          "inputs": {},
+          "steps": [
+            "alarm is activated"
+          ],
+          "expected": [
+            "alarm indicator color is yellow",
+            "alarm indicator flashes with a frequency of 0.5Hz and a 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "High severity alarms have an auditory signal of 10 pulses with each pulse lasting 200ms and a pulse frequency of 500Hz",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system triggers a high severity alarm"
+          ],
+          "inputs": {},
+          "steps": [
+            "alarm is activated"
+          ],
+          "expected": [
+            "auditory signal consists of 10 pulses",
+            "each pulse lasts 200ms",
+            "pulse frequency is 500Hz"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "High severity alarms have an auditory signal of 4 pulses with each pulse lasting 200ms and a pulse frequency of 500Hz",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system triggers a high severity alarm with a different condition"
+          ],
+          "inputs": {},
+          "steps": [
+            "alarm is activated"
+          ],
+          "expected": [
+            "auditory signal consists of 4 pulses",
+            "each pulse lasts 200ms",
+            "pulse frequency is 500Hz"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Pressing the AUDIO PAUSE / ALARM PAUSE key initiates a 60-second pause of all active alarms",
+          "req_ids": [
+            "RW-SW-78"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there are active alarms"
+          ],
+          "inputs": {},
+          "steps": [
+            "AUDIO PAUSE / ALARM PAUSE key is pressed"
+          ],
+          "expected": [
+            "all active alarms are paused for 60 seconds",
+            "alarm activation symbol displays the IEC 60417-5576 symbol during the inactivation state"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Apnea alarm is triggered if no breath is detected within the specified apnea time interval",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "apnea time interval is set to 5"
+          ],
+          "inputs": {},
+          "steps": [
+            "no breath is detected within the apnea time interval",
+            "system checks for apnea"
+          ],
+          "expected": [
+            "medium priority alarm is triggered",
+            "display text is APNEA ALARM"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Apnea alarm is triggered if no breath is detected within the specified apnea time interval",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "apnea time interval is set to 10"
+          ],
+          "inputs": {},
+          "steps": [
+            "no breath is detected within the apnea time interval",
+            "system checks for apnea"
+          ],
+          "expected": [
+            "medium priority alarm is triggered",
+            "display text is APNEA ALARM"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Apnea alarm is triggered if no breath is detected within the specified apnea time interval",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "apnea time interval is set to 15"
+          ],
+          "inputs": {},
+          "steps": [
+            "no breath is detected within the apnea time interval",
+            "system checks for apnea"
+          ],
+          "expected": [
+            "medium priority alarm is triggered",
+            "display text is APNEA ALARM"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "High breath rate alarm is triggered when the breath rate exceeds the breath rate setting",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "breath rate setting is 20"
+          ],
+          "inputs": {},
+          "steps": [
+            "current breath rate is 21",
+            "system checks the breath rate"
+          ],
+          "expected": [
+            "medium level alarm is triggered",
+            "display text is HIGH BREATH RATE"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "High breath rate alarm is triggered when the breath rate exceeds the breath rate setting",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "breath rate setting is 30"
+          ],
+          "inputs": {},
+          "steps": [
+            "current breath rate is 31",
+            "system checks the breath rate"
+          ],
+          "expected": [
+            "medium level alarm is triggered",
+            "display text is HIGH BREATH RATE"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "High breath rate alarm is triggered when the breath rate exceeds the breath rate setting",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "breath rate setting is 40"
+          ],
+          "inputs": {},
+          "steps": [
+            "current breath rate is 41",
+            "system checks the breath rate"
+          ],
+          "expected": [
+            "medium level alarm is triggered",
+            "display text is HIGH BREATH RATE"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Maximum breath rate setting acts as an alarm threshold",
+          "req_ids": [
+            "RW-SW-83"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "maximum breath rate setting is 40"
+          ],
+          "inputs": {},
+          "steps": [
+            "current breath rate is 41",
+            "system checks the breath rate"
+          ],
+          "expected": [
+            "medium level alarm is triggered",
+            "display text is HIGH BREATH RATE"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Maximum breath rate setting acts as an alarm threshold",
+          "req_ids": [
+            "RW-SW-83"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "maximum breath rate setting is 50"
+          ],
+          "inputs": {},
+          "steps": [
+            "current breath rate is 51",
+            "system checks the breath rate"
+          ],
+          "expected": [
+            "medium level alarm is triggered",
+            "display text is HIGH BREATH RATE"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Maximum breath rate setting acts as an alarm threshold",
+          "req_ids": [
+            "RW-SW-83"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "maximum breath rate setting is 60"
+          ],
+          "inputs": {},
+          "steps": [
+            "current breath rate is 61",
+            "system checks the breath rate"
+          ],
+          "expected": [
+            "medium level alarm is triggered",
+            "display text is HIGH BREATH RATE"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Low pressure alarm triggers a high severity alarm with the text LOW INSP P",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system detects low pressure"
+          ],
+          "inputs": {},
+          "steps": [
+            "low pressure condition is confirmed"
+          ],
+          "expected": [
+            "high severity alarm is triggered",
+            "display text is LOW INSP P"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.95,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.4615,
+        "hallucinated": [
+          {
+            "value": "5",
+            "context": "apnea time interval example",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "apnea time interval example",
+            "grounded": false
+          },
+          {
+            "value": "15",
+            "context": "apnea time interval example",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "breath rate setting example",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "breath rate setting example",
+            "grounded": false
+          },
+          {
+            "value": "40",
+            "context": "breath rate setting example",
+            "grounded": false
+          },
+          {
+            "value": "21",
+            "context": "current breath rate example",
+            "grounded": false
+          },
+          {
+            "value": "31",
+            "context": "current breath rate example",
+            "grounded": false
+          },
+          {
+            "value": "41",
+            "context": "current breath rate example",
+            "grounded": false
+          },
+          {
+            "value": "40",
+            "context": "maximum breath rate setting example",
+            "grounded": false
+          },
+          {
+            "value": "50",
+            "context": "maximum breath rate setting example",
+            "grounded": false
+          },
+          {
+            "value": "60",
+            "context": "maximum breath rate setting example",
+            "grounded": false
+          },
+          {
+            "value": "51",
+            "context": "current breath rate example",
+            "grounded": false
+          },
+          {
+            "value": "61",
+            "context": "current breath rate example",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 26,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No negative test coverage for error or out‑of‑range inputs",
+          "No boundary value testing for numeric thresholds such as apnea interval or breath rate limits",
+          "Several concrete values (apnea intervals, breath rate settings) are not grounded in the SRS and should be aligned with the specification or documented as assumptions",
+          "RW‑SW‑77 duplicates RW‑SW‑76; tests should clarify the intended difference",
+          "Timing accuracy for flashing frequency and pulse duration is not verified, only existence is asserted"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.7617,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

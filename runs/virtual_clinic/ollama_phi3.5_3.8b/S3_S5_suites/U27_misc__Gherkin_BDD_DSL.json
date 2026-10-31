@@ -1,0 +1,1193 @@
+{
+  "unit_id": "U27_misc",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:phi3.5:3.8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.4,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.2273,
+    "hallucinated": [
+      {
+        "value": "John Doe",
+        "context": "Doctor Name",
+        "grounded": false
+      },
+      {
+        "value": "30",
+        "context": "Age",
+        "grounded": false
+      },
+      {
+        "value": "Male",
+        "context": "Sex",
+        "grounded": false
+      },
+      {
+        "value": "MD",
+        "context": "Qualification",
+        "grounded": false
+      },
+      {
+        "value": "5 years",
+        "context": "Experience",
+        "grounded": false
+      },
+      {
+        "value": "Jane Smith",
+        "context": "Doctor Name",
+        "grounded": false
+      },
+      {
+        "value": "40",
+        "context": "Age",
+        "grounded": false
+      },
+      {
+        "value": "Female",
+        "context": "Sex",
+        "grounded": false
+      },
+      {
+        "value": "RN",
+        "context": "Qualification",
+        "grounded": false
+      },
+      {
+        "value": "10 years",
+        "context": "Experience",
+        "grounded": false
+      },
+      {
+        "value": "Yes",
+        "context": "Chemist Lab Flag",
+        "grounded": false
+      },
+      {
+        "value": "Health Lab",
+        "context": "Chemist Lab Name",
+        "grounded": false
+      },
+      {
+        "value": "123 Wellness St.",
+        "context": "Chemist Lab Address",
+        "grounded": false
+      },
+      {
+        "value": "(555) 123-4567 Dr. A. Smith",
+        "context": "Chemist Lab Contact Details",
+        "grounded": false
+      },
+      {
+        "value": "Care Lab",
+        "context": "Chemist Lab Name",
+        "grounded": false
+      },
+      {
+        "value": "456 Health Ave.",
+        "context": "Chemist Lab Address",
+        "grounded": false
+      },
+      {
+        "value": "(555) 765-4321 Dr. B. Johnson",
+        "context": "Chemist Lab Contact Details",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 22,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No Scenario Outline with Examples tables; lacks normal, edge, and invalid values.",
+      "Positive scenarios use vague assertions (e.g., \"should be added successfully\") instead of checking specific state changes or database entries.",
+      "No verification of field values after addition or modification.",
+      "No boundary value testing for numeric fields such as Age or Experience.",
+      "Some concrete values (e.g., contact details) are not grounded in the SRS, risking hallucination."
+    ],
+    "traceability": 0.75,
+    "untraced_reqs": [
+      "VCMDR02",
+      "VCMSP03-2"
+    ],
+    "fsa_score": 0.7941,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Speciality and Doctor Management\n  Background:\n    # No preconditions or states are specified in the requirements\n\n  Scenario: Display exception when Speciality does not exist with Speciality Id\n    Given there is no Speciality with the given Speciality Id\n    When the system tries to retrieve the Speciality details\n    Then an exception error message \"Speciality does not exist\" should be displayed\n\n  Scenario: Add a new Doctor in the Administrators Menu\n    Given the Administrators Menu is accessible\n    When the Add Doctor screen is accessed\n    And the following Doctor details are entered:\n      | Doctor Id          | Doctor Name       | Age | Sex    | Qualification | Experience |\n      | generated          | John Doe          | 30   | Male   | MD         | 5 years     |\n    And the \"Add\" button is clicked\n    Then the new Doctor should be added successfully\n\n  Scenario: Display exception when Doctor does not exist with Doctor Id\n    Given the system tries to retrieve a Doctor with the given Doctor Id\n    When the system accesses the Edit/Update Doctors screen\n    Then an exception error message \"Doctor does not exist\" should be displayed\n\n  Scenario: Modify or Delete a Doctor in the Administrators Menu\n    Given the Administrators Menu is accessible\n    When the Edit/Update Doctors screen is accessed\n    And the following Doctor details are queried:\n      | Doctor Id          | Doctor Name       | Age | Sex    | Qualification | Experience |\n      | generated          | Jane Smith        | 40   | Female | RN          | 10 years    |\n    And the modification options are selected\n    Then the Doctor' extrinsic details should be displayed for modification\n    And the modification should be successful\n\n  Scenario: Check for open Consultation Requests before Deleting a Doctor\n    Given the system tries to delete a Doctor\n    When the system checks for open Consultation Requests associated with the Doctor's Id\n    Then if open requests are found, an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed\n\n  Scenario: Add a new Chemist/Lab in the Administrators Menu\n    Given the Administrators Menu is accessible\n    When the Add Chemist/Lab screen is accessed\n    And the following Chemist/Lab details are entered:\n      | Chemist/Lab Id    | Chemist Lab Flag | Chemist Lab Name       | Chemist Lab Address         | Chemist Lab Contact Details |\n      | generated        | Yes             | Health Lab             | 123 Wellness St.          | (555) 123-4567             | Dr. A. Smith\n    And the \"Add\" button is clicked\n    Then the new Chemist/Lab should be added successfully\n\n  Scenario: Modify or Update a Chemist/Lab in the Administrators Menu\n    Given the Administrators Menu is accessible\n    When the Edit/Update Chemist/Lab screen is accessed\n    And the following Chemist/Lab details are queried:\n      | Chemist/Lab Id    | Chemist Lab Flag | Chemist Lab Name       | Chemist Lab Address         | Chemist Lab Contact Details |\n      | generated        | Yes             | Care Lab             | 456 Health Ave.           | (555) 765-4321             | Dr. B. Johnson\n    And the modification options are selected\n    Then the Chemist/Lab details should be displayed for modification\n    And the modification should be successful",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Display exception when Speciality does not exist with Speciality Id",
+      "req_ids": [
+        "VCMDR03-2"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Given there is no Speciality with the given Speciality Id",
+        "When the system tries to retrieve the Speciality details",
+        "Then an exception error message \"Speciality does not exist\" should be displayed"
+      ],
+      "expected": [
+        "an exception error message \"Speciality does not exist\" should be displayed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Add a new Doctor in the Administrators Menu",
+      "req_ids": [
+        "VCMDR01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "The Administrators Menu is accessible"
+      ],
+      "inputs": {},
+      "steps": [
+        "And the following Doctor details are entered:",
+        "   | generated          | John Doe          | 30   | Male   | MD         | 5 years     |",
+        "And the \"Add\" button is clicked",
+        "Then the new Doctor should be added successfully"
+      ],
+      "expected": [
+        "the new Doctor should be added successfully"
+      ]
+    },
+    {
+      "id": "TC-0don",
+      "title": "Display exception when Doctor does not exist with Doctor Id",
+      "req_ids": [
+        "VCMDR03-1"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Given the system tries to retrieve a Doctor with the given Doctor Id",
+        "When the system accesses the Edit/Update Doctors screen",
+        "Then an exception error message \"Doctor does not exist\" should be displayed"
+      ],
+      "expected": [
+        "an exception error message \"Doctor does not exist\" should be displayed"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Modify or Delete a Doctor in the Administrators Menu",
+      "req_ids": [
+        "VCMDR03-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "The Administrators Menu is accessible"
+      ],
+      "inputs": {},
+      "steps": [
+        "And the following Doctor details are queried:",
+        "   | generated          | Jane Smith        | 40   | Female | RN          | 10 years    |",
+        "And the modification options are selected",
+        "Then the Doctor extrinsic details should be displayed for modification",
+        "And the modification should be successful"
+      ],
+      "expected": [
+        "the Doctor extrinsic details should be displayed for modification",
+        "the modification should be successful"
+      ]
+    },
+    {
+      "id": "TC-020",
+      "title": "Check for open Consultation Requests before Deleting a Doctor",
+      "req_ids": [
+        "VCMDR03-3"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Given the system tries to delete a Doctor",
+        "When the system checks for open Consultation Requests associated with the Doctor's Id",
+        "Then an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed"
+      ],
+      "expected": [
+        "an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed"
+      ]
+    },
+    {
+      "id": "TC-030",
+      "title": "Add a new Chemist/Lab in the Administrators Menu",
+      "req_ids": [
+        "VCMCL01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "The Administrators Menu is accessible"
+      ],
+      "inputs": {},
+      "steps": [
+        "And the following Chemist/Lab details are entered:",
+        "   | generated        | Yes             | Health Lab             | 123 Wellness St.          | (555) 123-4567             | Dr. A. Smith",
+        "And the \"Add\" button is clicked",
+        "Then the new Chemist/Lab should be added successfully"
+      ],
+      "expected": [
+        "the new Chemist/Lab should be added successfully"
+      ]
+    },
+    {
+      "id": "TC-040",
+      "title": "Modify or Update a Chemist/Lab in the Administrators Menu",
+      "req_ids": [
+        "VCMCL02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "The Administrators Menu is accessible"
+      ],
+      "inputs": {},
+      "steps": [
+        "And the following Chemist/Lab details are queried:",
+        "   | generated        | Yes             | Care Lab             | 456 Health Ave.           | (555) 765-4321             | Dr. B. Johnson",
+        "And the modification options are selected",
+        "Then the Chemist/Lab details should be displayed for modification",
+        "And the modification should be successful"
+      ],
+      "expected": [
+        "the Chemist/Lab details should be displayed for modification",
+        "the modification should be successful"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Speciality and Doctor Management\n  Background:\n    As an administrator of the VCMSP03 system,\n    I want to ensure proper management of Specialities and Doctors,\n    so that all operations are error-free and informative.\n\n  Scenario: Display error when Speciality does not exist with Speciality Id\n    Given there is no Speciality with the given Speciality Id\n    When the system tries to retrieve the Speciality details\n    Then an error message \"Speciality does not exist\" should be displayed\n\n  Scenario: Add a new Doctor with generated Id, Name, Age, Sex, Qualification & Experience\n    Given the Administrators Menu Screen is accessible\n    When I select to Add a new Doctor\n    And I provide a valid Doctor Id, Name, Age, Sex, Qualification, and Experience\n    Then the new Doctor record should be created and displayed\n\n  Scenario: Edit/Update a Doctor with a given Doctor Id\n    Given the Administrators Menu Screen is accessible\n    When I select to Edit/Update a Doctor with a valid Doctor Id\n    And I provide the updated details\n    Then the Doctor record should be updated\n\n  Scenario: Display Doctor details for Edit/Update with valid Doctor Id\n    Given the Administrators Menu Screen is accessible\n    When I select to Edit/Update a Doctor with a valid Doctor Id\n    And I provide the updated details\n    Then the Doctor record should be updated\n\n  Scenario: Display error when Doctor does not exist with given Doctor Id\n    Given there is no Doctor with the given Doctor Id\n    When the system tries to retrieve the Doctor details\n    Then an error message \"Doctor does not exist\" should be displayed\n\n  Scenario: Check for open Consultation Requests before Deleting Doctor Details\n    Given there is a Doctor with a valid Doctor Id\n    And there are open Consultation Requests for this Doctor\n    When I attempt to delete the Doctor details\n    Then an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed\n\n  Scenario: Add a new Chemist/Lab with generated Id, Flag, Name, Address, and Contact Details\n    Given the Administrators Menu Screen is accessible\n    When I select to Add a new Chemist/Lab\n    And I provide a valid Chemist/Lab Id, Flag, Name, Address, and Contact Details\n    Then the new Chemist/Lab record should be created and displayed\n\n  Scenario: Edit/Update a Chemist/Lab with a given Chemist/Lab Id\n    Given the Administrators Menu Screen is accessible\n    When I select to Edit/Update a Chemist/Lab with a valid Chemist/Lab Id\n    And I provide the updated details\n    Then the Chemist/Lab record should be updated\n\n  Scenario: Display Chemist/Lab details for Edit/Update with valid Chemist/Lab Id\n    Given the Administrators Menu Screen is accessible\n    When I select to Edit/Update a Chemist/Lab with a valid Chemist/Lab Id\n    And I provide the updated details\n    Then the Chemist/Lab record should be updated\n\n  Scenario: Display error when Chemist/Lab does not exist with given Chemist/Lab Id\n    Given there is no Chemist/Lab with the given Chemist/Lab Id\n    When the system tries to retrieve the Chemist/Lab details\n    Then an error message \"Chemist/Lab does not exist\" should be displayed\n\n  Scenario: Check for open Consultation Requests before Deleting Chemist/Lab Details\n    Given there is a Chemist/Lab with a valid Chemist/Lab Id\n    And there are open Consultation Requests for this Chemist/Lab\n    When I attempt to delete the Chemist/Lab details\n    Then an exception error message \"Chemist/Lab has open Consultation Requests - cannot delete\" should be displayed",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Display error when Speciality does not exist with Speciality Id",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Speciality Id": "invalid"
+          },
+          "steps": [
+            "Given there is no Speciality with the given Speciality Id",
+            "When the system tries to retrieve the Speciality details",
+            "Then an error message \"Speciality does not exist\" should be displayed"
+          ],
+          "expected": [
+            "An error message \"Speciality does not exist\" should be displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Add a new Doctor with generated Id, Name, Age, Sex, Qualification & Experience",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Doctor Id": "generated",
+            "Doctor Name": "John Doe",
+            "Age": "35",
+            "Sex": "Male",
+            "Qualification": "MD",
+            "Experience": "10 years"
+          },
+          "steps": [
+            "Given the Administrators Menu Screen is accessible",
+            "When I select to Add a new Doctor",
+            "And I provide a valid Doctor Id, Name, Age, Sex, Qualification, and Experience",
+            "Then the new Doctor record should be created and displayed"
+          ],
+          "expected": [
+            "The new Doctor record should be created and displayed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Edit/Update a Doctor with a given Doctor Id",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Doctor Id": "valid",
+            "Doctor Name": "John Doe",
+            "Age": "35",
+            "Sex": "Male",
+            "Qualification": "MD",
+            "Experience": "10 years"
+          },
+          "steps": [
+            "Given the Administrators Menu Screen is accessible",
+            "When I select to Edit/Update a Doctor with a valid Doctor Id",
+            "And I provide the updated details",
+            "Then the Doctor record should be updated"
+          ],
+          "expected": [
+            "The Doctor record should be updated"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Display error when Doctor does not exist with given Doctor Id",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Doctor Id": "invalid"
+          },
+          "steps": [
+            "Given there is no Doctor with the given Doctor Id",
+            "When the system tries to retrieve the Doctor details",
+            "Then an error message \"Doctor does not exist\" should be displayed"
+          ],
+          "expected": [
+            "An error message \"Doctor does not exist\" should be displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Check for open Consultation Requests before Deleting Doctor Details",
+          "req_ids": [
+            "VCMDR03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Doctor Id": "valid",
+            "Open Consultation Requests": true
+          },
+          "steps": [
+            "Given there is a Doctor with a valid Doctor Id",
+            "And there are open Consultation Requests for this Doctor",
+            "When I attempt to delete the Doctor details",
+            "Then an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed"
+          ],
+          "expected": [
+            "An exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Add a new Chemist/Lab with generated Id, Flag, Name, Address, and Contact Details",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Chemist/Lab Id": "generated",
+            "Flag": "Clinic",
+            "Name": "Health Lab",
+            "Address": "123 Wellness St.",
+            "Contact Details": "555-1234"
+          },
+          "steps": [
+            "Given the Administrators Menu Screen is accessible",
+            "When I select to Add a new Chemist/Lab",
+            "And I provide a valid Chemist/Lab Id, Flag, Name, Address, and Contact Details",
+            "Then the new Chemist/Lab record should be created and displayed"
+          ],
+          "expected": [
+            "The new Chemist/Lab record should be created and displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Edit/Update a Chemist/Lab with a given Chemist/Lab Id",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Chemist/Lab Id": "generated",
+            "Flag": "Clinic",
+            "Name": "Health Lab",
+            "Address": "123 Wellness St.",
+            "Contact Details": "555-1234"
+          },
+          "steps": [
+            "Given the Administrators Menu Screen is accessible",
+            "When I select to Edit/Update a Chemist/Lab with a valid Chemist/Lab Id",
+            "And I provide the updated details",
+            "Then the Chemist/Lab record should be updated"
+          ],
+          "expected": [
+            "The Chemist/Lab record should be updated"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Display Chemist/Lab details for Edit/Update with valid Chemist/Lab Id",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Chemist/Lab Id": "generated",
+            "Flag": "Clinic",
+            "Name": "Health Lab",
+            "Address": "123 Wellness St.",
+            "Contact Details": "555-1234"
+          },
+          "steps": [
+            "Given the Administrators Menu Screen is accessible",
+            "When I select to Edit/Update a Chemist/Lab with a valid Chemist/Lab Id",
+            "And I provide the updated details",
+            "Then the Chemist/Lab record should be updated"
+          ],
+          "expected": [
+            "The Chemist/Lab record should be updated"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Display error when Chemist/Lab does not exist with given Chemist/Lab Id",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Chemist/Lab Id": "invalid"
+          },
+          "steps": [
+            "Given there is no Chemist/Lab with the given Chemist/Lab Id",
+            "When the system tries to retrieve the Chemist/Lab details",
+            "Then an error message \"Chemist/Lab does not exist\" should be displayed"
+          ],
+          "expected": [
+            "An error message \"Chemist/Lab does not exist\" should be displayed"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Check for open Consultation Requests before Deleting Chemist/Lab Details",
+          "req_ids": [
+            "VCMCL03"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Chemist/Lab Id": "valid",
+            "Open Consultation Requests": true
+          },
+          "steps": [
+            "Given there is a Chemist/Lab with a valid Chemist/Lab Id",
+            "And there are open Consultation Requests for this Chemist/Lab",
+            "When I attempt to delete the Chemist/Lab details",
+            "Then an exception error message \"Chemist/Lab has open Consultation Requests - cannot delete\" should be displayed"
+          ],
+          "expected": [
+            "An exception error message \"Chemist/Lab has open Consultation Requests - cannot delete\" should be displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.9,
+        "representation_score": 1.0,
+        "sfv_score": 0.95,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #10 (TC-010): traces to unknown requirement ids ['VCMCL03']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.95). Fix these problems and output the full corrected suite:\n- test case #10 (TC-010): traces to unknown requirement ids ['VCMCL03']",
+      "artifact": "@test_suite\nFeature: Speciality and Doctor Management System\n\n  Background:\n    # No preconditions or states are specified in the related requirements\n\n  Scenario Outline: Adding a Doctor with Speciality Id\n    Given there is an attempt to add a doctor with a Speciality Id\n    When the system processes the addition\n    Then the system should either:\n      # Normal case\n      - if the Speciality Id exists, the doctor is added successfully\n      # Error case\n      - if the Speciality Id does not exist, an exception error message \"Speciality does not exist\" should be displayed\n\n  Scenario: Adding a Doctor without Speciality Id\n    Given there is an attempt to add a doctor without a Speciality Id\n    When the system processes the addition\n    Then an exception error message \"Speciality does not exist\" should be displayed\n\n  Scenario Outline: Adding a Doctor with Generated Id\n    Given there is an attempt to add a doctor with a Generated Id\n    When the system processes the addition\n    Then the system should:\n      # Normal case\n      - create a unique Doctor Id\n      - display the Doctor Name, Age, Sex, Qualification & Experience\n\n  Scenario: Adding a Doctor without Generated Id\n    Given there is an attempt to add a doctor without a Generated Id\n    When the system processes the addition\n    Then an exception error message \"Doctor does not exist\" should be displayed\n\n  Scenario Outline: Editing/Updating a Doctor\n    Given there is an attempt to edit/update a doctor\n    When the system processes the edit/update\n    Then the system should display:\n      # Normal case\n      - the Doctor Id, Doctor Name, Age, Sex, Experience and Qualification for modification\n      # Error case\n      - if the Doctor does not exist, an exception error message \"Doctor does not exist\" should be displayed\n\n  Scenario: Editing/Updating a Doctor without Id\n    Given there is an attempt to edit/update a doctor without an Id\n    When the system processes the edit/update\n    Then an exception error message \"Doctor does not exist\" should be displayed\n\n  Scenario Outline: Deleting a Doctor\n    Given there is an attempt to delete a doctor\n    When the system checks for open Patient Consultation Requests\n    Then the system should:\n      # Normal case\n      - if no open requests, proceed with deletion\n      # Error case\n      - if there are open requests, display \"Doctor has open Consultation Requests - cannot delete\"\n\n  Scenario: Deleting a Doctor with Open Consultation Requests\n    Given there is an attempt to delete a doctor with open Patient Consultation Requests\n    When the system checks for open Patient Consultation Requests\n    Then an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed\n\n  Scenario Outline: Adding a Chemist/Lab\n    Given there is an attempt to add a Chemist/Lab\n    When the system processes the addition\n    Then the system should:\n      # Normal case\n      - create a unique Chemist/Lab Id\n      - display the Chemist/Lab Flag, Chemist Lab Name, Chemist Lab Address and Chemist Lab Contact Details\n\n  Scenario: Adding a Chemist/Lab without Id\n    Given there is an attempt to add a Chemist/Lab without an Id\n    When the system processes the addition\n    Then an exception error message \"Doctor does not exist\" should be displayed\n\n  Scenario: Editing/Updating a Chemist/Lab\n    Given there is an attempt to edit/update a Chemist/Lab\n    When the system processes the edit/update\n    Then the system should display:\n      # Normal case\n      - the Chemist/Lab Id, Chemist Lab Flag, Chemist Lab Name, Chemist Lab Address and Chemist Lab Contact Details for modification\n      # Error case\n      - if the Chemist/Lab does not exist, an exception error message \"Doctor does not exist\" should be displayed\n\n  Scenario: Editing/Updating a Chemist/Lab without Id\n    Given there is an attempt to edit/update a Chemist/Lab without an Id\n    When the system processes the edit/update\n    Then an exception error message \"Doctor does not exist\" should be displayed",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Adding a Doctor with Speciality Id",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Speciality Id": "existing"
+          },
+          "steps": [
+            "The system processes the addition",
+            "The doctor is added successfully"
+          ],
+          "expected": [
+            "The doctor is added successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Adding a Doctor without Speciality Id",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Speciality Id": "none"
+          },
+          "steps": [
+            "The system processes the addition",
+            "An exception error message \"Speciality does not exist\" should be displayed"
+          ],
+          "expected": [
+            "An exception error message \"Speciality does not exist\" should be displayed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Adding a Doctor with Generated Id",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Generated Id": "generated"
+          },
+          "steps": [
+            "The system processes the addition",
+            "The Doctor Id, Doctor Name, Age, Sex, Experience and Qualification are displayed"
+          ],
+          "expected": [
+            "The Doctor Id, Doctor Name, Age, Sex, Experience and Qualification are displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Adding a Doctor without Generated Id",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Generated Id": "none"
+          },
+          "steps": [
+            "The system processes the addition",
+            "An exception error message \"Doctor does not exist\" should be displayed"
+          ],
+          "expected": [
+            "An exception error message \"Doctor does not exist\" should be displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Editing/Updating a Doctor",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Doctor Id": "existing"
+          },
+          "steps": [
+            "The system processes the edit/update",
+            "The Doctor Name, Age, Sex, Experience and Qualification are displayed for modification"
+          ],
+          "expected": [
+            "The Doctor Name, Age, Sex, Experience and Qualification are displayed for modification"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Editing/Updating a Doctor without Id",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Doctor Id": "none"
+          },
+          "steps": [
+            "The system processes the edit/update",
+            "An exception error message \"Doctor does not exist\" should be displayed"
+          ],
+          "expected": [
+            "An exception error message \"Doctor does not exist\" should be displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Deleting a Doctor",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Doctor Id": "existing"
+          },
+          "steps": [
+            "The system checks for open Patient Consultation Requests",
+            "No open requests, proceed with deletion"
+          ],
+          "expected": [
+            "No open requests, proceed with deletion"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Deleting a Doctor with Open Consultation Requests",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Doctor Id": "existing"
+          },
+          "steps": [
+            "The system checks for open Patient Consultation Requests",
+            "Exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed"
+          ],
+          "expected": [
+            "Exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Adding a Chemist/Lab",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Chemist/Lab Id": "generated"
+          },
+          "steps": [
+            "The system processes the addition",
+            "The Chemist/Lab Id, Chemist Lab Flag, Chemist Lab Name, Chemist Lab Address and Chemist Lab Contact Details are displayed"
+          ],
+          "expected": [
+            "The Chemist/Lab Id, Chemist Lab Flag, Chemist Lab Name, Chemist Lab Address and Chemist Lab Contact Details are displayed"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Adding a Chemist/Lab without Id",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Chemist/Lab Id": "none"
+          },
+          "steps": [
+            "The system processes the addition",
+            "An exception error message \"Doctor does not exist\" should be displayed"
+          ],
+          "expected": [
+            "An exception error message \"Doctor does not exist\" should be displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Gherkin parse error: Parser errors:",
+      "artifact": "Feature: Speciality and Doctor Management\n  Background:\n    # No preconditions or states are specified in the requirements\n\n  Scenario: Display exception when Speciality does not exist with Speciality Id\n    Given there is no Speciality with the given Speciality Id\n    When the system tries to retrieve the Speciality details\n    Then an exception error message \"Speciality does not exist\" should be displayed\n\n  Scenario: Add a new Doctor in the Administrators Menu\n    Given the Administrators Menu is accessible\n    When the Add Doctor screen is accessed\n    And the following Doctor details are entered:\n      | Doctor Id          | Doctor Name       | Age | Sex    | Qualification | Experience |\n      | generated          | John Doe          | 30   | Male   | MD         | 5 years     |\n    And the \"Add\" button is clicked\n    Then the new Doctor should be added successfully\n\n  Scenario: Display exception when Doctor does not exist with Doctor Id\n    Given the system tries to retrieve a Doctor with the given Doctor Id\n    When the system accesses the Edit/Update Doctors screen\n    Then an exception error message \"Doctor does not exist\" should be displayed\n\n  Scenario: Modify or Delete a Doctor in the Administrators Menu\n    Given the Administrators Menu is accessible\n    When the Edit/Update Doctors screen is accessed\n    And the following Doctor details are queried:\n      | Doctor Id          | Doctor Name       | Age | Sex    | Qualification | Experience |\n      | generated          | Jane Smith        | 40   | Female | RN          | 10 years    |\n    And the modification options are selected\n    Then the Doctor' extrinsic details should be displayed for modification\n    And the modification should be successful\n\n  Scenario: Check for open Consultation Requests before Deleting a Doctor\n    Given the system tries to delete a Doctor\n    When the system checks for open Consultation Requests associated with the Doctor's Id\n    Then if open requests are found, an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed\n\n  Scenario: Add a new Chemist/Lab in the Administrators Menu\n    Given the Administrators Menu is accessible\n    When the Add Chemist/Lab screen is accessed\n    And the following Chemist/Lab details are entered:\n      | Chemist/Lab Id    | Chemist Lab Flag | Chemist Lab Name       | Chemist Lab Address         | Chemist Lab Contact Details |\n      | generated        | Yes             | Health Lab             | 123 Wellness St.          | (555) 123-4567             | Dr. A. Smith\n    And the \"Add\" button is clicked\n    Then the new Chemist/Lab should be added successfully\n\n  Scenario: Modify or Update a Chemist/Lab in the Administrators Menu\n    Given the Administrators Menu is accessible\n    When the Edit/Update Chemist/Lab screen is accessed\n    And the following Chemist/Lab details are queried:\n      | Chemist/Lab Id    | Chemist Lab Flag | Chemist Lab Name       | Chemist Lab Address         | Chemist Lab Contact Details |\n      | generated        | Yes             | Care Lab             | 456 Health Ave.           | (555) 765-4321             | Dr. B. Johnson\n    And the modification options are selected\n    Then the Chemist/Lab details should be displayed for modification\n    And the modification should be successful",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Display exception when Speciality does not exist with Speciality Id",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given there is no Speciality with the given Speciality Id",
+            "When the system tries to retrieve the Speciality details",
+            "Then an exception error message \"Speciality does not exist\" should be displayed"
+          ],
+          "expected": [
+            "an exception error message \"Speciality does not exist\" should be displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Add a new Doctor in the Administrators Menu",
+          "req_ids": [
+            "VCMDR01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The Administrators Menu is accessible"
+          ],
+          "inputs": {},
+          "steps": [
+            "And the following Doctor details are entered:",
+            "   | generated          | John Doe          | 30   | Male   | MD         | 5 years     |",
+            "And the \"Add\" button is clicked",
+            "Then the new Doctor should be added successfully"
+          ],
+          "expected": [
+            "the new Doctor should be added successfully"
+          ]
+        },
+        {
+          "id": "TC-0don",
+          "title": "Display exception when Doctor does not exist with Doctor Id",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given the system tries to retrieve a Doctor with the given Doctor Id",
+            "When the system accesses the Edit/Update Doctors screen",
+            "Then an exception error message \"Doctor does not exist\" should be displayed"
+          ],
+          "expected": [
+            "an exception error message \"Doctor does not exist\" should be displayed"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Modify or Delete a Doctor in the Administrators Menu",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The Administrators Menu is accessible"
+          ],
+          "inputs": {},
+          "steps": [
+            "And the following Doctor details are queried:",
+            "   | generated          | Jane Smith        | 40   | Female | RN          | 10 years    |",
+            "And the modification options are selected",
+            "Then the Doctor extrinsic details should be displayed for modification",
+            "And the modification should be successful"
+          ],
+          "expected": [
+            "the Doctor extrinsic details should be displayed for modification",
+            "the modification should be successful"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Check for open Consultation Requests before Deleting a Doctor",
+          "req_ids": [
+            "VCMDR03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given the system tries to delete a Doctor",
+            "When the system checks for open Consultation Requests associated with the Doctor's Id",
+            "Then an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed"
+          ],
+          "expected": [
+            "an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed"
+          ]
+        },
+        {
+          "id": "TC-030",
+          "title": "Add a new Chemist/Lab in the Administrators Menu",
+          "req_ids": [
+            "VCMCL01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The Administrators Menu is accessible"
+          ],
+          "inputs": {},
+          "steps": [
+            "And the following Chemist/Lab details are entered:",
+            "   | generated        | Yes             | Health Lab             | 123 Wellness St.          | (555) 123-4567             | Dr. A. Smith",
+            "And the \"Add\" button is clicked",
+            "Then the new Chemist/Lab should be added successfully"
+          ],
+          "expected": [
+            "the new Chemist/Lab should be added successfully"
+          ]
+        },
+        {
+          "id": "TC-040",
+          "title": "Modify or Update a Chemist/Lab in the Administrators Menu",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The Administrators Menu is accessible"
+          ],
+          "inputs": {},
+          "steps": [
+            "And the following Chemist/Lab details are queried:",
+            "   | generated        | Yes             | Care Lab             | 456 Health Ave.           | (555) 765-4321             | Dr. B. Johnson",
+            "And the modification options are selected",
+            "Then the Chemist/Lab details should be displayed for modification",
+            "And the modification should be successful"
+          ],
+          "expected": [
+            "the Chemist/Lab details should be displayed for modification",
+            "the modification should be successful"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.4,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.2273,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "Doctor Name",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "Age",
+            "grounded": false
+          },
+          {
+            "value": "Male",
+            "context": "Sex",
+            "grounded": false
+          },
+          {
+            "value": "MD",
+            "context": "Qualification",
+            "grounded": false
+          },
+          {
+            "value": "5 years",
+            "context": "Experience",
+            "grounded": false
+          },
+          {
+            "value": "Jane Smith",
+            "context": "Doctor Name",
+            "grounded": false
+          },
+          {
+            "value": "40",
+            "context": "Age",
+            "grounded": false
+          },
+          {
+            "value": "Female",
+            "context": "Sex",
+            "grounded": false
+          },
+          {
+            "value": "RN",
+            "context": "Qualification",
+            "grounded": false
+          },
+          {
+            "value": "10 years",
+            "context": "Experience",
+            "grounded": false
+          },
+          {
+            "value": "Yes",
+            "context": "Chemist Lab Flag",
+            "grounded": false
+          },
+          {
+            "value": "Health Lab",
+            "context": "Chemist Lab Name",
+            "grounded": false
+          },
+          {
+            "value": "123 Wellness St.",
+            "context": "Chemist Lab Address",
+            "grounded": false
+          },
+          {
+            "value": "(555) 123-4567 Dr. A. Smith",
+            "context": "Chemist Lab Contact Details",
+            "grounded": false
+          },
+          {
+            "value": "Care Lab",
+            "context": "Chemist Lab Name",
+            "grounded": false
+          },
+          {
+            "value": "456 Health Ave.",
+            "context": "Chemist Lab Address",
+            "grounded": false
+          },
+          {
+            "value": "(555) 765-4321 Dr. B. Johnson",
+            "context": "Chemist Lab Contact Details",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 22,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No Scenario Outline with Examples tables; lacks normal, edge, and invalid values.",
+          "Positive scenarios use vague assertions (e.g., \"should be added successfully\") instead of checking specific state changes or database entries.",
+          "No verification of field values after addition or modification.",
+          "No boundary value testing for numeric fields such as Age or Experience.",
+          "Some concrete values (e.g., contact details) are not grounded in the SRS, risking hallucination."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VCMDR02",
+          "VCMSP03-2"
+        ],
+        "fsa_score": 0.7941,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.7941; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.4, 'boundary_coverage': 1.0, 'groundedness_mg': 0.2273}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCMDR02', 'VCMSP03-2'] (add at least one each)\n- ungrounded value 'John Doe' (Doctor Name): remove or use the SRS value\n- ungrounded value '30' (Age): remove or use the SRS value\n- ungrounded value 'Male' (Sex): remove or use the SRS value\n- ungrounded value 'MD' (Qualification): remove or use the SRS value\n- ungrounded value '5 years' (Experience): remove or use the SRS value\n- ungrounded value 'Jane Smith' (Doctor Name): remove or use the SRS value\n- No Scenario Outline with Examples tables; lacks normal, edge, and invalid values.\n- Positive scenarios use vague assertions (e.g., \"should be added successfully\") instead of checking specific state changes or database entries.\n- No verification of field values after addition or modification.\n- No boundary value testing for numeric fields such as Age or Experience.\n- Some concrete values (e.g., contact details) are not grounded in the SRS, risking hallucination.",
+      "artifact": "Feature: Speciality and Doctor Management\n  Background:\n    As an administrator of the VCMSP03 system,\n    I manage specialities and doctors within the healthcare system.\n\n  Scenario: Display exception when Speciality does not exist with Speciality Id\n    Given there is no Speciality with the given Speciality Id\n    When attempting to access the speciality details\n    Then an exception error message \"Speciality does not exist\" should be displayed\n\n  Scenario: Access Administrators Menu to Add Doctors\n    Given the Administrators Menu is accessible\n    When choosing to add a new Doctor\n    Then the Doctor Id should be generated and a new Doctor record should be created\n    And the Doctor Name, Age, Sex, and Qualification fields should be populated\n\n  Scenario: Access Administrators Menu to Edit/Update Doctors\n    Given the Administrators Menu is accessible\n    When choosing to edit/update an existing Doctor\n    And the Doctor Id is provided\n    When entering new or modified details for Doctor Name, Age, Sex, Experience, and Qualification\n    Then the Doctor record should be updated successfully\n\n  Scenario: Display exception when Doctor does not exist with Doctor Id\n    Given there is no Doctor with the given Doctor Id\n    When attempting to access the Doctor' extr",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Access Administrators Menu to Add Doctors",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Doctor Name": "Sample Doctor Name",
+            "Age": "30",
+            "Sex": "Male",
+            "Qualification": "MD"
+          },
+          "steps": [
+            "Navigate to the Administrators Menu",
+            "Select the option to add a new Doctor",
+            "Fill in the required fields",
+            "Submit the new Doctor record"
+          ],
+          "expected": [
+            "The system generates a unique Doctor Id",
+            "A new Doctor record is created with the provided details"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Access Administrators Menu to Edit/Update Doctors",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Access to the Administrators Menu and an existing Doctor record"
+          ],
+          "inputs": {
+            "Doctor Id": "Generated Doctor Id",
+            "Doctor Name": "Sample Doctor Name",
+            "Age": "30",
+            "Sex": "Male",
+            "Qualification": "MD"
+          },
+          "steps": [
+            "Navigate to the Administrators Menu",
+            "Select the option to edit/update the Doctor record",
+            "Enter the new details for Doctor Name, Age, Sex, Experience, and Qualification",
+            "Submit the changes"
+          ],
+          "expected": [
+            "The Doctor record is updated with the new details"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Display exception when Doctor does not exist with Doctor Id",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor Id is provided"
+          ],
+          "inputs": {
+            "Doctor Id": "Non-existent Id"
+          },
+          "steps": [
+            "Attempt to access the Doctor record with the provided non-existent Id"
+          ],
+          "expected": [
+            "An exception error message 'Doctor does not exist' should be displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Check for open Consultation Requests before Deleting Doctor Details",
+          "req_ids": [
+            "VCMDR03-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor Id is provided"
+          ],
+          "inputs": {
+            "Doctor Id": "Generated Id"
+          },
+          "steps": [
+            "Attempt to delete the Doctor record with the provided Id",
+            "Check for any open Patient Consultation Requests associated with the Doctor"
+          ],
+          "expected": [
+            "No deletion should occur if there are open Consultation Requests",
+            "An exception error message 'Doctor has open Consultation Requests - cannot delete' should be displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Access Administrators Menu to Add Chemists & Labs",
+          "req_ids": [
+            "VCMCL01"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Chemist/Lab Flag": "Add",
+            "Chemist Lab Name": "Sample Lab Name",
+            "Chemist Lab Address": "Sample Address",
+            "Chemist Lab Contact Details": "Sample Contact"
+          },
+          "steps": [
+            "Navigate to the Administrators Menu",
+            "Select the option to add Chemists & Labs",
+            "Fill in the required fields",
+            "Submit the new Chemist/Lab record"
+          ],
+          "expected": [
+            "The system generates a unique Chemist/Lab Id",
+            "A new Chemist/Lab record is created with the provided details"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Access Administrators Menu to Edit/Update Chemists & Labs",
+          "reqdon_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Access to the Administrators Menu and an existing Chemist/Lab record"
+          ],
+          "inputs": {
+            "Chemist/Lab Id": "Generated Id",
+            "Chemist Lab Flag": "Edit",
+            "Chemist Lab Name": "Sample Lab Name",
+            "Chemist Lab Address": "Sample Address",
+            "Chemist Lab Contact Details": "Sample Contact"
+          },
+          "steps": [
+            "Navigate to the Administrators Menu",
+            "Select the option to edit/update the Chemist/Lab record",
+            "Enter the new details for Chemist/Lab Name, Address, and Contact Details",
+            "Submit the changes"
+          ],
+          "expected": [
+            "The Chemist/Lab record is updated with the new details"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.8333,
+        "representation_score": 1.0,
+        "sfv_score": 0.9167,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #6 (TC-006): 'req_ids' is a required property"
+        ]
+      }
+    }
+  ]
+}

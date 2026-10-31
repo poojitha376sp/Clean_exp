@@ -1,0 +1,757 @@
+{
+  "unit_id": "U22_3",
+  "representation": "Use-Cases & User Stories",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Use-Cases & User Stories",
+    "group": 1,
+    "schema_score": 0.8333,
+    "representation_score": 1.0,
+    "sfv_score": 0.9167,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']"
+    ]
+  },
+  "fsa": null,
+  "artifact": "# Use-Case: Online Consultation Payment Process\n**Actor:** Patient  \n**Goal:** Complete an offline consultation payment via a payment gateway.\n\n**Primary Success Flow:**\n1. Patient selects \"Offline Consultation\" option.\n2. System redirects to payment gateway page.\n3. Patient enters payment details (credit/debit card or net banking).\n4. Payment gateway processes the transaction.\n5. System confirms successful payment and displays a confirmation message.\n\n**Alternative Flow:**\n1. If the payment gateway fails to process the transaction:\n   a. System displays an error message at the bottom.\n   b. Error message is self-descriptive and within 80 characters.\n   c. Patient can retry the payment or choose an alternative payment method.\n\n**Exception Flow:**\n1. If the symptom entered by the patient does not exist in the system:\n   a. System displays the exception error message: “Symptom does not exist”.\n   b. Patient is prompted to select a valid symptom or contact support.\n\n---\n\n# Use-Case: Patient Registration and Consultation Request\n**Actor:** Elderly Patient  \n**Goal:** Register as a patient and request a consultation with a larger font size for ease of use.\n\n**Primary Success Flow:**\n1. Patient navigates to the \"Patient Registration\" screen.\n2. System displays the registration form with a bigger font size.\n3. Patient enters required personal and contact information.\n4. System validates the input and registers the patient.\n5. Patient is redirected to the \"Consultation Request\" screen with a larger font size.\n6. Patient selects a consultation type and submits the request.\n\n**Alternative Flow:**\n1. If the registration form validation fails (e.g., missing fields):\n   a. System displays an error message at the bottom, self-descriptive and ≤80 characters.\n   b. Patient corrects the input and resubmits.\n\n**Exception Flow:**\n1. If the system encounters an internal error during registration:\n   a. System displays a generic error message at the bottom.\n   b. Patient is advised to retry after a short interval or contact support.\n\n---\n\n# Use-Case: Error Message Handling\n**Actor:** System  \n**Goal:** Ensure error messages are displayed correctly at the bottom of the screen and adhere to size constraints.\n\n**Primary Success Flow:**\n1. System detects an error during any process (e.g., payment failure, invalid input).\n2. System generates an error message.\n3. Message is displayed at the bottom of the screen.\n4. Message length does not exceed 80 characters.\n\n**Alternative Flow:**\n1. If multiple errors occur:\n   a. System displays each error message sequentially at the bottom.\n   b. Each message remains ≤80 characters.\n\n**Exception Flow:**\n1. If an error message exceeds 80 characters:\n   a. System truncates the message to fit within the 80-character limit.\n   b. A warning is logged for further review.\n\n---\n\n# Use-Case: Navigation via Buttons\n**Actor:** Patient  \n**Goal:** Use buttons to navigate through the consultation and payment process easily.\n\n**Primary Success Flow:**\n1. Patient clicks the \"Next\" button to proceed to the next screen.\n2. System validates the input and transitions to the subsequent screen.\n3. Patient clicks the \"Submit\" button to finalize the consultation request or payment.\n4. System processes the request and displays the appropriate confirmation or error message.\n\n**Alternative Flow:**\n1. If a button click leads to an invalid state (e.g., attempting to submit before filling required fields):\n   a. System displays an error message at the bottom, self-descriptive and ≤80 characters.\n   b. Patient is prompted to fill in the missing information.\n\n**Exception Flow:**\n1. If a button click triggers an unexpected system error:\n   a. System displays a generic error message at the bottom.\n   b. Patient is advised to retry the action or contact support.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Offline Consultation Payment Success",
+      "req_ids": [
+        "VIRTUA-3-25"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient selects Offline Consultation",
+        "Payment gateway is operational"
+      ],
+      "inputs": {
+        "payment_details": "valid_credit_card"
+      },
+      "steps": [
+        "Patient selects 'Offline Consultation' option",
+        "System redirects to payment gateway page",
+        "Patient enters valid payment details",
+        "Payment gateway processes the transaction",
+        "System confirms successful payment"
+      ],
+      "expected": [
+        "Confirmation message displayed",
+        "Transaction status shows 'Success'"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Offline Consultation Payment Failure",
+      "req_ids": [
+        "VIRTUA-3-25"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient selects Offline Consultation",
+        "Payment gateway is operational but declines the transaction"
+      ],
+      "inputs": {
+        "payment_details": "declined_card"
+      },
+      "steps": [
+        "Patient selects 'Offline Consultation' option",
+        "System redirects to payment gateway page",
+        "Patient enters declined payment details",
+        "Payment gateway declines the transaction",
+        "System displays error message at the bottom"
+      ],
+      "expected": [
+        "Error message displayed",
+        "Message length ≤ 80 characters",
+        "Message is self-descriptive"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Symptom Does Not Exist Exception",
+      "req_ids": [
+        "VIRTUA-3.1-1#2"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "Patient attempts to select a non-existent symptom"
+      ],
+      "inputs": {
+        "symptom": "non_existent_symptom"
+      },
+      "steps": [
+        "Patient attempts to select a symptom",
+        "System checks symptom validity",
+        "Symptom does not exist in the system"
+      ],
+      "expected": [
+        "Exception error message displayed: 'Symptom does not exist'"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Patient Registration with Large Font",
+      "req_ids": [
+        "VIRTUA-3.1-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Elderly patient accesses registration screen"
+      ],
+      "inputs": {
+        "personal_info": "valid_user_data"
+      },
+      "steps": [
+        "Patient navigates to 'Patient Registration' screen",
+        "System displays form with larger font size",
+        "Patient enters required personal and contact information",
+        "System validates input and registers the patient"
+      ],
+      "expected": [
+        "Registration successful",
+        "Larger font size used throughout"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Error Message Size Constraint",
+      "req_ids": [
+        "VIRTUA-3.1-3"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System generates an error message"
+      ],
+      "inputs": {
+        "error_content": "exceeds_80_characters_but_still_within_specified_limit"
+      },
+      "steps": [
+        "System detects an error",
+        "System generates an error message",
+        "Message is displayed at the bottom of the screen"
+      ],
+      "expected": [
+        "Message length does not exceed 80 characters"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Navigation via Buttons",
+      "req_ids": [
+        "VIRTUA-3.1-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient is on the consultation request screen"
+      ],
+      "inputs": {
+        "button_click": "Next"
+      },
+      "steps": [
+        "Patient clicks the 'Next' button",
+        "System validates input and transitions to the next screen",
+        "Patient clicks the 'Submit' button to finalize the request"
+      ],
+      "expected": [
+        "System processes the request and displays confirmation"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "# Use-Case: Online Consultation Payment Process\n**Actor:** Patient  \n**Goal:** Complete an offline consultation payment via a payment gateway.\n\n**Primary Success Flow:**\n1. Patient selects \"Offline Consultation\" option.\n2. System redirects to payment gateway page.\n3. Patient enters payment details (credit/debit card or net banking).\n4. Payment gateway processes the transaction.\n5. System confirms successful payment and displays a confirmation message.\n\n**Alternative Flow:**\n1. If the payment gateway fails to process the transaction:\n   a. System displays an error message at the bottom.\n   b. Error message is self-descriptive and within 80 characters.\n   c. Patient can retry the payment or choose an alternative payment method.\n\n**Exception Flow:**\n1. If the symptom entered by the patient does not exist in the system:\n   a. System displays the exception error message: “Symptom does not exist”.\n   b. Patient is prompted to select a valid symptom or contact support.\n\n---\n\n# Use-Case: Patient Registration and Consultation Request\n**Actor:** Elderly Patient  \n**Goal:** Register as a patient and request a consultation with a larger font size for ease of use.\n\n**Primary Success Flow:**\n1. Patient navigates to the \"Patient Registration\" screen.\n2. System displays the registration form with a bigger font size.\n3. Patient enters required personal and contact information.\n4. System validates the input and registers the patient.\n5. Patient is redirected to the \"Consultation Request\" screen with a larger font size.\n6. Patient selects a consultation type and submits the request.\n\n**Alternative Flow:**\n1. If the registration form validation fails (e.g., missing fields):\n   a. System displays an error message at the bottom, self-descriptive and ≤80 characters.\n   b. Patient corrects the input and resubmits.\n\n**Exception Flow:**\n1. If the system encounters an internal error during registration:\n   a. System displays a generic error message at the bottom.\n   b. Patient is advised to retry after a short interval or contact support.\n\n---\n\n# Use-Case: Error Message Handling\n**Actor:** System  \n**Goal:** Ensure error messages are displayed correctly at the bottom of the screen and adhere to size constraints.\n\n**Primary Success Flow:**\n1. System detects an error during any process (e.g., payment failure, invalid input).\n2. System generates an error message.\n3. Message is displayed at the bottom of the screen.\n4. Message length does not exceed 80 characters.\n\n**Alternative Flow:**\n1. If multiple errors occur:\n   a. System displays each error message sequentially at the bottom.\n   b. Each message remains ≤80 characters.\n\n**Exception Flow:**\n1. If an error message exceeds 80 characters:\n   a. System truncates the message to fit within the 80-character limit.\n   b. A warning is logged for further review.\n\n---\n\n# Use-Case: Navigation via Buttons\n**Actor:** Patient  \n**Goal:** Use buttons to navigate through the consultation and payment process easily.\n\n**Primary Success Flow:**\n1. Patient clicks the \"Next\" button to proceed to the next screen.\n2. System validates the input and transitions to the subsequent screen.\n3. Patient clicks the \"Submit\" button to finalize the consultation request or payment.\n4. System processes the request and displays the appropriate confirmation or error message.\n\n**Alternative Flow:**\n1. If a button click leads to an invalid state (e.g., attempting to submit before filling required fields):\n   a. System displays an error message at the bottom, self-descriptive and ≤80 characters.\n   b. Patient is prompted to fill in the missing information.\n\n**Exception Flow:**\n1. If a button click triggers an unexpected system error:\n   a. System displays a generic error message at the bottom.\n   b. Patient is advised to retry the action or contact support.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Offline Consultation Payment Success",
+          "req_ids": [
+            "VIRTUA-3-25"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient selects Offline Consultation",
+            "Payment gateway is operational"
+          ],
+          "inputs": {
+            "payment_details": "valid_credit_card"
+          },
+          "steps": [
+            "Patient selects 'Offline Consultation' option",
+            "System redirects to payment gateway page",
+            "Patient enters valid payment details",
+            "Payment gateway processes the transaction",
+            "System confirms successful payment"
+          ],
+          "expected": [
+            "Confirmation message displayed",
+            "Transaction status shows 'Success'"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Offline Consultation Payment Failure",
+          "req_ids": [
+            "VIRTUA-3-25"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient selects Offline Consultation",
+            "Payment gateway is operational but declines the transaction"
+          ],
+          "inputs": {
+            "payment_details": "declined_card"
+          },
+          "steps": [
+            "Patient selects 'Offline Consultation' option",
+            "System redirects to payment gateway page",
+            "Patient enters declined payment details",
+            "Payment gateway declines the transaction",
+            "System displays error message at the bottom"
+          ],
+          "expected": [
+            "Error message displayed",
+            "Message length ≤ 80 characters",
+            "Message is self-descriptive"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Symptom Does Not Exist Exception",
+          "req_ids": [
+            "VIRTUA-3.1-1#2"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient attempts to select a non-existent symptom"
+          ],
+          "inputs": {
+            "symptom": "non_existent_symptom"
+          },
+          "steps": [
+            "Patient attempts to select a symptom",
+            "System checks symptom validity",
+            "Symptom does not exist in the system"
+          ],
+          "expected": [
+            "Exception error message displayed: 'Symptom does not exist'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Patient Registration with Large Font",
+          "req_ids": [
+            "VIRTUA-3.1-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Elderly patient accesses registration screen"
+          ],
+          "inputs": {
+            "personal_info": "valid_user_data"
+          },
+          "steps": [
+            "Patient navigates to 'Patient Registration' screen",
+            "System displays form with larger font size",
+            "Patient enters required personal and contact information",
+            "System validates input and registers the patient"
+          ],
+          "expected": [
+            "Registration successful",
+            "Larger font size used throughout"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Error Message Size Constraint",
+          "req_ids": [
+            "VIRTUA-3.1-3"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System generates an error message"
+          ],
+          "inputs": {
+            "error_content": "exceeds_80_characters_but_still_within_specified_limit"
+          },
+          "steps": [
+            "System detects an error",
+            "System generates an error message",
+            "Message is displayed at the bottom of the screen"
+          ],
+          "expected": [
+            "Message length does not exceed 80 characters"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Navigation via Buttons",
+          "req_ids": [
+            "VIRTUA-3.1-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is on the consultation request screen"
+          ],
+          "inputs": {
+            "button_click": "Next"
+          },
+          "steps": [
+            "Patient clicks the 'Next' button",
+            "System validates input and transitions to the next screen",
+            "Patient clicks the 'Submit' button to finalize the request"
+          ],
+          "expected": [
+            "System processes the request and displays confirmation"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.8333,
+        "representation_score": 1.0,
+        "sfv_score": 0.9167,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.92). Fix these problems and output the full corrected suite:\n- test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Case: Online Consultation Payment Process**\n\n*Actor:* Patient\n\n*Goal:* To make a payment for an offline consultation using a payment gateway.\n\n*Primary Success Flow:*\n1. Patient selects the \"Offline Consultation\" option.\n2. System displays the payment interface with enabled Credit/Debit/Net Banking options.\n3. Patient enters payment details and selects the preferred banking method.\n4. System processes the payment via the integrated payment gateway.\n5. System confirms successful payment and displays a success message at the bottom of the screen.\n\n*Alternative Flow:*\n1. If the payment method is unavailable, the system redirects to an alternative payment gateway selection screen.\n\n*Exception Flow:*\n1. If the symptom entered by the patient does not exist in the system, an exception error message \"Symptom does not exist\" is displayed at the bottom of the screen.\n\n---\n\n**Use-Case: Patient Registration and Consultation Request Screens**\n\n*Actor:* Elderly Patient\n\n*Goal:* To register as a patient and submit a consultation request with enhanced readability.\n\n*Primary Success Flow:*\n1. Patient navigates to the \"Patient Registration\" screen.\n2. System displays the registration form with a larger font size.\n3. Patient enters required personal and contact information.\n4. System validates the input and, upon success, displays the \"Consultation Request\" screen with a larger font size.\n5. Patient selects consultation options and submits the request.\n\n*Alternative Flow:*\n1. If the registration form is incomplete, a self-descriptive error message is shown at the bottom of the screen.\n\n*Exception Flow:*\n1. If the symptom entered by the patient does not exist, the exception error message \"Symptom does not exist\" is displayed at the bottom of the screen.\n\n---\n\n**Use-Case: Error Message Handling**\n\n*Actor:* User (Patient or Admin)\n\n*Goal:* To ensure error messages are self-descriptive, positioned at the bottom, and adhere to size constraints.\n\n*Primary Success Flow:*\n1. User performs an action that triggers an error (e.g., invalid input).\n2. System displays a self-descriptive error message at the bottom of the screen.\n3. Message length does not exceed 80 characters.\n\n*Alternative Flow:*\n1. If multiple errors occur, each error message is displayed sequentially at the bottom of the screen, each adhering to the 80-character limit.\n\n*Exception Flow:*\n1. If an error message exceeds 80 characters, the system truncates the message to fit within the limit and appends \"...\" to indicate truncation.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Verify payment processing for offline consultation",
+          "req_ids": [
+            "VIRTUA-3-25"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient selects Offline Consultation"
+          ],
+          "inputs": {
+            "paymentMethod": "Credit Card",
+            "amount": "100.00"
+          },
+          "steps": [
+            "Navigate to Offline Consultation option.",
+            "Select Credit Card as payment method.",
+            "Enter valid card details and submit.",
+            "Verify payment confirmation message."
+          ],
+          "expected": [
+            "Payment successful message displayed at bottom."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Check Credit/Debit/Net Banking options via Payment Gateway",
+          "req_ids": [
+            "VIRTUA-3-26"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient selects Offline Consultation"
+          ],
+          "inputs": {
+            "bankingMethod": "Net Banking"
+          },
+          "steps": [
+            "Select Offline Consultation.",
+            "Choose Net Banking from the enabled options.",
+            "Proceed to payment processing.",
+            "Confirm that Net Banking is successfully integrated."
+          ],
+          "expected": [
+            "Net Banking option is available and processes payment."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Validate error message positioning and self-description",
+          "req_ids": [
+            "VIRTUA-3-1-2",
+            "VIRTUA-3-1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User enters invalid input"
+          ],
+          "inputs": {
+            "invalidInput": "InvalidSymptom"
+          },
+          "steps": [
+            "Enter invalid symptom in consultation request.",
+            "Observe error message at the bottom of the screen.",
+            "Check that message length does not exceed 80 characters."
+          ],
+          "expected": [
+            "Self-descriptive error message displayed at bottom, ≤80 characters."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test exception error message for non-existent symptom",
+          "req_ids": [
+            "VIRTUA-3.1-1#2"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient attempts to select a non-existent symptom"
+          ],
+          "inputs": {
+            "symptom": "NonExistentSymptom"
+          },
+          "steps": [
+            "Select NonExistentSymptom from symptom list.",
+            "Observe the displayed error message."
+          ],
+          "expected": [
+            "Exception error message 'Symptom does not exist' displayed at bottom."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Confirm larger font size for elderly-friendly screens",
+          "req_ids": [
+            "VIRTUA-3.1-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Elderly patient accesses registration or consultation request screen"
+          ],
+          "inputs": {},
+          "steps": [
+            "Navigate to Patient Registration screen.",
+            "Verify font size is larger than standard."
+          ],
+          "expected": [
+            "Font size is increased to aid elderly users."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.6,
+        "representation_score": 1.0,
+        "sfv_score": 0.8,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #3 (TC-003): traces to unknown requirement ids ['VIRTUA-3-1-2', 'VIRTUA-3-1-3']",
+          "test case #4 (TC-004): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.80). Fix these problems and output the full corrected suite:\n- test case #3 (TC-003): traces to unknown requirement ids ['VIRTUA-3-1-2', 'VIRTUA-3-1-3']\n- test case #4 (TC-004): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Case: Online Consultation Payment Process**\n\n*Actor:* Patient\n\n*Goal:* To make a payment for an offline consultation using a payment gateway.\n\n*Primary Success Flow:*\n1. Patient selects the \"Offline Consultation\" option.\n2. System displays the payment screen with available payment methods (Credit/Debit/Net Banking).\n3. Patient enters payment details and selects a payment method.\n4. System processes the payment via the integrated payment gateway.\n5. System displays a confirmation message indicating successful payment.\n\n*Alternative Flow:*\n1. If the selected payment method is unavailable, the system prompts the patient to choose another method.\n\n*Exception Flow:*\n1. If the payment processing fails, the system displays the error message: “Symptom does not exist” (as specified in VIRTUA-3.1-1#2).\n\n---\n\n**Use-Case: Patient Registration and Consultation Request**\n\n*Actor:* Elderly Patient\n\n*Goal:* To register as a patient and request a consultation with a larger font size for better readability.\n\n*Primary Success Flow:*\n1. Patient navigates to the \"Patient Registration\" screen.\n2. System displays the registration form with a larger font size.\n3. Patient enters required personal and contact information.\n4. System confirms successful registration and navigates to the \"Consultation Request\" screen.\n5. Patient selects consultation options and submits the request.\n6. System confirms the consultation request with a larger font size for readability.\n\n*Alternative Flow:*\n1. If the registration form validation fails, the system displays self-descriptive error messages at the bottom (as per VIRTUA-3-1-2) with a maximum size of 80 characters (as per VIRTUA-3-1-3).\n\n*Exception Flow:*\n1. If the consultation request cannot be processed due to an internal error, the system displays the predefined exception message: “Symptom does not exist” (as per VIRTUA-3.1-1#2).\n\n---\n\n**Use-Case: Navigation via Buttons**\n\n*Actor:* Any User\n\n*Goal:* To navigate through the application using intuitive buttons.\n\n*Primary Success Flow:*\n1. User clicks on a navigation button (e.g., \"Next\", \"Back\", \"Submit\").\n2. System responds by transitioning to the next relevant screen or performing the associated action.\n\n*Alternative Flow:*\n1. If a button is disabled (e.g., due to missing required input), the system provides visual feedback indicating the button's inactive state.\n\n*Exception Flow:*\n1. If a button click triggers an unexpected error, the system displays a self-descriptive error message at the bottom of the screen (as per VIRTUA-3-1-2) with a maximum size of 80 characters (as per VIRTUA-3-1-3).\n\n---\n\n**Use-Case: Cross-Platform Compatibility**\n\n*Actor:* User\n\n*Goal:* To ensure all screens function correctly on a PC/Laptop.\n\n*Primary Success Flow:*\n1. User accesses the application on a PC/Laptop.\n2. System displays all screens as designed, maintaining layout and functionality.\n\n*Alternative Flow:*\n1. If the application is accessed on a non-supported device, the system prompts the user to use a PC/Laptop (as per VIRTUA-3.1-1).\n\n*Exception Flow:*\n1. If a screen fails to load on a PC/Laptop due to a technical glitch, the system displays a generic error message indicating a failure to load the requested screen.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Verify payment processing for offline consultation",
+          "req_ids": [
+            "VIRTUA-3-25"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient selects Offline Consultation option"
+          ],
+          "inputs": {
+            "paymentMethod": "Credit Card",
+            "amount": "1000"
+          },
+          "steps": [
+            "Navigate to Offline Consultation screen",
+            "Select payment method and enter details",
+            "Submit payment"
+          ],
+          "expected": [
+            "Confirmation message indicating successful payment"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Check error message display for unavailable payment method",
+          "req_ids": [
+            "VIRTUA-3-26"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Payment method is unavailable"
+          ],
+          "inputs": {
+            "paymentMethod": "Unavailable Method"
+          },
+          "steps": [
+            "Navigate to Offline Consultation screen",
+            "Select unavailable payment method",
+            "Attempt to submit payment"
+          ],
+          "expected": [
+            "Prompt to choose another payment method"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Validate error message length and placement",
+          "req_ids": [
+            "VIRTUA-3-1-2",
+            "VIRTUA-3-1-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Invalid input provided"
+          ],
+          "inputs": {
+            "symptom": "NonExistentSymptom"
+          },
+          "steps": [
+            "Enter invalid symptom in registration form",
+            "Submit form"
+          ],
+          "expected": [
+            "Error message displayed at bottom, max 80 characters"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test exception message for non-existent symptom",
+          "req_ids": [
+            "VIRTUA-3.1-1#2"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Symptom does not exist in database"
+          ],
+          "inputs": {
+            "symptom": "NonExistentSymptom"
+          },
+          "steps": [
+            "Attempt to register symptom that does not exist",
+            "Observe system response"
+          ],
+          "expected": [
+            "Display exception message: 'Symptom does not exist'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Confirm larger font size for elderly patients",
+          "req_ids": [
+            "VIRTUA-3-1-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Elderly patient accesses registration screen"
+          ],
+          "inputs": {},
+          "steps": [
+            "Navigate to Patient Registration screen",
+            "Observe font size"
+          ],
+          "expected": [
+            "Font size is larger to aid readability"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Verify cross-platform compatibility on PC/Laptop",
+          "req_ids": [
+            "VIRTUA-3.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User accesses application on PC/Laptop"
+          ],
+          "inputs": {},
+          "steps": [
+            "Launch application on PC/Laptop",
+            "Navigate through all screens"
+          ],
+          "expected": [
+            "All screens function correctly on PC/Laptop"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.3333,
+        "representation_score": 1.0,
+        "sfv_score": 0.6667,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #2 (TC-002): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #3 (TC-003): traces to unknown requirement ids ['VIRTUA-3-1-2', 'VIRTUA-3-1-3']",
+          "test case #4 (TC-004): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #5 (TC-005): traces to unknown requirement ids ['VIRTUA-3-1-5']"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.67). Fix these problems and output the full corrected suite:\n- test case #2 (TC-002): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #3 (TC-003): traces to unknown requirement ids ['VIRTUA-3-1-2', 'VIRTUA-3-1-3']\n- test case #4 (TC-004): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #5 (TC-005): traces to unknown requirement ids ['VIRTUA-3-1-5']",
+      "artifact": "# Use-Cases & User Stories for Virtual Consultation System\n\n## Use-Case: Conduct Offline Consultation with Payment Processing\n**Actor:** Patient  \n**Goal:** Complete an offline consultation and make a payment through a payment gateway.\n\n### Primary Success Flow\n1. Patient navigates to the \"Schedule Consultation\" screen.  \n2. Patient selects \"Offline Consultation\" option.  \n3. System displays the consultation request form with larger font size (per VIRTUA-3-1-5).  \n4. Patient fills in required fields (symptom, contact details).  \n5. System validates the symptom against the symptom database.  \n6. If the symptom exists, proceed; otherwise, display the exception error message “Symptom does not exist” (per VIRTUA-3.1-1#2).  \n7. Patient submits the request.  \n8. System presents a confirmation screen with a navigation button to proceed to payment.  \n9. Patient selects the payment method (Credit/Debit/Net Banking) via the payment gateway (per VIRTUA-3-26).  \n10. Payment is processed successfully, and a confirmation message is shown.\n\n### Alternative Flow: Symptom Not Found\n1. Follow steps 1-4 of the primary flow.  \n2. System detects an invalid symptom.  \n3. Display the exception error message “Symptom does not exist”.  \n4. Patient may correct the symptom or cancel the request.\n\n### Exception Flow: Payment Gateway Failure\n1. Follow steps 1-8 of the primary flow.  \n2. System attempts to process the payment through the gateway.  \n3. If the gateway fails (e.g., network error), display an error message at the bottom, limited to 80 characters (per VIRTUA-3-1-3).  \n4. Patient is prompted to retry the payment or cancel the consultation.\n\n## Use-Case: Display Error Messages\n**Actor:** Patient  \n**Goal:** Ensure error messages are self-descriptive and appropriately sized.\n\n### Primary Success Flow\n1. Patient interacts with any screen where an error may occur (e.g., invalid input).  \n2. System generates an error message and displays it at the bottom of the screen.  \n3. The message is self-descriptive and does not exceed 80 characters (per VIRTUA-3-1-3).  \n\n### Alternative Flow: Long Error Message\n1. System attempts to display an error message exceeding 80 characters.  \n2. Truncate the message to fit within the 80-character limit while preserving essential information.  \n\n## Use-Case: Navigation via Buttons\n**Actor:** Patient  \n**Goal:** Simplify navigation through the consultation process using buttons.\n\n### Primary Success Flow\n1. Patient accesses the consultation request screen.  \n2. System provides clearly labeled navigation buttons (e.g., \"Submit Request\", \"Select Payment Method\").  \n3. Patient clicks the appropriate button to proceed to the next step.  \n\n### Alternative Flow: Button Disabled\n1. System detects a condition where a button should be disabled (e.g., missing required fields).  \n2. Button is visually disabled, and an inline error message is shown.  \n\n## Use-Case: Compatibility with PC/Laptop\n**Actor:** Patient  \n**Goal:** Ensure all screens function correctly on a PC or laptop.\n\n### Primary Success Flow\n1. Patient accesses the system via a web browser on a PC or laptop.  \n2. All screens render correctly, and functionality is as specified (per VIRTUA-3-1-1).  \n\n### Alternative Flow: Unsupported Device\n1. Patient attempts to access the system on a device not supported (e.g., mobile).  \n2. System redirects or displays a message indicating compatibility only with PCs/laptops.  \n\n---\n\n**Note:** All font sizes for patient registration and consultation request screens are larger to aid elderly users (per VIRTUA-3-1-5). All error messages are positioned at the bottom of the screen (per VIRTUA-3-1-2). Payment processing is enabled via a payment gateway supporting credit, debit, and net banking (per VIRTUA-3-26). Offline consultation payments are mandatory (per VIRTUA-3-25).",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Validate symptom existence and proceed with offline consultation payment",
+          "req_ids": [
+            "VIRTUA-3-25",
+            "VIRTUA-3-26",
+            "VIRTUA-3.1-1#2",
+            "VIRTUA-3-1-2",
+            "VIRTUA-3-1-3",
+            "VIRTUA-3.1-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is logged into the system",
+            "Symptom database is populated"
+          ],
+          "inputs": {
+            "symptom": "Headache",
+            "paymentMethod": "Credit Card"
+          },
+          "steps": [
+            "Navigate to 'Schedule Consultation' screen",
+            "Select 'Offline Consultation' option",
+            "Enter symptom 'Headache' in the request form",
+            "Submit the consultation request",
+            "Select payment method via payment gateway",
+            "Confirm successful payment"
+          ],
+          "expected": [
+            "Confirmation message displayed indicating successful consultation and payment",
+            "Error message not shown (symptom exists)",
+            "Error message size ≤ 80 characters if any error occurs",
+            "Larger font size on registration and consultation request screens"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Handle invalid symptom during offline consultation",
+          "req_ids": [
+            "VIRTUA-3.1-1#2"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient is logged into the system"
+          ],
+          "inputs": {
+            "symptom": "NonExistentSymptom"
+          },
+          "steps": [
+            "Navigate to 'Schedule Consultation' screen",
+            "Select 'Offline Consultation' option",
+            "Enter invalid symptom 'NonExistentSymptom'",
+            "Submit the consultation request"
+          ],
+          "expected": [
+            "Display exception error message: 'Symptom does not exist'",
+            "Error message positioned at the bottom of the screen"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test error message length constraint",
+          "req_ids": [
+            "VIRTUA-3-1-3"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System generates an error message"
+          ],
+          "inputs": {
+            "errorMessage": "This is a very long error message that exceeds the eighty character limit specified in the requirement to ensure that the system properly truncates or handles it as defined."
+          },
+          "steps": [
+            "Trigger an error condition that would produce the long error message",
+            "Observe the displayed error message"
+          ],
+          "expected": [
+            "Displayed error message is truncated or handled to be ≤ 80 characters"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Verify navigation buttons for consultation process",
+          "req_ids": [
+            "VIRTUA-3-1-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is on the consultation request screen"
+          ],
+          "inputs": {},
+          "steps": [
+            "Access the consultation request screen",
+            "Check the presence of navigation buttons (e.g., 'Submit Request', 'Select Payment Method')"
+          ],
+          "expected": [
+            "Navigation buttons are clearly visible and functional"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Confirm larger font size for elderly users on registration and consultation request screens",
+          "req_ids": [
+            "VIRTUA-3.1-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient accesses registration or consultation request screen"
+          ],
+          "inputs": {},
+          "steps": [
+            "Navigate to the Patient Registration screen",
+            "Navigate to the Consultation Request screen",
+            "Observe the font size of displayed text"
+          ],
+          "expected": [
+            "Font size is larger than standard to aid elderly users"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.2,
+        "representation_score": 1.0,
+        "sfv_score": 0.6,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['VIRTUA-3-1-2', 'VIRTUA-3-1-3']",
+          "test case #2 (TC-002): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #3 (TC-003): traces to unknown requirement ids ['VIRTUA-3-1-3']",
+          "test case #4 (TC-004): traces to unknown requirement ids ['VIRTUA-3-1-4']"
+        ]
+      }
+    }
+  ]
+}

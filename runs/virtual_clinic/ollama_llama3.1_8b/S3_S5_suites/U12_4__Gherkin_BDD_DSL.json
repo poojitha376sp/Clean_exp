@@ -1,0 +1,1835 @@
+{
+  "unit_id": "U12_4",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.2,
+    "oracle_assertiveness": 0.4,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "John Doe",
+        "context": "Doctor name",
+        "grounded": false
+      },
+      {
+        "value": "30",
+        "context": "Doctor age",
+        "grounded": false
+      },
+      {
+        "value": "Male",
+        "context": "Doctor sex",
+        "grounded": false
+      },
+      {
+        "value": "MBBS",
+        "context": "Doctor qualification",
+        "grounded": false
+      },
+      {
+        "value": "5",
+        "context": "Doctor experience",
+        "grounded": false
+      },
+      {
+        "value": "Cardiology",
+        "context": "Doctor speciality",
+        "grounded": false
+      },
+      {
+        "value": "D001",
+        "context": "Doctor ID",
+        "grounded": false
+      },
+      {
+        "value": "Chemist 1",
+        "context": "Chemist name",
+        "grounded": false
+      },
+      {
+        "value": "123456",
+        "context": "Chemist pincode",
+        "grounded": false
+      },
+      {
+        "value": "C001",
+        "context": "Chemist ID",
+        "grounded": false
+      },
+      {
+        "value": "Duplicate speciality",
+        "context": "Error message",
+        "grounded": false
+      },
+      {
+        "value": "Duplicate pincode",
+        "context": "Error message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 12,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add negative test for deleting doctor/lab with pending requests",
+      "Add negative test for updating speciality/pincode",
+      "Verify actual field values after update, not just success message",
+      "Include boundary values for age, experience, pincode ranges",
+      "Ensure unique ID generation test verifies uniqueness across multiple additions"
+    ],
+    "traceability": 0.8571,
+    "untraced_reqs": [
+      "Req-3"
+    ],
+    "fsa_score": 0.6,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Doctor Management\n\n  Scenario: Add a new Doctor\n    Given a new Doctor with name \"John Doe\" and age \"30\" and sex \"Male\" and qualification \"MBBS\" and experience \"5\" and speciality \"Cardiology\"\n    When I add the Doctor to the system\n    Then the Doctor is added successfully with a unique ID\n    And the Doctor's details are stored in the system\n\n  Scenario: View and Update Doctor Details\n    Given a Doctor with ID \"D001\" and name \"John Doe\" and age \"30\" and sex \"Male\" and qualification \"MBBS\" and experience \"5\" and speciality \"Cardiology\"\n    When I view the Doctor's details\n    Then the Doctor's details are displayed correctly\n    When I update the Doctor's details\n    Then the Doctor's details are updated successfully\n    And the speciality field remains unchanged\n\n  Scenario: Delete Doctor Details\n    Given a Doctor with ID \"D001\" and no pending consultation requests\n    When I delete the Doctor's details\n    Then the Doctor's details are deleted successfully\n\n  Scenario: Add a new Chemist or Lab\n    Given a new Chemist with name \"Chemist 1\" and pincode \"123456\"\n    When I add the Chemist to the system\n    Then the Chemist is added successfully with a unique ID\n    And the Chemist's details are stored in the system\n\n  Scenario: View and Update Chemist/Lab Details\n    Given a Chemist with ID \"C001\" and name \"Chemist 1\" and pincode \"123456\"\n    When I view the Chemist's details\n    Then the Chemist's details are displayed correctly\n    When I update the Chemist's details\n    Then the Chemist's details are updated successfully\n    And the pincode field remains unchanged\n\n  Scenario: Delete Chemist/Lab Details\n    Given a Chemist with ID \"C001\" and no pending prescriptions\n    When I delete the Chemist's details\n    Then the Chemist's details are deleted successfully\n\n  Scenario Outline: Add multiple Doctors with same speciality\n    Given a new Doctor with name \"<name>\" and age \"<age>\" and sex \"<sex>\" and qualification \"<qualification>\" and experience \"<experience>\" and speciality \"<speciality>\"\n    When I add the Doctor to the system\n    Then the system raises an error \"Duplicate speciality\"\n\n    Examples:\n      | name | age | sex | qualification | experience | speciality |\n      | John | 30  | Male | MBBS          | 5          | Cardiology |\n      | Jane | 25  | Female| MBBS          | 3          | Cardiology |\n\n  Scenario Outline: Add multiple Chemists/Labs with same pincode\n    Given a new Chemist with name \"<name>\" and pincode \"<pincode>\"\n    When I add the Chemist to the system\n    Then the system raises an error \"Duplicate pincode\"\n\n    Examples:\n      | name | pincode |\n      | Chemist 1 | 123456 |\n      | Chemist 2 | 123456 |\n\n  Scenario: Verify unique ID generation\n    Given a new Doctor with name \"John Doe\" and age \"30\" and sex \"Male\" and qualification \"MBBS\" and experience \"5\" and speciality \"Cardiology\"\n    When I add the Doctor to the system\n    Then the Doctor's ID is unique",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Add a new Doctor",
+      "req_ids": [
+        "Req-2/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "No existing Doctors"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "age": "30",
+        "sex": "Male",
+        "qualification": "MBBS",
+        "experience": "5",
+        "speciality": "Cardiology"
+      },
+      "steps": [
+        "Add Doctor to system",
+        "Verify Doctor added successfully"
+      ],
+      "expected": [
+        "Doctor added successfully",
+        "Doctor's details stored in system"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "View and Update Doctor Details",
+      "req_ids": [
+        "Req-2/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Existing Doctor"
+      ],
+      "inputs": {
+        "id": "D001"
+      },
+      "steps": [
+        "View Doctor details",
+        "Update Doctor details",
+        "Verify Doctor details updated successfully"
+      ],
+      "expected": [
+        "Doctor details displayed correctly",
+        "Doctor details updated successfully",
+        "Speciality field remains unchanged"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Delete Doctor Details",
+      "req_ids": [
+        "Req-2/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Existing Doctor",
+        "No pending consultation requests"
+      ],
+      "inputs": {
+        "id": "D001"
+      },
+      "steps": [
+        "Delete Doctor details",
+        "Verify Doctor details deleted successfully"
+      ],
+      "expected": [
+        "Doctor details deleted successfully"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Add a new Chemist or Lab",
+      "req_ids": [
+        "Req-3/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "No existing Chemists/Labs"
+      ],
+      "inputs": {
+        "name": "Chemist 1",
+        "pincode": "123456"
+      },
+      "steps": [
+        "Add Chemist to system",
+        "Verify Chemist added successfully"
+      ],
+      "expected": [
+        "Chemist added successfully",
+        "Chemist's details stored in system"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "View and Update Chemist/Lab Details",
+      "req_ids": [
+        "Req-3/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Existing Chemist/Lab"
+      ],
+      "inputs": {
+        "id": "C001"
+      },
+      "steps": [
+        "View Chemist details",
+        "Update Chemist details",
+        "Verify Chemist details updated successfully"
+      ],
+      "expected": [
+        "Chemist details displayed correctly",
+        "Chemist details updated successfully",
+        "Pincode field remains unchanged"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Delete Chemist/Lab Details",
+      "req_ids": [
+        "Req-3/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Existing Chemist/Lab",
+        "No pending prescriptions"
+      ],
+      "inputs": {
+        "id": "C001"
+      },
+      "steps": [
+        "Delete Chemist details",
+        "Verify Chemist details deleted successfully"
+      ],
+      "expected": [
+        "Chemist details deleted successfully"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Add multiple Doctors with same speciality",
+      "req_ids": [
+        "Req-2/1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Existing Doctor"
+      ],
+      "inputs": {
+        "name": "John",
+        "age": "30",
+        "sex": "Male",
+        "qualification": "MBBS",
+        "experience": "5",
+        "speciality": "Cardiology"
+      },
+      "steps": [
+        "Add Doctor to system",
+        "Verify system raises error"
+      ],
+      "expected": [
+        "System raises error 'Duplicate speciality'"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Add multiple Chemists/Labs with same pincode",
+      "req_ids": [
+        "Req-3/1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Existing Chemist/Lab"
+      ],
+      "inputs": {
+        "name": "Chemist 1",
+        "pincode": "123456"
+      },
+      "steps": [
+        "Add Chemist to system",
+        "Verify system raises error"
+      ],
+      "expected": [
+        "System raises error 'Duplicate pincode'"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Verify unique ID generation",
+      "req_ids": [
+        "Req-2/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "No existing Doctors"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "age": "30",
+        "sex": "Male",
+        "qualification": "MBBS",
+        "experience": "5",
+        "speciality": "Cardiology"
+      },
+      "steps": [
+        "Add Doctor to system",
+        "Verify Doctor's ID is unique"
+      ],
+      "expected": [
+        "Doctor's ID is unique"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Doctor Management\n\n  Scenario: Add a new Doctor\n    Given a new Doctor with name \"John Doe\", age 30, sex \"Male\", qualification \"MBBS\", experience 5, speciality \"Cardiology\"\n    When I add the Doctor to the system\n    Then the Doctor is added successfully\n    And the Doctor's details are displayed correctly\n\n  Scenario: View and Update Doctor Details\n    Given a Doctor with name \"Jane Doe\", age 25, sex \"Female\", qualification \"MBBS\", experience 3, speciality \"Pediatrics\"\n    When I view the Doctor's details\n    Then the Doctor's details are displayed correctly\n    When I update the Doctor's details\n    Then the Doctor's details are updated successfully\n    And the Doctor's speciality remains the same\n\n  Scenario: Delete Doctor Details\n    Given a Doctor with name \"Bob Smith\", age 40, sex \"Male\", qualification \"MBBS\", experience 10, speciality \"Cardiology\"\n    And no new Patient Consultation Request is pending\n    When I delete the Doctor's details\n    Then the Doctor's details are deleted successfully\n\n  Scenario: Maintain Chemist & Labs\n    Given a Chemist with name \"Chemist 1\", pincode \"123456\", address \"Address 1\"\n    When I add the Chemist to the system\n    Then the Chemist is added successfully\n    And the Chemist's details are displayed correctly\n\n  Scenario: Add a new Chemist or Lab\n    Given a Lab with name \"Lab 1\", pincode \"123456\", address \"Address 1\"\n    When I add the Lab to the system\n    Then the Lab is added successfully\n    And there is only one Lab in the pincode\n\n  Scenario: View and Update Chemist/Lab Details\n    Given a Chemist with name \"Chemist 2\", pincode \"123456\", address \"Address 2\"\n    When I view the Chemist's details\n    Then the Chemist's details are displayed correctly\n    When I update the Chemist's details\n    Then the Chemist's details are updated successfully\n    And the Chemist's pincode remains the same\n\n  Scenario: Delete Chemist/Lab Details\n    Given a Chemist with name \"Chemist 3\", pincode \"123456\", address \"Address 3\"\n    And no new Prescription is pending\n    When I delete the Chemist's details\n    Then the Chemist's details are deleted successfully\n\n  Scenario Outline: Add a new Doctor with invalid details\n    Given a new Doctor with name \"<name>\", age \"<age>\", sex \"<sex>\", qualification \"<qualification>\", experience \"<experience>\", speciality \"<speciality>\"\n    When I add the Doctor to the system\n    Then an error message is displayed\n\n    Examples:\n      | name | age | sex | qualification | experience | speciality |\n      | \"\"  | 0   | \"\" | \"\"           | 0          | \"\"        |\n      | \"a\" | 100 | \"b\" | \"c\"          | 100        | \"d\"       |\n\n  Scenario Outline: Add a new Chemist or Lab with invalid details\n    Given a Chemist with name \"<name>\", pincode \"<pincode>\", address \"<address>\"\n    When I add the Chemist to the system\n    Then an error message is displayed\n\n    Examples:\n      | name | pincode | address |\n      | \"\"  | 0       | \"\"     |\n      | \"a\" | 100     | \"b\"    |\n\n  Scenario Outline: Delete Doctor Details with pending Patient Consultation Request\n    Given a Doctor with name \"<name>\", age \"<age>\", sex \"<sex>\", qualification \"<qualification>\", experience \"<experience>\", speciality \"<speciality>\"\n    And a new Patient Consultation Request is pending\n    When I delete the Doctor's details\n    Then an error message is displayed\n\n    Examples:\n      | name | age | sex | qualification | experience | speciality |\n      | \"a\"  | 0   | \"b\" | \"c\"          | 0          | \"d\"       |\n\n  Scenario Outline: Delete Chemist/Lab Details with pending Prescription\n    Given a Chemist with name \"<name>\", pincode \"<pincode>\", address \"<address>\"\n    And a new Prescription is pending\n    When I delete the Chemist's details\n    Then an error message is displayed\n\n    Examples:\n      | name | pincode | address |\n      | \"a\"  | 0       | \"b\"    |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new Doctor",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Doctors"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": 30,
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": 5,
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Add Doctor to system",
+            "Verify Doctor details displayed"
+          ],
+          "expected": [
+            "Doctor added successfully",
+            "Doctor details displayed correctly"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update Doctor Details",
+          "req_ids": [
+            "Req-2/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Doctor"
+          ],
+          "inputs": {
+            "name": "Jane Doe",
+            "age": 25,
+            "sex": "Female",
+            "qualification": "MBBS",
+            "experience": 3,
+            "speciality": "Pediatrics"
+          },
+          "steps": [
+            "View Doctor details",
+            "Update Doctor details",
+            "Verify Doctor details updated"
+          ],
+          "expected": [
+            "Doctor details displayed correctly",
+            "Doctor details updated successfully",
+            "Doctor speciality remains the same"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Doctor Details",
+          "req_ids": [
+            "Req-2/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Doctor",
+            "No pending Patient Consultation Request"
+          ],
+          "inputs": {
+            "name": "Bob Smith",
+            "age": 40,
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": 10,
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Delete Doctor details",
+            "Verify Doctor details deleted"
+          ],
+          "expected": [
+            "Doctor details deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add a new Chemist or Lab",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Chemists or Labs in pincode"
+          ],
+          "inputs": {
+            "name": "Chemist 1",
+            "pincode": "123456",
+            "address": "Address 1"
+          },
+          "steps": [
+            "Add Chemist to system",
+            "Verify Chemist details displayed"
+          ],
+          "expected": [
+            "Chemist added successfully",
+            "Chemist details displayed correctly"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Add a new Chemist or Lab with invalid details",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No existing Chemists or Labs in pincode"
+          ],
+          "inputs": {
+            "name": "",
+            "pincode": 0,
+            "address": ""
+          },
+          "steps": [
+            "Add Chemist to system",
+            "Verify error message displayed"
+          ],
+          "expected": [
+            "Error message displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete Chemist/Lab Details",
+          "req_ids": [
+            "Req-3/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Chemist or Lab",
+            "No pending Prescription"
+          ],
+          "inputs": {
+            "name": "Chemist 3",
+            "pincode": "123456",
+            "address": "Address 3"
+          },
+          "steps": [
+            "Delete Chemist details",
+            "Verify Chemist details deleted"
+          ],
+          "expected": [
+            "Chemist details deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Delete Chemist/Lab Details with pending Prescription",
+          "req_ids": [
+            "Req-3/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Existing Chemist or Lab",
+            "Pending Prescription"
+          ],
+          "inputs": {
+            "name": "Chemist 3",
+            "pincode": "123456",
+            "address": "Address 3"
+          },
+          "steps": [
+            "Delete Chemist details",
+            "Verify error message displayed"
+          ],
+          "expected": [
+            "Error message displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "error": "ollama:gpt-oss:20b returned an empty response",
+        "fsa_pass": false,
+        "fsa_score": 0.0
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.0; sub-scores {'clause_coverage': None, 'negative_coverage': None, 'oracle_assertiveness': None, 'boundary_coverage': None, 'groundedness_mg': None}). Output the full improved suite addressing:",
+      "artifact": "Feature: Doctor Management\n\n  Scenario: Add a new Doctor\n    Given a new Doctor with name \"John Doe\", age 30, sex \"Male\", qualification \"MBBS\", experience 5, speciality \"Cardiology\"\n    When the Doctor is added\n    Then the Doctor is saved with unique ID\n    And the Doctor's details are displayed\n\n  Scenario: View and Update Doctor Details\n    Given a Doctor with ID 1 and name \"John Doe\", age 30, sex \"Male\", qualification \"MBBS\", experience 5, speciality \"Cardiology\"\n    When the Doctor's details are viewed\n    Then the Doctor's details are displayed\n    And the speciality is not updated\n\n  Scenario: Delete Doctor Details\n    Given a Doctor with ID 1 and no pending Patient Consultation Requests\n    When the Doctor is deleted\n    Then the Doctor's details are deleted\n\n  Scenario: Add a new Chemist\n    Given a new Chemist with name \"Chemist 1\", pincode \"123456\", address \"Address 1\"\n    When the Chemist is added\n    Then the Chemist is saved with unique ID\n    And the Chemist's details are displayed\n\n  Scenario: Add a new Lab\n    Given a new Lab with name \"Lab 1\", pincode \"123456\", address \"Address 1\"\n    When the Lab is added\n    Then the Lab is saved with unique ID\n    And the Lab's details are displayed\n\n  Scenario: View and Update Chemist/Lab Details\n    Given a Chemist with ID 1 and name \"Chemist 1\", pincode \"123456\", address \"Address 1\"\n    When the Chemist's details are viewed\n    Then the Chemist's details are displayed\n    And the pincode is not updated\n\n  Scenario: Delete Chemist/Lab Details\n    Given a Chemist with ID 1 and no pending Prescriptions\n    When the Chemist is deleted\n    Then the Chemist's details are deleted\n\n  Scenario Outline: Add multiple Doctors with same speciality\n    Given a new Doctor with name \"<name>\", age \"<age>\", sex \"<sex>\", qualification \"<qualification>\", experience \"<experience>\", speciality \"<speciality>\"\n    When the Doctor is added\n    Then the Doctor is saved with unique ID\n    And the Doctor's details are displayed\n\n  Examples:\n    | name | age | sex | qualification | experience | speciality |\n    | John | 30  | Male | MBBS          | 5          | Cardiology |\n    | Jane | 25  | Female| MBBS          | 3          | Cardiology |\n\n  Scenario Outline: Add multiple Chemists with same pincode\n    Given a new Chemist with name \"<name>\", pincode \"<pincode>\", address \"<address>\"\n    When the Chemist is added\n    Then the Chemist is saved with unique ID\n    And the Chemist's details are displayed\n\n  Examples:\n    | name | pincode | address |\n    | Chemist 1 | 123456 | Address 1 |\n    | Chemist 2 | 123456 | Address 2 |\n\n  Scenario Outline: Add multiple Labs with same pincode\n    Given a new Lab with name \"<name>\", pincode \"<pincode>\", address \"<address>\"\n    When the Lab is added\n    Then the Lab is saved with unique ID\n    And the Lab's details are displayed\n\n  Examples:\n    | name | pincode | address |\n    | Lab 1 | 123456 | Address 1 |\n    | Lab 2 | 123456 | Address 2 |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new Doctor",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Doctors"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": 30,
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": 5,
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Given a new Doctor with name \"John Doe\", age 30, sex \"Male\", qualification \"MBBS\", experience 5, speciality \"Cardiology\""
+          ],
+          "expected": [
+            "The Doctor is saved with unique ID",
+            "The Doctor's details are displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update Doctor Details",
+          "req_ids": [
+            "Req-2/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A Doctor exists"
+          ],
+          "inputs": {
+            "id": 1,
+            "name": "John Doe",
+            "age": 30,
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": 5,
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Given a Doctor with ID 1 and name \"John Doe\", age 30, sex \"Male\", qualification \"MBBS\", experience 5, speciality \"Cardiology\""
+          ],
+          "expected": [
+            "The Doctor's details are displayed",
+            "The speciality is not updated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Doctor Details",
+          "req_ids": [
+            "Req-2/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A Doctor exists and no pending Patient Consultation Requests"
+          ],
+          "inputs": {
+            "id": 1
+          },
+          "steps": [
+            "Given a Doctor with ID 1 and no pending Patient Consultation Requests"
+          ],
+          "expected": [
+            "The Doctor's details are deleted"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add a new Chemist",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Chemists"
+          ],
+          "inputs": {
+            "name": "Chemist 1",
+            "pincode": "123456",
+            "address": "Address 1"
+          },
+          "steps": [
+            "Given a new Chemist with name \"Chemist 1\", pincode \"123456\", address \"Address 1\""
+          ],
+          "expected": [
+            "The Chemist is saved with unique ID",
+            "The Chemist's details are displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Add a new Lab",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Labs"
+          ],
+          "inputs": {
+            "name": "Lab 1",
+            "pincode": "123456",
+            "address": "Address 1"
+          },
+          "steps": [
+            "Given a new Lab with name \"Lab 1\", pincode \"123456\", address \"Address 1\""
+          ],
+          "expected": [
+            "The Lab is saved with unique ID",
+            "The Lab's details are displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "View and Update Chemist/Lab Details",
+          "req_ids": [
+            "Req-3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A Chemist/Lab exists"
+          ],
+          "inputs": {
+            "id": 1,
+            "name": "Chemist 1",
+            "pincode": "123456",
+            "address": "Address 1"
+          },
+          "steps": [
+            "Given a Chemist with ID 1 and name \"Chemist 1\", pincode \"123456\", address \"Address 1\""
+          ],
+          "expected": [
+            "The Chemist's details are displayed",
+            "The pincode is not updated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Delete Chemist/Lab Details",
+          "req_ids": [
+            "Req-3/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A Chemist/Lab exists and no pending Prescriptions"
+          ],
+          "inputs": {
+            "id": 1
+          },
+          "steps": [
+            "Given a Chemist with ID 1 and no pending Prescriptions"
+          ],
+          "expected": [
+            "The Chemist's details are deleted"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Add multiple Doctors with same speciality",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Doctors"
+          ],
+          "inputs": {
+            "name": "<name>",
+            "age": "<age>",
+            "sex": "<sex>",
+            "qualification": "<qualification>",
+            "experience": "<experience>",
+            "speciality": "<speciality>"
+          },
+          "steps": [
+            "Given a new Doctor with name \"<name>\", age \"<age>\", sex \"<sex>\", qualification \"<qualification>\", experience \"<experience>\", speciality \"<speciality>\""
+          ],
+          "expected": [
+            "The Doctor is saved with unique ID",
+            "The Doctor's details are displayed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Add multiple Chemists with same pincode",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No existing Chemists"
+          ],
+          "inputs": {
+            "name": "<name>",
+            "pincode": "<pincode>",
+            "address": "<address>"
+          },
+          "steps": [
+            "Given a new Chemist with name \"<name>\", pincode \"<pincode>\", address \"<address>\""
+          ],
+          "expected": [
+            "An error is thrown due to duplicate pincode"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Add multiple Labs with same pincode",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No existing Labs"
+          ],
+          "inputs": {
+            "name": "<name>",
+            "pincode": "<pincode>",
+            "address": "<address>"
+          },
+          "steps": [
+            "Given a new Lab with name \"<name>\", pincode \"<pincode>\", address \"<address>\""
+          ],
+          "expected": [
+            "An error is thrown due to duplicate pincode"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.3333333333333333,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "Doctor name",
+            "grounded": false
+          },
+          {
+            "value": 30,
+            "context": "Doctor age",
+            "grounded": false
+          },
+          {
+            "value": "Male",
+            "context": "Doctor sex",
+            "grounded": false
+          },
+          {
+            "value": "MBBS",
+            "context": "Doctor qualification",
+            "grounded": false
+          },
+          {
+            "value": 5,
+            "context": "Doctor experience",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "Doctor speciality",
+            "grounded": false
+          },
+          {
+            "value": 1,
+            "context": "Doctor ID",
+            "grounded": false
+          },
+          {
+            "value": "Chemist 1",
+            "context": "Chemist name",
+            "grounded": false
+          },
+          {
+            "value": "123456",
+            "context": "Pincode",
+            "grounded": false
+          },
+          {
+            "value": "Address 1",
+            "context": "Address",
+            "grounded": false
+          },
+          {
+            "value": "Lab 1",
+            "context": "Lab name",
+            "grounded": false
+          },
+          {
+            "value": "Chemist 2",
+            "context": "Chemist name",
+            "grounded": false
+          },
+          {
+            "value": "Address 2",
+            "context": "Address",
+            "grounded": false
+          },
+          {
+            "value": "Lab 2",
+            "context": "Lab name",
+            "grounded": false
+          },
+          {
+            "value": "Jane",
+            "context": "Doctor name",
+            "grounded": false
+          },
+          {
+            "value": 25,
+            "context": "Doctor age",
+            "grounded": false
+          },
+          {
+            "value": "Female",
+            "context": "Doctor sex",
+            "grounded": false
+          },
+          {
+            "value": 3,
+            "context": "Doctor experience",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 18,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test for deleting a doctor when pending consultation requests.",
+          "Add negative test for deleting a chemist/lab when pending prescriptions.",
+          "Include explicit assertions of field values after operations.",
+          "Verify unique ID generation (e.g., check non-duplicate).",
+          "Add boundary tests for age, experience ranges if defined."
+        ],
+        "traceability": 0.8571,
+        "untraced_reqs": [
+          "Req-3"
+        ],
+        "fsa_score": 0.5967,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.5967; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.3333333333333333, 'oracle_assertiveness': 0.2, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['Req-3'] (add at least one each)\n- ungrounded value 'John Doe' (Doctor name): remove or use the SRS value\n- ungrounded value '30' (Doctor age): remove or use the SRS value\n- ungrounded value 'Male' (Doctor sex): remove or use the SRS value\n- ungrounded value 'MBBS' (Doctor qualification): remove or use the SRS value\n- ungrounded value '5' (Doctor experience): remove or use the SRS value\n- ungrounded value 'Cardiology' (Doctor speciality): remove or use the SRS value\n- Add negative test for deleting a doctor when pending consultation requests.\n- Add negative test for deleting a chemist/lab when pending prescriptions.\n- Include explicit assertions of field values after operations.\n- Verify unique ID generation (e.g., check non-duplicate).\n- Add boundary tests for age, experience ranges if defined.",
+      "artifact": "Feature: Doctor Management\n\n  Scenario: Add a new Doctor\n    Given a new Doctor with name \"John Doe\" and age \"30\" and sex \"Male\" and qualification \"MBBS\" and experience \"5\" and speciality \"Cardiology\"\n    When I add the Doctor to the system\n    Then the Doctor is added successfully with a unique ID\n    And the Doctor's details are stored in the system\n\n  Scenario: View and Update Doctor Details\n    Given a Doctor with ID \"D001\" and name \"John Doe\" and age \"30\" and sex \"Male\" and qualification \"MBBS\" and experience \"5\" and speciality \"Cardiology\"\n    When I view the Doctor's details\n    Then the Doctor's details are displayed correctly\n    When I update the Doctor's details\n    Then the Doctor's details are updated successfully\n    And the speciality field remains unchanged\n\n  Scenario: Delete Doctor Details\n    Given a Doctor with ID \"D001\" and no pending consultation requests\n    When I delete the Doctor's details\n    Then the Doctor's details are deleted successfully\n\n  Scenario: Add a new Chemist or Lab\n    Given a new Chemist with name \"Chemist 1\" and pincode \"123456\"\n    When I add the Chemist to the system\n    Then the Chemist is added successfully with a unique ID\n    And the Chemist's details are stored in the system\n\n  Scenario: View and Update Chemist/Lab Details\n    Given a Chemist with ID \"C001\" and name \"Chemist 1\" and pincode \"123456\"\n    When I view the Chemist's details\n    Then the Chemist's details are displayed correctly\n    When I update the Chemist's details\n    Then the Chemist's details are updated successfully\n    And the pincode field remains unchanged\n\n  Scenario: Delete Chemist/Lab Details\n    Given a Chemist with ID \"C001\" and no pending prescriptions\n    When I delete the Chemist's details\n    Then the Chemist's details are deleted successfully\n\n  Scenario Outline: Add multiple Doctors with same speciality\n    Given a new Doctor with name \"<name>\" and age \"<age>\" and sex \"<sex>\" and qualification \"<qualification>\" and experience \"<experience>\" and speciality \"<speciality>\"\n    When I add the Doctor to the system\n    Then the system raises an error \"Duplicate speciality\"\n\n    Examples:\n      | name | age | sex | qualification | experience | speciality |\n      | John | 30  | Male | MBBS          | 5          | Cardiology |\n      | Jane | 25  | Female| MBBS          | 3          | Cardiology |\n\n  Scenario Outline: Add multiple Chemists/Labs with same pincode\n    Given a new Chemist with name \"<name>\" and pincode \"<pincode>\"\n    When I add the Chemist to the system\n    Then the system raises an error \"Duplicate pincode\"\n\n    Examples:\n      | name | pincode |\n      | Chemist 1 | 123456 |\n      | Chemist 2 | 123456 |\n\n  Scenario: Verify unique ID generation\n    Given a new Doctor with name \"John Doe\" and age \"30\" and sex \"Male\" and qualification \"MBBS\" and experience \"5\" and speciality \"Cardiology\"\n    When I add the Doctor to the system\n    Then the Doctor's ID is unique",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new Doctor",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Doctors"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": "30",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "5",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Add Doctor to system",
+            "Verify Doctor added successfully"
+          ],
+          "expected": [
+            "Doctor added successfully",
+            "Doctor's details stored in system"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update Doctor Details",
+          "req_ids": [
+            "Req-2/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Doctor"
+          ],
+          "inputs": {
+            "id": "D001"
+          },
+          "steps": [
+            "View Doctor details",
+            "Update Doctor details",
+            "Verify Doctor details updated successfully"
+          ],
+          "expected": [
+            "Doctor details displayed correctly",
+            "Doctor details updated successfully",
+            "Speciality field remains unchanged"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Doctor Details",
+          "req_ids": [
+            "Req-2/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Doctor",
+            "No pending consultation requests"
+          ],
+          "inputs": {
+            "id": "D001"
+          },
+          "steps": [
+            "Delete Doctor details",
+            "Verify Doctor details deleted successfully"
+          ],
+          "expected": [
+            "Doctor details deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add a new Chemist or Lab",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Chemists/Labs"
+          ],
+          "inputs": {
+            "name": "Chemist 1",
+            "pincode": "123456"
+          },
+          "steps": [
+            "Add Chemist to system",
+            "Verify Chemist added successfully"
+          ],
+          "expected": [
+            "Chemist added successfully",
+            "Chemist's details stored in system"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "View and Update Chemist/Lab Details",
+          "req_ids": [
+            "Req-3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Chemist/Lab"
+          ],
+          "inputs": {
+            "id": "C001"
+          },
+          "steps": [
+            "View Chemist details",
+            "Update Chemist details",
+            "Verify Chemist details updated successfully"
+          ],
+          "expected": [
+            "Chemist details displayed correctly",
+            "Chemist details updated successfully",
+            "Pincode field remains unchanged"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete Chemist/Lab Details",
+          "req_ids": [
+            "Req-3/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Chemist/Lab",
+            "No pending prescriptions"
+          ],
+          "inputs": {
+            "id": "C001"
+          },
+          "steps": [
+            "Delete Chemist details",
+            "Verify Chemist details deleted successfully"
+          ],
+          "expected": [
+            "Chemist details deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Add multiple Doctors with same speciality",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Existing Doctor"
+          ],
+          "inputs": {
+            "name": "John",
+            "age": "30",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "5",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Add Doctor to system",
+            "Verify system raises error"
+          ],
+          "expected": [
+            "System raises error 'Duplicate speciality'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Add multiple Chemists/Labs with same pincode",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Existing Chemist/Lab"
+          ],
+          "inputs": {
+            "name": "Chemist 1",
+            "pincode": "123456"
+          },
+          "steps": [
+            "Add Chemist to system",
+            "Verify system raises error"
+          ],
+          "expected": [
+            "System raises error 'Duplicate pincode'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Verify unique ID generation",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Doctors"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": "30",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "5",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Add Doctor to system",
+            "Verify Doctor's ID is unique"
+          ],
+          "expected": [
+            "Doctor's ID is unique"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.2,
+        "oracle_assertiveness": 0.4,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "Doctor name",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "Doctor age",
+            "grounded": false
+          },
+          {
+            "value": "Male",
+            "context": "Doctor sex",
+            "grounded": false
+          },
+          {
+            "value": "MBBS",
+            "context": "Doctor qualification",
+            "grounded": false
+          },
+          {
+            "value": "5",
+            "context": "Doctor experience",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "Doctor speciality",
+            "grounded": false
+          },
+          {
+            "value": "D001",
+            "context": "Doctor ID",
+            "grounded": false
+          },
+          {
+            "value": "Chemist 1",
+            "context": "Chemist name",
+            "grounded": false
+          },
+          {
+            "value": "123456",
+            "context": "Chemist pincode",
+            "grounded": false
+          },
+          {
+            "value": "C001",
+            "context": "Chemist ID",
+            "grounded": false
+          },
+          {
+            "value": "Duplicate speciality",
+            "context": "Error message",
+            "grounded": false
+          },
+          {
+            "value": "Duplicate pincode",
+            "context": "Error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 12,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test for deleting doctor/lab with pending requests",
+          "Add negative test for updating speciality/pincode",
+          "Verify actual field values after update, not just success message",
+          "Include boundary values for age, experience, pincode ranges",
+          "Ensure unique ID generation test verifies uniqueness across multiple additions"
+        ],
+        "traceability": 0.8571,
+        "untraced_reqs": [
+          "Req-3"
+        ],
+        "fsa_score": 0.6,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.6; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.2, 'oracle_assertiveness': 0.4, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['Req-3'] (add at least one each)\n- ungrounded value 'John Doe' (Doctor name): remove or use the SRS value\n- ungrounded value '30' (Doctor age): remove or use the SRS value\n- ungrounded value 'Male' (Doctor sex): remove or use the SRS value\n- ungrounded value 'MBBS' (Doctor qualification): remove or use the SRS value\n- ungrounded value '5' (Doctor experience): remove or use the SRS value\n- ungrounded value 'Cardiology' (Doctor speciality): remove or use the SRS value\n- Add negative test for deleting doctor/lab with pending requests\n- Add negative test for updating speciality/pincode\n- Verify actual field values after update, not just success message\n- Include boundary values for age, experience, pincode ranges\n- Ensure unique ID generation test verifies uniqueness across multiple additions",
+      "artifact": "Feature: Doctor Management\n\n  Scenario: Add a new Doctor\n    Given a new Doctor with name \"John Doe\", age 30, sex \"Male\", qualification \"MBBS\", experience 5, speciality \"Cardiology\"\n    When I add the Doctor to the system\n    Then the Doctor is added successfully with a unique ID\n    And the Doctor's details are stored in the system\n\n  Scenario: View and Update Doctor Details\n    Given a Doctor with ID \"D001\" and details \"John Doe\", 30, \"Male\", \"MBBS\", 5, \"Cardiology\"\n    When I view the Doctor's details\n    Then the Doctor's details are displayed correctly\n    When I update the Doctor's details with new name \"Jane Doe\", age 31, sex \"Female\", qualification \"MBBS\", experience 6, speciality \"Cardiology\"\n    Then the Doctor's details are updated successfully\n    And the Doctor's speciality is not updated\n\n  Scenario: Delete Doctor Details\n    Given a Doctor with ID \"D001\" and details \"John Doe\", 30, \"Male\", \"MBBS\", 5, \"Cardiology\"\n    When I delete the Doctor's details\n    Then the Doctor's details are deleted successfully\n    And no new Patient Consultation Request is pending\n\n  Scenario: Add a new Chemist or Lab\n    Given a new Chemist with name \"Chemist 1\", pincode 123456, address \"Address 1\"\n    When I add the Chemist to the system\n    Then the Chemist is added successfully with a unique ID\n    And the Chemist's details are stored in the system\n\n  Scenario: View and Update Chemist/Lab Details\n    Given a Chemist with ID \"C001\" and details \"Chemist 1\", pincode 123456, address \"Address 1\"\n    When I view the Chemist's details\n    Then the Chemist's details are displayed correctly\n    When I update the Chemist's details with new name \"Chemist 2\", pincode 123456, address \"Address 2\"\n    Then the Chemist's details are updated successfully\n    And the Chemist's pincode is not updated\n\n  Scenario: Delete Chemist/Lab Details\n    Given a Chemist with ID \"C001\" and details \"Chemist 1\", pincode 123456, address \"Address 1\"\n    When I delete the Chemist's details\n    Then the Chemist's details are deleted successfully\n    And no new Prescription is pending\n\n  Scenario Outline: Add multiple Doctors with unique IDs\n    Given a new Doctor with name \"<name>\", age \"<age>\", sex \"<sex>\", qualification \"<qualification>\", experience \"<experience>\", speciality \"<speciality>\"\n    When I add the Doctor to the system\n    Then the Doctor is added successfully with a unique ID\n    Examples:\n      | name | age | sex | qualification | experience | speciality |\n      | John | 30  | Male | MBBS          | 5          | Cardiology |\n      | Jane | 31  | Female| MBBS          | 6          | Cardiology |\n      | Bob  | 32  | Male | MBBS          | 7          | Cardiology |\n\n  Scenario Outline: Add multiple Chemists/Labs with unique IDs\n    Given a new Chemist with name \"<name>\", pincode \"<pincode>\", address \"<address>\"\n    When I add the Chemist to the system\n    Then the Chemist is added successfully with a unique ID\n    Examples:\n      | name | pincode | address |\n      | Chemist 1 | 123456 | Address 1 |\n      | Chemist 2 | 123456 | Address 2 |\n      | Chemist 3 | 123456 | Address 3 |\n\n  Scenario: Delete Doctor/Lab with pending requests\n    Given a Doctor with ID \"D001\" and details \"John Doe\", 30, \"Male\", \"MBBS\", 5, \"Cardiology\"\n    And a new Patient Consultation Request is pending\n    When I delete the Doctor's details\n    Then the Doctor's details are not deleted due to pending requests\n\n  Scenario: Update speciality/pincode\n    Given a Doctor with ID \"D001\" and details \"John Doe\", 30, \"Male\", \"MBBS\", 5, \"Cardiology\"\n    When I update the Doctor's speciality to \"Neurology\"\n    Then the Doctor's speciality is not updated\n    When I update the Chemist's pincode to 123457\n    Then the Chemist's pincode is not updated\n\n  Scenario: Verify actual field values after update\n    Given a Doctor with ID \"D001\" and details \"John Doe\", 30, \"Male\", \"MBBS\", 5, \"Cardiology\"\n    When I update the Doctor's details with new name \"Jane Doe\", age 31, sex \"Female\", qualification \"MBBS\", experience 6, speciality \"Cardiology\"\n    Then the Doctor's actual details are updated correctly",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new Doctor",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Doctors"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": "30",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "5",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Add Doctor to system",
+            "Verify Doctor added successfully"
+          ],
+          "expected": [
+            "Doctor added successfully",
+            "Doctor details stored in system"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update Doctor Details",
+          "req_ids": [
+            "Req-2/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Doctor"
+          ],
+          "inputs": {
+            "id": "D001",
+            "name": "John Doe",
+            "age": "30",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "5",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "View Doctor details",
+            "Update Doctor details",
+            "Verify Doctor details updated"
+          ],
+          "expected": [
+            "Doctor details displayed correctly",
+            "Doctor details updated successfully",
+            "Doctor speciality not updated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Doctor Details",
+          "req_ids": [
+            "Req-2/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Doctor"
+          ],
+          "inputs": {
+            "id": "D001",
+            "name": "John Doe",
+            "age": "30",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "5",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Delete Doctor details",
+            "Verify Doctor details deleted"
+          ],
+          "expected": [
+            "Doctor details deleted successfully",
+            "No new Patient Consultation Request pending"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add a new Chemist or Lab",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Chemists/Labs"
+          ],
+          "inputs": {
+            "name": "Chemist 1",
+            "pincode": "123456",
+            "address": "Address 1"
+          },
+          "steps": [
+            "Add Chemist to system",
+            "Verify Chemist added successfully"
+          ],
+          "expected": [
+            "Chemist added successfully",
+            "Chemist details stored in system"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "View and Update Chemist/Lab Details",
+          "req_ids": [
+            "Req-3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Chemist/Lab"
+          ],
+          "inputs": {
+            "id": "C001",
+            "name": "Chemist 1",
+            "pincode": "123456",
+            "address": "Address 1"
+          },
+          "steps": [
+            "View Chemist details",
+            "Update Chemist details",
+            "Verify Chemist details updated"
+          ],
+          "expected": [
+            "Chemist details displayed correctly",
+            "Chemist details updated successfully",
+            "Chemist pincode not updated"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete Chemist/Lab Details",
+          "req_ids": [
+            "Req-3/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Chemist/Lab"
+          ],
+          "inputs": {
+            "id": "C001",
+            "name": "Chemist 1",
+            "pincode": "123456",
+            "address": "Address 1"
+          },
+          "steps": [
+            "Delete Chemist details",
+            "Verify Chemist details deleted"
+          ],
+          "expected": [
+            "Chemist details deleted successfully",
+            "No new Prescription pending"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Add multiple Doctors with unique IDs",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Doctors"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": "30",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "5",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Add multiple Doctors to system",
+            "Verify Doctors added successfully"
+          ],
+          "expected": [
+            "Doctors added successfully",
+            "Doctors details stored in system"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Add multiple Chemists/Labs with unique IDs",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Chemists/Labs"
+          ],
+          "inputs": {
+            "name": "Chemist 1",
+            "pincode": "123456",
+            "address": "Address 1"
+          },
+          "steps": [
+            "Add multiple Chemists/Labs to system",
+            "Verify Chemists/Labs added successfully"
+          ],
+          "expected": [
+            "Chemists/Labs added successfully",
+            "Chemists/Labs details stored in system"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Delete Doctor/Lab with pending requests",
+          "req_ids": [
+            "Req-2/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Existing Doctor/Lab with pending requests"
+          ],
+          "inputs": {
+            "id": "D001",
+            "name": "John Doe",
+            "age": "30",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "5",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Delete Doctor/Lab details",
+            "Verify Doctor/Lab details not deleted"
+          ],
+          "expected": [
+            "Doctor/Lab details not deleted due to pending requests"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Update speciality/pincode",
+          "req_ids": [
+            "Req-2/2",
+            "Req-3/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Existing Doctor/Chemist/Lab"
+          ],
+          "inputs": {
+            "id": "D001",
+            "name": "John Doe",
+            "age": "30",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "5",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Update Doctor/Chemist/Lab speciality/pincode",
+            "Verify Doctor/Chemist/Lab speciality/pincode not updated"
+          ],
+          "expected": [
+            "Doctor/Chemist/Lab speciality/pincode not updated"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Verify actual field values after update",
+          "req_ids": [
+            "Req-2/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Existing Doctor"
+          ],
+          "inputs": {
+            "id": "D001",
+            "name": "John Doe",
+            "age": "30",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "5",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Update Doctor details",
+            "Verify Doctor details updated correctly"
+          ],
+          "expected": [
+            "Doctor details updated correctly"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Boundary values for age, experience, pincode ranges",
+          "req_ids": [
+            "Req-2/1",
+            "Req-3/1"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "No existing Doctors/Chemists/Labs"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": "0",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "0",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Add Doctor/Chemist/Lab with boundary values",
+            "Verify Doctor/Chemist/Lab added successfully"
+          ],
+          "expected": [
+            "Doctor/Chemist/Lab added successfully"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Unique ID generation test verifies uniqueness across multiple additions",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No existing Doctors"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": "30",
+            "sex": "Male",
+            "qualification": "MBBS",
+            "experience": "5",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Add multiple Doctors to system",
+            "Verify unique IDs generated"
+          ],
+          "expected": [
+            "Unique IDs generated correctly"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.75,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "name",
+            "grounded": false
+          },
+          {
+            "value": "Jane Doe",
+            "context": "name",
+            "grounded": false
+          },
+          {
+            "value": "Bob",
+            "context": "name",
+            "grounded": false
+          },
+          {
+            "value": "Male",
+            "context": "sex",
+            "grounded": false
+          },
+          {
+            "value": "Female",
+            "context": "sex",
+            "grounded": false
+          },
+          {
+            "value": "MBBS",
+            "context": "qualification",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "speciality",
+            "grounded": false
+          },
+          {
+            "value": "Neurology",
+            "context": "speciality",
+            "grounded": false
+          },
+          {
+            "value": "D001",
+            "context": "doctor id",
+            "grounded": false
+          },
+          {
+            "value": "Chemist 1",
+            "context": "chemist name",
+            "grounded": false
+          },
+          {
+            "value": "Chemist 2",
+            "context": "chemist name",
+            "grounded": false
+          },
+          {
+            "value": "Chemist 3",
+            "context": "chemist name",
+            "grounded": false
+          },
+          {
+            "value": "C001",
+            "context": "chemist id",
+            "grounded": false
+          },
+          {
+            "value": 123456,
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": 123457,
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "Address 1",
+            "context": "address",
+            "grounded": false
+          },
+          {
+            "value": "Address 2",
+            "context": "address",
+            "grounded": false
+          },
+          {
+            "value": "Address 3",
+            "context": "address",
+            "grounded": false
+          },
+          {
+            "value": 30,
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": 31,
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": 32,
+            "context": "age",
+            "grounded": false
+          },
+          {
+            "value": 5,
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": 6,
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": 7,
+            "context": "experience",
+            "grounded": false
+          },
+          {
+            "value": 0,
+            "context": "age/experience",
+            "grounded": false
+          },
+          {
+            "value": "Doctor added successfully",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Doctor details stored in system",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Doctor's details are deleted successfully",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "No new Patient Consultation Request pending",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "No new Prescription pending",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Doctor's speciality is not updated",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Chemist's pincode is not updated",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Doctor's actual details are updated correctly",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Unique IDs generated correctly",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Doctor's details displayed correctly",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Doctor details updated successfully",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Chemist details displayed correctly",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Chemist details updated successfully",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Chemist details deleted successfully",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Doctor/Lab details not deleted due to pending requests",
+            "context": "message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 40,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test for chemist/lab deletion when prescription pending",
+          "Include boundary checks for age, experience, pincode as per business rules",
+          "Assert concrete expected values (e.g., verify stored field values match input)",
+          "Verify that unique IDs are truly unique across multiple additions",
+          "Add tests for lab uniqueness constraint (only one lab per pincode)"
+        ],
+        "traceability": 0.8571,
+        "untraced_reqs": [
+          "Req-3"
+        ],
+        "fsa_score": 0.495,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

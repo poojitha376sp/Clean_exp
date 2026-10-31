@@ -1,0 +1,1519 @@
+{
+  "unit_id": "U15_5",
+  "representation": "Use-Cases & User Stories",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Use-Cases & User Stories",
+    "group": 1,
+    "schema_score": 0.7692,
+    "representation_score": 1.0,
+    "sfv_score": 0.8846,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "test case #9 (TC-009): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+      "test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "test case #13 (TC-013): 'exception' is not one of ['positive', 'negative', 'boundary']"
+    ]
+  },
+  "fsa": null,
+  "artifact": "**Use-Cases & User Stories for Virtual Healthcare System (Unit U15_5)**  \n\n---\n\n### Actor\n- **Doctor** (privileged role with rights to view, consult, prescribe lab tests, medicines, and release lab reports)\n\n---\n\n#### Use-Case 1: View Pending Appointments / Consultation Requests  \n**ID:** UC-VC-01  \n**Requirement Trace:** [VIRTUA-5-9]  \n\n**Primary Success Flow**  \n1. Doctor logs into the system.  \n2. System displays the “Pending Appointments” dashboard.  \n3. Doctor selects a pending consultation request.  \n4. System shows patient details and consultation summary.  \n5. Doctor proceeds to provide consultation.  \n\n**Alternative Flow**  \n1. If no pending requests exist, system shows a “No Pending Requests” message.  \n\n**Exception Flow**  \n1. System denies access if the doctor’s session expires or privileges are revoked.  \n\n---\n\n#### Use-Case 2: Provide Consultation and Generate Prescription  \n**ID:** UC-VC-02  \n**Requirement Trace:** [VIRTUA-5-10]  \n\n**Primary Success Flow**  \n1. Doctor selects a pending consultation request.  \n2. System opens the consultation interface with patient data.  \n3. Doctor enters consultation notes and diagnoses.  \n4. System automatically generates a prescription based on the diagnosis.  \n5. Doctor reviews and confirms the prescription.  \n\n**Alternative Flow**  \n1. If the patient has no prior records, system prompts for additional information before generating the prescription.  \n\n**Exception Flow**  \n1. If the doctor lacks the necessary credentials for the patient’s specialty, system raises an access error.  \n\n---\n\n#### Use-Case 3: Prescribe Lab Tests During Consultation  \n**ID:** UC-VC-03  \n**Requirement Trace:** [VIRTUA-5-11]  \n\n**Primary Success Flow**  \n1. During consultation, doctor selects “Prescribe Lab Test”.  \n2. System presents a list of relevant lab tests.  \n3. Doctor chooses one or more tests.  \n4. System logs the prescription and sends a request to the lab.  \n\n**Alternative Flow**  \n1. If the selected lab test is unavailable, system suggests an alternative test.  \n\n**Exception Flow**  \n1. If the lab system is down, an error notification is displayed, and the prescription is queued for retry.  \n\n---\n\n#### Use-Case 4: Create and Request Lab Test for Patient  \n**ID:** UC-VC-04  \n**Requirement Trace:** [VIRTUA-5-12]  \n\n**Primary Success Flow**  \n1. Lab test prescription is sent from the consultation module.  \n2. System generates a lab test order linked to the patient.  \n3. Order is transmitted to the external lab system.  \n4. System records the request status as “Pending”.  \n\n**Alternative Flow**  \n1. If the lab capacity is full, system notifies the doctor and offers to schedule the test later.  \n\n**Exception Flow**  \n1. If the external lab system returns an error (e.g., invalid patient ID), the order is flagged for manual review.  \n\n---\n\n#### Use-Case 5: Prescribe Medicines During Consultation  \n**ID:** UC-VC-05  \n**Requirement Trace:** [VIRTUA-5-13]  \n\n**Primary Success Flow**  \n1. Doctor selects “Prescribe Medicines” during consultation.  \n2. System displays a searchable medication catalog.  \n3. Doctor selects required medicines and specifies dosage.  \n4. System generates a medication prescription linked to the consultation.  \n\n**Alternative Flow**  \n1. If a prescribed medicine is out of stock, system suggests a substitute from the same therapeutic class.  \n\n**Exception Flow**  \n1. If the doctor attempts to prescribe a controlled substance without proper authorization, system blocks the action and logs an audit entry.  \n\n---\n\n#### Use-Case 6: Request Medicines Delivery to Patient  \n**ID:**  \n**Requirement Trace:** [VIRTUA-5-14]  \n\n**Primary Success Flow**  \n1. Prescription for medicines is created.  \n2. System sends the prescription details to the designated chemist or pharmacy partner.  \n3. Chemist confirms receipt and schedules delivery.  \n4. System updates the patient’s record with delivery status.  \n\n**Alternative Flow**  \n1. If the primary chemist is unavailable, system routes the request to a backup chemist.  \n\n**Exception Flow**  \n1. If the pharmacy partner reports a delivery failure, system triggers a notification to the doctor for manual follow-up.  \n\n---\n\n#### Use-Case 7: Perform Lab Tests and Update Reports (Offline)  \n**ID:** UC-VC-07  \n**Requirement Trace:** [VIRTUA-5-15]  \n\n**Primary Success Flow**  \n1. Lab technician processes the ordered tests offline.  \n2. Technician inputs results into the lab system.  \n3. System synchronizes the results with the patient’s record once connectivity is restored.  \n\n**Alternative Flow**  \n1. If offline data exceeds a threshold (e.g., >24 hours), system prompts for manual data entry verification.  \n\n**Exception Flow**  \n1. If data corruption occurs during offline entry, system rolls back to the last valid state and alerts the administrator.  \n\n---\n\n#### Use-Case 8: Release Lab Report for Patient to View (Offline)  \n**ID:** UC-VC-08  \n**Requirement Trace:** [VIRTUA-5-16]  \n\n**Primary Success Flow**  \n1. Lab results are synchronized with the patient’s record.  \n2. System marks the report as “Available”.  \n3. Patient or authorized caregiver accesses the report via the portal.  \n\n**Alternative Flow**  \n1. If the patient attempts to view the report before synchronization, system shows a “Report Not Yet Available” notice.  \n\n**Exception Flow**  \n1. If the report fails to synchronize due to network issues, system retries automatically and notifies the patient of any delays.  \n\n---\n\n**Note:** All concrete values (e.g., thresholds, time limits) are derived from the requirement text; unspecified values are denoted as “as specified”.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Doctor views pending appointments successfully",
+      "req_ids": [
+        "VIRTUA-5-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor logged in",
+        "Pending appointments exist"
+      ],
+      "inputs": {
+        "actor": "Doctor"
+      },
+      "steps": [
+        "Log in",
+        "Navigate to Pending Appointments dashboard",
+        "Select a pending consultation request"
+      ],
+      "expected": [
+        "Consultation details displayed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Doctor provides consultation and generates prescription",
+      "req_ids": [
+        "VIRTUA-5-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Pending consultation selected",
+        "Doctor has necessary privileges"
+      ],
+      "inputs": {
+        "actor": "Doctor"
+      },
+      "steps": [
+        "Select consultation request",
+        "Enter consultation notes",
+        "Confirm prescription"
+      ],
+      "expected": [
+        "Prescription generated and linked to consultation"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Doctor prescribes lab test during consultation",
+      "req_ids": [
+        "VIRTUA-5-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Consultation in progress",
+        "Lab test options available"
+      ],
+      "inputs": {
+        "actor": "Doctor"
+      },
+      "steps": [
+        "Choose Prescribe Lab Test",
+        "Select relevant lab test(s)",
+        "Confirm prescription"
+      ],
+      "expected": [
+        "Lab test order created and sent to lab"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Lab test order is created and requested successfully",
+      "req_ids": [
+        "VIRTUA-5-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Lab test prescription exists"
+      ],
+      "inputs": {
+        "actor": "System"
+      },
+      "steps": [
+        "Receive prescription",
+        "Generate lab order",
+        "Send request to external lab"
+      ],
+      "expected": [
+        "Order status set to Pending"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Doctor prescribes medicines during consultation",
+      "req_ids": [
+        "VIRTUA-5-13"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Consultation in progress",
+        "Medication catalog accessible"
+      ],
+      "inputs": {
+        "actor": "Doctor"
+      },
+      "steps": [
+        "Select Prescribe Medicines",
+        "Choose required medicines",
+        "Specify dosage",
+        "Confirm prescription"
+      ],
+      "expected": [
+        "Medication prescription linked to consultation"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Medicines delivery request is sent to chemist successfully",
+      "req_ids": [
+        "VIRTUA-5-14"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Medication prescription created",
+        "Chemist partner available"
+      ],
+      "inputs": {
+        "actor": "System"
+      },
+      "steps": [
+        "Receive prescription",
+        "Send request to chemist",
+        "Update delivery status"
+      ],
+      "expected": [
+        "Delivery status marked as Scheduled"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Lab tests are performed and reports are updated offline successfully",
+      "req_ids": [
+        "VIRTUA-5-15"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Lab order exists",
+        "Offline processing enabled"
+      ],
+      "inputs": {
+        "actor": "Lab Technician"
+      },
+      "steps": [
+        "Process tests offline",
+        "Enter results",
+        "Synchronize with system upon connectivity"
+      ],
+      "expected": [
+        "Patient record updated with lab results"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Lab report is released for patient to view offline successfully",
+      "req_ids": [
+        "VIRTUA-5-16"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Lab results synchronized",
+        "Patient has access"
+      ],
+      "inputs": {
+        "actor": "System"
+      },
+      "steps": [
+        "Mark report as Available",
+        "Notify patient"
+      ],
+      "expected": [
+        "Patient can view the report in the portal"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "No pending appointments displayed correctly when none exist",
+      "req_ids": [
+        "VIRTUA-5-9"
+      ],
+      "kind": "alternative",
+      "preconditions": [
+        "Doctor logged in",
+        "No pending appointments"
+      ],
+      "inputs": {
+        "actor": "Doctor"
+      },
+      "steps": [
+        "Navigate to Pending Appointments dashboard"
+      ],
+      "expected": [
+        "Message 'No Pending Appointments' shown"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Prescription generation fails due to missing patient data",
+      "req_ids": [
+        "VIRTUA-5-10"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Consultation selected",
+        "Patient record incomplete"
+      ],
+      "inputs": {
+        "actor": "Doctor"
+      },
+      "steps": [
+        "Select consultation",
+        "Attempt to generate prescription"
+      ],
+      "expected": [
+        "Error message indicating incomplete patient data"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Lab test request fails due to lab system unavailability",
+      "req_ids": [
+        "VIRTUA-5-12"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Lab prescription exists",
+        "Lab system down"
+      ],
+      "inputs": {
+        "actor": "System"
+      },
+      "steps": [
+        "Receive prescription",
+        "Attempt to send request"
+      ],
+      "expected": [
+        "Notification of lab system unavailability and queued request"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Medication prescription blocked for controlled substance without authorization",
+      "req_ids": [
+        "VIRTUA-5-13"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "Consultation in progress",
+        "Doctor lacks authorization"
+      ],
+      "inputs": {
+        "actor": "Doctor"
+      },
+      "steps": [
+        "Select Prescribe Medicines",
+        "Attempt to prescribe controlled substance"
+      ],
+      "expected": [
+        "Access denied error and audit log entry"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Lab report synchronization fails due to data corruption",
+      "req_ids": [
+        "VIRTUA-5-16"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "Lab results ready",
+        "Offline data corrupted"
+      ],
+      "inputs": {
+        "actor": "System"
+      },
+      "steps": [
+        "Attempt to synchronize results"
+      ],
+      "expected": [
+        "Rollback to last valid state and administrator notification"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "**Use-Case: Doctor Views and Provides Consultation**\n\n*Actor*: Doctor  \n*Goal*: View pending appointments/consultation requests and provide consultation.\n\n**Primary Success Flow**  \n1. Doctor logs into the system.  \n2. Doctor navigates to the \"Pending Consultations\" list.  \n3. System displays all pending consultation requests.  \n4. Doctor selects a consultation request.  \n5. System presents patient details and consultation history.  \n6. Doctor provides consultation (records notes, diagnoses).  \n7. System generates a prescription based on the consultation.\n\n**Alternative Flow: No Pending Consultations**  \n1. Doctor navigates to the \"Pending Consultations\" list.  \n2. System displays a message indicating no pending consultations.\n\n**Exception Flow: Consultation Access Denied**  \n1. Doctor attempts to view a consultation request.  \n2. System checks doctor's privileges.  \n3. If privileges are insufficient, system displays an error message and denies access.\n\n---\n\n**Use-Case: Doctor Prescribes Lab Tests and Medicines**\n\n*Actor*: Doctor  \n*Goal*: Prescribe lab tests and medicines during a consultation.\n\n**Primary Success Flow**  \n1. During consultation, doctor selects \"Prescribe Lab Test\" option.  \n2. System presents a list of available lab tests.  \n3. Doctor selects required lab tests.  \n4. System creates a lab test request for the patient and sends it to the lab.  \n5. Doctor selects \"Prescribe Medicines\" option.  \n6. System presents a list of available medicines.  \n7. Doctor selects required medicines.  \n8. System creates a medicine request for the chemist and sends it for delivery.\n\n**Alternative Flow: Lab Test Not Available**  \n1. Doctor attempts to prescribe a lab test.  \n2. System checks availability.  \n3. If the lab test is unavailable, system displays a message and prompts doctor to select an alternative test.\n\n**Exception Flow: Medicine Prescription Denied**  \n1. Doctor attempts to prescribe a medicine.  \n2. System checks if the medicine is approved for the patient's condition.  \n3. If denied, system displays an error message and prevents prescription.\n\n---\n\n**Use-Case: Lab Test Execution and Report Update**\n\n*Actor*: Lab Technician  \n*Goal*: Perform lab tests and update patient reports.\n\n**Primary Success Flow**  \n1. Lab technician receives a lab test request for a patient.  \n2. Technician collects samples and performs the lab tests.  \n3. Technician inputs test results into the system.  \n4. System updates the patient's lab report (offline).\n\n**Alternative Flow: Sample Not Available**  \n1. Technician attempts to perform a lab test.  \n2. System checks sample availability.  \n3. If samples are unavailable, technician notifies the system and reschedules the test.\n\n**Exception Flow: Test Failure**  \n1. Technician performs a lab test.  \n2. If the test fails, technician logs the failure and alerts the system for review.\n\n---\n\n**Use-Case: Lab Report Release**\n\n*Actor*: Doctor / Patient  \n*Goal*: Release and view lab test reports.\n\n**Primary Success Flow**  \n1. Doctor or patient navigates to the \"Lab Reports\" section.  \n2. System displays all available lab reports for the patient.  \n3. Doctor or patient selects a lab report.  \n4. System presents the detailed lab report.\n\n**Alternative Flow: Report Not Yet Available**  \n1. Doctor or patient attempts to view a lab report.  \n2. System checks report status.  \n3. If the report is still being processed, system displays a message indicating the report will be available shortly.\n\n**Exception Flow: Unauthorized Access**  \n1. An unauthorized user attempts to view a lab report.  \n2. System checks user privileges.  \n3. If unauthorized, system denies access and logs the attempt.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Doctor views pending consultations and provides consultation",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged in",
+            "Pending consultation requests exist"
+          ],
+          "inputs": {
+            "doctor_id": "D001"
+          },
+          "steps": [
+            "Navigate to Pending Consultations",
+            "Select a consultation request",
+            "Provide consultation notes"
+          ],
+          "expected": [
+            "Consultation notes saved",
+            "Prescription generated"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Doctor prescribes lab tests during consultation",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged in",
+            "Consultation in progress"
+          ],
+          "inputs": {
+            "doctor_id": "D001",
+            "lab_test_id": "LT001"
+          },
+          "steps": [
+            "Select Prescribe Lab Test",
+            "Choose lab test",
+            "Confirm prescription"
+          ],
+          "expected": [
+            "Lab test request created",
+            "Lab report status updated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor prescribes medicines during consultation",
+          "req_ids": [
+            "VIRTUA-5-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged in",
+            "Consultation in progress"
+          ],
+          "inputs": {
+            "doctor_id": "D001",
+            "medicine_id": "M001"
+          },
+          "steps": [
+            "Select Prescribe Medicines",
+            "Choose medicine",
+            "Confirm prescription"
+          ],
+          "expected": [
+            "Medicine request created",
+            "Chemist notified for delivery"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Lab technician performs lab test and updates report (offline)",
+          "req_ids": [
+            "VIRTUA-5-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab test request exists",
+            "Samples available"
+          ],
+          "inputs": {
+            "lab_technician_id": "T001",
+            "patient_id": "P001"
+          },
+          "steps": [
+            "Receive lab test request",
+            "Perform test",
+            "Input results"
+          ],
+          "expected": [
+            "Lab report updated offline"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Lab report is released for viewing (offline)",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab report completed offline"
+          ],
+          "inputs": {
+            "doctor_id": "D001",
+            "patient_id": "P001"
+          },
+          "steps": [
+            "Navigate to Lab Reports",
+            "Select patient",
+            "View lab report"
+          ],
+          "expected": [
+            "Lab report displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "No pending consultations displayed",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Doctor is logged in",
+            "No pending consultations"
+          ],
+          "inputs": {
+            "doctor_id": "D001"
+          },
+          "steps": [
+            "Navigate to Pending Consultations"
+          ],
+          "expected": [
+            "Message indicating no pending consultations"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Consultation access denied due to insufficient privileges",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Unauthorized user attempts to view consultation"
+          ],
+          "inputs": {
+            "user_id": "U001"
+          },
+          "steps": [
+            "Attempt to view consultation"
+          ],
+          "expected": [
+            "Error message and access denied"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Lab test not available for prescription",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Doctor attempts to prescribe a lab test",
+            "Lab test unavailable"
+          ],
+          "inputs": {
+            "doctor_id": "D001",
+            "lab_test_id": "LT999"
+          },
+          "steps": [
+            "Select Prescribe Lab Test",
+            "Attempt to choose unavailable test"
+          ],
+          "expected": [
+            "Message indicating test is unavailable, prompt to select alternative"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Medicine prescription denied due to condition approval",
+          "req_ids": [
+            "VIRTUA-5-13"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Doctor attempts to prescribe a medicine",
+            "Medicine not approved for condition"
+          ],
+          "inputs": {
+            "doctor_id": "D001",
+            "medicine_id": "M999"
+          },
+          "steps": [
+            "Select Prescribe Medicines",
+            "Attempt to choose disapproved medicine"
+          ],
+          "expected": [
+            "Error message and prescription denied"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Lab report not yet available for viewing",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Lab report still being processed"
+          ],
+          "inputs": {
+            "doctor_id": "D001",
+            "patient_id": "P001"
+          },
+          "steps": [
+            "Navigate to Lab Reports",
+            "Select patient",
+            "Attempt to view report"
+          ],
+          "expected": [
+            "Message indicating report will be available shortly"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Unauthorized access to lab report",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Unauthorized user attempts to view lab report"
+          ],
+          "inputs": {
+            "user_id": "U001",
+            "patient_id": "P001"
+          },
+          "steps": [
+            "Attempt to view lab report"
+          ],
+          "expected": [
+            "Error message and access denied"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Sample not available for lab test",
+          "req_ids": [
+            "VIRTUA-5-15"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Lab technician attempts to perform a lab test",
+            "Samples unavailable"
+          ],
+          "inputs": {
+            "lab_technician_id": "T001",
+            "patient_id": "P001"
+          },
+          "steps": [
+            "Receive lab test request",
+            "Attempt to perform test without samples"
+          ],
+          "expected": [
+            "Message indicating samples are unavailable, technician reschedules"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.4167,
+        "representation_score": 1.0,
+        "sfv_score": 0.7083,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #6 (TC-006): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #7 (TC-007): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #8 (TC-008): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #12 (TC-012): 'alternative' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.71). Fix these problems and output the full corrected suite:\n- test case #6 (TC-006): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #7 (TC-007): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #8 (TC-008): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #12 (TC-012): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories for Virtual Healthcare System (Unit U15_5)**\n\n---\n\n### Use-Case: View and Provide Consultation\n\n**Primary Actor:** Doctor  \n**Goal:** View pending appointments/consultation requests and provide consultation.\n\n**Preconditions:**  \n- Doctor is logged into the system.  \n- Pending appointments/consultation requests exist.\n\n**Main Success Scenario (Positive):**  \n1. Doctor accesses the \"Consultation List\" dashboard.  \n2. System displays all pending appointments/consultation requests.  \n3. Doctor selects a pending request.  \n4. System navigates to the consultation interface.  \n5. Doctor provides consultation and generates a prescription.\n\n**Alternative Scenarios:**  \n- **A1:** No pending requests exist.  \n  1. Doctor accesses the \"Consultation List\".  \n  2. System displays a message: \"No pending consultations.\"  \n\n- **A2:** Doctor attempts to provide consultation without selecting a request.  \n  1. Doctor navigates to the consultation interface.  \n  2. System prompts: \"Please select a pending consultation request.\"\n\n**Exception Scenarios:**  \n- **E1:** System fails to load the consultation list due to a backend error.  \n  1. Doctor accesses the \"Consultation List\".  \n  2. System displays an error message: \"Failed to load consultation list. Please try again.\"  \n\n- **E2:** Doctor is unauthorized to view a specific consultation request.  \n  1. Doctor attempts to view a consultation.  \n  2. System denies access and shows: \"Unauthorized access to consultation request.\"\n\n**Related Requirements:** [VIRTUA-5-9]\n\n---\n\n### Use-Case: Generate Prescription and Prescribe Lab Tests\n\n**Primary Actor:** Doctor  \n**Goal:** Generate a prescription and prescribe lab tests during consultation.\n\n**Preconditions:**  \n- Consultation is in progress.  \n- Patient has relevant symptoms requiring lab tests.\n\n**Main Success Scenario (Positive):**  \n1. Doctor completes consultation.  \n2. System prompts to generate prescription.  \n3. Doctor selects required lab tests.  \n4. System generates prescription and records lab test orders.\n\n**Alternative Scenarios:**  \n- **A1:** Doctor declines to prescribe lab tests.  \n  1. System prompts for lab test prescription.  \n  2. Doctor selects \"No Lab Tests\".  \n  3. System proceeds to generate prescription without lab orders.\n\n**Exception Scenarios:**  \n- **E1:** Lab test options are unavailable.  \n  1. Doctor attempts to prescribe lab tests.  \n  2. System shows: \"Selected lab tests are currently unavailable.\"\n\n**Related Requirements:** [VIRTUA-5-10, VIRTUA-5-11]\n\n---\n\n### Use-Case: Request Lab Test Execution\n\n**Primary Actor:** System (Automated)  \n**Goal:** Create and request lab tests for a patient after prescription.\n\n**Preconditions:**  \n- Prescription includes lab test orders.  \n- Lab service is available.\n\n**Main Success Scenario (Positive):**  \n1. System receives prescription with lab test orders.  \n2. System creates lab test entries in the lab management system.  \n3. System sends request to the lab for test execution.\n\n**Alternative Scenarios:**  \n- **A1:** Lab service is temporarily offline.  \n  1. System attempts to send request.  \n  2. System logs: \"Lab service is offline; request queued.\"\n\n**Exception Scenarios:**  \n- **E1:** Lab test order exceeds maximum allowed tests per patient.  \n  1. System receives excessive lab test orders.  \n  2. System rejects additional orders and notifies: \"Maximum lab tests reached for this patient.\"\n\n**Related Requirements:** [VIRTUA-5-12]\n\n---\n\n### Use-Case: Request Medicines Delivery\n\n**Primary Actor:** System (Automated)  \n**Goal:** Request medicine delivery to the patient after prescription.\n\n**Preconditions:**  \n- Prescription includes medicine orders.  \n- Chemist service is available.\n\n**Main Success Scenario (Positive):**  \n1. System receives prescription with medicine orders.  \n2. System sends request to the chemist for medicine preparation.  \n3. System schedules delivery to the patient's address.\n\n**Alternative Scenarios:**  \n- **A1:** Patient prefers pickup over delivery.  \n  1. System receives preference.  \n  2. System updates order status to \"Pickup\".\n\n**Exception Scenarios:**  \n- **E1:** Chemist is out of stock for a prescribed medicine.  \n  1. System attempts to request medicine.  \n  2. System notifies: \"Medicine out of stock; alternative suggested.\"\n\n**Related Requirements:** [VIRTUA-5-13, VIRTUA-5-14]\n\n---\n\n### Use-Case: Perform Lab Tests and Update Reports (Offline)\n\n**Primary Actor:** Lab Technician  \n**Goal:** Perform lab tests offline and update patient reports.\n\n**Preconditions:**  \n- Lab test requests are received.  \n- Technician has necessary equipment.\n\n**Main Success Scenario (Positive):**  \n1. Technician receives lab test request.  \n2. Technician performs tests offline.  \n3. Technician updates the lab report in the system.\n\n**Alternative Scenarios:**  \n- **A1:** Test equipment malfunctions.  \n  1. Technician attempts to perform tests.  \n  2. Technician logs malfunction and escalates.\n\n**Exception Scenarios:**  \n- **E1:** Test results exceed data storage limits.  \n  1. Technician attempts to upload results.  \n  2. System rejects and prompts: \"Data storage limit exceeded; please archive old results.\"\n\n**Related Requirements:** [VIRTUA-5-15]\n\n---\n\n### Use-Case: Release Lab Report for Viewing (Offline)\n\n**Primary Actor:** System (Automated)  \n**Goal:** Release updated lab reports to the patient and doctor for viewing.\n\n**Preconditions:**  \n- Lab test results are finalized and uploaded.  \n- Patient and doctor have access permissions.\n\n**Main Success Scenario (Positive):**  \n1. System receives finalized lab reports.  \n2. System marks reports as \"Released\".  \n3. Patient and doctor can view reports via the dashboard.\n\n**Alternative Scenarios:**  \n- **A1:** Patient requests delayed report release.  \n  1. System receives delay request.  \n  2. System schedules release for a later time.\n\n**Exception Scenarios:**  \n- **E1:** Report contains confidential data flagged for restricted access.  \n  1. System attempts to release report.  \n  2. System denies release and notifies: \"Report contains restricted data; access denied.\"\n\n**Related Requirements:** [VIRTUA-5-16]\n\n---",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Doctor views pending consultations",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged in"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Access Consultation List",
+            "View pending requests"
+          ],
+          "expected": [
+            "Pending requests displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Doctor provides consultation and generates prescription",
+          "req_ids": [
+            "VIRTUA-5-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pending consultation selected"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Select consultation",
+            "Provide consultation",
+            "Generate prescription"
+          ],
+          "expected": [
+            "Prescription generated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor prescribes lab tests during consultation",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation in progress"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Select lab tests",
+            "Confirm prescription"
+          ],
+          "expected": [
+            "Lab test orders recorded"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "System requests lab test execution",
+          "req_ids": [
+            "VIRTUA-5-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab test orders exist"
+          ],
+          "inputs": {
+            "actor": "System"
+          },
+          "steps": [
+            "Create lab test entries",
+            "Send request to lab"
+          ],
+          "expected": [
+            "Lab request sent"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "System requests medicine delivery",
+          "req_ids": [
+            "VIRTUA-5-13",
+            "VIRTUA-5-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Medicine orders exist"
+          ],
+          "inputs": {
+            "actor": "System"
+          },
+          "steps": [
+            "Send request to chemist",
+            "Schedule delivery"
+          ],
+          "expected": [
+            "Delivery scheduled"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Lab technician performs offline tests and updates reports",
+          "req_ids": [
+            "VIRTUA-5-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Test requests received"
+          ],
+          "inputs": {
+            "actor": "Lab Technician"
+          },
+          "steps": [
+            "Perform tests",
+            "Upload results"
+          ],
+          "expected": [
+            "Reports updated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "System releases lab report for viewing",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab results finalized"
+          ],
+          "inputs": {
+            "actor": "System"
+          },
+          "steps": [
+            "Mark reports as released",
+            "Notify patient and doctor"
+          ],
+          "expected": [
+            "Reports accessible"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "No pending consultations scenario",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Doctor logged in",
+            "No pending requests"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Access Consultation List",
+            "View message"
+          ],
+          "expected": [
+            "Message: No pending consultations."
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Unauthorized access to consultation request",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Doctor attempts access without permission"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Attempt to view consultation",
+            "System check permissions"
+          ],
+          "expected": [
+            "Error: Unauthorized access."
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Lab service offline during request",
+          "req_ids": [
+            "VIRTUA-5-12"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Lab service offline"
+          ],
+          "inputs": {
+            "actor": "System"
+          },
+          "steps": [
+            "Attempt lab request",
+            "Queue request"
+          ],
+          "expected": [
+            "Log: Lab service offline; request queued."
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Medicine out of stock exception",
+          "req_ids": [
+            "VIRTUA-5-14"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Prescribed medicine out of stock"
+          ],
+          "inputs": {
+            "actor": "System"
+          },
+          "steps": [
+            "Attempt medicine request",
+            "Check stock"
+          ],
+          "expected": [
+            "Error: Medicine out of stock; alternative suggested."
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Lab report contains restricted data exception",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Report flagged as restricted"
+          ],
+          "inputs": {
+            "actor": "System"
+          },
+          "steps": [
+            "Attempt report release",
+            "Check data flags"
+          ],
+          "expected": [
+            "Error: Report contains restricted data; access denied."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.5833,
+        "representation_score": 1.0,
+        "sfv_score": 0.7917,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #8 (TC-008): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.79). Fix these problems and output the full corrected suite:\n- test case #8 (TC-008): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Case: Doctor Views and Provides Consultation**\n\n*Actor*: Doctor  \n*Goal*: View pending appointments/consultation requests and provide consultation.\n\n**Primary Success Flow**  \n1. Doctor logs into the system.  \n2. Doctor navigates to the \"Pending Consultations\" list.  \n3. System displays all pending appointments/consultation requests.  \n4. Doctor selects a consultation request.  \n5. System presents the patient's details and consultation history.  \n6. Doctor provides consultation (records notes, diagnoses, etc.).  \n7. System generates a prescription based on the consultation.\n\n**Alternative Flow: No Pending Consultations**  \n1. Doctor logs into the system.  \n2. Doctor navigates to the \"Pending Consultations\" list.  \n3. System displays a message indicating \"No pending consultations available.\"\n\n**Exception Flow: Consultation Access Denied**  \n1. Doctor logs into the system.  \n2. System checks doctor's permissions.  \n3. Permissions are insufficient; system displays an error message \"Access denied: insufficient privileges to view consultations.\"\n\n---\n\n**Use-Case: Doctor Prescribes Lab Tests and Medicines**\n\n*Actor*: Doctor  \n*Goal*: Prescribe lab tests and medicines during a consultation.\n\n**Primary Success Flow**  \n1. During consultation, doctor selects \"Prescribe Lab Test\" option.  \n2. System presents a list of available lab tests.  \n3. Doctor selects required lab tests.  \n4. System sends a request to the lab for the selected tests.  \n5. Doctor selects \"Prescribe Medicines\" option.  \n6. System presents a list of available medicines.  \n7. Doctor selects required medicines.  \n8. System sends a request to the concerned chemist for delivery.\n\n**Alternative Flow: Lab Test Not Available**  \n1. During consultation, doctor selects \"Prescribe Lab Test.\"  \n2. System checks availability of selected lab tests.  \n3. Selected lab test is unavailable; system displays a message \"Lab test not available. Please select an alternative.\"\n\n**Exception Flow: Medicine Prescription Denied**  \n1. During consultation, doctor selects \"Prescribe Medicines.\"  \n2. System checks doctor's authority for the selected medicine.  \n3. Authority is insufficient; system displays an error message \"Prescription denied: insufficient authority for selected medicine.\"\n\n---\n\n**Use-Case: Lab Test Execution and Report Update**\n\n*Actor*: Lab Technician  \n*Goal*: Perform lab tests and update patient reports.\n\n**Primary Success Flow**  \n1. Lab technician receives a lab test request from the system.  \n2. Technician collects samples and performs the required tests.  \n3. Technician inputs test results into the system.  \n4. System updates the patient's lab test report (offline).\n\n**Alternative Flow: Sample Not Available**  \n1. Lab technician receives a lab test request.  \n2. Technician checks sample availability.  \n3. Sample is unavailable; technician notifies the system, which updates the patient's record with a \"Sample unavailable\" status.\n\n**Exception Flow: Test Failure**  \n1. Lab technician performs a test.  \n2. Test fails due to equipment malfunction.  \n3. Technician logs the failure in the system, which triggers an alert for maintenance and updates the patient's report with a \"Test failed\" status.\n\n---\n\n**Use-Case: Lab Report Release**\n\n*Actor*: Doctor  \n*Goal*: View and release lab reports for patients.\n\n**Primary Success Flow**  \n1. Doctor logs into the system.  \n2. Doctor navigates to the \"Lab Reports\" section.  \n3. System displays all available lab reports.  \n4. Doctor selects a patient's lab report.  \n5. System releases the report for viewing (offline).\n\n**Alternative Flow: Report Already Released**  \n1. Doctor navigates to the \"Lab Reports\" section.  \n2. System checks the release status of the selected report.  \n3. Report is already released; system displays a message \"Report already released.\"\n\n**Exception Flow: Report Access Denied**  \n1. Doctor attempts to view a lab report.  \n2. System checks doctor's permissions.  \n3. Permissions are insufficient; system displays an error message \"Access denied: insufficient privileges to view lab report.\"",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Doctor views pending consultations",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged in"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Navigate to Pending Consultations",
+            "View list of pending appointments"
+          ],
+          "expected": [
+            "List of pending consultations displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Doctor provides consultation and generates prescription",
+          "req_ids": [
+            "VIRTUA-5-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pending consultation selected"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Select consultation",
+            "Provide consultation notes",
+            "Generate prescription"
+          ],
+          "expected": [
+            "Prescription generated and recorded"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor prescribes lab test during consultation",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation in progress"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Select Prescribe Lab Test",
+            "Choose lab tests",
+            "Confirm prescription"
+          ],
+          "expected": [
+            "Lab test request sent to lab"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Doctor prescribes medicine during consultation",
+          "req_ids": [
+            "VIRTUA-5-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation in progress"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Select Prescribe Medicines",
+            "Choose medicines",
+            "Confirm prescription"
+          ],
+          "expected": [
+            "Medicine request sent to chemist"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Lab technician performs lab test and updates report (offline)",
+          "req_ids": [
+            "VIRTUA-5-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab test request received"
+          ],
+          "inputs": {
+            "actor": "Lab Technician"
+          },
+          "steps": [
+            "Collect samples",
+            "Perform tests",
+            "Input results"
+          ],
+          "expected": [
+            "Patient's lab report updated offline"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Lab report is released to view (offline)",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab report completed"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Navigate to Lab Reports",
+            "Select patient's report",
+            "Release report"
+          ],
+          "expected": [
+            "Patient's lab report available for viewing"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "No pending consultations available",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Doctor is logged in"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Navigate to Pending Consultations",
+            "Check list"
+          ],
+          "expected": [
+            "Message indicating no pending consultations"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Consultation access denied due to insufficient privileges",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Doctor attempts to view consultations"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Navigate to Pending Consultations",
+            "Attempt to view"
+          ],
+          "expected": [
+            "Error message: Access denied: insufficient privileges to view consultations"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Lab test not available during prescription",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Consultation in progress"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Select Prescribe Lab Test",
+            "Attempt to choose unavailable test"
+          ],
+          "expected": [
+            "Message: Lab test not available. Please select an alternative."
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Medicine prescription denied due to insufficient authority",
+          "req_ids": [
+            "VIRTUA-5-13"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Consultation in progress"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Select Prescribe Medicines",
+            "Attempt to prescribe restricted medicine"
+          ],
+          "expected": [
+            "Error message: Prescription denied: insufficient authority for selected medicine."
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Sample unavailable for lab test",
+          "req_ids": [
+            "VIRTUA-5-15"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Lab test request received"
+          ],
+          "inputs": {
+            "actor": "Lab Technician"
+          },
+          "steps": [
+            "Check sample availability",
+            "Attempt to perform test"
+          ],
+          "expected": [
+            "Message: Sample unavailable. Status updated accordingly."
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Lab test fails due to equipment malfunction",
+          "req_ids": [
+            "VIRTUA-5-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Lab test request received"
+          ],
+          "inputs": {
+            "actor": "Lab Technician"
+          },
+          "steps": [
+            "Perform test",
+            "Equipment malfunctions"
+          ],
+          "expected": [
+            "Alert for maintenance and status 'Test failed' in report."
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Lab report already released",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Lab report completed"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Navigate to Lab Reports",
+            "Attempt to release already released report"
+          ],
+          "expected": [
+            "Message: Report already released."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.4615,
+        "representation_score": 1.0,
+        "sfv_score": 0.7308,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #7 (TC-007): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #11 (TC-011): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #13 (TC-013): 'alternative' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.73). Fix these problems and output the full corrected suite:\n- test case #7 (TC-007): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #9 (TC-009): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #11 (TC-011): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #13 (TC-013): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories for Virtual Healthcare System (Unit U15_5)**  \n\n---\n\n### Actor\n- **Doctor** (privileged role with rights to view, consult, prescribe lab tests, medicines, and release lab reports)\n\n---\n\n#### Use-Case 1: View Pending Appointments / Consultation Requests  \n**ID:** UC-VC-01  \n**Requirement Trace:** [VIRTUA-5-9]  \n\n**Primary Success Flow**  \n1. Doctor logs into the system.  \n2. System displays the “Pending Appointments” dashboard.  \n3. Doctor selects a pending consultation request.  \n4. System shows patient details and consultation summary.  \n5. Doctor proceeds to provide consultation.  \n\n**Alternative Flow**  \n1. If no pending requests exist, system shows a “No Pending Requests” message.  \n\n**Exception Flow**  \n1. System denies access if the doctor’s session expires or privileges are revoked.  \n\n---\n\n#### Use-Case 2: Provide Consultation and Generate Prescription  \n**ID:** UC-VC-02  \n**Requirement Trace:** [VIRTUA-5-10]  \n\n**Primary Success Flow**  \n1. Doctor selects a pending consultation request.  \n2. System opens the consultation interface with patient data.  \n3. Doctor enters consultation notes and diagnoses.  \n4. System automatically generates a prescription based on the diagnosis.  \n5. Doctor reviews and confirms the prescription.  \n\n**Alternative Flow**  \n1. If the patient has no prior records, system prompts for additional information before generating the prescription.  \n\n**Exception Flow**  \n1. If the doctor lacks the necessary credentials for the patient’s specialty, system raises an access error.  \n\n---\n\n#### Use-Case 3: Prescribe Lab Tests During Consultation  \n**ID:** UC-VC-03  \n**Requirement Trace:** [VIRTUA-5-11]  \n\n**Primary Success Flow**  \n1. During consultation, doctor selects “Prescribe Lab Test”.  \n2. System presents a list of relevant lab tests.  \n3. Doctor chooses one or more tests.  \n4. System logs the prescription and sends a request to the lab.  \n\n**Alternative Flow**  \n1. If the selected lab test is unavailable, system suggests an alternative test.  \n\n**Exception Flow**  \n1. If the lab system is down, an error notification is displayed, and the prescription is queued for retry.  \n\n---\n\n#### Use-Case 4: Create and Request Lab Test for Patient  \n**ID:** UC-VC-04  \n**Requirement Trace:** [VIRTUA-5-12]  \n\n**Primary Success Flow**  \n1. Lab test prescription is sent from the consultation module.  \n2. System generates a lab test order linked to the patient.  \n3. Order is transmitted to the external lab system.  \n4. System records the request status as “Pending”.  \n\n**Alternative Flow**  \n1. If the lab capacity is full, system notifies the doctor and offers to schedule the test later.  \n\n**Exception Flow**  \n1. If the external lab system returns an error (e.g., invalid patient ID), the order is flagged for manual review.  \n\n---\n\n#### Use-Case 5: Prescribe Medicines During Consultation  \n**ID:** UC-VC-05  \n**Requirement Trace:** [VIRTUA-5-13]  \n\n**Primary Success Flow**  \n1. Doctor selects “Prescribe Medicines” during consultation.  \n2. System displays a searchable medication catalog.  \n3. Doctor selects required medicines and specifies dosage.  \n4. System generates a medication prescription linked to the consultation.  \n\n**Alternative Flow**  \n1. If a prescribed medicine is out of stock, system suggests a substitute from the same therapeutic class.  \n\n**Exception Flow**  \n1. If the doctor attempts to prescribe a controlled substance without proper authorization, system blocks the action and logs an audit entry.  \n\n---\n\n#### Use-Case 6: Request Medicines Delivery to Patient  \n**ID:**  \n**Requirement Trace:** [VIRTUA-5-14]  \n\n**Primary Success Flow**  \n1. Prescription for medicines is created.  \n2. System sends the prescription details to the designated chemist or pharmacy partner.  \n3. Chemist confirms receipt and schedules delivery.  \n4. System updates the patient’s record with delivery status.  \n\n**Alternative Flow**  \n1. If the primary chemist is unavailable, system routes the request to a backup chemist.  \n\n**Exception Flow**  \n1. If the pharmacy partner reports a delivery failure, system triggers a notification to the doctor for manual follow-up.  \n\n---\n\n#### Use-Case 7: Perform Lab Tests and Update Reports (Offline)  \n**ID:** UC-VC-07  \n**Requirement Trace:** [VIRTUA-5-15]  \n\n**Primary Success Flow**  \n1. Lab technician processes the ordered tests offline.  \n2. Technician inputs results into the lab system.  \n3. System synchronizes the results with the patient’s record once connectivity is restored.  \n\n**Alternative Flow**  \n1. If offline data exceeds a threshold (e.g., >24 hours), system prompts for manual data entry verification.  \n\n**Exception Flow**  \n1. If data corruption occurs during offline entry, system rolls back to the last valid state and alerts the administrator.  \n\n---\n\n#### Use-Case 8: Release Lab Report for Patient to View (Offline)  \n**ID:** UC-VC-08  \n**Requirement Trace:** [VIRTUA-5-16]  \n\n**Primary Success Flow**  \n1. Lab results are synchronized with the patient’s record.  \n2. System marks the report as “Available”.  \n3. Patient or authorized caregiver accesses the report via the portal.  \n\n**Alternative Flow**  \n1. If the patient attempts to view the report before synchronization, system shows a “Report Not Yet Available” notice.  \n\n**Exception Flow**  \n1. If the report fails to synchronize due to network issues, system retries automatically and notifies the patient of any delays.  \n\n---\n\n**Note:** All concrete values (e.g., thresholds, time limits) are derived from the requirement text; unspecified values are denoted as “as specified”.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Doctor views pending appointments successfully",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor logged in",
+            "Pending appointments exist"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Log in",
+            "Navigate to Pending Appointments dashboard",
+            "Select a pending consultation request"
+          ],
+          "expected": [
+            "Consultation details displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Doctor provides consultation and generates prescription",
+          "req_ids": [
+            "VIRTUA-5-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pending consultation selected",
+            "Doctor has necessary privileges"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Select consultation request",
+            "Enter consultation notes",
+            "Confirm prescription"
+          ],
+          "expected": [
+            "Prescription generated and linked to consultation"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor prescribes lab test during consultation",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation in progress",
+            "Lab test options available"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Choose Prescribe Lab Test",
+            "Select relevant lab test(s)",
+            "Confirm prescription"
+          ],
+          "expected": [
+            "Lab test order created and sent to lab"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Lab test order is created and requested successfully",
+          "req_ids": [
+            "VIRTUA-5-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab test prescription exists"
+          ],
+          "inputs": {
+            "actor": "System"
+          },
+          "steps": [
+            "Receive prescription",
+            "Generate lab order",
+            "Send request to external lab"
+          ],
+          "expected": [
+            "Order status set to Pending"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor prescribes medicines during consultation",
+          "req_ids": [
+            "VIRTUA-5-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation in progress",
+            "Medication catalog accessible"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Select Prescribe Medicines",
+            "Choose required medicines",
+            "Specify dosage",
+            "Confirm prescription"
+          ],
+          "expected": [
+            "Medication prescription linked to consultation"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Medicines delivery request is sent to chemist successfully",
+          "req_ids": [
+            "VIRTUA-5-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Medication prescription created",
+            "Chemist partner available"
+          ],
+          "inputs": {
+            "actor": "System"
+          },
+          "steps": [
+            "Receive prescription",
+            "Send request to chemist",
+            "Update delivery status"
+          ],
+          "expected": [
+            "Delivery status marked as Scheduled"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Lab tests are performed and reports are updated offline successfully",
+          "req_ids": [
+            "VIRTUA-5-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab order exists",
+            "Offline processing enabled"
+          ],
+          "inputs": {
+            "actor": "Lab Technician"
+          },
+          "steps": [
+            "Process tests offline",
+            "Enter results",
+            "Synchronize with system upon connectivity"
+          ],
+          "expected": [
+            "Patient record updated with lab results"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Lab report is released for patient to view offline successfully",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab results synchronized",
+            "Patient has access"
+          ],
+          "inputs": {
+            "actor": "System"
+          },
+          "steps": [
+            "Mark report as Available",
+            "Notify patient"
+          ],
+          "expected": [
+            "Patient can view the report in the portal"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "No pending appointments displayed correctly when none exist",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Doctor logged in",
+            "No pending appointments"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Navigate to Pending Appointments dashboard"
+          ],
+          "expected": [
+            "Message 'No Pending Appointments' shown"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Prescription generation fails due to missing patient data",
+          "req_ids": [
+            "VIRTUA-5-10"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Consultation selected",
+            "Patient record incomplete"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Select consultation",
+            "Attempt to generate prescription"
+          ],
+          "expected": [
+            "Error message indicating incomplete patient data"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Lab test request fails due to lab system unavailability",
+          "req_ids": [
+            "VIRTUA-5-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Lab prescription exists",
+            "Lab system down"
+          ],
+          "inputs": {
+            "actor": "System"
+          },
+          "steps": [
+            "Receive prescription",
+            "Attempt to send request"
+          ],
+          "expected": [
+            "Notification of lab system unavailability and queued request"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Medication prescription blocked for controlled substance without authorization",
+          "req_ids": [
+            "VIRTUA-5-13"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Consultation in progress",
+            "Doctor lacks authorization"
+          ],
+          "inputs": {
+            "actor": "Doctor"
+          },
+          "steps": [
+            "Select Prescribe Medicines",
+            "Attempt to prescribe controlled substance"
+          ],
+          "expected": [
+            "Access denied error and audit log entry"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Lab report synchronization fails due to data corruption",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Lab results ready",
+            "Offline data corrupted"
+          ],
+          "inputs": {
+            "actor": "System"
+          },
+          "steps": [
+            "Attempt to synchronize results"
+          ],
+          "expected": [
+            "Rollback to last valid state and administrator notification"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.7692,
+        "representation_score": 1.0,
+        "sfv_score": 0.8846,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #9 (TC-009): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #13 (TC-013): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    }
+  ]
+}

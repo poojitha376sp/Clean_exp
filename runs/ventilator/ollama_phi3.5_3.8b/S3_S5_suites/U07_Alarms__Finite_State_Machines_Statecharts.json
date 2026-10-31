@@ -1,0 +1,1725 @@
+{
+  "unit_id": "U07_Alarms",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:phi3.5:3.8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.2,
+    "sfv_score": 0.6,
+    "threshold": 0.7,
+    "sfv_pass": false,
+    "issues": [
+      "missing: transitions (>=2)",
+      "missing: states declared",
+      "missing: initial state",
+      "missing: events/guards"
+    ]
+  },
+  "fsa": null,
+  "artifact": "<Finite State Machines / Statecharts Representation>",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test Medium Severity Alarm Color and Flashing Frequency",
+      "req_ids": [
+        "RW-SW-75"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "color": "yellow",
+        "flashing_frequency": "0.5Hz",
+        "duty_cycle": "50%"
+      },
+      "steps": [
+        "Set alarm color to yellow",
+        "Set flashing frequency to 0.5Hz",
+        "Set duty cycle to 50%"
+      ],
+      "expected": [
+        "Alarm should appear yellow and flash with a 0.5Hz frequency at a 50% duty cycle"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test High Severity Alarm Auditory Signal with 10 Pulses",
+      "req_ids": [
+        "RW-SW-76"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "pulse_count": 10,
+        "pulse_duration": "200ms",
+        "pulse_frequency": "500Hz"
+      },
+      "steps": [
+        "Set alarm auditory signal to 10 pulses",
+        "Set each pulse duration to 200ms",
+        "Set pulse frequency to 500Hz"
+      ],
+      "expected": [
+        "Alarm should emit 10 pulses, each lasting 200ms with a frequency of 500Hz"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test High Severity Alarm with 4 Pulses (Confirms Difference from Requirement 77)",
+      "req_ids": [
+        "RW-SW-77"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "pulse_count": 4,
+        "pulse_duration": "200ms",
+        "pulse_frequency": "500Hz"
+      },
+      "steps": [
+        "Set alarm auditory signal to 4 pulses",
+        "Set each pulse duration to 200ms",
+        "Set pulse frequency to 500Hz"
+      ],
+      "expected": [
+        "Alarm should emit 4 pulses, each lasting 200ms with a frequency of 500Hz, confirming it is different from Requirement 77 which specifies 10 pulses"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test Alarm Pause Functionality",
+      "req_ids": [
+        "RW-SW-80"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "APNEA ALARM or HIGH BREATH RATE active"
+      ],
+      "inputs": {
+        "pause_duration": "60 seconds"
+      },
+      "steps": [
+        "Press AUDIO PAUSE / ALARM PAUSE key",
+        "Initiate pause for all active alarms"
+      ],
+      "expected": [
+        "All active alarms should pause for 60 seconds",
+        "Alarm activation symbol IEC 60417-5576 should be displayed"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test Resumption of Alarms After Pause",
+      "req_ids": [
+        "RW-SW-80"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Alarms paused as per TC-004"
+      ],
+      "inputs": {
+        "resume_action": "release pause"
+      },
+      "steps": [
+        "Release pause on AUDIO PAUSE / ALARM PAUSE key",
+        "Resume all active alarms"
+      ],
+      "expected": [
+        "All active alarms should resume after pause is released"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Test Medium Severity Alarm for Apnea",
+      "req_ids": [
+        "RW-SW-80"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "No breath detected within specified interval"
+      ],
+      "inputs": {
+        "trigger": "no_breath"
+      },
+      "steps": [
+        "Trigger apnea condition check",
+        "Set alarm to APNEA ALARM"
+      ],
+      "expected": [
+        "APNEA ALARM should be displayed"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Test High Severity Alarm for High Breath Rate",
+      "req_ids": [
+        "RW-SW-82"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "breath_rate": "exceeds_threshold"
+      },
+      "steps": [
+        "Set breath rate to exceed threshold"
+      ],
+      "expected": [
+        "HIGH BREATH RATE should be displayed"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Test Medium Severity Alarm for Exceeded Breath Rate Threshold",
+      "req_ids": [
+        "RW-SW-83"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "breath_rate": "exceeds_threshold"
+      },
+      "steps": [
+        "Set breath rate to exceed threshold"
+      ],
+      "expected": [
+        "Medium severity alarm for high breath rate should be triggered"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Test High Severity Alarm for Low Pressure",
+      "req_ids": [
+        "RW-SW-84"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "pressure_status": "low"
+      },
+      "steps": [
+        "Set pressure status to low"
+      ],
+      "expected": [
+        "LOW INSP P high severity alarm should be triggered"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Test Medium Severity Alarm for Low Pressure with No Input",
+      "req_ids": [
+        "RW-SW-84"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "pressure_status": "normal"
+      },
+      "steps": [
+        "Set pressure status to normal"
+      ],
+      "expected": [
+        "No alarm should be triggered for normal pressure"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Test Medium Severity Alarm for Normal Pressure",
+      "req_ids": [
+        "RW-SW-84"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "pressure_status": "low"
+      },
+      "steps": [
+        "Set pressure status to normal"
+      ],
+      "expected": [
+        "No high severity alarm should be triggered for normal pressure"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "<Finite State Machines / Statecharts Representation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Medium Severity Alarm Color and Flashing Frequency",
+          "req_ids": [
+            "RW-SW-75"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "color": "yellow",
+            "flashing_frequency": "0.5Hz",
+            "duty_cycle": "50%"
+          },
+          "steps": [
+            "Set alarm color to yellow",
+            "Set flashing frequency to 0.5Hz",
+            "Set duty cycle to 50%"
+          ],
+          "expected": [
+            "Alarm should appear yellow and flash with a 0.5Hz frequency at a 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test High Severity Alarm Auditory Signal with 10 Pulses",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pulse_count": 10,
+            "pulse_duration": "200ms",
+            "pulse_frequency": "500Hz"
+          },
+          "steps": [
+            "Set alarm auditory signal to 10 pulses",
+            "Set each pulse duration to 200ms",
+            "Set pulse frequency to 500Hz"
+          ],
+          "expected": [
+            "Alarm should emit 10 pulses, each lasting 200ms with a frequency of 500Hz"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test High Severity Alarm with 4 Pulses (Confirms Difference from Requirement 77)",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "pulse_count": 4,
+            "pulse_duration": "200ms",
+            "pulse_frequency": "500Hz"
+          },
+          "steps": [
+            "Set alarm auditory signal to 4 pulses",
+            "Set each pulse duration to 200ms",
+            "Set pulse frequency to 500Hz"
+          ],
+          "expected": [
+            "Alarm should emit 4 pulses, each lasting 200ms with a frequency of 500Hz, confirming it is different from Requirement 77 which specifies 10 pulses"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Alarm Pause Functionality",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "APNEA ALARM or HIGH BREATH RATE active"
+          ],
+          "inputs": {
+            "pause_duration": "60 seconds"
+          },
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Initiate pause for all active alarms"
+          ],
+          "expected": [
+            "All active alarms should pause for 60 seconds",
+            "Alarm activation symbol IEC 60417-5576 should be displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Resumption of Alarms After Pause",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Alarms paused as per TC-004"
+          ],
+          "inputs": {
+            "resume_action": "release pause"
+          },
+          "steps": [
+            "Release pause on AUDIO PAUSE / ALARM PAUSE key",
+            "Resume all active alarms"
+          ],
+          "expected": [
+            "All active alarms should resume after pause is released"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Medium Severity Alarm for Apnea",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No breath detected within specified interval"
+          ],
+          "inputs": {
+            "trigger": "no_breath"
+          },
+          "steps": [
+            "Trigger apnea condition check",
+            "Set alarm to APNEA ALARM"
+          ],
+          "expected": [
+            "APNEA ALARM should be displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test High Severity Alarm for High Breath Rate",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "breath_rate": "exceeds_threshold"
+          },
+          "steps": [
+            "Set breath rate to exceed threshold"
+          ],
+          "expected": [
+            "HIGH BREATH RATE should be displayed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Medium Severity Alarm for Exceeded Breath Rate Threshold",
+          "req_ids": [
+            "RW-SW-83"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "breath_rate": "exceeds_threshold"
+          },
+          "steps": [
+            "Set breath rate to exceed threshold"
+          ],
+          "expected": [
+            "Medium severity alarm for high breath rate should be triggered"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test High Severity Alarm for Low Pressure",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pressure_status": "low"
+          },
+          "steps": [
+            "Set pressure status to low"
+          ],
+          "expected": [
+            "LOW INSP P high severity alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test Medium Severity Alarm for Low Pressure with No Input",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "pressure_status": "normal"
+          },
+          "steps": [
+            "Set pressure status to normal"
+          ],
+          "expected": [
+            "No alarm should be triggered for normal pressure"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Test Medium Severity Alarm for Normal Pressure",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "pressure_status": "low"
+          },
+          "steps": [
+            "Set pressure status to normal"
+          ],
+          "expected": [
+            "No high severity alarm should be triggered for normal pressure"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.60). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Medium Severity Alarm Color and Flashing Frequency",
+          "req_ids": [
+            "RW-SW-75"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "color": "yellow",
+            "flashingFrequency": "0.5Hz",
+            "dutyCycle": "50%"
+          },
+          "steps": [
+            "Set alarm color to yellow",
+            "Set flashing frequency to 0.5Hz with a 50% duty cycle"
+          ],
+          "expected": [
+            "Alarm should appear yellow and flash with the specified frequency and duty cycle"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test High Severity Alarm Auditory Signal with 10 Pulses",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pulseCount": 10,
+            "pulseDuration": "200ms",
+            "pulseFrequency": "500Hz"
+          },
+          "steps": [
+            "Activate high severity alarm",
+            "Play auditory signal with 10 pulses of 200ms duration each at 500Hz"
+          ],
+          "expected": [
+            "Alarm should emit 10 pulses at 500Hz with each pulse lasting 200ms"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test High Severity Alarm Auditory Signal with 4 Pulses",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "pulseCount": 4,
+            "pulseDuration": "200ms",
+            "pulseFrequency": "500Hz"
+          },
+          "steps": [
+            "Activate high severity alarm",
+            "Play auditory signal with 4 pulses of 200ms duration each at 500Hz"
+          ],
+          "expected": [
+            "Alarm should emit 4 pulses at 500Hz with each pulse lasting 200ms"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Pressure Low Alarm Activation",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pressure": "low"
+          },
+          "steps": [
+            "Detect low pressure",
+            "Activate pressure low alarm",
+            "Play auditory alarm sound",
+            "Display 'LOW INSP P' text"
+          ],
+          "expected": [
+            "Low pressure detected, alarm sounded, and 'LOW INSP P' displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Apnea Alarm Activation",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No breath detected within specified interval"
+          ],
+          "inputs": {},
+          "steps": [
+            "Detect lack of breath",
+            "Activate apnea alarm",
+            "Display 'APNEA ALARM' text"
+          ],
+          "expected": [
+            "Apnea alarm activated with 'APNEA ALARM' displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test High Breath Rate Alarm Activation",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "breathRate": "high"
+          },
+          "steps": [
+            "Detect high breath rate",
+            "Activate high breath rate alarm",
+            "Display 'HIGH BREATH RATE' text"
+          ],
+          "expected": [
+            "High breath rate detected, alarm activated with 'HIGH BREATH RATE' displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Medium Breath Rate Alarm Activation",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Breath rate within normal range"
+          ],
+          "inputs": {},
+          "steps": [
+            "Detect normal breath rate",
+            "Do not activate alarm"
+          ],
+          "expected": [
+            "No alarm should be activated as the breath rate is normal"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Pressure Low Alarm Pause Functionality",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause all auditory alarms",
+            "Maintain pause for 60 seconds",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume alarms"
+          ],
+          "expected": [
+            "All alarms should pause for 60 seconds and then resume normally"
+          ]
+        },
+        {
+          "id": "TC-101",
+          "title": "Test Medium Severity Alarm Pause Functionality",
+          "req_ids": [
+            "RW-SW-78"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause alarms"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-102",
+          "title": "Test Pressure Low Alarm Pause Functionality",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause all alarms",
+            "Maintain pause for less than 60 seconds",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume alarms"
+          ],
+          "expected": [
+            "Alarms should pause for the duration of the key press and then resume normally"
+          ]
+        },
+        {
+          "id": "TC-103",
+          "title": "Test Pressure Low Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure low alarm paused"
+          ],
+          "inputs": {},
+          "steps": [
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume all alarms"
+          ],
+          "expected": [
+            "Paused pressure low alarm should resume normal alarm operation"
+          ]
+        },
+        {
+          "id": "TC-104",
+          "title": "Test Medium Severity Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-78"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause all alarms",
+            "Press AUDIO PAUSE / ALARM PAUSE key again",
+            "Resume all alarms"
+          ],
+          "expected": [
+            "All alarms should resume normal operation after double key press"
+          ]
+        },
+        {
+          "id": "TC-105",
+          "title": "Test High Severity Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause alarms"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-106",
+          "title": "Test High Severity Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        },
+        {
+          "id": "TC-107",
+          "title": "Test Medium Severity Alarm Resume Functionality with Different Pulse Count",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause auditory high severity alarm"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-108",
+          "title": "Test High Severity Alarm Resume Functionality with Different Pulse Count",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        },
+        {
+          "id": "TC-109",
+          "title": "Test Medium Severity Alarm Resume Functionality with Different Pulse Count",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm with different pulse count",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        },
+        {
+          "id": "TC-110",
+          "title": "Test Medium Severity Alarm Resume Functionality with Different Pulse Frequency",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause auditory high severity alarm with different pulse frequency"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-111",
+          "title": "Test High Severity Alarm Resume Functionality with Different Pulse Frequency",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm with different pulse frequency",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.60). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Medium Severity Alarm Color and Flashing Frequency",
+          "req_ids": [
+            "RW-SW-75"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "color": "yellow",
+            "flashingFrequency": "0.5Hz",
+            "dutyCycle": "50%"
+          },
+          "steps": [
+            "Set alarm color to yellow",
+            "Set flashing frequency to 0.5Hz with a 50% duty cycle"
+          ],
+          "expected": [
+            "Alarm should appear yellow and flash with the specified frequency and duty cycle"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test High Severity Alarm Auditory Signal with 10 Pulses",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pulseCount": 10,
+            "pulseDuration": "200ms",
+            "pulseFrequency": "500Hz"
+          },
+          "steps": [
+            "Activate high severity alarm",
+            "Play auditory signal with 10 pulses of 200ms duration each at 500Hz"
+          ],
+          "expected": [
+            "Alarm should emit 10 pulses at 500Hz with each pulse lasting 200ms"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test High Severity Alarm Auditory Signal with 4 Pulses",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "pulseCount": 4,
+            "pulseDuration": "200ms",
+            "pulseFrequency": "500Hz"
+          },
+          "steps": [
+            "Activate high severity alarm",
+            "Play auditory signal with 4 pulses of 200ms duration each at 500Hz"
+          ],
+          "expected": [
+            "Alarm should emit 4 pulses at 500Hz with each pulse lasting 200ms"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Pressure Low Alarm Activation",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pressure": "low"
+          },
+          "steps": [
+            "Detect low pressure",
+            "Activate pressure low alarm",
+            "Play auditory alarm sound",
+            "Display 'LOW INSP P' text"
+          ],
+          "expected": [
+            "Low pressure detected, alarm sounded, and 'LOW INSP P' displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Apnea Alarm Activation",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No breath detected within specified interval"
+          ],
+          "inputs": {},
+          "steps": [
+            "Detect lack of breath",
+            "Activate apnea alarm",
+            "Display 'APNEA ALARM' text"
+          ],
+          "expected": [
+            "Apnea alarm activated with 'APNEA ALARM' displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test High Breath Rate Alarm Activation",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "breathRate": "high"
+          },
+          "steps": [
+            "Detect high breath rate",
+            "Activate high breath rate alarm",
+            "Display 'HIGH BREATH RATE' text"
+          ],
+          "expected": [
+            "High breath rate detected, alarm activated with 'HIGH BREATH RATE' displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Medium Breath Rate Alarm Activation",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Breath rate within normal range"
+          ],
+          "inputs": {},
+          "steps": [
+            "Detect normal breath rate",
+            "Do not activate alarm"
+          ],
+          "expected": [
+            "No alarm should be activated as the breath rate is normal"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Pressure Low Alarm Pause Functionality",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause all auditory alarms",
+            "Maintain pause for 60 seconds",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume alarms"
+          ],
+          "expected": [
+            "All alarms should pause for 60 seconds and then resume normally"
+          ]
+        },
+        {
+          "id": "TC-101",
+          "title": "Test Medium Severity Alarm Pause Functionality",
+          "req_ids": [
+            "RW-SW-78"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause alarms"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-102",
+          "title": "Test Pressure Low Alarm Pause Functionality",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause all alarms",
+            "Maintain pause for less than 60 seconds",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume alarms"
+          ],
+          "expected": [
+            "Alarms should pause for the duration of the key press and then resume normally"
+          ]
+        },
+        {
+          "id": "TC-103",
+          "title": "Test Pressure Low Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure low alarm paused"
+          ],
+          "inputs": {},
+          "steps": [
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume all alarms"
+          ],
+          "expected": [
+            "Paused pressure low alarm should resume normal alarm operation"
+          ]
+        },
+        {
+          "id": "TC-104",
+          "title": "Test Medium Severity Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-78"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause all alarms",
+            "Press AUDIO PAUSE / ALARM PAUSE key again",
+            "Resume all alarms"
+          ],
+          "expected": [
+            "All alarms should resume normal operation after double key press"
+          ]
+        },
+        {
+          "id": "TC-105",
+          "title": "Test High Severity Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause alarms"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-106",
+          "title": "Test High Severity Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        },
+        {
+          "id": "TC-107",
+          "title": "Test Medium Severity Alarm Resume Functionality with Different Pulse Count",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause auditory high severity alarm"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-108",
+          "title": "Test High Severity Alarm Resume Functionality with Different Pulse Count",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        },
+        {
+          "id": "TC-109",
+          "title": "Test Medium Severity Alarm Resume Functionality with Different Pulse Count",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm with different pulse count",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        },
+        {
+          "id": "TC-110",
+          "title": "Test Medium Severity Alarm Resume Functionality with Different Pulse Frequency",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause auditory high severity alarm with different pulse frequency"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-111",
+          "title": "Test High Severity Alarm Resume Functionality with Different Pulse Frequency",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm with different pulse frequency",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.60). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Medium Severity Alarm Color and Flashing Frequency",
+          "req_ids": [
+            "RW-SW-75"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "color": "yellow",
+            "flashingFrequency": "0.5Hz",
+            "dutyCycle": "50%"
+          },
+          "steps": [
+            "Set alarm color to yellow",
+            "Set flashing frequency to 0.5Hz with a 50% duty cycle"
+          ],
+          "expected": [
+            "Alarm should appear yellow and flash with the specified frequency and duty cycle"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test High Severity Alarm Auditory Signal with 10 Pulses",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pulseCount": 10,
+            "pulseDuration": "200ms",
+            "pulseFrequency": "500Hz"
+          },
+          "steps": [
+            "Activate high severity alarm",
+            "Play auditory signal with 10 pulses of 200ms duration each at 500Hz"
+          ],
+          "expected": [
+            "Alarm should emit 10 pulses at 500Hz with each pulse lasting 200ms"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test High Severity Alarm Auditory Signal with 4 Pulses",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "pulseCount": 4,
+            "pulseDuration": "200ms",
+            "pulseFrequency": "500Hz"
+          },
+          "steps": [
+            "Activate high severity alarm",
+            "Play auditory signal with 4 pulses of 200ms duration each at 500Hz"
+          ],
+          "expected": [
+            "Alarm should emit 4 pulses at 500Hz with each pulse lasting 200ms"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Pressure Low Alarm Activation",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pressure": "low"
+          },
+          "steps": [
+            "Detect low pressure",
+            "Activate pressure low alarm",
+            "Play auditory alarm sound",
+            "Display 'LOW INSP P' text"
+          ],
+          "expected": [
+            "Low pressure detected, alarm sounded, and 'LOW INSP P' displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Apnea Alarm Activation",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No breath detected within specified interval"
+          ],
+          "inputs": {},
+          "steps": [
+            "Detect lack of breath",
+            "Activate apnea alarm",
+            "Display 'APNEA ALARM' text"
+          ],
+          "expected": [
+            "Apnea alarm activated with 'APNEA ALARM' displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test High Breath Rate Alarm Activation",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "breathRate": "high"
+          },
+          "steps": [
+            "Detect high breath rate",
+            "Activate high breath rate alarm",
+            "Display 'HIGH BREATH RATE' text"
+          ],
+          "expected": [
+            "High breath rate detected, alarm activated with 'HIGH BREATH RATE' displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Medium Breath Rate Alarm Activation",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Breath rate within normal range"
+          ],
+          "inputs": {},
+          "steps": [
+            "Detect normal breath rate",
+            "Do not activate alarm"
+          ],
+          "expected": [
+            "No alarm should be activated as the breath rate is normal"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Pressure Low Alarm Pause Functionality",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause all auditory alarms",
+            "Maintain pause for 60 seconds",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume alarms"
+          ],
+          "expected": [
+            "All alarms should pause for 60 seconds and then resume normally"
+          ]
+        },
+        {
+          "id": "TC-101",
+          "title": "Test Medium Severity Alarm Pause Functionality",
+          "req_ids": [
+            "RW-SW-78"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause alarms"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-102",
+          "title": "Test Pressure Low Alarm Pause Functionality",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause all alarms",
+            "Maintain pause for less than 60 seconds",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume alarms"
+          ],
+          "expected": [
+            "Alarms should pause for the duration of the key press and then resume normally"
+          ]
+        },
+        {
+          "id": "TC-103",
+          "title": "Test Pressure Low Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure low alarm paused"
+          ],
+          "inputs": {},
+          "steps": [
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume all alarms"
+          ],
+          "expected": [
+            "Paused pressure low alarm should resume normal alarm operation"
+          ]
+        },
+        {
+          "id": "TC-104",
+          "title": "Test Medium Severity Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-78"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause all alarms",
+            "Press AUDIO PAUSE / ALARM PAUSE key again",
+            "Resume all alarms"
+          ],
+          "expected": [
+            "All alarms should resume normal operation after double key press"
+          ]
+        },
+        {
+          "id": "TC-105",
+          "title": "Test High Severity Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause alarms"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-106",
+          "title": "Test High Severity Alarm Resume Functionality",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        },
+        {
+          "id": "TC-107",
+          "title": "Test Medium Severity Alarm Resume Functionality with Different Pulse Count",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause auditory high severity alarm"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-108",
+          "title": "Test High Severity Alarm Resume Functionality with Different Pulse Count",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        },
+        {
+          "id": "TC-109",
+          "title": "Test Medium Severity Alarm Resume Functionality with Different Pulse Count",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm with different pulse count",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        },
+        {
+          "id": "TC-110",
+          "title": "Test Medium Severity Alarm Resume Functionality with Different Pulse Frequency",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Do not press AUDIO PAUSE / ALARM PAUSE key",
+            "Do not pause auditory high severity alarm with different pulse frequency"
+          ],
+          "expected": [
+            "No pause should occur as the key was not pressed"
+          ]
+        },
+        {
+          "id": "TC-111",
+          "title": "Test High Severity Alarm Resume Functionality with Different Pulse Frequency",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Press AUDIO PAUSE / ALARM PAUSE key pressed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Press AUDIO PAUSE / ALARM PAUSE key",
+            "Pause auditory high severity alarm with different pulse frequency",
+            "Release AUDIO PAUSE / ALARM PAUSE key",
+            "Resume auditory high severity alarm"
+          ],
+          "expected": [
+            "High severity alarm should pause and then resume normal operation after key release"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    }
+  ]
+}

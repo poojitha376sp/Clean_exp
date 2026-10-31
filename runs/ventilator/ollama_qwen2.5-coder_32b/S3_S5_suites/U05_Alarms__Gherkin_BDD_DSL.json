@@ -1,0 +1,1102 @@
+{
+  "unit_id": "U05_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.375,
+    "oracle_assertiveness": 0.35,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.5882,
+    "hallucinated": [
+      {
+        "value": "79",
+        "context": "tidal volume threshold",
+        "grounded": false
+      },
+      {
+        "value": "3001",
+        "context": "tidal volume threshold",
+        "grounded": false
+      },
+      {
+        "value": "85",
+        "context": "tidal volume threshold",
+        "grounded": false
+      },
+      {
+        "value": "2995",
+        "context": "tidal volume threshold",
+        "grounded": false
+      },
+      {
+        "value": "151",
+        "context": "leakage threshold",
+        "grounded": false
+      },
+      {
+        "value": "system is running",
+        "context": "system state",
+        "grounded": false
+      },
+      {
+        "value": "an alarm is active",
+        "context": "alarm state",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 17,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Increase oracle assertiveness by checking concrete log entries or alarm IDs rather than generic descriptions",
+      "Add explicit checks for event log content (e.g., timestamp, alarm type)",
+      "Include negative tests for GUI actions (e.g., inhibiting an already inhibited alarm)",
+      "Verify that tidal volume increments of 10 ml are enforced (e.g., test 90 ml)",
+      "Add boundary tests for PIP threshold increments if applicable"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.747,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Alarm Management and Event Logging\n\n  Scenario: Event log includes all alarm occurrences\n    Given the system is running\n    When an alarm occurs\n    Then the event log should include the alarm occurrence\n\n  Scenario: Event log includes all alarm inhibitions\n    Given the system is running\n    And an alarm is active\n    When the alarm is inhibited\n    Then the event log should include the alarm inhibition\n\n  Scenario: Event log includes all alarm cancellations\n    Given the system is running\n    And an alarm is active\n    When the alarm is cancelled\n    Then the event log should include the alarm cancellation\n\n  Scenario: Event log includes all alarm resets\n    Given the system is running\n    And an alarm is active\n    When the alarm is reset\n    Then the event log should include the alarm reset\n\n  Scenario: Event log includes all alarm acknowledgements\n    Given the system is running\n    And an alarm is active\n    When the alarm is acknowledged\n    Then the event log should include the alarm acknowledgement\n\n  Scenario: GUI allows inhibiting alarms\n    Given the system is running\n    And an alarm is active\n    When the user inhibits the alarm\n    Then the alarm should be inhibited\n\n  Scenario: GUI allows acknowledging alarms\n    Given the system is running\n    And an alarm is active\n    When the user acknowledges the alarm\n    Then the alarm should be acknowledged\n\n  Scenario: GUI allows cancelling alarms\n    Given the system is running\n    And an alarm is active\n    When the user cancels the alarm\n    Then the alarm should be cancelled\n\n  Scenario Outline: GUI allows setting an alarm on inspiration tidal volume above threshold\n    Given the system is running\n    When the user sets an alarm on inspiration tidal volume above <threshold> ml\n    Then the alarm should be set with a threshold of <threshold> ml\n    Examples:\n      | threshold |\n      | 80        |  # Normal value\n      | 3000      |  # Normal value\n      | 79        |  # Below lower bound\n      | 3001      |  # Above upper bound\n      | 85        |  # Edge value\n      | 2995      |  # Edge value\n\n  Scenario Outline: GUI has an alarm that fires if for 3 consecutive breaths PIP > user-specified threshold\n    Given the system is running\n    And the user sets a PIP alarm threshold of <threshold> cmH2O\n    When the PIP exceeds <threshold> cmH2O for <breaths> consecutive breaths\n    Then the PIP alarm should <fire_or_not>\n    Examples:\n      | threshold | breaths | fire_or_not |\n      | 20        | 3       | fire        |  # Normal value\n      | 20        | 2       | not fire    |  # Below threshold\n      | 20        | 4       | fire        |  # Above threshold\n\n  Scenario Outline: GUI has an alarm that fires if amount of leakage is > user-specified threshold\n    Given the system is running\n    And the user sets a leakage alarm threshold of <threshold> lpm\n    When the leakage exceeds <threshold> lpm\n    Then the leakage alarm should <fire_or_not>\n    Examples:\n      | threshold | fire_or_not |\n      | 5         | fire        |  # Normal value\n      | 150       | fire        |  # Normal value\n      | 4         | not fire    |  # Below lower bound\n      | 151       | not fire    |  # Above upper bound\n      | 6         | fire        |  # Edge value\n      | 149       | fire        |  # Edge value",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Event log includes all alarm occurrences",
+      "req_ids": [
+        "RW-SW-27"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {},
+      "steps": [
+        "an alarm occurs"
+      ],
+      "expected": [
+        "the event log should include the alarm occurrence"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Event log includes all alarm inhibitions",
+      "req_ids": [
+        "RW-SW-28"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running",
+        "an alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the alarm is inhibited"
+      ],
+      "expected": [
+        "the event log should include the alarm inhibition"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Event log includes all alarm cancellations",
+      "req_ids": [
+        "RW-SW-28"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running",
+        "an alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the alarm is cancelled"
+      ],
+      "expected": [
+        "the event log should include the alarm cancellation"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Event log includes all alarm resets",
+      "req_ids": [
+        "RW-SW-28"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running",
+        "an alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the alarm is reset"
+      ],
+      "expected": [
+        "the event log should include the alarm reset"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Event log includes all alarm acknowledgements",
+      "req_ids": [
+        "RW-SW-28"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running",
+        "an alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the alarm is acknowledged"
+      ],
+      "expected": [
+        "the event log should include the alarm acknowledgement"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "GUI allows inhibiting alarms",
+      "req_ids": [
+        "RW-SW-31"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running",
+        "an alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the user inhibits the alarm"
+      ],
+      "expected": [
+        "the alarm should be inhibited"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "GUI allows acknowledging alarms",
+      "req_ids": [
+        "RW-SW-32"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running",
+        "an alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the user acknowledges the alarm"
+      ],
+      "expected": [
+        "the alarm should be acknowledged"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "GUI allows cancelling alarms",
+      "req_ids": [
+        "RW-SW-33"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running",
+        "an alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the user cancels the alarm"
+      ],
+      "expected": [
+        "the alarm should be cancelled"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+      "req_ids": [
+        "RW-SW-39"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "80"
+      },
+      "steps": [
+        "the user sets an alarm on inspiration tidal volume above 80 ml"
+      ],
+      "expected": [
+        "the alarm should be set with a threshold of 80 ml"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+      "req_ids": [
+        "RW-SW-39"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "3000"
+      },
+      "steps": [
+        "the user sets an alarm on inspiration tidal volume above 3000 ml"
+      ],
+      "expected": [
+        "the alarm should be set with a threshold of 3000 ml"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+      "req_ids": [
+        "RW-SW-39"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "79"
+      },
+      "steps": [
+        "the user sets an alarm on inspiration tidal volume above 79 ml"
+      ],
+      "expected": [
+        "the alarm should not be set"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+      "req_ids": [
+        "RW-SW-39"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "3001"
+      },
+      "steps": [
+        "the user sets an alarm on inspiration tidal volume above 3001 ml"
+      ],
+      "expected": [
+        "the alarm should not be set"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+      "req_ids": [
+        "RW-SW-39"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "85"
+      },
+      "steps": [
+        "the user sets an alarm on inspiration tidal volume above 85 ml"
+      ],
+      "expected": [
+        "the alarm should be set with a threshold of 85 ml"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+      "req_ids": [
+        "RW-SW-39"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "2995"
+      },
+      "steps": [
+        "the user sets an alarm on inspiration tidal volume above 2995 ml"
+      ],
+      "expected": [
+        "the alarm should be set with a threshold of 2995 ml"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "GUI has an alarm that fires if for 3 consecutive breaths PIP > user-specified threshold",
+      "req_ids": [
+        "RW-SW-42"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "20",
+        "breaths": "3"
+      },
+      "steps": [
+        "the user sets a PIP alarm threshold of 20 cmH2O",
+        "the PIP exceeds 20 cmH2O for 3 consecutive breaths"
+      ],
+      "expected": [
+        "the PIP alarm should fire"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "GUI has an alarm that fires if for 3 consecutive breaths PIP > user-specified threshold",
+      "req_ids": [
+        "RW-SW-42"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "20",
+        "breaths": "2"
+      },
+      "steps": [
+        "the user sets a PIP alarm threshold of 20 cmH2O",
+        "the PIP exceeds 20 cmH2O for 2 consecutive breaths"
+      ],
+      "expected": [
+        "the PIP alarm should not fire"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "GUI has an alarm that fires if for 3 consecutive breaths PIP > user-specified threshold",
+      "req_ids": [
+        "RW-SW-42"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "20",
+        "breaths": "4"
+      },
+      "steps": [
+        "the user sets a PIP alarm threshold of 20 cmH2O",
+        "the PIP exceeds 20 cmH2O for 4 consecutive breaths"
+      ],
+      "expected": [
+        "the PIP alarm should fire"
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+      "req_ids": [
+        "RW-SW-44"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "5"
+      },
+      "steps": [
+        "the user sets a leakage alarm threshold of 5 lpm",
+        "the leakage exceeds 5 lpm"
+      ],
+      "expected": [
+        "the leakage alarm should fire"
+      ]
+    },
+    {
+      "id": "TC-019",
+      "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+      "req_ids": [
+        "RW-SW-44"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "150"
+      },
+      "steps": [
+        "the user sets a leakage alarm threshold of 150 lpm",
+        "the leakage exceeds 150 lpm"
+      ],
+      "expected": [
+        "the leakage alarm should fire"
+      ]
+    },
+    {
+      "id": "TC-020",
+      "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+      "req_ids": [
+        "RW-SW-44"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "4"
+      },
+      "steps": [
+        "the user sets a leakage alarm threshold of 4 lpm",
+        "the leakage exceeds 4 lpm"
+      ],
+      "expected": [
+        "the leakage alarm should not fire"
+      ]
+    },
+    {
+      "id": "TC-021",
+      "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+      "req_ids": [
+        "RW-SW-44"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "151"
+      },
+      "steps": [
+        "the user sets a leakage alarm threshold of 151 lpm",
+        "the leakage exceeds 151 lpm"
+      ],
+      "expected": [
+        "the leakage alarm should not fire"
+      ]
+    },
+    {
+      "id": "TC-022",
+      "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+      "req_ids": [
+        "RW-SW-44"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "6"
+      },
+      "steps": [
+        "the user sets a leakage alarm threshold of 6 lpm",
+        "the leakage exceeds 6 lpm"
+      ],
+      "expected": [
+        "the leakage alarm should fire"
+      ]
+    },
+    {
+      "id": "TC-023",
+      "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+      "req_ids": [
+        "RW-SW-44"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the system is running"
+      ],
+      "inputs": {
+        "threshold": "149"
+      },
+      "steps": [
+        "the user sets a leakage alarm threshold of 149 lpm",
+        "the leakage exceeds 149 lpm"
+      ],
+      "expected": [
+        "the leakage alarm should fire"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarm Management and Event Logging\n\n  Scenario: Event log includes all alarm occurrences\n    Given the system is running\n    When an alarm occurs\n    Then the event log should include the alarm occurrence\n\n  Scenario: Event log includes all alarm inhibitions\n    Given the system is running\n    And an alarm is active\n    When the alarm is inhibited\n    Then the event log should include the alarm inhibition\n\n  Scenario: Event log includes all alarm cancellations\n    Given the system is running\n    And an alarm is active\n    When the alarm is cancelled\n    Then the event log should include the alarm cancellation\n\n  Scenario: Event log includes all alarm resets\n    Given the system is running\n    And an alarm is active\n    When the alarm is reset\n    Then the event log should include the alarm reset\n\n  Scenario: Event log includes all alarm acknowledgements\n    Given the system is running\n    And an alarm is active\n    When the alarm is acknowledged\n    Then the event log should include the alarm acknowledgement\n\n  Scenario: GUI allows inhibiting alarms\n    Given the system is running\n    And an alarm is active\n    When the user inhibits the alarm\n    Then the alarm should be inhibited\n\n  Scenario: GUI allows acknowledging alarms\n    Given the system is running\n    And an alarm is active\n    When the user acknowledges the alarm\n    Then the alarm should be acknowledged\n\n  Scenario: GUI allows cancelling alarms\n    Given the system is running\n    And an alarm is active\n    When the user cancels the alarm\n    Then the alarm should be cancelled\n\n  Scenario Outline: GUI allows setting an alarm on inspiration tidal volume above threshold\n    Given the system is running\n    When the user sets an alarm on inspiration tidal volume above <threshold> ml\n    Then the alarm should be set with a threshold of <threshold> ml\n    Examples:\n      | threshold |\n      | 80        |  # Normal value\n      | 3000      |  # Normal value\n      | 79        |  # Below lower bound\n      | 3001      |  # Above upper bound\n      | 85        |  # Edge value\n      | 2995      |  # Edge value\n\n  Scenario Outline: GUI has an alarm that fires if for 3 consecutive breaths PIP > user-specified threshold\n    Given the system is running\n    And the user sets a PIP alarm threshold of <threshold> cmH2O\n    When the PIP exceeds <threshold> cmH2O for <breaths> consecutive breaths\n    Then the PIP alarm should <fire_or_not>\n    Examples:\n      | threshold | breaths | fire_or_not |\n      | 20        | 3       | fire        |  # Normal value\n      | 20        | 2       | not fire    |  # Below threshold\n      | 20        | 4       | fire        |  # Above threshold\n\n  Scenario Outline: GUI has an alarm that fires if amount of leakage is > user-specified threshold\n    Given the system is running\n    And the user sets a leakage alarm threshold of <threshold> lpm\n    When the leakage exceeds <threshold> lpm\n    Then the leakage alarm should <fire_or_not>\n    Examples:\n      | threshold | fire_or_not |\n      | 5         | fire        |  # Normal value\n      | 150       | fire        |  # Normal value\n      | 4         | not fire    |  # Below lower bound\n      | 151       | not fire    |  # Above upper bound\n      | 6         | fire        |  # Edge value\n      | 149       | fire        |  # Edge value",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Event log includes all alarm occurrences",
+          "req_ids": [
+            "RW-SW-27"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {},
+          "steps": [
+            "an alarm occurs"
+          ],
+          "expected": [
+            "the event log should include the alarm occurrence"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Event log includes all alarm inhibitions",
+          "req_ids": [
+            "RW-SW-28"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running",
+            "an alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the alarm is inhibited"
+          ],
+          "expected": [
+            "the event log should include the alarm inhibition"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Event log includes all alarm cancellations",
+          "req_ids": [
+            "RW-SW-28"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running",
+            "an alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the alarm is cancelled"
+          ],
+          "expected": [
+            "the event log should include the alarm cancellation"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Event log includes all alarm resets",
+          "req_ids": [
+            "RW-SW-28"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running",
+            "an alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the alarm is reset"
+          ],
+          "expected": [
+            "the event log should include the alarm reset"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Event log includes all alarm acknowledgements",
+          "req_ids": [
+            "RW-SW-28"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running",
+            "an alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the alarm is acknowledged"
+          ],
+          "expected": [
+            "the event log should include the alarm acknowledgement"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI allows inhibiting alarms",
+          "req_ids": [
+            "RW-SW-31"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running",
+            "an alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the user inhibits the alarm"
+          ],
+          "expected": [
+            "the alarm should be inhibited"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI allows acknowledging alarms",
+          "req_ids": [
+            "RW-SW-32"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running",
+            "an alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the user acknowledges the alarm"
+          ],
+          "expected": [
+            "the alarm should be acknowledged"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI allows cancelling alarms",
+          "req_ids": [
+            "RW-SW-33"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running",
+            "an alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the user cancels the alarm"
+          ],
+          "expected": [
+            "the alarm should be cancelled"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+          "req_ids": [
+            "RW-SW-39"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "80"
+          },
+          "steps": [
+            "the user sets an alarm on inspiration tidal volume above 80 ml"
+          ],
+          "expected": [
+            "the alarm should be set with a threshold of 80 ml"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+          "req_ids": [
+            "RW-SW-39"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "3000"
+          },
+          "steps": [
+            "the user sets an alarm on inspiration tidal volume above 3000 ml"
+          ],
+          "expected": [
+            "the alarm should be set with a threshold of 3000 ml"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+          "req_ids": [
+            "RW-SW-39"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "79"
+          },
+          "steps": [
+            "the user sets an alarm on inspiration tidal volume above 79 ml"
+          ],
+          "expected": [
+            "the alarm should not be set"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+          "req_ids": [
+            "RW-SW-39"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "3001"
+          },
+          "steps": [
+            "the user sets an alarm on inspiration tidal volume above 3001 ml"
+          ],
+          "expected": [
+            "the alarm should not be set"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+          "req_ids": [
+            "RW-SW-39"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "85"
+          },
+          "steps": [
+            "the user sets an alarm on inspiration tidal volume above 85 ml"
+          ],
+          "expected": [
+            "the alarm should be set with a threshold of 85 ml"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "GUI allows setting an alarm on inspiration tidal volume above threshold",
+          "req_ids": [
+            "RW-SW-39"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "2995"
+          },
+          "steps": [
+            "the user sets an alarm on inspiration tidal volume above 2995 ml"
+          ],
+          "expected": [
+            "the alarm should be set with a threshold of 2995 ml"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "GUI has an alarm that fires if for 3 consecutive breaths PIP > user-specified threshold",
+          "req_ids": [
+            "RW-SW-42"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "20",
+            "breaths": "3"
+          },
+          "steps": [
+            "the user sets a PIP alarm threshold of 20 cmH2O",
+            "the PIP exceeds 20 cmH2O for 3 consecutive breaths"
+          ],
+          "expected": [
+            "the PIP alarm should fire"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "GUI has an alarm that fires if for 3 consecutive breaths PIP > user-specified threshold",
+          "req_ids": [
+            "RW-SW-42"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "20",
+            "breaths": "2"
+          },
+          "steps": [
+            "the user sets a PIP alarm threshold of 20 cmH2O",
+            "the PIP exceeds 20 cmH2O for 2 consecutive breaths"
+          ],
+          "expected": [
+            "the PIP alarm should not fire"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "GUI has an alarm that fires if for 3 consecutive breaths PIP > user-specified threshold",
+          "req_ids": [
+            "RW-SW-42"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "20",
+            "breaths": "4"
+          },
+          "steps": [
+            "the user sets a PIP alarm threshold of 20 cmH2O",
+            "the PIP exceeds 20 cmH2O for 4 consecutive breaths"
+          ],
+          "expected": [
+            "the PIP alarm should fire"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+          "req_ids": [
+            "RW-SW-44"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "5"
+          },
+          "steps": [
+            "the user sets a leakage alarm threshold of 5 lpm",
+            "the leakage exceeds 5 lpm"
+          ],
+          "expected": [
+            "the leakage alarm should fire"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+          "req_ids": [
+            "RW-SW-44"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "150"
+          },
+          "steps": [
+            "the user sets a leakage alarm threshold of 150 lpm",
+            "the leakage exceeds 150 lpm"
+          ],
+          "expected": [
+            "the leakage alarm should fire"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+          "req_ids": [
+            "RW-SW-44"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "4"
+          },
+          "steps": [
+            "the user sets a leakage alarm threshold of 4 lpm",
+            "the leakage exceeds 4 lpm"
+          ],
+          "expected": [
+            "the leakage alarm should not fire"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+          "req_ids": [
+            "RW-SW-44"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "151"
+          },
+          "steps": [
+            "the user sets a leakage alarm threshold of 151 lpm",
+            "the leakage exceeds 151 lpm"
+          ],
+          "expected": [
+            "the leakage alarm should not fire"
+          ]
+        },
+        {
+          "id": "TC-022",
+          "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+          "req_ids": [
+            "RW-SW-44"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "6"
+          },
+          "steps": [
+            "the user sets a leakage alarm threshold of 6 lpm",
+            "the leakage exceeds 6 lpm"
+          ],
+          "expected": [
+            "the leakage alarm should fire"
+          ]
+        },
+        {
+          "id": "TC-023",
+          "title": "GUI has an alarm that fires if amount of leakage is > user-specified threshold",
+          "req_ids": [
+            "RW-SW-44"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is running"
+          ],
+          "inputs": {
+            "threshold": "149"
+          },
+          "steps": [
+            "the user sets a leakage alarm threshold of 149 lpm",
+            "the leakage exceeds 149 lpm"
+          ],
+          "expected": [
+            "the leakage alarm should fire"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.375,
+        "oracle_assertiveness": 0.35,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.5882,
+        "hallucinated": [
+          {
+            "value": "79",
+            "context": "tidal volume threshold",
+            "grounded": false
+          },
+          {
+            "value": "3001",
+            "context": "tidal volume threshold",
+            "grounded": false
+          },
+          {
+            "value": "85",
+            "context": "tidal volume threshold",
+            "grounded": false
+          },
+          {
+            "value": "2995",
+            "context": "tidal volume threshold",
+            "grounded": false
+          },
+          {
+            "value": "151",
+            "context": "leakage threshold",
+            "grounded": false
+          },
+          {
+            "value": "system is running",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "an alarm is active",
+            "context": "alarm state",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Increase oracle assertiveness by checking concrete log entries or alarm IDs rather than generic descriptions",
+          "Add explicit checks for event log content (e.g., timestamp, alarm type)",
+          "Include negative tests for GUI actions (e.g., inhibiting an already inhibited alarm)",
+          "Verify that tidal volume increments of 10 ml are enforced (e.g., test 90 ml)",
+          "Add boundary tests for PIP threshold increments if applicable"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.747,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

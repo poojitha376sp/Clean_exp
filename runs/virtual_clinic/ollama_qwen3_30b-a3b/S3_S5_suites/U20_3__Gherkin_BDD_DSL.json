@@ -1,0 +1,109 @@
+{
+  "unit_id": "U20_3",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen3:30b-a3b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 0.0,
+    "representation_score": 0.0,
+    "sfv_score": 0.0,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "No canonical test cases found (expected a JSON list).",
+      "Representation artifact is empty."
+    ]
+  },
+  "fsa": null,
+  "artifact": null,
+  "test_cases": null,
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given 8 requirements (VIRTUA-3-9 to VIRTUA-3-16). We must create a test suite in Gherkin (BDD DSL) and a corresponding JSON test case list.\n\nImportant: \n- Every requirement must map to at least one scenario (or scenario outline with examples).\n- We must cover normal, edge, and invalid values (for requirements that have such boundaries).\n- We cannot invent specific values (like exact pincode, exact file size, etc.) unless specified in the requirement. If unspecified, we use \"as specified\" or the requirement's own numbers.\n\nLet's break down each requirement and plan the scenarios:\n\n1. VIRTUA-3-9: All Lab requests shall be routed to the Laboratory after matching the Patient Pincode.\n   - We need to test:\n        - Normal: Request with a pincode that matches (so routed to lab).\n        - Edge: Pincode at the boundary (if pincode is 6 digits, then 000000 and 999999? But requirement doesn't specify pincode length, so we assume it's a standard 6-digit. However, the requirement doesn't specify, so we'll use \"valid pincode\" as per requirement and not invent. But note: the requirement says \"matching\", so we can have a valid pincode and an invalid one).\n        - Invalid: Pincode that doesn't match (so not routed? or error? requirement doesn't say, but we can assume it's not routed).\n\n   However, note: the requirement says \"after matching\", meaning if it matches, it's routed. So if it doesn't match, it shouldn't be routed? But the requirement doesn't specify what happens on mismatch. We'll test for the matching case (normal) and non-matching (invalid) as negative.\n\n   But note: the requirement is about routing when matching. So we can have:\n        - Scenario: Lab request with matching pincode is routed to lab.\n        - Scenario: Lab request with non-matching pincode is not routed to lab.\n\n   However, the requirement doesn't say what happens on non-matching, so we can only test the matching case as positive and non-matching as negative (but we must be cautious: the requirement doesn't say non-matching is an error, but we can assume that the system would not route it).\n\n2. VIRTUA-3-10: Lab personnel shall make appointments and perform home collection of specimen.\n   - This is about the lab personnel's action. We don't have a specific input, so we can test:\n        - Normal: Lab personnel can make an appointment and perform home collection (we can simulate a successful appointment creation and home collection).\n        - But note: the requirement doesn't specify any input constraints, so we don't have boundaries. We'll test a positive scenario.\n\n   However, the requirement says \"shall\", meaning it must be possible. So we can have a scenario that checks that the lab personnel can make an appointment and perform home collection (without any specific input, so we'll assume the system allows it).\n\n   But note: the requirement doesn't specify any conditions, so we'll have a positive scenario.\n\n3. VIRTUA-3-11: This will be offline, also, they will email or ",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given a set of requirements (VIRTUA-3-9 to VIRTUA-3-16) and we must write a Gherkin test suite that covers each requirement with at least one scenario.\n Additionally, we must provide a JSON representation of the test cases.\n\n Important: The previous attempt failed because:\n   - No canonical test cases found (expected a JSON list).\n   - Representation artifact is empty.\n\n We must fix by:\n   - Writing a Gherkin feature file (with scenarios) that covers each requirement.\n   - Providing a JSON array of test cases (with the same test cases as in the Gherkin) in the specified format.\n\n Steps:\n 1. We'll create a Gherkin feature file that has one scenario per requirement (or group related ones if they are about the same flow, but note: each requirement must be covered by at least one scenario).\n    However, note that the requirements are about different parts of the system (Lab requests, Patient uploads, Doctor routing, etc.). So we'll have separate scenarios.\n\n 2. We must have a Scenario Outline for the test cases that require multiple examples (like normal, edge, invalid). But note: the requirements have specific constraints (e.g., 5 reports, 1 MB size, etc.) so we'll use Scenario Outlines for those.\n\n 3. We are to output two blocks: one for the Gherkin artifact and one for the JSON.\n\n 4. The JSON must have:\n      - id: TC-001, TC-002, ... (in order of appearance in the Gherkin)\n      - title: a short title for the test case\n      - req_ids: an array of the requirement IDs that this test case covers (note: one test case might cover multiple requirements? But the problem says \"every requirement clause maps to a unique scenario\", so we'll have one scenario per requirement. However, note that requirement VIRTUA-3-12 has multiple constraints (5 reports, 1 MB) so we might break it into multiple test cases? But the problem says \"unique scenario\" per requirement. So we'll have one scenario per requirement, but for VIRTUA-3-12 we'll have a scenario that covers the constraints by using a Scenario Outline with examples for normal, edge, and invalid.\n\n 5. However, note: the problem says \"The test set must contain a Scenario Outline with Examples tables containing normal, edge, and invalid values.\" So we must have at least one Scenario Outline (for the requirement that has multiple values to test, like VIRTUA-3-12). But note: VIRTUA-3-12 is the only one that has a count and size constraint.\n\n 6. Let's break down the requirements:\n\n    VIRTUA-3-9: Lab requests routed after matching Patient Pincode.\n        - We can test with a valid pincode (normal) and an invalid pincode (negative) but note: the requirement says \"after matching\", so we are testing that the routing happens when the pincode matches. We don't have a requirement for what happens when it doesn't match? But the requirement doesn't specify error handling. However, the problem says \"negative / error paths\", so we must test an invalid pincode (which would not route the request?).\n\n    VIRTUA-3-10: L",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given a set of requirements (VIRTUA-3-9 to VIRTUA-3-16) and we must write a Gherkin test suite that covers each requirement with at least one scenario.\n Additionally, we must provide a JSON representation of the test cases.\n\n Important: The previous attempt failed because:\n   - No canonical test cases found (expected a JSON list).\n   - Representation artifact is empty.\n\n We must fix by:\n   - Writing a Gherkin feature file (with scenarios) that covers each requirement.\n   - Providing a JSON array of test cases (with the same test cases as in the Gherkin) in the specified format.\n\n Steps:\n 1. We'll create a Gherkin feature file that has one scenario per requirement (or group related ones if they are about the same flow, but note: each requirement must be covered by at least one scenario).\n    However, note that the requirements are about different parts of the system (Lab requests, Patient uploads, Doctor routing, etc.). So we'll have separate scenarios.\n\n 2. We must have a Scenario Outline for the test cases that require multiple examples (like normal, edge, invalid). But note: the requirements have specific constraints (e.g., 5 reports, 1 MB size, etc.) so we'll use Scenario Outlines for those.\n\n 3. We are to output two blocks: one for the Gherkin artifact and one for the JSON.\n\n 4. The JSON must have:\n      - id: TC-001, TC-002, ... (in order of appearance in the Gherkin)\n      - title: a short title for the test case\n      - req_ids: an array of the requirement IDs that this test case covers (note: one test case might cover multiple requirements? But the problem says \"every requirement clause maps to a unique scenario\", so we'll have one scenario per requirement. However, note that requirement VIRTUA-3-12 has multiple constraints (5 reports, 1 MB) so we might break it into multiple test cases? But the problem says \"unique scenario\" per requirement. So we'll have one scenario per requirement, but for VIRTUA-3-12 we'll have a scenario that covers the constraints by using a Scenario Outline with examples for normal, edge, and invalid.\n\n 5. However, note: the problem says \"The test set must contain a Scenario Outline with Examples tables containing normal, edge, and invalid values.\" So we must have at least one Scenario Outline (for the requirement that has multiple values to test, like VIRTUA-3-12). But note: VIRTUA-3-12 is the only one that has a count and size constraint.\n\n 6. Let's break down the requirements:\n\n    VIRTUA-3-9: Lab requests routed after matching Patient Pincode.\n        - We can test with a valid pincode (normal) and an invalid pincode (negative) but note: the requirement says \"after matching\", so we are testing that the routing happens when the pincode matches. We don't have a requirement for what happens when it doesn't match? But the requirement doesn't specify error handling. However, the problem says \"negative / error paths\", so we must test an invalid pincode (which would not route the request?).\n\n    VIRTUA-3-10: L",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given a set of requirements (VIRTUA-3-9 to VIRTUA-3-16) and we must write a Gherkin test suite that covers each requirement with at least one scenario.\n Additionally, we must provide a JSON representation of the test cases.\n\n Important: The previous attempt failed because:\n   - No canonical test cases found (expected a JSON list).\n   - Representation artifact is empty.\n\n We must fix by:\n   - Writing a Gherkin feature file (with scenarios) that covers each requirement.\n   - Providing a JSON array of test cases (with the same test cases as in the Gherkin) in the specified format.\n\n Steps:\n 1. We'll create a Gherkin feature file that has one scenario per requirement (or group related ones if they are about the same flow, but note: each requirement must be covered by at least one scenario).\n    However, note that the requirements are about different parts of the system (Lab requests, Patient uploads, Doctor routing, etc.). So we'll have separate scenarios.\n\n 2. We must have a Scenario Outline for the test cases that require multiple examples (like normal, edge, invalid). But note: the requirements have specific constraints (e.g., 5 reports, 1 MB size, etc.) so we'll use Scenario Outlines for those.\n\n 3. We are to output two blocks: one for the Gherkin artifact and one for the JSON.\n\n 4. The JSON must have:\n      - id: TC-001, TC-002, ... (in order of appearance in the Gherkin)\n      - title: a short title for the test case\n      - req_ids: an array of the requirement IDs that this test case covers (note: one test case might cover multiple requirements? But the problem says \"every requirement clause maps to a unique scenario\", so we'll have one scenario per requirement. However, note that requirement VIRTUA-3-12 has multiple constraints (5 reports, 1 MB) so we might break it into multiple test cases? But the problem says \"unique scenario\" per requirement. So we'll have one scenario per requirement, but for VIRTUA-3-12 we'll have a scenario that covers the constraints by using a Scenario Outline with examples for normal, edge, and invalid.\n\n 5. However, note: the problem says \"The test set must contain a Scenario Outline with Examples tables containing normal, edge, and invalid values.\" So we must have at least one Scenario Outline (for the requirement that has multiple values to test, like VIRTUA-3-12). But note: VIRTUA-3-12 is the only one that has a count and size constraint.\n\n 6. Let's break down the requirements:\n\n    VIRTUA-3-9: Lab requests routed after matching Patient Pincode.\n        - We can test with a valid pincode (normal) and an invalid pincode (negative) but note: the requirement says \"after matching\", so we are testing that the routing happens when the pincode matches. We don't have a requirement for what happens when it doesn't match? But the requirement doesn't specify error handling. However, the problem says \"negative / error paths\", so we must test an invalid pincode (which would not route the request?).\n\n    VIRTUA-3-10: L",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,1473 @@
+{
+  "unit_id": "U17_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "standard",
+  "n_attempts": 3,
+  "repairs_used": 2,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.86,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "1234",
+        "context": "PinCode",
+        "grounded": false
+      },
+      {
+        "value": "5678",
+        "context": "PinCode",
+        "grounded": false
+      },
+      {
+        "value": "invalid_pin",
+        "context": "PinCode",
+        "grounded": false
+      },
+      {
+        "value": "12345",
+        "context": "PinCode",
+        "grounded": false
+      },
+      {
+        "value": "abcdef",
+        "context": "PinCode",
+        "grounded": false
+      },
+      {
+        "value": "Doctor1",
+        "context": "Doctor name",
+        "grounded": false
+      },
+      {
+        "value": "Specialty1",
+        "context": "Specialty name",
+        "grounded": false
+      },
+      {
+        "value": "Patient1",
+        "context": "Patient name",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 8,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add scenario outlines with normal, edge, and invalid values for each requirement",
+      "Provide concrete assertions (status codes, error messages) instead of vague statements",
+      "Include negative tests for BR-5 (Doctor Consultation) and BR-7 (Patient Consultation Request)",
+      "Cover edge cases such as maximum/minimum PinCode length",
+      "Replace hardcoded names (Doctor1, Specialty1, Patient1) with placeholders or document them"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.702,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: System Availability and User Management\n\n  Scenario: System Availability on Specified PinCodes\n    Given the system is configured with the following PinCodes in the Parameter Control File\n      | PinCode |\n      | 1234    |\n      | 5678    |\n    When the system is accessed with a PinCode\n    Then the system is available only for the specified PinCodes\n\n  Scenario: User Login and Password Management\n    Given the system is configured with user credentials\n    When a user attempts to login with a valid username and password\n    Then the system grants access to the user\n    And the login-id/password is managed in a secured manner\n\n  Scenario: Doctor-Specialty Mapping\n    Given the system is configured with a Doctor and a Specialty\n    When the Doctor is mapped to the Specialty\n    Then the Doctor is linked to the Specialty\n    And the Doctor is mapped to ONE and ONLY ONE Specialty\n\n  Scenario: Doctor Consultation\n    Given the system is configured with a Doctor and a Patient\n    When the Doctor provides consultation to the Patient\n    Then the Doctor is linked to the Patient\n    And the Patient has a consultation request linked to the Doctor's Specialty\n\n  Scenario: Patient Registration\n    Given the system is configured with a Patient\n    When the Patient registers themselves by filling the Patient profile\n    Then a unique id is generated for the Patient\n    And the Patient is registered in the system\n\n  Scenario: Patient Consultation Request\n    Given the system is configured with a Patient and a Doctor\n    When the Patient requests consultation with the Doctor\n    Then the Patient has a consultation request linked to the Doctor's Specialty\n\n  Scenario Outline: System Availability on Invalid PinCodes\n    Given the system is configured with the following PinCodes in the Parameter Control File\n      | PinCode |\n      | invalid_pin |\n      | 12345    |\n      | abcdef    |\n    When the system is accessed with a PinCode\n    Then the system is not available for the specified PinCodes\n\n  Scenario Outline: User Login with Invalid Credentials\n    Given the system is configured with user credentials\n    When a user attempts to login with an invalid username and password\n    Then the system denies access to the user\n\n  Scenario Outline: Doctor-Specialty Mapping with Duplicate Mapping\n    Given the system is configured with a Doctor and a Specialty\n    When the Doctor is mapped to the Specialty with a duplicate mapping\n    Then the system raises an error for duplicate mapping\n\n  Scenario Outline: Patient Registration with Invalid Data\n    Given the system is configured with a Patient\n    When the Patient registers themselves with invalid data\n    Then the system raises an error for invalid data",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "System Availability on Specified PinCodes",
+      "req_ids": [
+        "BR-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system configured with PinCodes"
+      ],
+      "inputs": {
+        "PinCode": "1234"
+      },
+      "steps": [
+        "access system with PinCode",
+        "verify system availability"
+      ],
+      "expected": [
+        "system is available"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "User Login and Password Management",
+      "req_ids": [
+        "BR-2-1",
+        "BR-2-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system configured with user credentials"
+      ],
+      "inputs": {
+        "username": "valid_user",
+        "password": "valid_password"
+      },
+      "steps": [
+        "attempt login with valid credentials",
+        "verify system grants access"
+      ],
+      "expected": [
+        "system grants access"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Doctor-Specialty Mapping",
+      "req_ids": [
+        "BR-3",
+        "BR-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system configured with Doctor and Specialty"
+      ],
+      "inputs": {
+        "Doctor": "Doctor1",
+        "Specialty": "Specialty1"
+      },
+      "steps": [
+        "map Doctor to Specialty",
+        "verify Doctor is linked to Specialty"
+      ],
+      "expected": [
+        "Doctor is linked to Specialty"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Doctor Consultation",
+      "req_ids": [
+        "BR-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system configured with Doctor and Patient"
+      ],
+      "inputs": {
+        "Doctor": "Doctor1",
+        "Patient": "Patient1"
+      },
+      "steps": [
+        "provide consultation",
+        "verify Doctor is linked to Patient"
+      ],
+      "expected": [
+        "Doctor is linked to Patient"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Patient Registration",
+      "req_ids": [
+        "BR-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system configured with Patient"
+      ],
+      "inputs": {
+        "Patient": "Patient1"
+      },
+      "steps": [
+        "register Patient",
+        "verify unique id is generated"
+      ],
+      "expected": [
+        "unique id is generated"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Patient Consultation Request",
+      "req_ids": [
+        "BR-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system configured with Patient and Doctor"
+      ],
+      "inputs": {
+        "Patient": "Patient1",
+        "Doctor": "Doctor1"
+      },
+      "steps": [
+        "request consultation",
+        "verify consultation request is linked to Doctor's Specialty"
+      ],
+      "expected": [
+        "consultation request is linked to Doctor's Specialty"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "System Availability on Invalid PinCodes",
+      "req_ids": [
+        "BR-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "system configured with PinCodes"
+      ],
+      "inputs": {
+        "PinCode": "invalid_pin"
+      },
+      "steps": [
+        "access system with PinCode",
+        "verify system is not available"
+      ],
+      "expected": [
+        "system is not available"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "User Login with Invalid Credentials",
+      "req_ids": [
+        "BR-2-1",
+        "BR-2-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "system configured with user credentials"
+      ],
+      "inputs": {
+        "username": "invalid_user",
+        "password": "invalid_password"
+      },
+      "steps": [
+        "attempt login with invalid credentials",
+        "verify system denies access"
+      ],
+      "expected": [
+        "system denies access"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Doctor-Specialty Mapping with Duplicate Mapping",
+      "req_ids": [
+        "BR-3",
+        "BR-4"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "system configured with Doctor and Specialty"
+      ],
+      "inputs": {
+        "Doctor": "Doctor1",
+        "Specialty": "Specialty1"
+      },
+      "steps": [
+        "map Doctor to Specialty with duplicate mapping",
+        "verify system raises error"
+      ],
+      "expected": [
+        "system raises error for duplicate mapping"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Patient Registration with Invalid Data",
+      "req_ids": [
+        "BR-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "system configured with Patient"
+      ],
+      "inputs": {
+        "Patient": "Patient1"
+      },
+      "steps": [
+        "register Patient with invalid data",
+        "verify system raises error"
+      ],
+      "expected": [
+        "system raises error for invalid data"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: System Availability and User Authentication\n  As a system administrator\n  I want the system to be available only on specified pin codes\n  So that unauthorized access is prevented\n\n  Scenario: System Availability on Specified Pin Codes\n    Given the system is configured with pin codes in the parameter control file\n    When the system is accessed with a valid pin code\n    Then the system is available for user authentication\n    And the system denies access with an invalid pin code\n\n  Scenario: User Authentication with Valid Credentials\n    Given the system is configured with valid user credentials\n    When the user attempts to login with valid credentials\n    Then the user is authenticated successfully\n    And the user is redirected to the dashboard\n\n  Scenario: User Authentication with Invalid Credentials\n    Given the system is configured with valid user credentials\n    When the user attempts to login with invalid credentials\n    Then the user is denied access\n    And an error message is displayed\n\n  Scenario: Doctor Speciality Mapping\n    Given the system is configured with doctor speciality mapping\n    When a doctor is assigned to a speciality\n    Then the doctor is linked to the speciality\n    And the speciality has one or more doctors linked to it\n\n  Scenario: Doctor Consultation with Patient\n    Given the system is configured with doctor consultation mapping\n    When a doctor provides consultation to a patient\n    Then the patient is linked to the doctor\n    And the doctor has provided consultation to one or more patients\n\n  Scenario: Patient Registration\n    Given the system is configured with patient registration\n    When a patient registers with a unique id\n    Then the patient is registered successfully\n    And a unique id is generated for the patient\n\n  Scenario: Patient Consultation Request\n    Given the system is configured with patient consultation request\n    When a patient requests consultation with a doctor\n    Then the patient is linked to the doctor\n    And the doctor has received a consultation request from the patient\n\n  Scenario Outline: System Availability on Specified Pin Codes with Examples\n    Given the system is configured with pin codes in the parameter control file\n    When the system is accessed with a <pin_code>\n    Then the system is available for user authentication if the pin code is valid\n    And the system denies access with an invalid pin code\n\n    Examples:\n      | pin_code    |\n      | 1234        |\n      | 5678        |\n      | invalid_pin |\n\n  Scenario Outline: User Authentication with Valid and Invalid Credentials with Examples\n    Given the system is configured with valid user credentials\n    When the user attempts to login with <username> and <password>\n    Then the user is authenticated successfully if the credentials are valid\n    And the user is denied access with an invalid password\n\n    Examples:\n      | username | password |\n      | valid_user | valid_password |\n      | invalid_user | valid_password |\n      | valid_user | invalid_password |\n\n  Scenario Outline: Doctor Speciality Mapping with Examples\n    Given the system is configured with doctor speciality mapping\n    When a doctor is assigned to a speciality with <speciality_id>\n    Then the doctor is linked to the speciality if the speciality id is valid\n    And the speciality has one or more doctors linked to it\n\n    Examples:\n      | speciality_id |\n      | 1             |\n      | 2             |\n      | invalid_id    |\n\n  Scenario Outline: Doctor Consultation with Patient with Examples\n    Given the system is configured with doctor consultation mapping\n    When a doctor provides consultation to a patient with <patient_id>\n    Then the patient is linked to the doctor if the patient id is valid\n    And the doctor has provided consultation to one or more patients\n\n    Examples:\n      | patient_id |\n      | 1          |\n      | 2          |\n      | invalid_id |\n\n  Scenario Outline: Patient Registration with Examples\n    Given the system is configured with patient registration\n    When a patient registers with a unique id <patient_id>\n    Then the patient is registered successfully if the patient id is valid\n    And a unique id is generated for the patient\n\n    Examples:\n      | patient_id |\n      | 1          |\n      | 2          |\n      | invalid_id |\n\n  Scenario Outline: Patient Consultation Request with Examples\n    Given the system is configured with patient consultation request\n    When a patient requests consultation with a doctor with <doctor_id>\n    Then the patient is linked to the doctor if the doctor id is valid\n    And the doctor has received a consultation request from the patient\n\n    Examples:\n      | doctor_id |\n      | 1         |\n      | 2         |\n      | invalid_id |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "System Availability on Specified Pin Codes",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with pin codes"
+          ],
+          "inputs": {
+            "pin_code": "1234"
+          },
+          "steps": [
+            "access system with pin code",
+            "verify system availability"
+          ],
+          "expected": [
+            "system is available"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "User Authentication with Valid Credentials",
+          "req_ids": [
+            "BR-2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with valid user credentials"
+          ],
+          "inputs": {
+            "username": "valid_user",
+            "password": "valid_password"
+          },
+          "steps": [
+            "attempt login with valid credentials",
+            "verify user authentication"
+          ],
+          "expected": [
+            "user is authenticated successfully"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "User Authentication with Invalid Credentials",
+          "req_ids": [
+            "BR-2-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system is configured with valid user credentials"
+          ],
+          "inputs": {
+            "username": "invalid_user",
+            "password": "invalid_password"
+          },
+          "steps": [
+            "attempt login with invalid credentials",
+            "verify user denial"
+          ],
+          "expected": [
+            "user is denied access"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Doctor Speciality Mapping",
+          "req_ids": [
+            "BR-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with doctor speciality mapping"
+          ],
+          "inputs": {
+            "speciality_id": "1"
+          },
+          "steps": [
+            "assign doctor to speciality",
+            "verify doctor speciality mapping"
+          ],
+          "expected": [
+            "doctor is linked to speciality"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor Consultation with Patient",
+          "req_ids": [
+            "BR-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with doctor consultation mapping"
+          ],
+          "inputs": {
+            "patient_id": "1"
+          },
+          "steps": [
+            "provide consultation to patient",
+            "verify patient doctor mapping"
+          ],
+          "expected": [
+            "patient is linked to doctor"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient Registration",
+          "req_ids": [
+            "BR-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with patient registration"
+          ],
+          "inputs": {
+            "patient_id": "1"
+          },
+          "steps": [
+            "register patient",
+            "verify patient registration"
+          ],
+          "expected": [
+            "patient is registered successfully"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient Consultation Request",
+          "req_ids": [
+            "BR-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with patient consultation request"
+          ],
+          "inputs": {
+            "doctor_id": "1"
+          },
+          "steps": [
+            "request consultation with doctor",
+            "verify doctor consultation request"
+          ],
+          "expected": [
+            "doctor has received consultation request"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "System Availability on Specified Pin Codes with Examples",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with pin codes"
+          ],
+          "inputs": {
+            "pin_code": "1234"
+          },
+          "steps": [
+            "access system with pin code",
+            "verify system availability"
+          ],
+          "expected": [
+            "system is available"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "User Authentication with Valid and Invalid Credentials with Examples",
+          "req_ids": [
+            "BR-2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with valid user credentials"
+          ],
+          "inputs": {
+            "username": "valid_user",
+            "password": "valid_password"
+          },
+          "steps": [
+            "attempt login with valid credentials",
+            "verify user authentication"
+          ],
+          "expected": [
+            "user is authenticated successfully"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Doctor Speciality Mapping with Examples",
+          "req_ids": [
+            "BR-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with doctor speciality mapping"
+          ],
+          "inputs": {
+            "speciality_id": "1"
+          },
+          "steps": [
+            "assign doctor to speciality",
+            "verify doctor speciality mapping"
+          ],
+          "expected": [
+            "doctor is linked to speciality"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Doctor Consultation with Patient with Examples",
+          "req_ids": [
+            "BR-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with doctor consultation mapping"
+          ],
+          "inputs": {
+            "patient_id": "1"
+          },
+          "steps": [
+            "provide consultation to patient",
+            "verify patient doctor mapping"
+          ],
+          "expected": [
+            "patient is linked to doctor"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Patient Registration with Examples",
+          "req_ids": [
+            "BR-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with patient registration"
+          ],
+          "inputs": {
+            "patient_id": "1"
+          },
+          "steps": [
+            "register patient",
+            "verify patient registration"
+          ],
+          "expected": [
+            "patient is registered successfully"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Patient Consultation Request with Examples",
+          "req_ids": [
+            "BR-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is configured with patient consultation request"
+          ],
+          "inputs": {
+            "doctor_id": "1"
+          },
+          "steps": [
+            "request consultation with doctor",
+            "verify doctor consultation request"
+          ],
+          "expected": [
+            "doctor has received consultation request"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "1234",
+            "context": "pin code",
+            "grounded": false
+          },
+          {
+            "value": "5678",
+            "context": "pin code",
+            "grounded": false
+          },
+          {
+            "value": "invalid_pin",
+            "context": "pin code",
+            "grounded": false
+          },
+          {
+            "value": "valid_user",
+            "context": "username",
+            "grounded": false
+          },
+          {
+            "value": "invalid_user",
+            "context": "username",
+            "grounded": false
+          },
+          {
+            "value": "valid_password",
+            "context": "password",
+            "grounded": false
+          },
+          {
+            "value": "invalid_password",
+            "context": "password",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "speciality_id",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "speciality_id",
+            "grounded": false
+          },
+          {
+            "value": "invalid_id",
+            "context": "speciality_id",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "patient_id",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "patient_id",
+            "grounded": false
+          },
+          {
+            "value": "invalid_id",
+            "context": "patient_id",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "doctor_id",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "doctor_id",
+            "grounded": false
+          },
+          {
+            "value": "invalid_id",
+            "context": "doctor_id",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 16,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add explicit assertions for error messages and status codes to improve oracle assertiveness.",
+          "Verify uniqueness constraint for doctor-speciality mapping (BR-4) to ensure a doctor is linked to only one speciality.",
+          "Include boundary tests for pin code length or format if applicable.",
+          "Test secure handling of credentials (BR-2-2) to ensure passwords are stored encrypted.",
+          "Validate that patient registration generates a unique ID that is not reused."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "BR-2-2",
+          "BR-4"
+        ],
+        "fsa_score": 0.745,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.745; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.3, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['BR-2-2', 'BR-4'] (add at least one each)\n- ungrounded value '1234' (pin code): remove or use the SRS value\n- ungrounded value '5678' (pin code): remove or use the SRS value\n- ungrounded value 'invalid_pin' (pin code): remove or use the SRS value\n- ungrounded value 'valid_user' (username): remove or use the SRS value\n- ungrounded value 'invalid_user' (username): remove or use the SRS value\n- ungrounded value 'valid_password' (password): remove or use the SRS value\n- Add explicit assertions for error messages and status codes to improve oracle assertiveness.\n- Verify uniqueness constraint for doctor-speciality mapping (BR-4) to ensure a doctor is linked to only one speciality.\n- Include boundary tests for pin code length or format if applicable.\n- Test secure handling of credentials (BR-2-2) to ensure passwords are stored encrypted.\n- Validate that patient registration generates a unique ID that is not reused.",
+      "artifact": "Feature: System Availability and User Management\n\n  Scenario: System Availability by Pin Code\n    Given the system is configured with pin codes \"1234\" and \"5678\"\n    When the user attempts to access the system with pin code \"1234\"\n    Then the system is available\n    And the system displays the login page\n\n  Scenario: System Unavailability by Pin Code\n    Given the system is configured with pin codes \"1234\" and \"5678\"\n    When the user attempts to access the system with pin code \"invalid_pin\"\n    Then the system is unavailable\n    And the system displays an error message \"Invalid pin code\"\n\n  Scenario: User Login\n    Given the system is configured with pin codes \"1234\" and \"5678\"\n    And the user has a valid username \"valid_user\" and password \"valid_password\"\n    When the user attempts to login with username \"valid_user\" and password \"valid_password\"\n    Then the user is logged in\n    And the system displays the dashboard\n\n  Scenario: Invalid User Login\n    Given the system is configured with pin codes \"1234\" and \"5678\"\n    And the user has an invalid username \"invalid_user\" and password \"valid_password\"\n    When the user attempts to login with username \"invalid_user\" and password \"valid_password\"\n    Then the user is not logged in\n    And the system displays an error message \"Invalid username or password\"\n\n  Scenario: Doctor-Specialty Mapping\n    Given the system is configured with pin codes \"1234\" and \"5678\"\n    And there are two doctors with specialty \"Cardiology\" and \"Dermatology\"\n    When the user attempts to map a doctor to a specialty\n    Then the doctor is mapped to one and only one specialty\n    And the system displays a success message \"Doctor specialty mapping successful\"\n\n  Scenario: Patient Registration\n    Given the system is configured with pin codes \"1234\" and \"5678\"\n    And there is a patient with unique ID \"patient_1\"\n    When the patient attempts to register\n    Then the patient is registered\n    And the system generates a unique ID for the patient\n    And the system displays a success message \"Patient registration successful\"\n\n  Scenario: Consultation Request\n    Given the system is configured with pin codes \"1234\" and \"5678\"\n    And there is a patient with unique ID \"patient_1\" and a doctor with specialty \"Cardiology\"\n    When the patient attempts to request a consultation\n    Then the patient is able to request a consultation\n    And the system displays a success message \"Consultation request successful\"\n\n  Scenario Outline: Pin Code Length and Format\n    Given the system is configured with pin codes \"1234\" and \"5678\"\n    When the user attempts to access the system with pin code \"<pin_code>\"\n    Then the system is available\n    Examples:\n      | pin_code |\n      | 1234     |\n      | 5678     |\n      | 12345    |\n      | abcdef   |\n\n  Scenario Outline: Secure Handling of Credentials\n    Given the system is configured with pin codes \"1234\" and \"5678\"\n    And the user has a valid username \"valid_user\" and password \"valid_password\"\n    When the user attempts to login with username \"valid_user\" and password \"valid_password\"\n    Then the user is logged in\n    And the system stores the password encrypted\n    Examples:\n      | username | password |\n      | valid_user | valid_password |\n      | invalid_user | invalid_password |\n\n  Scenario Outline: Unique Patient ID\n    Given the system is configured with pin codes \"1234\" and \"5678\"\n    When the patient attempts to register\n    Then the system generates a unique ID for the patient\n    And the system does not reuse the patient ID\n    Examples:\n      | patient_id |\n      | patient_1  |\n      | patient_2  |\n      | patient_3  |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "System Availability by Pin Code",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with pin codes"
+          ],
+          "inputs": {
+            "pin_code": "1234"
+          },
+          "steps": [
+            "user attempts to access the system",
+            "system displays the login page"
+          ],
+          "expected": [
+            "system is available",
+            "system displays the login page"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "System Unavailability by Pin Code",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system configured with pin codes"
+          ],
+          "inputs": {
+            "pin_code": "invalid_pin"
+          },
+          "steps": [
+            "user attempts to access the system",
+            "system displays an error message"
+          ],
+          "expected": [
+            "system is unavailable",
+            "system displays an error message"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "User Login",
+          "req_ids": [
+            "BR-2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with pin codes",
+            "user has a valid username and password"
+          ],
+          "inputs": {
+            "username": "valid_user",
+            "password": "valid_password"
+          },
+          "steps": [
+            "user attempts to login",
+            "system displays the dashboard"
+          ],
+          "expected": [
+            "user is logged in",
+            "system displays the dashboard"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Invalid User Login",
+          "req_ids": [
+            "BR-2-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system configured with pin codes",
+            "user has an invalid username and password"
+          ],
+          "inputs": {
+            "username": "invalid_user",
+            "password": "valid_password"
+          },
+          "steps": [
+            "user attempts to login",
+            "system displays an error message"
+          ],
+          "expected": [
+            "user is not logged in",
+            "system displays an error message"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor-Specialty Mapping",
+          "req_ids": [
+            "BR-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with pin codes",
+            "there are two doctors with specialty"
+          ],
+          "inputs": {
+            "doctor_id": "doctor_1",
+            "specialty_id": "specialty_1"
+          },
+          "steps": [
+            "user attempts to map a doctor to a specialty",
+            "system displays a success message"
+          ],
+          "expected": [
+            "doctor is mapped to one and only one specialty",
+            "system displays a success message"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient Registration",
+          "req_ids": [
+            "BR-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with pin codes",
+            "there is a patient with unique ID"
+          ],
+          "inputs": {
+            "patient_id": "patient_1"
+          },
+          "steps": [
+            "patient attempts to register",
+            "system generates a unique ID for the patient",
+            "system displays a success message"
+          ],
+          "expected": [
+            "patient is registered",
+            "system generates a unique ID for the patient",
+            "system displays a success message"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Consultation Request",
+          "req_ids": [
+            "BR-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with pin codes",
+            "there is a patient with unique ID and a doctor with specialty"
+          ],
+          "inputs": {
+            "patient_id": "patient_1",
+            "doctor_id": "doctor_1"
+          },
+          "steps": [
+            "patient attempts to request a consultation",
+            "system displays a success message"
+          ],
+          "expected": [
+            "patient is able to request a consultation",
+            "system displays a success message"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Pin Code Length and Format",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with pin codes"
+          ],
+          "inputs": {
+            "pin_code": "1234"
+          },
+          "steps": [
+            "user attempts to access the system",
+            "system displays the login page"
+          ],
+          "expected": [
+            "system is available",
+            "system displays the login page"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Secure Handling of Credentials",
+          "req_ids": [
+            "BR-2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with pin codes",
+            "user has a valid username and password"
+          ],
+          "inputs": {
+            "username": "valid_user",
+            "password": "valid_password"
+          },
+          "steps": [
+            "user attempts to login",
+            "system stores the password encrypted"
+          ],
+          "expected": [
+            "user is logged in",
+            "system stores the password encrypted"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Unique Patient ID",
+          "req_ids": [
+            "BR-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with pin codes"
+          ],
+          "inputs": {
+            "patient_id": "patient_1"
+          },
+          "steps": [
+            "patient attempts to register",
+            "system generates a unique ID for the patient",
+            "system does not reuse the patient ID"
+          ],
+          "expected": [
+            "patient is registered",
+            "system generates a unique ID for the patient",
+            "system does not reuse the patient ID"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.8571428571428571,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.4,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "1234",
+            "context": "pin code",
+            "grounded": false
+          },
+          {
+            "value": "5678",
+            "context": "pin code",
+            "grounded": false
+          },
+          {
+            "value": "invalid_pin",
+            "context": "pin code",
+            "grounded": false
+          },
+          {
+            "value": "12345",
+            "context": "pin code",
+            "grounded": false
+          },
+          {
+            "value": "abcdef",
+            "context": "pin code",
+            "grounded": false
+          },
+          {
+            "value": "valid_user",
+            "context": "username",
+            "grounded": false
+          },
+          {
+            "value": "invalid_user",
+            "context": "username",
+            "grounded": false
+          },
+          {
+            "value": "valid_password",
+            "context": "password",
+            "grounded": false
+          },
+          {
+            "value": "invalid_password",
+            "context": "password",
+            "grounded": false
+          },
+          {
+            "value": "doctor_1",
+            "context": "doctor id",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "specialty",
+            "grounded": false
+          },
+          {
+            "value": "Dermatology",
+            "context": "specialty",
+            "grounded": false
+          },
+          {
+            "value": "patient_1",
+            "context": "patient id",
+            "grounded": false
+          },
+          {
+            "value": "patient_2",
+            "context": "patient id",
+            "grounded": false
+          },
+          {
+            "value": "patient_3",
+            "context": "patient id",
+            "grounded": false
+          },
+          {
+            "value": "Invalid pin code",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Invalid username or password",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Doctor specialty mapping successful",
+            "context": "success message",
+            "grounded": false
+          },
+          {
+            "value": "Patient registration successful",
+            "context": "success message",
+            "grounded": false
+          },
+          {
+            "value": "Consultation request successful",
+            "context": "success message",
+            "grounded": false
+          },
+          {
+            "value": "system is available",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "system is unavailable",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "system displays the login page",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "system displays the dashboard",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "user is logged in",
+            "context": "user state",
+            "grounded": false
+          },
+          {
+            "value": "user is not logged in",
+            "context": "user state",
+            "grounded": false
+          },
+          {
+            "value": "patient is registered",
+            "context": "patient state",
+            "grounded": false
+          },
+          {
+            "value": "patient is able to request a consultation",
+            "context": "patient state",
+            "grounded": false
+          },
+          {
+            "value": "system stores the password encrypted",
+            "context": "security state",
+            "grounded": false
+          },
+          {
+            "value": "system does not reuse the patient ID",
+            "context": "patient id state",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 30,
+        "uncovered_clauses": [
+          "BR-5"
+        ],
+        "weaknesses": [
+          "Missing tests for doctor providing consultation (BR-5).",
+          "Negative tests for doctor-specialty mapping (e.g., duplicate mapping) are absent.",
+          "Oracle assertions are often vague; use concrete values or status codes.",
+          "Boundary coverage is low; no tests for pin code length defined in spec.",
+          "Concrete elements are not grounded; use realistic data from the specification."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "BR-4",
+          "BR-7"
+        ],
+        "fsa_score": 0.5171,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.5171; sub-scores {'clause_coverage': 0.8571428571428571, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.4, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['BR-4', 'BR-7'] (add at least one each)\n- uncovered clause: BR-5\n- ungrounded value '1234' (pin code): remove or use the SRS value\n- ungrounded value '5678' (pin code): remove or use the SRS value\n- ungrounded value 'invalid_pin' (pin code): remove or use the SRS value\n- ungrounded value '12345' (pin code): remove or use the SRS value\n- ungrounded value 'abcdef' (pin code): remove or use the SRS value\n- ungrounded value 'valid_user' (username): remove or use the SRS value\n- Missing tests for doctor providing consultation (BR-5).\n- Negative tests for doctor-specialty mapping (e.g., duplicate mapping) are absent.\n- Oracle assertions are often vague; use concrete values or status codes.\n- Boundary coverage is low; no tests for pin code length defined in spec.\n- Concrete elements are not grounded; use realistic data from the specification.",
+      "artifact": "Feature: System Availability and User Management\n\n  Scenario: System Availability on Specified PinCodes\n    Given the system is configured with the following PinCodes in the Parameter Control File\n      | PinCode |\n      | 1234    |\n      | 5678    |\n    When the system is accessed with a PinCode\n    Then the system is available only for the specified PinCodes\n\n  Scenario: User Login and Password Management\n    Given the system is configured with user credentials\n    When a user attempts to login with a valid username and password\n    Then the system grants access to the user\n    And the login-id/password is managed in a secured manner\n\n  Scenario: Doctor-Specialty Mapping\n    Given the system is configured with a Doctor and a Specialty\n    When the Doctor is mapped to the Specialty\n    Then the Doctor is linked to the Specialty\n    And the Doctor is mapped to ONE and ONLY ONE Specialty\n\n  Scenario: Doctor Consultation\n    Given the system is configured with a Doctor and a Patient\n    When the Doctor provides consultation to the Patient\n    Then the Doctor is linked to the Patient\n    And the Patient has a consultation request linked to the Doctor's Specialty\n\n  Scenario: Patient Registration\n    Given the system is configured with a Patient\n    When the Patient registers themselves by filling the Patient profile\n    Then a unique id is generated for the Patient\n    And the Patient is registered in the system\n\n  Scenario: Patient Consultation Request\n    Given the system is configured with a Patient and a Doctor\n    When the Patient requests consultation with the Doctor\n    Then the Patient has a consultation request linked to the Doctor's Specialty\n\n  Scenario Outline: System Availability on Invalid PinCodes\n    Given the system is configured with the following PinCodes in the Parameter Control File\n      | PinCode |\n      | invalid_pin |\n      | 12345    |\n      | abcdef    |\n    When the system is accessed with a PinCode\n    Then the system is not available for the specified PinCodes\n\n  Scenario Outline: User Login with Invalid Credentials\n    Given the system is configured with user credentials\n    When a user attempts to login with an invalid username and password\n    Then the system denies access to the user\n\n  Scenario Outline: Doctor-Specialty Mapping with Duplicate Mapping\n    Given the system is configured with a Doctor and a Specialty\n    When the Doctor is mapped to the Specialty with a duplicate mapping\n    Then the system raises an error for duplicate mapping\n\n  Scenario Outline: Patient Registration with Invalid Data\n    Given the system is configured with a Patient\n    When the Patient registers themselves with invalid data\n    Then the system raises an error for invalid data",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "System Availability on Specified PinCodes",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with PinCodes"
+          ],
+          "inputs": {
+            "PinCode": "1234"
+          },
+          "steps": [
+            "access system with PinCode",
+            "verify system availability"
+          ],
+          "expected": [
+            "system is available"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "User Login and Password Management",
+          "req_ids": [
+            "BR-2-1",
+            "BR-2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with user credentials"
+          ],
+          "inputs": {
+            "username": "valid_user",
+            "password": "valid_password"
+          },
+          "steps": [
+            "attempt login with valid credentials",
+            "verify system grants access"
+          ],
+          "expected": [
+            "system grants access"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor-Specialty Mapping",
+          "req_ids": [
+            "BR-3",
+            "BR-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with Doctor and Specialty"
+          ],
+          "inputs": {
+            "Doctor": "Doctor1",
+            "Specialty": "Specialty1"
+          },
+          "steps": [
+            "map Doctor to Specialty",
+            "verify Doctor is linked to Specialty"
+          ],
+          "expected": [
+            "Doctor is linked to Specialty"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Doctor Consultation",
+          "req_ids": [
+            "BR-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with Doctor and Patient"
+          ],
+          "inputs": {
+            "Doctor": "Doctor1",
+            "Patient": "Patient1"
+          },
+          "steps": [
+            "provide consultation",
+            "verify Doctor is linked to Patient"
+          ],
+          "expected": [
+            "Doctor is linked to Patient"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Patient Registration",
+          "req_ids": [
+            "BR-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with Patient"
+          ],
+          "inputs": {
+            "Patient": "Patient1"
+          },
+          "steps": [
+            "register Patient",
+            "verify unique id is generated"
+          ],
+          "expected": [
+            "unique id is generated"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient Consultation Request",
+          "req_ids": [
+            "BR-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system configured with Patient and Doctor"
+          ],
+          "inputs": {
+            "Patient": "Patient1",
+            "Doctor": "Doctor1"
+          },
+          "steps": [
+            "request consultation",
+            "verify consultation request is linked to Doctor's Specialty"
+          ],
+          "expected": [
+            "consultation request is linked to Doctor's Specialty"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "System Availability on Invalid PinCodes",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system configured with PinCodes"
+          ],
+          "inputs": {
+            "PinCode": "invalid_pin"
+          },
+          "steps": [
+            "access system with PinCode",
+            "verify system is not available"
+          ],
+          "expected": [
+            "system is not available"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "User Login with Invalid Credentials",
+          "req_ids": [
+            "BR-2-1",
+            "BR-2-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system configured with user credentials"
+          ],
+          "inputs": {
+            "username": "invalid_user",
+            "password": "invalid_password"
+          },
+          "steps": [
+            "attempt login with invalid credentials",
+            "verify system denies access"
+          ],
+          "expected": [
+            "system denies access"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Doctor-Specialty Mapping with Duplicate Mapping",
+          "req_ids": [
+            "BR-3",
+            "BR-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system configured with Doctor and Specialty"
+          ],
+          "inputs": {
+            "Doctor": "Doctor1",
+            "Specialty": "Specialty1"
+          },
+          "steps": [
+            "map Doctor to Specialty with duplicate mapping",
+            "verify system raises error"
+          ],
+          "expected": [
+            "system raises error for duplicate mapping"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Patient Registration with Invalid Data",
+          "req_ids": [
+            "BR-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system configured with Patient"
+          ],
+          "inputs": {
+            "Patient": "Patient1"
+          },
+          "steps": [
+            "register Patient with invalid data",
+            "verify system raises error"
+          ],
+          "expected": [
+            "system raises error for invalid data"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.86,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "1234",
+            "context": "PinCode",
+            "grounded": false
+          },
+          {
+            "value": "5678",
+            "context": "PinCode",
+            "grounded": false
+          },
+          {
+            "value": "invalid_pin",
+            "context": "PinCode",
+            "grounded": false
+          },
+          {
+            "value": "12345",
+            "context": "PinCode",
+            "grounded": false
+          },
+          {
+            "value": "abcdef",
+            "context": "PinCode",
+            "grounded": false
+          },
+          {
+            "value": "Doctor1",
+            "context": "Doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Specialty1",
+            "context": "Specialty name",
+            "grounded": false
+          },
+          {
+            "value": "Patient1",
+            "context": "Patient name",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 8,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add scenario outlines with normal, edge, and invalid values for each requirement",
+          "Provide concrete assertions (status codes, error messages) instead of vague statements",
+          "Include negative tests for BR-5 (Doctor Consultation) and BR-7 (Patient Consultation Request)",
+          "Cover edge cases such as maximum/minimum PinCode length",
+          "Replace hardcoded names (Doctor1, Specialty1, Patient1) with placeholders or document them"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.702,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,588 @@
+{
+  "unit_id": "U20_Embedded",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:hf.co/bartowski/Phi-3.5-MoE-instruct-GGUF:Q4_K_M",
+  "system_type": "safety_critical",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.4,
+    "sfv_score": 0.7,
+    "threshold": 0.7,
+    "sfv_pass": false,
+    "issues": [
+      "missing: transitions (>=2)",
+      "missing: states declared",
+      "missing: balanced brackets"
+    ]
+  },
+  "fsa": null,
+  "artifact": "Statechart Test Suite for U20_Embedded Controller\n\nStatechart:\n1. Initial State\n2. Pressure Fall Phase\n3. Pressure Control Phase\n4. FiO2 Control Phase\n5. Assist/Control Mode\n6. Safety Mode\n\nEvents:\n- Pressure Command\n- FiO2 Command\n- Inspiration Detection\n- Data Corruption\n- Mode Switch\n\nGuards:\n- Pressure Fall Phase Overshoot\n- Pressure Control Phase Accuracy\n- FiO2 Accuracy\n- Air Condition Variation\n- Assist/Control Mode Activation\n- Safety Mode Activation\n\nLifecycle:\n- Start\n- Transition to Pressure Fall Phase\n- Transition to Pressure Control Phase\n- Transition to FiO2 Control Phase\n- Transition to Assist/Control Mode\n- Transition to Safety Mode\n- End\n\nMode-Switching Behaviour:\n- From Initial to Pressure Fall Phase\n- From Pressure Fall Phase to Pressure Control Phase\n- From Pressure Control Phase to FiO2 Control Phase\n- From FiO2 Control Phase to Assist/Control Mode\n- From Assist/Control Mode to Safety Mode\n- From Safety Mode to End\n\nTest Cases:\n\nTC-001:\n{\n  \"id\": \"TC-001\",\n  \"title\": \"Pressure Fall Phase Overshoot\",\n  \"req_ids\": [\"RW-SW-63\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Pressure Control Phase\"],\n  \"inputs\": {\"name\": \"Pressure Command\"},\n  \"steps\": [\"Detect Pressure Command\", \"Measure Pressure Fall Phase Overshoot\"],\n  \"expected\": [\"Pressure Fall Phase Overshoot <= 0.8*PEEP-1 cmH2O\"]\n}\n\nTC-002:\n{\n  \"id\": \"TC-002\",\n  \"title\": \"Pressure Control Phase Accuracy\",\n  \"req_ids\": [\"RW-SW-64\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Pressure Control Phase\"],\n  \"inputs\": {\"name\": \"Pressure Command\"},\n  \"steps\": [\"Detect Pressure Command\", \"Measure Pressure Control Phase Accuracy\"],\n  \"expected\": [\"Pressure Control Phase Accuracy <= +-1 H2O + 10%\"]\n}\n\nTC-003:\n{\n  \"id\": \"TC-003\",\n  \"title\": \"FiO2 Accuracy\",\n  \"req_ids\": [\"RW-SW-95\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in FiO2 Control Phase\"],\n  \"inputs\": {\"name\": \"FiO2 Command\"},\n  \"steps\": [\"Detect FiO2 Command\", \"Measure FiO2 Accuracy\"],\n  \"expected\": [\"FiO2 Accuracy <= 0.05\"]\n}\n\nTC-004:\n{\n  \"id\": \"TC-004\",\n  \"title\": \"Air Condition Variation\",\n  \"req_ids\": [\"RW-SW-98\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in FiO2 Control Phase\"],\n  \"inputs\": {\"name\": \"FiO2 Command\"},\n  \"steps\": [\"Detect FiO2 Command\", \"Measure Air Condition Variation\"],\n  \"expected\": [\"Air Condition Variation does not affect FiO2 Accuracy\"]\n}\n\nTC-005:\n{\n  \"id\": \"TC-005\",\n  \"title\": \"Assist/Control Mode Activation\",\n  \"req_ids\": [\"RW-SW-153\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Assist/Control Mode\"],\n  \"inputs\": {\"name\": \"Inspiration Detection\"},\n  \"steps\": [\"Detect Inspiration\", \"Activate Assist/Control Mode\"],\n  \"expected\": [\"Assist/Control Mode Activated\"]\n}\n\nTC-006:\n{\n  \"id\": \"TC-006\",\n  \"title\": \"Safety Mode Activation\",\n  \"req_ids\": [\"RW-SW-156\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Safety Mode\"],\n  \"inputs\": {\"name\": \"Data Corruption\"},\n  \"steps\": [\"Detect Data Corruption\", \"Activate Safety Mode\"],\n  \"expected\": [\"Safety Mode Activated\"]\n}\n\nTC-007:\n{\n  \"id\": \"TC-007\",\n  \"title\": \"Report FiO2 Prior to Inhale\",\n  \"req_ids\": [\"RW-SW-97\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in FiO2 Control Phase\"],\n  \"inputs\": {\"name\": \"FiO2 Command\"},\n  \"steps\": [\"Detect FiO2 Command\", \"Report FiO2 Prior to Inhale\"],\n  \"expected\": [\"FiO2 Prior to Inhale is reported\"]\n}\n\nTC-008:\n{\n  \"id\": \"TC-008\",\n  \"title\": \"Commanded Pressure Meeting\",\n  \"req_ids\": [\"RW-SW-63\", \"RW-SW-64\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Pressure Control Phase\"],\n  \"inputs\": {\"name\": \"Pressure Command\"},\n  \"steps\": [\"Detect Pressure Command\", \"Measure Pressure Meeting\"],\n  \"expected\": [\"Pressure Meeting <= 0.8*PEEP-1 cmH2O\", \"Pressure Meeting >= -1 H2O + 10%\"]\n}\n\nTC-009:\n{\n  \"id\": \"TC-009\",\n  \"title\": \"Commanded FiO2 Meeting\",\n  \"req_ids\": [\"RW-SW-95\", \"RW-SW-98\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in FiO2 Control Phase\"],\n  \"inputs\": {\"name\": \"FiO2 Command\"},\n  \"steps\": [\"Detect FiO2 Command\", \"Measure FiO2 Meeting\"],\n  \"expected\": [\"FiO2 Meeting <= 0.05\", \"FiO2 Meeting is not affected by Air Condition Variation\"]\n}\n\nTC-010:\n{\n  \"id\": \"TC-010\",\n  \"title\": \"Assist/Control Mode Meeting\",\n  \"req_ids\": [\"RW-SW-153\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Assist/Control Mode\"],\n  \"inputs\": {\"name\": \"Inspiration Detection\"},\n  \"steps\": [\"Detect Inspiration\", \"Measure Assist/Control Mode Meeting\"],\n  \"expected\": [\"Assist/Control Mode Meeting is triggered by Inspiration Detection\"]\n}\n\nTC-011:\n{\n  \"id\": \"TC-011\",\n  \"title\": \"Safety Mode Meeting\",\n  \"req_ids\": [\"RW-SW-156\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Safety Mode\"],\n  \"inputs\": {\"name\": \"Data Corruption\"},\n  \"steps\": [\"Detect Data Corruption\", \"Measure Safety Mode Meeting\"],\n  \"expected\": [\"Safety Mode Meeting is triggered by Data Corruption\"]\n}\n}",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Pressure Fall Phase Overshoot",
+      "req_ids": [
+        "RW-SW-63"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in Pressure Control Phase"
+      ],
+      "inputs": {
+        "name": "Pressure Command"
+      },
+      "steps": [
+        "Detect Pressure Command",
+        "Measure Pressure Fall Phase Overshoot"
+      ],
+      "expected": [
+        "Pressure Fall Phase Overshoot <= 0.8*PEEP-1 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Pressure Control Phase Accuracy",
+      "req_ids": [
+        "RW-SW-64"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in Pressure Control Phase"
+      ],
+      "inputs": {
+        "name": "Pressure Command"
+      },
+      "steps": [
+        "Detect Pressure Command",
+        "Measure Pressure Control Phase Accuracy"
+      ],
+      "expected": [
+        "Pressure Control Phase Accuracy <= +-1 H2O + 10%"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "FiO2 Accuracy",
+      "req_ids": [
+        "RW-SW-95"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in FiO2 Control Phase"
+      ],
+      "inputs": {
+        "name": "FiO2 Command"
+      },
+      "steps": [
+        "Detect FiO2 Command",
+        "Measure FiO2 Accuracy"
+      ],
+      "expected": [
+        "FiO2 Accuracy <= 0.05"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Air Condition Variation",
+      "req_ids": [
+        "RW-SW-98"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in FiO2 Control Phase"
+      ],
+      "inputs": {
+        "name": "FiO2 Command"
+      },
+      "steps": [
+        "Detect FiO2 Command",
+        "Measure Air Condition Variation"
+      ],
+      "expected": [
+        "Air Condition Variation does not affect FiO2 Accuracy"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Assist/Control Mode Activation",
+      "req_ids": [
+        "RW-SW-153"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in Assist/Control Mode"
+      ],
+      "inputs": {
+        "name": "Inspiration Detection"
+      },
+      "steps": [
+        "Detect Inspiration",
+        "Activate Assist/Control Mode"
+      ],
+      "expected": [
+        "Assist/Control Mode Activated"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Safety Mode Activation",
+      "req_ids": [
+        "RW-SW-156"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in Safety Mode"
+      ],
+      "inputs": {
+        "name": "Data Corruption"
+      },
+      "steps": [
+        "Detect Data Corruption",
+        "Activate Safety Mode"
+      ],
+      "expected": [
+        "Safety Mode Activated"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Report FiO2 Prior to Inhale",
+      "req_ids": [
+        "RW-SW-97"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in FiO2 Control Phase"
+      ],
+      "inputs": {
+        "name": "FiO2 Command"
+      },
+      "steps": [
+        "Detect FiO2 Command",
+        "Report FiO2 Prior to Inhale"
+      ],
+      "expected": [
+        "FiO2 Prior to Inhale is reported"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Commanded Pressure Meeting",
+      "req_ids": [
+        "RW-SW-63",
+        "RW-SW-64"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in Pressure Control Phase"
+      ],
+      "inputs": {
+        "name": "Pressure Command"
+      },
+      "steps": [
+        "Detect Pressure Command",
+        "Measure Pressure Meeting"
+      ],
+      "expected": [
+        "Pressure Meeting <= 0.8*PEEP-1 cmH2O",
+        "Pressure Meeting >= -1 H2O + 10%"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Commanded FiO2 Meeting",
+      "req_ids": [
+        "RW-SW-95",
+        "RW-SW-98"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in FiO2 Control Phase"
+      ],
+      "inputs": {
+        "name": "FiO2 Command"
+      },
+      "steps": [
+        "Detect FiO2 Command",
+        "Measure FiO2 Meeting"
+      ],
+      "expected": [
+        "FiO2 Meeting <= 0.05",
+        "FiO2 Meeting is not affected by Air Condition Variation"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Assist/Control Mode Meeting",
+      "req_ids": [
+        "RW-SW-153"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in Assist/Control Mode"
+      ],
+      "inputs": {
+        "name": "Inspiration Detection"
+      },
+      "steps": [
+        "Detect Inspiration",
+        "Measure Assist/Control Mode Meeting"
+      ],
+      "expected": [
+        "Assist/Control Mode Meeting is triggered by Inspiration Detection"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Safety Mode Meeting",
+      "req_ids": [
+        "RW-SW-156"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in Safety Mode"
+      ],
+      "inputs": {
+        "name": "Data Corruption"
+      },
+      "steps": [
+        "Detect Data Corruption",
+        "Measure Safety Mode Meeting"
+      ],
+      "expected": [
+        "Safety Mode Meeting is triggered by Data Corruption"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Statechart Test Suite for U20_Embedded Controller\n\nStatechart:\n1. Initial State\n2. Pressure Fall Phase\n3. Pressure Control Phase\n4. FiO2 Control Phase\n5. Assist/Control Mode\n6. Safety Mode\n\nEvents:\n- Pressure Command\n- FiO2 Command\n- Inspiration Detection\n- Data Corruption\n- Mode Switch\n\nGuards:\n- Pressure Fall Phase Overshoot\n- Pressure Control Phase Accuracy\n- FiO2 Accuracy\n- Air Condition Variation\n- Assist/Control Mode Activation\n- Safety Mode Activation\n\nLifecycle:\n- Start\n- Transition to Pressure Fall Phase\n- Transition to Pressure Control Phase\n- Transition to FiO2 Control Phase\n- Transition to Assist/Control Mode\n- Transition to Safety Mode\n- End\n\nMode-Switching Behaviour:\n- From Initial to Pressure Fall Phase\n- From Pressure Fall Phase to Pressure Control Phase\n- From Pressure Control Phase to FiO2 Control Phase\n- From FiO2 Control Phase to Assist/Control Mode\n- From Assist/Control Mode to Safety Mode\n- From Safety Mode to End\n\nTest Cases:\n\nTC-001:\n{\n  \"id\": \"TC-001\",\n  \"title\": \"Pressure Fall Phase Overshoot\",\n  \"req_ids\": [\"RW-SW-63\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Pressure Control Phase\"],\n  \"inputs\": {\"name\": \"Pressure Command\"},\n  \"steps\": [\"Detect Pressure Command\", \"Measure Pressure Fall Phase Overshoot\"],\n  \"expected\": [\"Pressure Fall Phase Overshoot <= 0.8*PEEP-1 cmH2O\"]\n}\n\nTC-002:\n{\n  \"id\": \"TC-002\",\n  \"title\": \"Pressure Control Phase Accuracy\",\n  \"req_ids\": [\"RW-SW-64\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Pressure Control Phase\"],\n  \"inputs\": {\"name\": \"Pressure Command\"},\n  \"steps\": [\"Detect Pressure Command\", \"Measure Pressure Control Phase Accuracy\"],\n  \"expected\": [\"Pressure Control Phase Accuracy <= +-1 H2O + 10%\"]\n}\n\nTC-003:\n{\n  \"id\": \"TC-003\",\n  \"title\": \"FiO2 Accuracy\",\n  \"req_ids\": [\"RW-SW-95\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in FiO2 Control Phase\"],\n  \"inputs\": {\"name\": \"FiO2 Command\"},\n  \"steps\": [\"Detect FiO2 Command\", \"Measure FiO2 Accuracy\"],\n  \"expected\": [\"FiO2 Accuracy <= 0.05\"]\n}\n\nTC-004:\n{\n  \"id\": \"TC-004\",\n  \"title\": \"Air Condition Variation\",\n  \"req_ids\": [\"RW-SW-98\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in FiO2 Control Phase\"],\n  \"inputs\": {\"name\": \"FiO2 Command\"},\n  \"steps\": [\"Detect FiO2 Command\", \"Measure Air Condition Variation\"],\n  \"expected\": [\"Air Condition Variation does not affect FiO2 Accuracy\"]\n}\n\nTC-005:\n{\n  \"id\": \"TC-005\",\n  \"title\": \"Assist/Control Mode Activation\",\n  \"req_ids\": [\"RW-SW-153\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Assist/Control Mode\"],\n  \"inputs\": {\"name\": \"Inspiration Detection\"},\n  \"steps\": [\"Detect Inspiration\", \"Activate Assist/Control Mode\"],\n  \"expected\": [\"Assist/Control Mode Activated\"]\n}\n\nTC-006:\n{\n  \"id\": \"TC-006\",\n  \"title\": \"Safety Mode Activation\",\n  \"req_ids\": [\"RW-SW-156\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Safety Mode\"],\n  \"inputs\": {\"name\": \"Data Corruption\"},\n  \"steps\": [\"Detect Data Corruption\", \"Activate Safety Mode\"],\n  \"expected\": [\"Safety Mode Activated\"]\n}\n\nTC-007:\n{\n  \"id\": \"TC-007\",\n  \"title\": \"Report FiO2 Prior to Inhale\",\n  \"req_ids\": [\"RW-SW-97\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in FiO2 Control Phase\"],\n  \"inputs\": {\"name\": \"FiO2 Command\"},\n  \"steps\": [\"Detect FiO2 Command\", \"Report FiO2 Prior to Inhale\"],\n  \"expected\": [\"FiO2 Prior to Inhale is reported\"]\n}\n\nTC-008:\n{\n  \"id\": \"TC-008\",\n  \"title\": \"Commanded Pressure Meeting\",\n  \"req_ids\": [\"RW-SW-63\", \"RW-SW-64\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Pressure Control Phase\"],\n  \"inputs\": {\"name\": \"Pressure Command\"},\n  \"steps\": [\"Detect Pressure Command\", \"Measure Pressure Meeting\"],\n  \"expected\": [\"Pressure Meeting <= 0.8*PEEP-1 cmH2O\", \"Pressure Meeting >= -1 H2O + 10%\"]\n}\n\nTC-009:\n{\n  \"id\": \"TC-009\",\n  \"title\": \"Commanded FiO2 Meeting\",\n  \"req_ids\": [\"RW-SW-95\", \"RW-SW-98\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in FiO2 Control Phase\"],\n  \"inputs\": {\"name\": \"FiO2 Command\"},\n  \"steps\": [\"Detect FiO2 Command\", \"Measure FiO2 Meeting\"],\n  \"expected\": [\"FiO2 Meeting <= 0.05\", \"FiO2 Meeting is not affected by Air Condition Variation\"]\n}\n\nTC-010:\n{\n  \"id\": \"TC-010\",\n  \"title\": \"Assist/Control Mode Meeting\",\n  \"req_ids\": [\"RW-SW-153\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Assist/Control Mode\"],\n  \"inputs\": {\"name\": \"Inspiration Detection\"},\n  \"steps\": [\"Detect Inspiration\", \"Measure Assist/Control Mode Meeting\"],\n  \"expected\": [\"Assist/Control Mode Meeting is triggered by Inspiration Detection\"]\n}\n\nTC-011:\n{\n  \"id\": \"TC-011\",\n  \"title\": \"Safety Mode Meeting\",\n  \"req_ids\": [\"RW-SW-156\"],\n  \"kind\": \"positive\",\n  \"preconditions\": [\"Controller in Safety Mode\"],\n  \"inputs\": {\"name\": \"Data Corruption\"},\n  \"steps\": [\"Detect Data Corruption\", \"Measure Safety Mode Meeting\"],\n  \"expected\": [\"Safety Mode Meeting is triggered by Data Corruption\"]\n}\n}",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Pressure Fall Phase Overshoot",
+          "req_ids": [
+            "RW-SW-63"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in Pressure Control Phase"
+          ],
+          "inputs": {
+            "name": "Pressure Command"
+          },
+          "steps": [
+            "Detect Pressure Command",
+            "Measure Pressure Fall Phase Overshoot"
+          ],
+          "expected": [
+            "Pressure Fall Phase Overshoot <= 0.8*PEEP-1 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Pressure Control Phase Accuracy",
+          "req_ids": [
+            "RW-SW-64"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in Pressure Control Phase"
+          ],
+          "inputs": {
+            "name": "Pressure Command"
+          },
+          "steps": [
+            "Detect Pressure Command",
+            "Measure Pressure Control Phase Accuracy"
+          ],
+          "expected": [
+            "Pressure Control Phase Accuracy <= +-1 H2O + 10%"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "FiO2 Accuracy",
+          "req_ids": [
+            "RW-SW-95"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in FiO2 Control Phase"
+          ],
+          "inputs": {
+            "name": "FiO2 Command"
+          },
+          "steps": [
+            "Detect FiO2 Command",
+            "Measure FiO2 Accuracy"
+          ],
+          "expected": [
+            "FiO2 Accuracy <= 0.05"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Air Condition Variation",
+          "req_ids": [
+            "RW-SW-98"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in FiO2 Control Phase"
+          ],
+          "inputs": {
+            "name": "FiO2 Command"
+          },
+          "steps": [
+            "Detect FiO2 Command",
+            "Measure Air Condition Variation"
+          ],
+          "expected": [
+            "Air Condition Variation does not affect FiO2 Accuracy"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Assist/Control Mode Activation",
+          "req_ids": [
+            "RW-SW-153"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in Assist/Control Mode"
+          ],
+          "inputs": {
+            "name": "Inspiration Detection"
+          },
+          "steps": [
+            "Detect Inspiration",
+            "Activate Assist/Control Mode"
+          ],
+          "expected": [
+            "Assist/Control Mode Activated"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Safety Mode Activation",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in Safety Mode"
+          ],
+          "inputs": {
+            "name": "Data Corruption"
+          },
+          "steps": [
+            "Detect Data Corruption",
+            "Activate Safety Mode"
+          ],
+          "expected": [
+            "Safety Mode Activated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Report FiO2 Prior to Inhale",
+          "req_ids": [
+            "RW-SW-97"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in FiO2 Control Phase"
+          ],
+          "inputs": {
+            "name": "FiO2 Command"
+          },
+          "steps": [
+            "Detect FiO2 Command",
+            "Report FiO2 Prior to Inhale"
+          ],
+          "expected": [
+            "FiO2 Prior to Inhale is reported"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Commanded Pressure Meeting",
+          "req_ids": [
+            "RW-SW-63",
+            "RW-SW-64"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in Pressure Control Phase"
+          ],
+          "inputs": {
+            "name": "Pressure Command"
+          },
+          "steps": [
+            "Detect Pressure Command",
+            "Measure Pressure Meeting"
+          ],
+          "expected": [
+            "Pressure Meeting <= 0.8*PEEP-1 cmH2O",
+            "Pressure Meeting >= -1 H2O + 10%"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Commanded FiO2 Meeting",
+          "req_ids": [
+            "RW-SW-95",
+            "RW-SW-98"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in FiO2 Control Phase"
+          ],
+          "inputs": {
+            "name": "FiO2 Command"
+          },
+          "steps": [
+            "Detect FiO2 Command",
+            "Measure FiO2 Meeting"
+          ],
+          "expected": [
+            "FiO2 Meeting <= 0.05",
+            "FiO2 Meeting is not affected by Air Condition Variation"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Assist/Control Mode Meeting",
+          "req_ids": [
+            "RW-SW-153"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in Assist/Control Mode"
+          ],
+          "inputs": {
+            "name": "Inspiration Detection"
+          },
+          "steps": [
+            "Detect Inspiration",
+            "Measure Assist/Control Mode Meeting"
+          ],
+          "expected": [
+            "Assist/Control Mode Meeting is triggered by Inspiration Detection"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Safety Mode Meeting",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in Safety Mode"
+          ],
+          "inputs": {
+            "name": "Data Corruption"
+          },
+          "steps": [
+            "Detect Data Corruption",
+            "Measure Safety Mode Meeting"
+          ],
+          "expected": [
+            "Safety Mode Meeting is triggered by Data Corruption"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.4,
+        "sfv_score": 0.7,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: balanced brackets"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.70). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: states declared\n- missing: balanced brackets",
+      "artifact": "{\n  \"Test Suite for U20_Embedded Controller Functional Requirements\":\n  [\n    {\n      \"id\": \"TC-001\",\n      \"title\": \"Meet commanded pressure within overshoot\",\n      \"req_ids\": [\"RW-SW-63\"],\n      \"kind\": \"positive\",\n      \"preconditions\": [\"Controller in pressure fall phase\"],\n      \"inputs\": {\"name\": \"Pressure command\"},\n      \"steps\": [\"Apply command\", \"Measure pressure\"],\n      \"expected\": [\"Pressure <= 0.8*PEEP-1 cmH2O\"]\n    },\n    {\n      \"id\": \"TC-002\",\n      \"title\": \"Meet commanded PEEP within tolerance\",\n      \"req_ids\": [\"RW-SW-64\"],\n      \"kind\": \"positive\",\n      \"preconditions\": [\"Controller in stable phase\"],\n      \"inputs\": {\"name\": \"PEEP command\"},\n      \"steps\": [\"Apply command\", \"Measure PEEP\"],\n      \"expected\": [\"PEEP within +-1 H2O + 10%\"]\n    },\n    {\n      \"id\": \"TC-003\",\n      \"title\": \"Achieve target FiO2 value\",\n      \"req_ids\": [\"RW-SW-95\"],\n      \"kind\": \"positive\",\n      \"preconditions\": [\"Controller in stable phase\"],\n      \"inputs\": {\"name\": \"FiO2 command\"},\n      \"steps\": [\"Apply command\", \"Measure FiO2\"],\n      \"expected\": [\"FiO2 <= 0.05\"]\n    },\n    {\n      \"id\": \"TC-004\",\n      \"title\": \"Report FiO2 prior to inhale\",\n      \"req_ids\": [\"RW-SW-97\"],\n      \"kind\": \"positive\",\n      \"preconditions\": [\"Controller in stable phase\"],\n      \"inputs\": {\"name\": \"FiO2 measurement\"},\n      \"steps\": [\"Report FiO2\", \"Inhale limb check\"],\n      \"expected\": [\"FiO2 reported before inhale\"]\n    },\n    {\n      \"id\": \"TC-005\",\n      \"title\": \"Achieve commanded values under varying air conditions\",\n      \"req_ids\": [\"RW-SW-98\"],\n      \"kind\": \"positive\",\n      \"preconditions\": [\"Controller in stable phase\", \"Air conditions varied\"],\n      \"inputs\": {\"name\": \"Air condition parameters\"},\n      \"steps\": [\"Apply command\", \"Measure FiO2\"],\n      \"expected\": [\"FiO2 within tolerance under varied air conditions\"]\n    },\n    {\n      \"id\": \"TC-006\",\n      \"title\": \"Assist/control with pressure controlled ventilation\",\n      \"req_ids\": [\"RW-SW-153\"],\n      \"kind\": \"positive\",\n      \"preconditions\": [\"Controller in assist/control mode\", \"Patient inspiration detected\"],\n      \"inputs\": {\"name\": \"Inspiration signal\"},\n      \"steps\": [\"Detect inspiration\", \"Apply assist/control command\"],\n      \"expected\": [\"Assist/control command applied\"]\n    },\n    {\n      \"id\": \"TC-007\",\n      \"title\": \"Safety measures against absurd commands\",\n      \"req_ids\": [\"RW-SW-156\"],\n      \"kind\": \"negative\",\n      \"preconditions\": [\"Controller in any mode\", \"Corrupted data received\"],\n      \"inputs\": {\"name\": \"Corrupted data\"},\n      \"steps\": [\"Receive data\", \"Check data integrity\"],\n      \"expected\": [\"No action on corrupted data\"]\n    }\n  ]\n}",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.4,
+        "sfv_score": 0.2,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.20). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state",
+      "artifact": "{\n  \"Test Suite for U20_Embedded Controller Functional Requirements\":\n  [\n    {\n      \"Initial State\": \"Idle\",\n      \"States\": [\n        \"Pressure Fall Phase\",\n        \"PEEP Achievement\",\n        \"FiO2 Achievement\",\n        \"Assist/Control Mode\",\n        \"Safety Measures Mode\"\n      ],\n      \"Events\": [\n        \"Command Pressure\",\n        \"Pressure Overshoot\",\n        \"PEEP Command\",\n        \"FiO2 Command\",\n        \"Inspiration Detection\",\n        \"Absurd Command Detection\"\n      ],\n      \"Transitions\": [\n        {\n          \"from\": \"Idle\",\n          \"to\": \"Pressure Fall Phase\",\n          \"guard\": \"true\"\n        },\n        {\n          \"from\": \"Pressure Fall Phase\",\n          \"to\": \"PEEP Achievement\",\n          \"guard\": \"Pressure <= 0.8*PEEP-1 cmH2O\"\n        },\n        {\n          \"from\": \"PEEP Achievement\",\n          \"to\": \"FiO2 Achievement\",\n          \"guard\": \"true\"\n        },\n        {\n          \"from\": \"FiO2 Achievement\",\n          \"to\": \"Assist/Control Mode\",\n          \"guard\": \"true\"\n        },\n        {\n          \"from\": \"Assist/Control Mode\",\n          \"to\": \"Safety Measures Mode\",\n          \"guard\": \"true\"\n        },\n        {\n          \"from\": \"Safety Measures Mode\",\n          \"to\": \"Idle\",\n          \"guard\": \"true\"\n        }\n      ]\n    },\n    {\n      \"Initial State\": \"Pressure Fall Phase\",\n      \"States\": [\n        \"Pressure Fall Phase\",\n        \"PEEP Achievement\",\n        \"FiO2 Achievement\",\n        \"Assist/Control Mode\",\n        \"Safety Measures Mode\"\n      ],\n      \"Events\": [\n        \"Command Pressure\",\n        \"Pressure Overshoot\",\n        \"PEEP Command\",\n        \"FiO2 Command\",\n        \"Inspiration Detection\",\n        \"Absurd Command Detection\"\n      ],\n      \"Transitions\": [\n        {\n          \"from\": \"Pressure Fall Phase\",\n          \"to\": \"PEEP Achievement\",\n          \"guard\": \"Pressure <= 0.8*PEEP-1 cmH2O\"\n        },\n        {\n          \"from\": \"PEEP Achievement\",\n          \"to\": \"FiO2 Achievement\",\n          \"guard\": \"true\"\n        },\n        {\n          \"from\": \"FiO2 Achievement\",\n          \"to\": \"Assist/Control Mode\",\n          \"guard\": \"true\"\n        },\n        {\n          \"from\": \"Assist/Control Mode\",\n          \"to\": \"Safety Measures Mode\",\n          \"guard\": \"true\"\n        },\n        {\n          \"from\": \"Safety Measures Mode\",\n          \"to\": \"Pressure Fall Phase\",\n          \"guard\": \"true\"\n        }\n      ]\n    }\n  ]\n}",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.6,
+        "sfv_score": 0.3,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: transitions (>=2)",
+          "missing: states declared"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.30). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- missing: transitions (>=2)\n- missing: states declared",
+      "artifact": "Statechart for U20_Embedded Controller Test Suite\n\n[\n  [\"Initial\", \"Command Pressure Phase\", \"Pressure Fall Phase\", \"PEEP Achieved\", \"FiO2 Achieved\", \"Assist/Control Mode\", \"Safety Measures Activated\", \"Error State\"],\n  [\"Initial\", \"Command Pressure Phase\", \"Pressure Fall Phase\", \"false\", \"true\", \"true\", \"true\", \"false\"],\n  [\"Command Pressure Phase\", \"Pressure Fall Phase\", \"PEEP Achieved\", \"true\", \"true\", \"true\", \"true\", \"false\"],\n  [\"Pressure Fall Phase\", \"PEEP Achieved\", \"true\", \"true\", \"true\", \"true\", \"false\"],\n  [\"PEEP Achieved\", \"FiO2 Achieved\", \"true\", \"true\", \"true\", \"true\", \"false\"],\n  [\"FiO2 Achieved\", \"Assist/Control Mode\", \"true\", \"true\", \"true\", \"true\", \"false\"],\n  [\"Assist/Control Mode\", \"Safety Measures Activated\", \"true\", \"true\", \"true\", \"true\", \"false\"],\n  [\"Safety Measures Activated\", \"Error State\", \"true\", \"true\", \"true\", \"true\", \"false\"]\n]\n]",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.4,
+        "sfv_score": 0.2,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: balanced brackets"
+        ]
+      }
+    }
+  ]
+}

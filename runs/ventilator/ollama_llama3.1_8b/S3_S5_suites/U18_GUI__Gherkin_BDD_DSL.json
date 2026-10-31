@@ -1,0 +1,872 @@
+{
+  "unit_id": "U18_GUI",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.5,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.5152,
+    "hallucinated": [
+      {
+        "value": "56 cmH2O",
+        "context": "PIP value",
+        "grounded": false
+      },
+      {
+        "value": "4",
+        "context": "PIP value",
+        "grounded": false
+      },
+      {
+        "value": "57",
+        "context": "PIP value",
+        "grounded": false
+      },
+      {
+        "value": "0%",
+        "context": "rise time parameter",
+        "grounded": false
+      },
+      {
+        "value": "10%",
+        "context": "rise time parameter",
+        "grounded": false
+      },
+      {
+        "value": "20%",
+        "context": "rise time parameter",
+        "grounded": false
+      },
+      {
+        "value": "21%",
+        "context": "rise time parameter",
+        "grounded": false
+      },
+      {
+        "value": "21% of breath cycle time",
+        "context": "rise parameter",
+        "grounded": false
+      },
+      {
+        "value": "PIP value displayed as 56 cmH2O",
+        "context": "PIP display",
+        "grounded": false
+      },
+      {
+        "value": "PIP value displayed as 4",
+        "context": "PIP display",
+        "grounded": false
+      },
+      {
+        "value": "PIP value displayed as 57",
+        "context": "PIP display",
+        "grounded": false
+      },
+      {
+        "value": "rise time parameter displayed as 10%",
+        "context": "rise time display",
+        "grounded": false
+      },
+      {
+        "value": "rise time parameter displayed as 20%",
+        "context": "rise time display",
+        "grounded": false
+      },
+      {
+        "value": "rise time parameter displayed as 0%",
+        "context": "rise time display",
+        "grounded": false
+      },
+      {
+        "value": "rise time parameter displayed as 21%",
+        "context": "rise time display",
+        "grounded": false
+      },
+      {
+        "value": "rise parameter displayed as 21% of breath cycle time",
+        "context": "rise parameter display",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 33,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "FiO2 assertion is vague; should check exact numeric value or display format.",
+      "Shutdown message assertion is vague; should verify exact message text or error code.",
+      "Assist/control mode assertion is vague; should verify specific UI indicator or state.",
+      "Tests for rise time and rise parameter assume a 0-20% range, but requirement RW-SW-139 does not specify a range; clarify requirement or adjust tests.",
+      "Negative tests for PIP out-of-range values (4, 56, 57) do not assert expected error handling; add explicit checks for error messages or rejection."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.8523,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Ventilator GUI Functionality\n\n  Scenario: Display FiO2 as measured prior to patient inhale limb\n    Given the ventilator is in a stable state\n    When the user views the GUI\n    Then the FiO2 value is displayed as measured prior to the patient inhale limb\n\n  Scenario: Set PIP from 5-55 cmH2O with increments of 1 cm H2O\n    Given the ventilator is in a stable state\n    When the user sets PIP to 5 cmH2O\n    Then the PIP value is displayed as 5 cmH2O\n    When the user increments PIP by 1 cmH2O\n    Then the PIP value is displayed as 6 cmH2O\n    When the user sets PIP to 55 cmH2O\n    Then the PIP value is displayed as 55 cmH2O\n    When the user increments PIP by 1 cmH2O\n    Then the PIP value is displayed as 56 cmH2O\n\n  Scenario: Detect controller shutdown\n    Given the ventilator is in a stable state\n    When the controller is shut down\n    Then the GUI displays a shutdown message\n\n  Scenario: Rise time parameter in pressure controlled ventilation mode\n    Given the ventilator is in a stable state\n    And the user is in pressure controlled ventilation mode\n    When the user sets the rise time parameter to 10%\n    Then the rise time parameter is displayed as 10%\n    When the user sets the rise time parameter to 20%\n    Then the rise time parameter is displayed as 20%\n    When the user sets the rise time parameter to 0%\n    Then the rise time parameter is displayed as 0%\n\n  Scenario: Rise parameter in pressure controlled ventilation mode\n    Given the ventilator is in a stable state\n    And the user is in pressure controlled ventilation mode\n    When the user sets the rise parameter to 10% of breath cycle time\n    Then the rise parameter is displayed as 10% of breath cycle time\n    When the user sets the rise parameter to 20% of breath cycle time\n    Then the rise parameter is displayed as 20% of breath cycle time\n    When the user sets the rise parameter to 0% of breath cycle time\n    Then the rise parameter is displayed as 0% of breath cycle time\n\n  Scenario: Assist/control with pressure controlled ventilation mode\n    Given the ventilator is in a stable state\n    And the user is in pressure controlled ventilation mode\n    When the user selects assist/control with pressure controlled ventilation mode\n    Then the assist/control with pressure controlled ventilation mode is displayed as selected\n\n  Scenario Outline: Set PIP with edge values\n    Given the ventilator is in a stable state\n    When the user sets PIP to <value>\n    Then the PIP value is displayed as <value>\n    Examples:\n      | value | edge |\n      | 4     | boundary |\n      | 5     | positive |\n      | 6     | positive |\n      | 56    | boundary |\n      | 57    | negative |\n\n  Scenario Outline: Set rise time parameter with edge values\n    Given the ventilator is in a stable state\n    And the user is in pressure controlled ventilation mode\n    When the user sets the rise time parameter to <value>\n    Then the rise time parameter is displayed as <value>\n    Examples:\n      | value | edge |\n      | 0     | boundary |\n      | 10    | positive |\n      | 20    | positive |\n      | 21    | negative |\n\n  Scenario Outline: Set rise parameter with edge values\n    Given the ventilator is in a stable state\n    And the user is in pressure controlled ventilation mode\n    When the user sets the rise parameter to <value> of breath cycle time\n    Then the rise parameter is displayed as <value> of breath cycle time\n    Examples:\n      | value | edge |\n      | 0     | boundary |\n      | 10    | positive |\n      | 20    | positive |\n      | 21    | negative |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Display FiO2 as measured prior to patient inhale limb",
+      "req_ids": [
+        "RW-SW-96"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "ventilator in stable state"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "view GUI",
+        "assert FiO2 value displayed"
+      ],
+      "expected": [
+        "FiO2 value displayed as measured prior to patient inhale limb"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Set PIP from 5-55 cmH2O with increments of 1 cm H2O",
+      "req_ids": [
+        "RW-SW-99"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "ventilator in stable state"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "set PIP to 5 cmH2O",
+        "increment PIP by 1 cmH2O",
+        "assert PIP value displayed"
+      ],
+      "expected": [
+        "PIP value displayed as 5 cmH2O",
+        "PIP value displayed as 6 cmH2O",
+        "PIP value displayed as 56 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Detect controller shutdown",
+      "req_ids": [
+        "RW-SW-113"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "ventilator in stable state"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "shutdown controller",
+        "assert shutdown message displayed"
+      ],
+      "expected": [
+        "shutdown message displayed"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Rise time parameter in pressure controlled ventilation mode",
+      "req_ids": [
+        "RW-SW-139"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "ventilator in stable state",
+        "user in pressure controlled ventilation mode"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "set rise time parameter to 10%",
+        "assert rise time parameter displayed"
+      ],
+      "expected": [
+        "rise time parameter displayed as 10%"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Rise parameter in pressure controlled ventilation mode",
+      "req_ids": [
+        "RW-SW-141"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "ventilator in stable state",
+        "user in pressure controlled ventilation mode"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "set rise parameter to 10% of breath cycle time",
+        "assert rise parameter displayed"
+      ],
+      "expected": [
+        "rise parameter displayed as 10% of breath cycle time"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Assist/control with pressure controlled ventilation mode",
+      "req_ids": [
+        "RW-SW-155"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "ventilator in stable state",
+        "user in pressure controlled ventilation mode"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "select assist/control with pressure controlled ventilation mode",
+        "assert assist/control with pressure controlled ventilation mode displayed"
+      ],
+      "expected": [
+        "assist/control with pressure controlled ventilation mode displayed as selected"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Set PIP with edge values",
+      "req_ids": [
+        "RW-SW-99"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "ventilator in stable state"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "set PIP to <value>",
+        "assert PIP value displayed"
+      ],
+      "expected": [
+        "PIP value displayed as <value>"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Set rise time parameter with edge values",
+      "req_ids": [
+        "RW-SW-139"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "ventilator in stable state",
+        "user in pressure controlled ventilation mode"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "set rise time parameter to <value>",
+        "assert rise time parameter displayed"
+      ],
+      "expected": [
+        "rise time parameter displayed as <value>"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Set rise parameter with edge values",
+      "req_ids": [
+        "RW-SW-141"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "ventilator in stable state",
+        "user in pressure controlled ventilation mode"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "set rise parameter to <value> of breath cycle time",
+        "assert rise parameter displayed"
+      ],
+      "expected": [
+        "rise parameter displayed as <value> of breath cycle time"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Display FiO2 as measured prior to patient inhale limb",
+          "req_ids": [
+            "RW-SW-96"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in normal operation mode"
+          ],
+          "inputs": {
+            "none": "none"
+          },
+          "steps": [
+            "view GUI",
+            "verify FiO2 value displayed"
+          ],
+          "expected": [
+            "FiO2 value displayed as measured prior to patient inhale limb"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Set PIP from 5-55 cmH2O with increments of 1 cm H2O",
+          "req_ids": [
+            "RW-SW-99"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in normal operation mode"
+          ],
+          "inputs": {
+            "PIP": "5"
+          },
+          "steps": [
+            "set PIP to 5 cmH2O",
+            "verify PIP value displayed"
+          ],
+          "expected": [
+            "PIP value displayed as 5 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Detect controller shutdown",
+          "req_ids": [
+            "RW-SW-113"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in normal operation mode"
+          ],
+          "inputs": {
+            "none": "none"
+          },
+          "steps": [
+            "shutdown controller",
+            "verify shutdown message displayed"
+          ],
+          "expected": [
+            "shutdown message displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Set rise time parameter in [CPAP, PSV] modes",
+          "req_ids": [
+            "RW-SW-139"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in CPAP mode"
+          ],
+          "inputs": {
+            "rise time": "10"
+          },
+          "steps": [
+            "set rise time parameter to 10 seconds",
+            "verify rise time value displayed"
+          ],
+          "expected": [
+            "rise time value displayed as 10 seconds"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Set rise parameter in the range of 0..20% of breath cycle time",
+          "req_ids": [
+            "RW-SW-141"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in normal operation mode"
+          ],
+          "inputs": {
+            "rise parameter": "0"
+          },
+          "steps": [
+            "set rise parameter to 0%",
+            "verify rise parameter value displayed"
+          ],
+          "expected": [
+            "rise parameter value displayed as 0%"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Specify assist/control with pressure controlled ventilation mode",
+          "req_ids": [
+            "RW-SW-155"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in normal operation mode"
+          ],
+          "inputs": {
+            "none": "none"
+          },
+          "steps": [
+            "select pressure controlled ventilation mode",
+            "verify assist/control mode displayed"
+          ],
+          "expected": [
+            "assist/control mode displayed as pressure controlled ventilation"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Set PIP with edge and invalid values",
+          "req_ids": [
+            "RW-SW-99"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "ventilator in normal operation mode"
+          ],
+          "inputs": {
+            "PIP": "5"
+          },
+          "steps": [
+            "set PIP to 5 cmH2O",
+            "verify PIP value displayed"
+          ],
+          "expected": [
+            "PIP value displayed as 5 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Set rise time parameter with edge and invalid values",
+          "req_ids": [
+            "RW-SW-139"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "ventilator in CPAP mode"
+          ],
+          "inputs": {
+            "rise time": "10"
+          },
+          "steps": [
+            "set rise time parameter to 10 seconds",
+            "verify rise time value displayed"
+          ],
+          "expected": [
+            "rise time value displayed as 10 seconds"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Set rise parameter with edge and invalid values",
+          "req_ids": [
+            "RW-SW-141"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "ventilator in normal operation mode"
+          ],
+          "inputs": {
+            "rise parameter": "0"
+          },
+          "steps": [
+            "set rise parameter to 0%",
+            "verify rise parameter value displayed"
+          ],
+          "expected": [
+            "rise parameter value displayed as 0%"
+          ]
+        }
+      ],
+      "raw_if_unparsed": "```gherkin\nFeature: Ventilator GUI Functionality\n\n  Scenario: Display FiO2 as measured prior to patient inhale limb\n    Given the ventilator is in normal operation mode\n    When the user views the GUI\n    Then the FiO2 value is displayed as measured prior to the patient inhale limb\n\n  Scenario: Set PIP from 5-55 cmH2O with increments of 1 cm H2O\n    Given the ventilator is in normal operation mode\n    When the user sets PIP to 5 cmH2O\n    Then the PIP value is displayed as 5 cmH2O\n    When the user increments PIP by 1 cmH2O\n    Then the PIP value is displayed as 6 cmH2O\n    When the user sets PIP to 55 cmH2O\n    Then the PIP value is displayed as 55 cmH2O\n    When the user increments PIP beyond 55 cmH2O\n    Then an error message is displayed indicating PIP is out of range\n\n  Scenario: Detect controller shutdown\n    Given the ventilator is in normal operation mode\n    When the controller is shut down\n    Then the GUI displays a shutdown message\n\n  Scenario: Set rise time parameter in [CPAP, PSV] modes\n    Given the ventilator is in CPAP mode\n    When the user sets the rise time parameter to 10 seconds\n    Then the rise time value is displayed as 10 seconds\n    Given the ventilator is in PSV mode\n    When the user sets the rise time parameter to 15 seconds\n    Then the rise time value is displayed as 15 seconds\n    When the user sets the rise time parameter to a value outside the valid range\n    Then an error message is displayed indicating the rise time is out of range\n\n  Scenario: Set rise parameter in the range of 0..20% of breath cycle time\n    Given the ventilator is in normal operation mode\n    When the user sets the rise parameter to 0%\n    Then the rise parameter value is displayed as 0%\n    When the user sets the rise parameter to 20%\n    Then the rise parameter value is displayed as 20%\n    When the user sets the rise parameter to a value outside the valid range\n    Then an error message is displayed indicating the rise parameter is out of range\n\n  Scenario: Specify assist/control with pressure controlled ventilation mode\n    Given the ventilator is in normal operation mode\n    When the user selects pressure controlled ventilation mode\n    Then the assist/control mode is displayed as pressure controlled ventilation\n\n  Scenario Outline: Set PIP with edge and invalid values\n    Given the ventilator is in normal operation mode\n    When the user sets PIP to <value>\n    Then the PIP value is displayed as <value>\n    Examples:\n      | value  |\n      | 5      |\n      | 55     |\n      | -1     |\n      | 56     |\n\n  Scenario Outline: Set rise time parameter with edge and invalid values\n    Given the ventilator is in CPAP mode\n    When the user sets the rise time parameter to <value>\n    Then the rise time value is displayed as <value>\n    Examples:\n      | value  |\n      | 10     |\n      | 15     |\n      | -1     |\n      | 16     |\n\n  Scenario Outline: Set rise parameter with edge and invalid values\n    Given the ventilator is in normal operation ",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.6667,
+        "representation_score": 0.0,
+        "sfv_score": 0.3333,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #7 (TC-007): 'edge' is not one of ['positive', 'negative', 'boundary']",
+          "test case #8 (TC-008): 'edge' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'edge' is not one of ['positive', 'negative', 'boundary']",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.33). Fix these problems and output the full corrected suite:\n- test case #7 (TC-007): 'edge' is not one of ['positive', 'negative', 'boundary']\n- test case #8 (TC-008): 'edge' is not one of ['positive', 'negative', 'boundary']\n- test case #9 (TC-009): 'edge' is not one of ['positive', 'negative', 'boundary']\n- Representation artifact is empty.",
+      "artifact": "Feature: Ventilator GUI Functionality\n\n  Scenario: Display FiO2 as measured prior to patient inhale limb\n    Given the ventilator is in a stable state\n    When the user views the GUI\n    Then the FiO2 value is displayed as measured prior to the patient inhale limb\n\n  Scenario: Set PIP from 5-55 cmH2O with increments of 1 cm H2O\n    Given the ventilator is in a stable state\n    When the user sets PIP to 5 cmH2O\n    Then the PIP value is displayed as 5 cmH2O\n    When the user increments PIP by 1 cmH2O\n    Then the PIP value is displayed as 6 cmH2O\n    When the user sets PIP to 55 cmH2O\n    Then the PIP value is displayed as 55 cmH2O\n    When the user increments PIP by 1 cmH2O\n    Then the PIP value is displayed as 56 cmH2O\n\n  Scenario: Detect controller shutdown\n    Given the ventilator is in a stable state\n    When the controller is shut down\n    Then the GUI displays a shutdown message\n\n  Scenario: Rise time parameter in pressure controlled ventilation mode\n    Given the ventilator is in a stable state\n    And the user is in pressure controlled ventilation mode\n    When the user sets the rise time parameter to 10%\n    Then the rise time parameter is displayed as 10%\n    When the user sets the rise time parameter to 20%\n    Then the rise time parameter is displayed as 20%\n    When the user sets the rise time parameter to 0%\n    Then the rise time parameter is displayed as 0%\n\n  Scenario: Rise parameter in pressure controlled ventilation mode\n    Given the ventilator is in a stable state\n    And the user is in pressure controlled ventilation mode\n    When the user sets the rise parameter to 10% of breath cycle time\n    Then the rise parameter is displayed as 10% of breath cycle time\n    When the user sets the rise parameter to 20% of breath cycle time\n    Then the rise parameter is displayed as 20% of breath cycle time\n    When the user sets the rise parameter to 0% of breath cycle time\n    Then the rise parameter is displayed as 0% of breath cycle time\n\n  Scenario: Assist/control with pressure controlled ventilation mode\n    Given the ventilator is in a stable state\n    And the user is in pressure controlled ventilation mode\n    When the user selects assist/control with pressure controlled ventilation mode\n    Then the assist/control with pressure controlled ventilation mode is displayed as selected\n\n  Scenario Outline: Set PIP with edge values\n    Given the ventilator is in a stable state\n    When the user sets PIP to <value>\n    Then the PIP value is displayed as <value>\n    Examples:\n      | value | edge |\n      | 4     | boundary |\n      | 5     | positive |\n      | 6     | positive |\n      | 56    | boundary |\n      | 57    | negative |\n\n  Scenario Outline: Set rise time parameter with edge values\n    Given the ventilator is in a stable state\n    And the user is in pressure controlled ventilation mode\n    When the user sets the rise time parameter to <value>\n    Then the rise time parameter is displayed as <value>\n    Examples:\n      | value | edge |\n      | 0     | boundary |\n      | 10    | positive |\n      | 20    | positive |\n      | 21    | negative |\n\n  Scenario Outline: Set rise parameter with edge values\n    Given the ventilator is in a stable state\n    And the user is in pressure controlled ventilation mode\n    When the user sets the rise parameter to <value> of breath cycle time\n    Then the rise parameter is displayed as <value> of breath cycle time\n    Examples:\n      | value | edge |\n      | 0     | boundary |\n      | 10    | positive |\n      | 20    | positive |\n      | 21    | negative |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Display FiO2 as measured prior to patient inhale limb",
+          "req_ids": [
+            "RW-SW-96"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in stable state"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "view GUI",
+            "assert FiO2 value displayed"
+          ],
+          "expected": [
+            "FiO2 value displayed as measured prior to patient inhale limb"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Set PIP from 5-55 cmH2O with increments of 1 cm H2O",
+          "req_ids": [
+            "RW-SW-99"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in stable state"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "set PIP to 5 cmH2O",
+            "increment PIP by 1 cmH2O",
+            "assert PIP value displayed"
+          ],
+          "expected": [
+            "PIP value displayed as 5 cmH2O",
+            "PIP value displayed as 6 cmH2O",
+            "PIP value displayed as 56 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Detect controller shutdown",
+          "req_ids": [
+            "RW-SW-113"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in stable state"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "shutdown controller",
+            "assert shutdown message displayed"
+          ],
+          "expected": [
+            "shutdown message displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Rise time parameter in pressure controlled ventilation mode",
+          "req_ids": [
+            "RW-SW-139"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in stable state",
+            "user in pressure controlled ventilation mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "set rise time parameter to 10%",
+            "assert rise time parameter displayed"
+          ],
+          "expected": [
+            "rise time parameter displayed as 10%"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Rise parameter in pressure controlled ventilation mode",
+          "req_ids": [
+            "RW-SW-141"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in stable state",
+            "user in pressure controlled ventilation mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "set rise parameter to 10% of breath cycle time",
+            "assert rise parameter displayed"
+          ],
+          "expected": [
+            "rise parameter displayed as 10% of breath cycle time"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Assist/control with pressure controlled ventilation mode",
+          "req_ids": [
+            "RW-SW-155"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in stable state",
+            "user in pressure controlled ventilation mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "select assist/control with pressure controlled ventilation mode",
+            "assert assist/control with pressure controlled ventilation mode displayed"
+          ],
+          "expected": [
+            "assist/control with pressure controlled ventilation mode displayed as selected"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Set PIP with edge values",
+          "req_ids": [
+            "RW-SW-99"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "ventilator in stable state"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "set PIP to <value>",
+            "assert PIP value displayed"
+          ],
+          "expected": [
+            "PIP value displayed as <value>"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Set rise time parameter with edge values",
+          "req_ids": [
+            "RW-SW-139"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in stable state",
+            "user in pressure controlled ventilation mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "set rise time parameter to <value>",
+            "assert rise time parameter displayed"
+          ],
+          "expected": [
+            "rise time parameter displayed as <value>"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Set rise parameter with edge values",
+          "req_ids": [
+            "RW-SW-141"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ventilator in stable state",
+            "user in pressure controlled ventilation mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "set rise parameter to <value> of breath cycle time",
+            "assert rise parameter displayed"
+          ],
+          "expected": [
+            "rise parameter displayed as <value> of breath cycle time"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.5,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.5152,
+        "hallucinated": [
+          {
+            "value": "56 cmH2O",
+            "context": "PIP value",
+            "grounded": false
+          },
+          {
+            "value": "4",
+            "context": "PIP value",
+            "grounded": false
+          },
+          {
+            "value": "57",
+            "context": "PIP value",
+            "grounded": false
+          },
+          {
+            "value": "0%",
+            "context": "rise time parameter",
+            "grounded": false
+          },
+          {
+            "value": "10%",
+            "context": "rise time parameter",
+            "grounded": false
+          },
+          {
+            "value": "20%",
+            "context": "rise time parameter",
+            "grounded": false
+          },
+          {
+            "value": "21%",
+            "context": "rise time parameter",
+            "grounded": false
+          },
+          {
+            "value": "21% of breath cycle time",
+            "context": "rise parameter",
+            "grounded": false
+          },
+          {
+            "value": "PIP value displayed as 56 cmH2O",
+            "context": "PIP display",
+            "grounded": false
+          },
+          {
+            "value": "PIP value displayed as 4",
+            "context": "PIP display",
+            "grounded": false
+          },
+          {
+            "value": "PIP value displayed as 57",
+            "context": "PIP display",
+            "grounded": false
+          },
+          {
+            "value": "rise time parameter displayed as 10%",
+            "context": "rise time display",
+            "grounded": false
+          },
+          {
+            "value": "rise time parameter displayed as 20%",
+            "context": "rise time display",
+            "grounded": false
+          },
+          {
+            "value": "rise time parameter displayed as 0%",
+            "context": "rise time display",
+            "grounded": false
+          },
+          {
+            "value": "rise time parameter displayed as 21%",
+            "context": "rise time display",
+            "grounded": false
+          },
+          {
+            "value": "rise parameter displayed as 21% of breath cycle time",
+            "context": "rise parameter display",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 33,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "FiO2 assertion is vague; should check exact numeric value or display format.",
+          "Shutdown message assertion is vague; should verify exact message text or error code.",
+          "Assist/control mode assertion is vague; should verify specific UI indicator or state.",
+          "Tests for rise time and rise parameter assume a 0-20% range, but requirement RW-SW-139 does not specify a range; clarify requirement or adjust tests.",
+          "Negative tests for PIP out-of-range values (4, 56, 57) do not assert expected error handling; add explicit checks for error messages or rejection."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.8523,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

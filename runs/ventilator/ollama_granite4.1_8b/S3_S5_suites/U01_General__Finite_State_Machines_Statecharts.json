@@ -1,0 +1,620 @@
+{
+  "unit_id": "U01_General",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.7,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.4,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0667,
+    "hallucinated": [
+      {
+        "value": "Idle",
+        "context": "state",
+        "grounded": false
+      },
+      {
+        "value": "Running",
+        "context": "state",
+        "grounded": false
+      },
+      {
+        "value": "StressTest",
+        "context": "state",
+        "grounded": false
+      },
+      {
+        "value": "BatteryLow",
+        "context": "state",
+        "grounded": false
+      },
+      {
+        "value": "InspirationDetected",
+        "context": "state",
+        "grounded": false
+      },
+      {
+        "value": "StartClock",
+        "context": "event",
+        "grounded": false
+      },
+      {
+        "value": "StopClock",
+        "context": "event",
+        "grounded": false
+      },
+      {
+        "value": "RunAlgorithm",
+        "context": "event",
+        "grounded": false
+      },
+      {
+        "value": "StressTestStart",
+        "context": "event",
+        "grounded": false
+      },
+      {
+        "value": "StressTestEnd",
+        "context": "event",
+        "grounded": false
+      },
+      {
+        "value": "BatteryCheck",
+        "context": "event",
+        "grounded": false
+      },
+      {
+        "value": "PatientInspiration",
+        "context": "event",
+        "grounded": false
+      },
+      {
+        "value": "Idle --> Running",
+        "context": "transition",
+        "grounded": false
+      },
+      {
+        "value": "Running --> StressTest",
+        "context": "transition",
+        "grounded": false
+      },
+      {
+        "value": "StressTest --> Running",
+        "context": "transition",
+        "grounded": false
+      },
+      {
+        "value": "Running --> BatteryLow",
+        "context": "transition",
+        "grounded": false
+      },
+      {
+        "value": "BatteryLow --> Idle",
+        "context": "transition",
+        "grounded": false
+      },
+      {
+        "value": "Idle --> InspirationDetected",
+        "context": "transition",
+        "grounded": false
+      },
+      {
+        "value": "canStartClock",
+        "context": "guard",
+        "grounded": false
+      },
+      {
+        "value": "canRunAlgorithmFasterThanRealTime",
+        "context": "guard",
+        "grounded": false
+      },
+      {
+        "value": "stressTestDurationExceeded",
+        "context": "guard",
+        "grounded": false
+      },
+      {
+        "value": "batteryLevelLow",
+        "context": "guard",
+        "grounded": false
+      },
+      {
+        "value": "patientInspirationDetected",
+        "context": "guard",
+        "grounded": false
+      },
+      {
+        "value": "softwareClockRangeSufficient()",
+        "context": "function",
+        "grounded": false
+      },
+      {
+        "value": "algorithmRunTime < realTimeFactor()",
+        "context": "condition",
+        "grounded": false
+      },
+      {
+        "value": "stressTestDuration > twoWeeks()",
+        "context": "condition",
+        "grounded": false
+      },
+      {
+        "value": "batteryCapacity < oneHourOperation()",
+        "context": "condition",
+        "grounded": false
+      },
+      {
+        "value": "sensorDetectsInspiration()",
+        "context": "function",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 30,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No negative test cases for overflow, instability, slow algorithm, battery depletion, or missed inspiration detection.",
+      "Oracle assertions are vague; lack numeric thresholds or specific state checks.",
+      "Tests rely on \"as specified\" inputs; no concrete values for algorithms or sensor signals.",
+      "Boundary values are tested only at exact limits; no near-boundary or out-of-range checks.",
+      "State transitions and guard conditions are not explicitly verified for both true and false outcomes."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.57,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "/* Finite State Machine / Statechart for Unit U01_General */\n\n/* States */\nState Idle;\nState Running;\nState StressTest;\nState BatteryLow;\nState InspirationDetected;\n\n/* Events */\nEvent StartClock;\nEvent StopClock;\nEvent RunAlgorithm;\nEvent StressTestStart;\nEvent StressTestEnd;\nEvent BatteryCheck;\nEvent PatientInspiration;\n\n/* Transitions with Guards */\nTransition Idle --> Running\n    Guard canStartClock;\n\nTransition Running --> StressTest\n    Guard canRunAlgorithmFasterThanRealTime;\n\nTransition StressTest --> Running\n    Guard stressTestDurationExceeded;\n\nTransition Running --> BatteryLow\n    Guard batteryLevelLow;\n\nTransition BatteryLow --> Idle\n    Guard batteryRecharged;\n\nTransition Idle --> InspirationDetected\n    Guard patientInspirationDetected;\n\n/* Guards Definitions */\nGuard canStartClock\n    Returns true if softwareClockRangeSufficient();\n\nGuard canRunAlgorithmFasterThanRealTime\n    Returns true if algorithmRunTime < realTimeFactor();\n\nGuard stressTestDurationExceeded\n    Returns true if stressTestDuration > twoWeeks();\n\nGuard batteryLevelLow\n    Returns true if batteryCapacity < oneHourOperation();\n\nGuard patientInspirationDetected\n    Returns true if sensorDetectsInspiration();\n\n/* Lifecycle */\nInitial Idle;\n\n/* Additional Notes */\n/* All guards must be tested for both True and False outcomes to ensure full transition coverage. */",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test software clock range sufficiency",
+      "req_ids": [
+        "RW-SW-8"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System initialized in Idle state"
+      ],
+      "inputs": {
+        "name": "softwareClockRange",
+        "value": "as specified"
+      },
+      "steps": [
+        "Trigger StartClock event",
+        "Verify transition Idle --> Running",
+        "Simulate time passage for 14 days",
+        "Check if clock overflow occurs"
+      ],
+      "expected": [
+        "No overflow within 14 days"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test numeric algorithm stability over 2 weeks",
+      "req_ids": [
+        "RW-SW-9"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System in Running state"
+      ],
+      "inputs": {
+        "name": "numericAlgorithm",
+        "value": "as specified"
+      },
+      "steps": [
+        "Trigger RunAlgorithm event",
+        "Execute algorithm continuously for 14 days",
+        "Monitor algorithm stability metrics"
+      ],
+      "expected": [
+        "Algorithm remains stable throughout 14 days"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test algorithm run time faster than real time",
+      "req_ids": [
+        "RW-SW-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System in Running state"
+      ],
+      "inputs": {
+        "name": "algorithmRunTime",
+        "value": "as specified"
+      },
+      "steps": [
+        "Trigger StressTestStart event",
+        "Execute algorithm in StressTest mode",
+        "Measure execution time against real time",
+        "Trigger StressTestEnd event"
+      ],
+      "expected": [
+        "Algorithm execution time < real time"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test power efficiency for 1 hour battery operation",
+      "req_ids": [
+        "RW-SW-41"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System in Idle state"
+      ],
+      "inputs": {
+        "name": "batteryCapacity",
+        "value": "as specified"
+      },
+      "steps": [
+        "Trigger BatteryCheck event",
+        "Run system continuously for 1 hour",
+        "Verify battery level remains sufficient"
+      ],
+      "expected": [
+        "Battery level >= 1 hour operation"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test patient inspiration detection",
+      "req_ids": [
+        "RW-SW-154"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient in breathing condition"
+      ],
+      "inputs": {
+        "name": "sensorSignal",
+        "value": "as specified"
+      },
+      "steps": [
+        "Trigger PatientInspiration event",
+        "Monitor state transition to InspirationDetected",
+        "Confirm detection acknowledgment"
+      ],
+      "expected": [
+        "State transitions to InspirationDetected"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "/* Finite State Machine / Statechart for Unit U01_General */\n\n/* States */\nState Idle;\nState Running;\nState StressTest;\nState BatteryLow;\nState InspirationDetected;\n\n/* Events */\nEvent StartClock;\nEvent StopClock;\nEvent RunAlgorithm;\nEvent StressTestStart;\nEvent StressTestEnd;\nEvent BatteryCheck;\nEvent PatientInspiration;\n\n/* Transitions with Guards */\nTransition Idle --> Running\n    Guard canStartClock;\n\nTransition Running --> StressTest\n    Guard canRunAlgorithmFasterThanRealTime;\n\nTransition StressTest --> Running\n    Guard stressTestDurationExceeded;\n\nTransition Running --> BatteryLow\n    Guard batteryLevelLow;\n\nTransition BatteryLow --> Idle\n    Guard batteryRecharged;\n\nTransition Idle --> InspirationDetected\n    Guard patientInspirationDetected;\n\n/* Guards Definitions */\nGuard canStartClock\n    Returns true if softwareClockRangeSufficient();\n\nGuard canRunAlgorithmFasterThanRealTime\n    Returns true if algorithmRunTime < realTimeFactor();\n\nGuard stressTestDurationExceeded\n    Returns true if stressTestDuration > twoWeeks();\n\nGuard batteryLevelLow\n    Returns true if batteryCapacity < oneHourOperation();\n\nGuard patientInspirationDetected\n    Returns true if sensorDetectsInspiration();\n\n/* Lifecycle */\nInitial Idle;\n\n/* Additional Notes */\n/* All guards must be tested for both True and False outcomes to ensure full transition coverage. */",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test software clock range sufficiency",
+          "req_ids": [
+            "RW-SW-8"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System initialized in Idle state"
+          ],
+          "inputs": {
+            "name": "softwareClockRange",
+            "value": "as specified"
+          },
+          "steps": [
+            "Trigger StartClock event",
+            "Verify transition Idle --> Running",
+            "Simulate time passage for 14 days",
+            "Check if clock overflow occurs"
+          ],
+          "expected": [
+            "No overflow within 14 days"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test numeric algorithm stability over 2 weeks",
+          "req_ids": [
+            "RW-SW-9"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System in Running state"
+          ],
+          "inputs": {
+            "name": "numericAlgorithm",
+            "value": "as specified"
+          },
+          "steps": [
+            "Trigger RunAlgorithm event",
+            "Execute algorithm continuously for 14 days",
+            "Monitor algorithm stability metrics"
+          ],
+          "expected": [
+            "Algorithm remains stable throughout 14 days"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test algorithm run time faster than real time",
+          "req_ids": [
+            "RW-SW-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System in Running state"
+          ],
+          "inputs": {
+            "name": "algorithmRunTime",
+            "value": "as specified"
+          },
+          "steps": [
+            "Trigger StressTestStart event",
+            "Execute algorithm in StressTest mode",
+            "Measure execution time against real time",
+            "Trigger StressTestEnd event"
+          ],
+          "expected": [
+            "Algorithm execution time < real time"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test power efficiency for 1 hour battery operation",
+          "req_ids": [
+            "RW-SW-41"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System in Idle state"
+          ],
+          "inputs": {
+            "name": "batteryCapacity",
+            "value": "as specified"
+          },
+          "steps": [
+            "Trigger BatteryCheck event",
+            "Run system continuously for 1 hour",
+            "Verify battery level remains sufficient"
+          ],
+          "expected": [
+            "Battery level >= 1 hour operation"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test patient inspiration detection",
+          "req_ids": [
+            "RW-SW-154"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient in breathing condition"
+          ],
+          "inputs": {
+            "name": "sensorSignal",
+            "value": "as specified"
+          },
+          "steps": [
+            "Trigger PatientInspiration event",
+            "Monitor state transition to InspirationDetected",
+            "Confirm detection acknowledgment"
+          ],
+          "expected": [
+            "State transitions to InspirationDetected"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.4,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0667,
+        "hallucinated": [
+          {
+            "value": "Idle",
+            "context": "state",
+            "grounded": false
+          },
+          {
+            "value": "Running",
+            "context": "state",
+            "grounded": false
+          },
+          {
+            "value": "StressTest",
+            "context": "state",
+            "grounded": false
+          },
+          {
+            "value": "BatteryLow",
+            "context": "state",
+            "grounded": false
+          },
+          {
+            "value": "InspirationDetected",
+            "context": "state",
+            "grounded": false
+          },
+          {
+            "value": "StartClock",
+            "context": "event",
+            "grounded": false
+          },
+          {
+            "value": "StopClock",
+            "context": "event",
+            "grounded": false
+          },
+          {
+            "value": "RunAlgorithm",
+            "context": "event",
+            "grounded": false
+          },
+          {
+            "value": "StressTestStart",
+            "context": "event",
+            "grounded": false
+          },
+          {
+            "value": "StressTestEnd",
+            "context": "event",
+            "grounded": false
+          },
+          {
+            "value": "BatteryCheck",
+            "context": "event",
+            "grounded": false
+          },
+          {
+            "value": "PatientInspiration",
+            "context": "event",
+            "grounded": false
+          },
+          {
+            "value": "Idle --> Running",
+            "context": "transition",
+            "grounded": false
+          },
+          {
+            "value": "Running --> StressTest",
+            "context": "transition",
+            "grounded": false
+          },
+          {
+            "value": "StressTest --> Running",
+            "context": "transition",
+            "grounded": false
+          },
+          {
+            "value": "Running --> BatteryLow",
+            "context": "transition",
+            "grounded": false
+          },
+          {
+            "value": "BatteryLow --> Idle",
+            "context": "transition",
+            "grounded": false
+          },
+          {
+            "value": "Idle --> InspirationDetected",
+            "context": "transition",
+            "grounded": false
+          },
+          {
+            "value": "canStartClock",
+            "context": "guard",
+            "grounded": false
+          },
+          {
+            "value": "canRunAlgorithmFasterThanRealTime",
+            "context": "guard",
+            "grounded": false
+          },
+          {
+            "value": "stressTestDurationExceeded",
+            "context": "guard",
+            "grounded": false
+          },
+          {
+            "value": "batteryLevelLow",
+            "context": "guard",
+            "grounded": false
+          },
+          {
+            "value": "patientInspirationDetected",
+            "context": "guard",
+            "grounded": false
+          },
+          {
+            "value": "softwareClockRangeSufficient()",
+            "context": "function",
+            "grounded": false
+          },
+          {
+            "value": "algorithmRunTime < realTimeFactor()",
+            "context": "condition",
+            "grounded": false
+          },
+          {
+            "value": "stressTestDuration > twoWeeks()",
+            "context": "condition",
+            "grounded": false
+          },
+          {
+            "value": "batteryCapacity < oneHourOperation()",
+            "context": "condition",
+            "grounded": false
+          },
+          {
+            "value": "sensorDetectsInspiration()",
+            "context": "function",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 30,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No negative test cases for overflow, instability, slow algorithm, battery depletion, or missed inspiration detection.",
+          "Oracle assertions are vague; lack numeric thresholds or specific state checks.",
+          "Tests rely on \"as specified\" inputs; no concrete values for algorithms or sensor signals.",
+          "Boundary values are tested only at exact limits; no near-boundary or out-of-range checks.",
+          "State transitions and guard conditions are not explicitly verified for both true and false outcomes."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.57,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

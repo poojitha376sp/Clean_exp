@@ -1,0 +1,1120 @@
+{
+  "unit_id": "U10_4",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "safety_critical",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 0.2,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "1696076400",
+        "context": "timestamp",
+        "grounded": false
+      },
+      {
+        "value": "1696076401.5",
+        "context": "timestamp",
+        "grounded": false
+      },
+      {
+        "value": "1696076403.5",
+        "context": "timestamp",
+        "grounded": false
+      },
+      {
+        "value": "1696076460",
+        "context": "timestamp",
+        "grounded": false
+      },
+      {
+        "value": "1696076520",
+        "context": "timestamp",
+        "grounded": false
+      },
+      {
+        "value": "1696076580",
+        "context": "timestamp",
+        "grounded": false
+      },
+      {
+        "value": "John Doe",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": 30,
+        "context": "patient age",
+        "grounded": false
+      },
+      {
+        "value": "Hypertension",
+        "context": "medical info",
+        "grounded": false
+      },
+      {
+        "value": "No allergies",
+        "context": "general info",
+        "grounded": false
+      },
+      {
+        "value": -5,
+        "context": "invalid age",
+        "grounded": false
+      },
+      {
+        "value": "Cardiology",
+        "context": "specialty name",
+        "grounded": false
+      },
+      {
+        "value": "",
+        "context": "empty specialty name",
+        "grounded": false
+      },
+      {
+        "value": "Dr. Smith",
+        "context": "doctor name",
+        "grounded": false
+      },
+      {
+        "value": "Nonexistent Specialty",
+        "context": "nonexistent specialty",
+        "grounded": false
+      },
+      {
+        "value": 1.5,
+        "context": "critical response time",
+        "grounded": false
+      },
+      {
+        "value": 3.5,
+        "context": "peak response time",
+        "grounded": false
+      },
+      {
+        "value": false,
+        "context": "system availability during outage",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "system availability outside outage",
+        "grounded": false
+      },
+      {
+        "value": 0.99999,
+        "context": "overall availability",
+        "grounded": false
+      },
+      {
+        "value": 10000,
+        "context": "number of concurrent users",
+        "grounded": false
+      },
+      {
+        "value": "Invalid age",
+        "context": "error message",
+        "grounded": false
+      },
+      {
+        "value": "Specialty name cannot be empty",
+        "context": "error message",
+        "grounded": false
+      },
+      {
+        "value": "Specialty not found",
+        "context": "error message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 24,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Tests rely on MagicMock and do not exercise real system behavior; add integration tests",
+      "Boundary values (exact 2s, 4s, 99.999%) are not tested; add edge cases",
+      "Outage window not precisely tested (exact 12:00–12:10); add time‑based tests",
+      "Scaling test only checks 10,000 users; test higher loads and concurrency limits",
+      "Test names and assertions could be more descriptive for clarity"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.72,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\nimport time\n\nclass TestVirtualSystem(unittest.TestCase):\n\n    def setUp(self):\n        self.patient_service = MagicMock()\n        self.admin_service = MagicMock()\n        self.system_monitor = MagicMock()\n\n    @patch('time.time')\n    def test_patient_registration_within_limits(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        patient_info = {\n            \"name\": \"John Doe\",\n            \"age\": 30,\n            \"medical_info\": \"Hypertension\",\n            \"general_info\": \"No allergies\"\n        }\n        self.patient_service.register_patient.return_value = True\n        result = self.patient_service.register_patient(patient_info)\n        self.assertTrue(result)\n\n    @patch('time.time')\n    def test_patient_registration_invalid_age(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        patient_info = {\n            \"name\": \"John Doe\",\n            \"age\": -5,\n            \"medical_info\": \"Hypertension\",\n            \"general_info\": \"No allergies\"\n        }\n        with self.assertRaises(ValueError) as context:\n            self.patient_service.register_patient(patient_info)\n        self.assertEqual(str(context.exception), \"Invalid age\")\n\n    @patch('time.time')\n    def test_add_specialty_within_limits(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        specialty_name = \"Cardiology\"\n        self.admin_service.add_specialty.return_value = True\n        result = self.admin_service.add_specialty(specialty_name)\n        self.assertTrue(result)\n\n    @patch('time.time')\n    def test_add_specialty_empty_name(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        specialty_name = \"\"\n        with self.assertRaises(ValueError) as context:\n            self.admin_service.add_specialty(specialty_name)\n        self.assertEqual(str(context.exception), \"Specialty name cannot be empty\")\n\n    @patch('time.time')\n    def test_register_doctor_within_limits(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        doctor_info = {\n            \"name\": \"Dr. Smith\",\n            \"specialty\": \"Cardiology\"\n        }\n        self.admin_service.register_doctor.return_value = True\n        result = self.admin_service.register_doctor(doctor_info)\n        self.assertTrue(result)\n\n    @patch('time.time')\n    def test_register_doctor_specialty_not_found(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        doctor_info = {\n            \"name\": \"Dr. Smith\",\n            \"specialty\": \"Nonexistent Specialty\"\n        }\n        with self.assertRaises(ValueError) as context:\n            self.admin_service.register_doctor(doctor_info)\n        self.assertEqual(str(context.exception), \"Specialty not found\")\n\n    @patch('time.time')\n    def test_response_time_critical_functionality(self, mock_time):\n        mock_time.side_effect = [1696076400, 1696076401.5]  # Start and end times\n        self.system_monitor.measure_response_time.return_value = 1.5\n        response_time = self.system_monitor.measure_response_time()\n        self.assertLessEqual(response_time, 2)\n\n    @patch('time.time')\n    def test_response_time_other_functions_peak(self, mock_time):\n        mock_time.side_effect = [1696076400, 1696076403.5]  # Start and end times\n        self.system_monitor.measure_response_time.return_value = 3.5\n        response_time = self.system_monitor.measure_response_time()\n        self.assertLessEqual(response_time, 4)\n\n    @patch('time.time')\n    def test_system_availability_during_outage(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp during outage window\n        self.system_monitor.is_system_available.return_value = False\n        availability = self.system_monitor.is_system_available()\n        self.assertFalse(availability)\n\n    @patch('time.time')\n    def test_system_availability_outside_outage(self, mock_time):\n        mock_time.return_value = 1696076460  # Example timestamp outside outage window\n        self.system_monitor.is_system_available.return_value = True\n        availability = self.system_monitor.is_system_available()\n        self.assertTrue(availability)\n\n    @patch('time.time')\n    def test_system_availability_overall(self, mock_time):\n        mock_time.side_effect = [1696076400, 1696076460, 1696076520, 1696076580]  # Example timestamps\n        self.system_monitor.calculate_availability.return_value = 0.99999\n        availability = self.system_monitor.calculate_availability()\n        self.assertGreaterEqual(availability, 0.99999)\n\n    @patch('concurrent.futures.ThreadPoolExecutor')\n    def test_system_scaling_concurrent_users(self, mock_executor):\n        mock_executor.return_value.__enter__.return_value.map.return_value = [True] * 10000\n        results = self.system_monitor.test_concurrent_users(10000)\n        self.assertTrue(all(results))",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Patient registration within limits",
+      "req_ids": [
+        "VIRTUA-4.2-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "age": 30,
+        "medical_info": "Hypertension",
+        "general_info": "No allergies"
+      },
+      "steps": [
+        "Call register_patient with valid patient info"
+      ],
+      "expected": [
+        "Registration successful"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Patient registration invalid age",
+      "req_ids": [
+        "VIRTUA-4.2-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "age": -5,
+        "medical_info": "Hypertension",
+        "general_info": "No allergies"
+      },
+      "steps": [
+        "Call register_patient with invalid age"
+      ],
+      "expected": [
+        "ValueError with message 'Invalid age'"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Add specialty within limits",
+      "req_ids": [
+        "VIRTUA-4.2-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "specialty_name": "Cardiology"
+      },
+      "steps": [
+        "Call add_specialty with valid specialty name"
+      ],
+      "expected": [
+        "Specialty added successfully"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Add specialty empty name",
+      "req_ids": [
+        "VIRTUA-4.2-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "specialty_name": ""
+      },
+      "steps": [
+        "Call add_specialty with empty specialty name"
+      ],
+      "expected": [
+        "ValueError with message 'Specialty name cannot be empty'"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Register doctor within limits",
+      "req_ids": [
+        "VIRTUA-4.2-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running",
+        "Specialty exists"
+      ],
+      "inputs": {
+        "name": "Dr. Smith",
+        "specialty": "Cardiology"
+      },
+      "steps": [
+        "Call register_doctor with valid doctor info"
+      ],
+      "expected": [
+        "Doctor registered successfully"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Register doctor specialty not found",
+      "req_ids": [
+        "VIRTUA-4.2-3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "System is running",
+        "Specialty does not exist"
+      ],
+      "inputs": {
+        "name": "Dr. Smith",
+        "specialty": "Nonexistent Specialty"
+      },
+      "steps": [
+        "Call register_doctor with non-existent specialty"
+      ],
+      "expected": [
+        "ValueError with message 'Specialty not found'"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Response time critical functionality",
+      "req_ids": [
+        "VIRTUA-4.1-2"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {},
+      "steps": [
+        "Measure response time for critical functionality"
+      ],
+      "expected": [
+        "Response time <= 2 seconds"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Response time other functions peak",
+      "req_ids": [
+        "VIRTUA-4.1-3"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is running during peak period"
+      ],
+      "inputs": {},
+      "steps": [
+        "Measure response time for other functions"
+      ],
+      "expected": [
+        "Response time <= 4 seconds"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "System availability during outage",
+      "req_ids": [
+        "VIRTUA-4.1-4"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "System is running during outage window"
+      ],
+      "inputs": {},
+      "steps": [
+        "Check system availability"
+      ],
+      "expected": [
+        "System is not available"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "System availability outside outage",
+      "req_ids": [
+        "VIRTUA-4.1-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running outside outage window"
+      ],
+      "inputs": {},
+      "steps": [
+        "Check system availability"
+      ],
+      "expected": [
+        "System is available"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "System availability overall",
+      "req_ids": [
+        "VIRTUA-4.1-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running over a month"
+      ],
+      "inputs": {},
+      "steps": [
+        "Calculate overall system availability"
+      ],
+      "expected": [
+        "Availability >= 99.999%"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "System scaling concurrent users",
+      "req_ids": [
+        "VIRTUA-4.1-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "number_of_users": 10000
+      },
+      "steps": [
+        "Test system with 10,000+ concurrent users"
+      ],
+      "expected": [
+        "All users registered successfully"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\nimport time\n\nclass TestVirtualSystem(unittest.TestCase):\n\n    def setUp(self):\n        self.patient_service = MagicMock()\n        self.admin_service = MagicMock()\n        self.system_monitor = MagicMock()\n\n    @patch('time.time')\n    def test_patient_registration_response_time(self, mock_time):\n        # Simulate the response time for patient registration\n        mock_time.side_effect = [0, 1.5]  # Start time and end time\n        self.patient_service.register_patient.return_value = True\n        start_time = time.time()\n        result = self.patient_service.register_patient(name=\"John Doe\", age=30, medical_info=\"Allergies: None\")\n        end_time = time.time()\n        response_time = end_time - start_time\n        self.assertTrue(response_time <= 2, f\"Response time was {response_time} seconds, expected <= 2 seconds\")\n        self.assertTrue(result, \"Patient registration should be successful\")\n\n    @patch('time.time')\n    def test_other_function_response_time(self, mock_time):\n        # Simulate the response time for other functions\n        mock_time.side_effect = [0, 3.5]  # Start time and end time\n        self.admin_service.add_specialty.return_value = True\n        start_time = time.time()\n        result = self.admin_service.add_specialty(specialty_name=\"Cardiology\")\n        end_time = time.time()\n        response_time = end_time - start_time\n        self.assertTrue(response_time <= 4, f\"Response time was {response_time} seconds, expected <= 4 seconds\")\n        self.assertTrue(result, \"Adding specialty should be successful\")\n\n    def test_patient_registration(self):\n        # Test successful patient registration\n        self.patient_service.register_patient.return_value = True\n        result = self.patient_service.register_patient(name=\"Jane Doe\", age=25, medical_info=\"Allergies: Penicillin\")\n        self.assertTrue(result, \"Patient registration should be successful\")\n\n    def test_add_specialty(self):\n        # Test successful addition of specialty\n        self.admin_service.add_specialty.return_value = True\n        result = self.admin_service.add_specialty(specialty_name=\"Neurology\")\n        self.assertTrue(result, \"Adding specialty should be successful\")\n\n    def test_register_doctor(self):\n        # Test successful doctor registration\n        self.admin_service.register_doctor.return_value = True\n        result = self.admin_service.register_doctor(name=\"Dr. Smith\", specialty=\"Cardiology\")\n        self.assertTrue(result, \"Doctor registration should be successful\")\n\n    def test_patient_registration_invalid_data(self):\n        # Test patient registration with invalid data\n        self.patient_service.register_patient.side_effect = ValueError(\"Invalid age\")\n        with self.assertRaises(ValueError) as context:\n            self.patient_service.register_patient(name=\"John Doe\", age=-5, medical_info=\"Allergies: None\")\n        self.assertEqual(str(context.exception), \"Invalid age\")\n\n    def test_add_specialty_invalid_data(self):\n        # Test adding specialty with invalid data\n        self.admin_service.add_specialty.side_effect = ValueError(\"Specialty name cannot be empty\")\n        with self.assertRaises(ValueError) as context:\n            self.admin_service.add_specialty(specialty_name=\"\")\n        self.assertEqual(str(context.exception), \"Specialty name cannot be empty\")\n\n    def test_register_doctor_invalid_data(self):\n        # Test doctor registration with invalid data\n        self.admin_service.register_doctor.side_effect = ValueError(\"Specialty not found\")\n        with self.assertRaises(ValueError) as context:\n            self.admin_service.register_doctor(name=\"Dr. Smith\", specialty=\"Nonexistent Specialty\")\n        self.assertEqual(str(context.exception), \"Specialty not found\")\n\n    def test_system_availability(self):\n        # Test system availability during the outage window\n        self.system_monitor.is_available.return_value = False\n        outage_start = time.strptime(\"2023-10-01 00:00:00\", \"%Y-%m-%d %H:%M:%S\")\n        outage_end = time.strptime(\"2023-10-01 00:10:00\", \"%Y-%m-%d %H:%M:%S\")\n        current_time = time.strptime(\"2023-10-01 00:05:00\", \"%Y-%m-%d %H:%M:%S\")\n        with patch('time.localtime', return_value=current_time):\n            availability = self.system_monitor.is_available()\n            self.assertFalse(availability, \"System should be unavailable during the outage window\")\n\n    def test_system_availability_outside_outage(self):\n        # Test system availability outside the outage window\n        self.system_monitor.is_available.return_value = True\n        current_time = time.strptime(\"2023-10-01 00:15:00\", \"%Y-%m-%d %H:%M:%S\")\n        with patch('time.localtime', return_value=current_time):\n            availability = self.system_monitor.is_available()\n            self.assertTrue(availability, \"System should be available outside the outage window\")",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test patient registration response time",
+          "req_ids": [
+            "VIRTUA-4.1-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient service is available"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": 30,
+            "medical_info": "Allergies: None"
+          },
+          "steps": [
+            "Simulate response time for patient registration"
+          ],
+          "expected": [
+            "Response time <= 2 seconds",
+            "Patient registration successful"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test other function response time",
+          "req_ids": [
+            "VIRTUA-4.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin service is available"
+          ],
+          "inputs": {
+            "specialty_name": "Cardiology"
+          },
+          "steps": [
+            "Simulate response time for adding specialty"
+          ],
+          "expected": [
+            "Response time <= 4 seconds",
+            "Adding specialty successful"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test patient registration",
+          "req_ids": [
+            "VIRTUA-4.2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient service is available"
+          ],
+          "inputs": {
+            "name": "Jane Doe",
+            "age": 25,
+            "medical_info": "Allergies: Penicillin"
+          },
+          "steps": [
+            "Register patient"
+          ],
+          "expected": [
+            "Patient registration successful"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test add specialty",
+          "req_ids": [
+            "VIRTUA-4.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin service is available"
+          ],
+          "inputs": {
+            "specialty_name": "Neurology"
+          },
+          "steps": [
+            "Add specialty"
+          ],
+          "expected": [
+            "Adding specialty successful"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test register doctor",
+          "req_ids": [
+            "VIRTUA-4.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin service is available"
+          ],
+          "inputs": {
+            "name": "Dr. Smith",
+            "specialty": "Cardiology"
+          },
+          "steps": [
+            "Register doctor"
+          ],
+          "expected": [
+            "Doctor registration successful"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test patient registration with invalid data",
+          "req_ids": [
+            "VIRTUA-4.2-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient service is available"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": -5,
+            "medical_info": "Allergies: None"
+          },
+          "steps": [
+            "Register patient with invalid age"
+          ],
+          "expected": [
+            "ValueError raised with message 'Invalid age'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test add specialty with invalid data",
+          "req_ids": [
+            "VIRTUA-4.2-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Admin service is available"
+          ],
+          "inputs": {
+            "specialty_name": ""
+          },
+          "steps": [
+            "Add specialty with empty name"
+          ],
+          "expected": [
+            "ValueError raised with message 'Specialty name cannot be empty'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test register doctor with invalid data",
+          "req_ids": [
+            "VIRTUA-4.2-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Admin service is available"
+          ],
+          "inputs": {
+            "name": "Dr. Smith",
+            "specialty": "Nonexistent Specialty"
+          },
+          "steps": [
+            "Register doctor with nonexistent specialty"
+          ],
+          "expected": [
+            "ValueError raised with message 'Specialty not found'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test system availability during outage",
+          "req_ids": [
+            "VIRTUA-4.1-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System monitor is available"
+          ],
+          "inputs": {},
+          "steps": [
+            "Check system availability during outage window"
+          ],
+          "expected": [
+            "System should be unavailable"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test system availability outside outage",
+          "req_ids": [
+            "VIRTUA-4.1-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System monitor is available"
+          ],
+          "inputs": {},
+          "steps": [
+            "Check system availability outside outage window"
+          ],
+          "expected": [
+            "System should be available"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.86,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.4167,
+        "hallucinated": [
+          {
+            "value": "Invalid age",
+            "context": "patient registration error message",
+            "grounded": false
+          },
+          {
+            "value": "Specialty name cannot be empty",
+            "context": "add specialty error message",
+            "grounded": false
+          },
+          {
+            "value": "Specialty not found",
+            "context": "register doctor error message",
+            "grounded": false
+          },
+          {
+            "value": "2023-10-01 00:00:00",
+            "context": "outage start time used in test",
+            "grounded": false
+          },
+          {
+            "value": "2023-10-01 00:10:00",
+            "context": "outage end time used in test",
+            "grounded": false
+          },
+          {
+            "value": "2023-10-01 00:05:00",
+            "context": "current time inside outage used in test",
+            "grounded": false
+          },
+          {
+            "value": "2023-10-01 00:15:00",
+            "context": "current time outside outage used in test",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 12,
+        "uncovered_clauses": [
+          "VIRTUA-4.1-1"
+        ],
+        "weaknesses": [
+          "No test for scaling to 10,000+ concurrent users",
+          "Response time tests use mocked time, not real measurement",
+          "Boundary values (2s, 4s) not tested",
+          "Availability test only checks outage window, not overall 99.999% availability",
+          "Error messages are not specified in SRS, tests rely on implementation details"
+        ],
+        "traceability": 0.8571,
+        "untraced_reqs": [
+          "VIRTUA-4.1-1"
+        ],
+        "fsa_score": 0.7067,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.7067; sub-scores {'clause_coverage': 0.86, 'negative_coverage': 1.0, 'oracle_assertiveness': 1.0, 'boundary_coverage': 0.0, 'groundedness_mg': 0.4167}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-4.1-1'] (add at least one each)\n- uncovered clause: VIRTUA-4.1-1\n- ungrounded value 'Invalid age' (patient registration error message): remove or use the SRS value\n- ungrounded value 'Specialty name cannot be empty' (add specialty error message): remove or use the SRS value\n- ungrounded value 'Specialty not found' (register doctor error message): remove or use the SRS value\n- ungrounded value '2023-10-01 00:00:00' (outage start time used in test): remove or use the SRS value\n- ungrounded value '2023-10-01 00:10:00' (outage end time used in test): remove or use the SRS value\n- ungrounded value '2023-10-01 00:05:00' (current time inside outage used in test): remove or use the SRS value\n- No test for scaling to 10,000+ concurrent users\n- Response time tests use mocked time, not real measurement\n- Boundary values (2s, 4s) not tested\n- Availability test only checks outage window, not overall 99.999% availability\n- Error messages are not specified in SRS, tests rely on implementation details",
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\nimport time\n\nclass TestVirtualSystem(unittest.TestCase):\n\n    def setUp(self):\n        self.patient_service = MagicMock()\n        self.admin_service = MagicMock()\n        self.system_monitor = MagicMock()\n\n    @patch('time.time')\n    def test_patient_registration_within_limits(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        patient_info = {\n            \"name\": \"John Doe\",\n            \"age\": 30,\n            \"medical_info\": \"Hypertension\",\n            \"general_info\": \"No allergies\"\n        }\n        self.patient_service.register_patient.return_value = True\n        result = self.patient_service.register_patient(patient_info)\n        self.assertTrue(result)\n\n    @patch('time.time')\n    def test_patient_registration_invalid_age(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        patient_info = {\n            \"name\": \"John Doe\",\n            \"age\": -5,\n            \"medical_info\": \"Hypertension\",\n            \"general_info\": \"No allergies\"\n        }\n        with self.assertRaises(ValueError) as context:\n            self.patient_service.register_patient(patient_info)\n        self.assertEqual(str(context.exception), \"Invalid age\")\n\n    @patch('time.time')\n    def test_add_specialty_within_limits(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        specialty_name = \"Cardiology\"\n        self.admin_service.add_specialty.return_value = True\n        result = self.admin_service.add_specialty(specialty_name)\n        self.assertTrue(result)\n\n    @patch('time.time')\n    def test_add_specialty_empty_name(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        specialty_name = \"\"\n        with self.assertRaises(ValueError) as context:\n            self.admin_service.add_specialty(specialty_name)\n        self.assertEqual(str(context.exception), \"Specialty name cannot be empty\")\n\n    @patch('time.time')\n    def test_register_doctor_within_limits(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        doctor_info = {\n            \"name\": \"Dr. Smith\",\n            \"specialty\": \"Cardiology\"\n        }\n        self.admin_service.register_doctor.return_value = True\n        result = self.admin_service.register_doctor(doctor_info)\n        self.assertTrue(result)\n\n    @patch('time.time')\n    def test_register_doctor_specialty_not_found(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp\n        doctor_info = {\n            \"name\": \"Dr. Smith\",\n            \"specialty\": \"Nonexistent Specialty\"\n        }\n        with self.assertRaises(ValueError) as context:\n            self.admin_service.register_doctor(doctor_info)\n        self.assertEqual(str(context.exception), \"Specialty not found\")\n\n    @patch('time.time')\n    def test_response_time_critical_functionality(self, mock_time):\n        mock_time.side_effect = [1696076400, 1696076401.5]  # Start and end times\n        self.system_monitor.measure_response_time.return_value = 1.5\n        response_time = self.system_monitor.measure_response_time()\n        self.assertLessEqual(response_time, 2)\n\n    @patch('time.time')\n    def test_response_time_other_functions_peak(self, mock_time):\n        mock_time.side_effect = [1696076400, 1696076403.5]  # Start and end times\n        self.system_monitor.measure_response_time.return_value = 3.5\n        response_time = self.system_monitor.measure_response_time()\n        self.assertLessEqual(response_time, 4)\n\n    @patch('time.time')\n    def test_system_availability_during_outage(self, mock_time):\n        mock_time.return_value = 1696076400  # Example timestamp during outage window\n        self.system_monitor.is_system_available.return_value = False\n        availability = self.system_monitor.is_system_available()\n        self.assertFalse(availability)\n\n    @patch('time.time')\n    def test_system_availability_outside_outage(self, mock_time):\n        mock_time.return_value = 1696076460  # Example timestamp outside outage window\n        self.system_monitor.is_system_available.return_value = True\n        availability = self.system_monitor.is_system_available()\n        self.assertTrue(availability)\n\n    @patch('time.time')\n    def test_system_availability_overall(self, mock_time):\n        mock_time.side_effect = [1696076400, 1696076460, 1696076520, 1696076580]  # Example timestamps\n        self.system_monitor.calculate_availability.return_value = 0.99999\n        availability = self.system_monitor.calculate_availability()\n        self.assertGreaterEqual(availability, 0.99999)\n\n    @patch('concurrent.futures.ThreadPoolExecutor')\n    def test_system_scaling_concurrent_users(self, mock_executor):\n        mock_executor.return_value.__enter__.return_value.map.return_value = [True] * 10000\n        results = self.system_monitor.test_concurrent_users(10000)\n        self.assertTrue(all(results))",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient registration within limits",
+          "req_ids": [
+            "VIRTUA-4.2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": 30,
+            "medical_info": "Hypertension",
+            "general_info": "No allergies"
+          },
+          "steps": [
+            "Call register_patient with valid patient info"
+          ],
+          "expected": [
+            "Registration successful"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient registration invalid age",
+          "req_ids": [
+            "VIRTUA-4.2-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": -5,
+            "medical_info": "Hypertension",
+            "general_info": "No allergies"
+          },
+          "steps": [
+            "Call register_patient with invalid age"
+          ],
+          "expected": [
+            "ValueError with message 'Invalid age'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Add specialty within limits",
+          "req_ids": [
+            "VIRTUA-4.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "specialty_name": "Cardiology"
+          },
+          "steps": [
+            "Call add_specialty with valid specialty name"
+          ],
+          "expected": [
+            "Specialty added successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add specialty empty name",
+          "req_ids": [
+            "VIRTUA-4.2-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "specialty_name": ""
+          },
+          "steps": [
+            "Call add_specialty with empty specialty name"
+          ],
+          "expected": [
+            "ValueError with message 'Specialty name cannot be empty'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Register doctor within limits",
+          "req_ids": [
+            "VIRTUA-4.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running",
+            "Specialty exists"
+          ],
+          "inputs": {
+            "name": "Dr. Smith",
+            "specialty": "Cardiology"
+          },
+          "steps": [
+            "Call register_doctor with valid doctor info"
+          ],
+          "expected": [
+            "Doctor registered successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Register doctor specialty not found",
+          "req_ids": [
+            "VIRTUA-4.2-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is running",
+            "Specialty does not exist"
+          ],
+          "inputs": {
+            "name": "Dr. Smith",
+            "specialty": "Nonexistent Specialty"
+          },
+          "steps": [
+            "Call register_doctor with non-existent specialty"
+          ],
+          "expected": [
+            "ValueError with message 'Specialty not found'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Response time critical functionality",
+          "req_ids": [
+            "VIRTUA-4.1-2"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {},
+          "steps": [
+            "Measure response time for critical functionality"
+          ],
+          "expected": [
+            "Response time <= 2 seconds"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Response time other functions peak",
+          "req_ids": [
+            "VIRTUA-4.1-3"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is running during peak period"
+          ],
+          "inputs": {},
+          "steps": [
+            "Measure response time for other functions"
+          ],
+          "expected": [
+            "Response time <= 4 seconds"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "System availability during outage",
+          "req_ids": [
+            "VIRTUA-4.1-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is running during outage window"
+          ],
+          "inputs": {},
+          "steps": [
+            "Check system availability"
+          ],
+          "expected": [
+            "System is not available"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "System availability outside outage",
+          "req_ids": [
+            "VIRTUA-4.1-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running outside outage window"
+          ],
+          "inputs": {},
+          "steps": [
+            "Check system availability"
+          ],
+          "expected": [
+            "System is available"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "System availability overall",
+          "req_ids": [
+            "VIRTUA-4.1-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running over a month"
+          ],
+          "inputs": {},
+          "steps": [
+            "Calculate overall system availability"
+          ],
+          "expected": [
+            "Availability >= 99.999%"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "System scaling concurrent users",
+          "req_ids": [
+            "VIRTUA-4.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "number_of_users": 10000
+          },
+          "steps": [
+            "Test system with 10,000+ concurrent users"
+          ],
+          "expected": [
+            "All users registered successfully"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 0.2,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "1696076400",
+            "context": "timestamp",
+            "grounded": false
+          },
+          {
+            "value": "1696076401.5",
+            "context": "timestamp",
+            "grounded": false
+          },
+          {
+            "value": "1696076403.5",
+            "context": "timestamp",
+            "grounded": false
+          },
+          {
+            "value": "1696076460",
+            "context": "timestamp",
+            "grounded": false
+          },
+          {
+            "value": "1696076520",
+            "context": "timestamp",
+            "grounded": false
+          },
+          {
+            "value": "1696076580",
+            "context": "timestamp",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": 30,
+            "context": "patient age",
+            "grounded": false
+          },
+          {
+            "value": "Hypertension",
+            "context": "medical info",
+            "grounded": false
+          },
+          {
+            "value": "No allergies",
+            "context": "general info",
+            "grounded": false
+          },
+          {
+            "value": -5,
+            "context": "invalid age",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "specialty name",
+            "grounded": false
+          },
+          {
+            "value": "",
+            "context": "empty specialty name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Smith",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Nonexistent Specialty",
+            "context": "nonexistent specialty",
+            "grounded": false
+          },
+          {
+            "value": 1.5,
+            "context": "critical response time",
+            "grounded": false
+          },
+          {
+            "value": 3.5,
+            "context": "peak response time",
+            "grounded": false
+          },
+          {
+            "value": false,
+            "context": "system availability during outage",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "system availability outside outage",
+            "grounded": false
+          },
+          {
+            "value": 0.99999,
+            "context": "overall availability",
+            "grounded": false
+          },
+          {
+            "value": 10000,
+            "context": "number of concurrent users",
+            "grounded": false
+          },
+          {
+            "value": "Invalid age",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Specialty name cannot be empty",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Specialty not found",
+            "context": "error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 24,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Tests rely on MagicMock and do not exercise real system behavior; add integration tests",
+          "Boundary values (exact 2s, 4s, 99.999%) are not tested; add edge cases",
+          "Outage window not precisely tested (exact 12:00–12:10); add time‑based tests",
+          "Scaling test only checks 10,000 users; test higher loads and concurrency limits",
+          "Test names and assertions could be more descriptive for clarity"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.72,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

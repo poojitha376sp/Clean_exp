@@ -1,0 +1,690 @@
+{
+  "unit_id": "U20_Embedded",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "safety_critical",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.8,
+    "sfv_score": 0.9,
+    "threshold": 0.7,
+    "sfv_pass": true,
+    "issues": [
+      "missing: initial state"
+    ]
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.5,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 48,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Boundary test cases do not specify actual numeric boundary values",
+      "Oracle assertions are vague and omit numeric thresholds",
+      "Transition guard conditions are not explicitly tested for both true and false values",
+      "Safety measures under data corruption scenarios are not fully exercised",
+      "State and transition coverage are not explicitly verified in the tests"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.9,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "@startuml\n[*] --> Init\n\nstate Init {\n  [*] --> Idle\n  Idle --> PressureFall : Commanded Pressure Fall\n  Idle --> PEEPControl : Commanded PEEP\n  Idle --> FiO2Control : Commanded FiO2\n  Idle --> PressureControl : Commanded Pressure Control\n  Idle --> SafetyCheck : Safety Check\n}\n\nstate PressureFall {\n  [*] --> PressureFallInit\n  PressureFallInit --> PressureFallControl : Commanded Pressure Fall\n  PressureFallControl --> PressureFallCheck : Pressure Fall Check\n  PressureFallCheck --> PressureFall : Pressure Fall Check Passed\n  PressureFallCheck --> PressureFallFail : Pressure Fall Check Failed\n}\n\nstate PressureFallCheck {\n  [*] --> PressureFallCheckInit\n  PressureFallCheckInit --> PressureFallCheckControl : Pressure Fall Check Control\n  PressureFallCheckControl --> PressureFallCheckResult : Pressure Fall Check Result\n  PressureFallCheckResult --> PressureFall : Pressure Fall Check Passed\n  PressureFallCheckResult --> PressureFallFail : Pressure Fall Check Failed\n}\n\nstate PressureFallFail {\n  [*] --> PressureFallFailInit\n  PressureFallFailInit --> PressureFallFailControl : Pressure Fall Fail Control\n  PressureFallFailControl --> PressureFallFailResult : Pressure Fall Fail Result\n  PressureFallFailResult --> PressureFall : Pressure Fall Fail Passed\n  PressureFallFailResult --> PressureFallFailFail : Pressure Fall Fail Failed\n}\n\nstate PEEPControl {\n  [*] --> PEEPControlInit\n  PEEPControlInit --> PEEPControlControl : Commanded PEEP Control\n  PEEPControlControl --> PEEPControlCheck : PEEP Control Check\n  PEEPControlCheck --> PEEPControl : PEEP Control Check Passed\n  PEEPControlCheck --> PEEPControlFail : PEEP Control Check Failed\n}\n\nstate PEEPControlCheck {\n  [*] --> PEEPControlCheckInit\n  PEEPControlCheckInit --> PEEPControlCheckControl : PEEP Control Check Control\n  PEEPControlCheckControl --> PEEPControlCheckResult : PEEP Control Check Result\n  PEEPControlCheckResult --> PEEPControl : PEEP Control Check Passed\n  PEEPControlCheckResult --> PEEPControlFail : PEEP Control Check Failed\n}\n\nstate PEEPControlFail {\n  [*] --> PEEPControlFailInit\n  PEEPControlFailInit --> PEEPControlFailControl : PEEP Control Fail Control\n  PEEPControlFailControl --> PEEPControlFailResult : PEEP Control Fail Result\n  PEEPControlFailResult --> PEEPControl : PEEP Control Fail Passed\n  PEEPControlFailResult --> PEEPControlFailFail : PEEP Control Fail Failed\n}\n\nstate FiO2Control {\n  [*] --> FiO2ControlInit\n  FiO2ControlInit --> FiO2ControlControl : Commanded FiO2 Control\n  FiO2ControlControl --> FiO2ControlCheck : FiO2 Control Check\n  FiO2ControlCheck --> FiO2Control : FiO2 Control Check Passed\n  FiO2ControlCheck --> FiO2ControlFail : FiO2 Control Check Failed\n}\n\nstate FiO2ControlCheck {\n  [*] --> FiO2ControlCheckInit\n  FiO2ControlCheckInit --> FiO2ControlCheckControl : FiO2 Control Check Control\n  FiO2ControlCheckControl --> FiO2ControlCheckResult : FiO2 Control Check Result\n  FiO2ControlCheckResult --> FiO2Control : FiO2 Control Check Passed\n  FiO2ControlCheckResult --> FiO2ControlFail : FiO2 Control Check Failed\n}\n\nstate FiO2ControlFail {\n  [*] --> FiO2ControlFailInit\n  FiO2ControlFailInit --> FiO2ControlFailControl : FiO2 Control Fail Control\n  FiO2ControlFailControl --> FiO2ControlFailResult : FiO2 Control Fail Result\n  FiO2ControlFailResult --> FiO2Control : FiO2 Control Fail Passed\n  FiO2ControlFailResult --> FiO2ControlFailFail : FiO2 Control Fail Failed\n}\n\nstate PressureControl {\n  [*] --> PressureControlInit\n  PressureControlInit --> PressureControlControl : Commanded Pressure Control\n  PressureControlControl --> PressureControlCheck : Pressure Control Check\n  PressureControlCheck --> PressureControl : Pressure Control Check Passed\n  PressureControlCheck --> PressureControlFail : Pressure Control Check Failed\n}\n\nstate PressureControlCheck {\n  [*] --> PressureControlCheckInit\n  PressureControlCheckInit --> PressureControlCheckControl : Pressure Control Check Control\n  PressureControlCheckControl --> PressureControlCheckResult : Pressure Control Check Result\n  PressureControlCheckResult --> PressureControl : Pressure Control Check Passed\n  PressureControlCheckResult --> PressureControlFail : Pressure Control Check Failed\n}\n\nstate PressureControlFail {\n  [*] --> PressureControlFailInit\n  PressureControlFailInit --> PressureControlFailControl : Pressure Control Fail Control\n  PressureControlFailControl --> PressureControlFailResult : Pressure Control Fail Result\n  PressureControlFailResult --> PressureControl : Pressure Control Fail Passed\n  PressureControlFailResult --> PressureControlFailFail : Pressure Control Fail Failed\n}\n\nstate SafetyCheck {\n  [*] --> SafetyCheckInit\n  SafetyCheckInit --> SafetyCheckControl : Safety Check Control\n  SafetyCheckControl --> SafetyCheckResult : Safety Check Result\n  SafetyCheckResult --> SafetyCheck : Safety Check Passed\n  SafetyCheckResult --> SafetyCheckFail : Safety Check Failed\n}\n\nstate SafetyCheckFail {\n  [*] --> SafetyCheckFailInit\n  SafetyCheckFailInit --> SafetyCheckFailControl : Safety Check Fail Control\n  SafetyCheckFailControl --> SafetyCheckFailResult : Safety Check Fail Result\n  SafetyCheckFailResult --> SafetyCheck : Safety Check Passed\n  SafetyCheckFailResult --> SafetyCheckFailFail : Safety Check Fail Failed\n}\n\n@enduml",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test Pressure Fall Phase Overshoot",
+      "req_ids": [
+        "RW-SW-63"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in Idle state"
+      ],
+      "inputs": {
+        "name": "commanded_pressure_fall"
+      },
+      "steps": [
+        "Controller enters PressureFall state",
+        "Controller checks pressure fall",
+        "Controller meets commanded pressure fall within 0.8*PEEP-1 cmH2O"
+      ],
+      "expected": [
+        "Controller remains in PressureFall state",
+        "Controller reports pressure fall check passed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test PEEP Control within Tolerance",
+      "req_ids": [
+        "RW-SW-64"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in Idle state"
+      ],
+      "inputs": {
+        "name": "commanded_peep"
+      },
+      "steps": [
+        "Controller enters PEEPControl state",
+        "Controller checks PEEP",
+        "Controller meets commanded PEEP within +-1 H2O + 10%"
+      ],
+      "expected": [
+        "Controller remains in PEEPControl state",
+        "Controller reports PEEP check passed"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test FiO2 Control within Tolerance",
+      "req_ids": [
+        "RW-SW-95"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in Idle state"
+      ],
+      "inputs": {
+        "name": "commanded_fio2"
+      },
+      "steps": [
+        "Controller enters FiO2Control state",
+        "Controller checks FiO2",
+        "Controller meets commanded FiO2 within 0.05"
+      ],
+      "expected": [
+        "Controller remains in FiO2Control state",
+        "Controller reports FiO2 check passed"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test FiO2 Reporting",
+      "req_ids": [
+        "RW-SW-97"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in Idle state"
+      ],
+      "inputs": {
+        "name": "fio2_measurement"
+      },
+      "steps": [
+        "Controller enters FiO2Control state",
+        "Controller reports FiO2 measurement"
+      ],
+      "expected": [
+        "Controller remains in FiO2Control state",
+        "Controller reports FiO2 measurement"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test Pressure Control under Different Air Conditions",
+      "req_ids": [
+        "RW-SW-98"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in Idle state"
+      ],
+      "inputs": {
+        "name": "air_conditions"
+      },
+      "steps": [
+        "Controller enters PressureControl state",
+        "Controller adjusts pressure based on air conditions"
+      ],
+      "expected": [
+        "Controller remains in PressureControl state",
+        "Controller reports pressure control check passed"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Test Assist/Control with Pressure Controlled Ventilation",
+      "req_ids": [
+        "RW-SW-153"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in Idle state"
+      ],
+      "inputs": {
+        "name": "patient_inspiration"
+      },
+      "steps": [
+        "Controller enters PressureControl state",
+        "Controller detects patient inspiration",
+        "Controller triggers inspiration"
+      ],
+      "expected": [
+        "Controller remains in PressureControl state",
+        "Controller reports inspiration triggered"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Test Safety Check with Absurd Commands",
+      "req_ids": [
+        "RW-SW-156"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Controller is in Idle state"
+      ],
+      "inputs": {
+        "name": "absurd_command"
+      },
+      "steps": [
+        "Controller enters SafetyCheck state",
+        "Controller checks safety",
+        "Controller detects absurd command"
+      ],
+      "expected": [
+        "Controller remains in SafetyCheck state",
+        "Controller reports safety check failed"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Test Pressure Fall Check Boundary Values",
+      "req_ids": [
+        "RW-SW-63"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Controller is in PressureFall state"
+      ],
+      "inputs": {
+        "name": "boundary_pressure_fall"
+      },
+      "steps": [
+        "Controller checks pressure fall",
+        "Controller meets boundary pressure fall"
+      ],
+      "expected": [
+        "Controller remains in PressureFall state",
+        "Controller reports pressure fall check passed"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Test PEEP Control Boundary Values",
+      "req_ids": [
+        "RW-SW-64"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Controller is in PEEPControl state"
+      ],
+      "inputs": {
+        "name": "boundary_peep"
+      },
+      "steps": [
+        "Controller checks PEEP",
+        "Controller meets boundary PEEP"
+      ],
+      "expected": [
+        "Controller remains in PEEPControl state",
+        "Controller reports PEEP check passed"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Test FiO2 Control Boundary Values",
+      "req_ids": [
+        "RW-SW-95"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Controller is in FiO2Control state"
+      ],
+      "inputs": {
+        "name": "boundary_fio2"
+      },
+      "steps": [
+        "Controller checks FiO2",
+        "Controller meets boundary FiO2"
+      ],
+      "expected": [
+        "Controller remains in FiO2Control state",
+        "Controller reports FiO2 check passed"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Test Pressure Control Boundary Values",
+      "req_ids": [
+        "RW-SW-98"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Controller is in PressureControl state"
+      ],
+      "inputs": {
+        "name": "boundary_air_conditions"
+      },
+      "steps": [
+        "Controller adjusts pressure based on boundary air conditions",
+        "Controller checks pressure control"
+      ],
+      "expected": [
+        "Controller remains in PressureControl state",
+        "Controller reports pressure control check passed"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Test Assist/Control with Pressure Controlled Ventilation Boundary Values",
+      "req_ids": [
+        "RW-SW-153"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Controller is in PressureControl state"
+      ],
+      "inputs": {
+        "name": "boundary_patient_inspiration"
+      },
+      "steps": [
+        "Controller detects boundary patient inspiration",
+        "Controller triggers inspiration"
+      ],
+      "expected": [
+        "Controller remains in PressureControl state",
+        "Controller reports inspiration triggered"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Test Safety Check with Boundary Values",
+      "req_ids": [
+        "RW-SW-156"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Controller is in SafetyCheck state"
+      ],
+      "inputs": {
+        "name": "boundary_absurd_command"
+      },
+      "steps": [
+        "Controller checks safety",
+        "Controller detects boundary absurd command"
+      ],
+      "expected": [
+        "Controller remains in SafetyCheck state",
+        "Controller reports safety check failed"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "@startuml\n[*] --> Init\n\nstate Init {\n  [*] --> Idle\n  Idle --> PressureFall : Commanded Pressure Fall\n  Idle --> PEEPControl : Commanded PEEP\n  Idle --> FiO2Control : Commanded FiO2\n  Idle --> PressureControl : Commanded Pressure Control\n  Idle --> SafetyCheck : Safety Check\n}\n\nstate PressureFall {\n  [*] --> PressureFallInit\n  PressureFallInit --> PressureFallControl : Commanded Pressure Fall\n  PressureFallControl --> PressureFallCheck : Pressure Fall Check\n  PressureFallCheck --> PressureFall : Pressure Fall Check Passed\n  PressureFallCheck --> PressureFallFail : Pressure Fall Check Failed\n}\n\nstate PressureFallCheck {\n  [*] --> PressureFallCheckInit\n  PressureFallCheckInit --> PressureFallCheckControl : Pressure Fall Check Control\n  PressureFallCheckControl --> PressureFallCheckResult : Pressure Fall Check Result\n  PressureFallCheckResult --> PressureFall : Pressure Fall Check Passed\n  PressureFallCheckResult --> PressureFallFail : Pressure Fall Check Failed\n}\n\nstate PressureFallFail {\n  [*] --> PressureFallFailInit\n  PressureFallFailInit --> PressureFallFailControl : Pressure Fall Fail Control\n  PressureFallFailControl --> PressureFallFailResult : Pressure Fall Fail Result\n  PressureFallFailResult --> PressureFall : Pressure Fall Fail Passed\n  PressureFallFailResult --> PressureFallFailFail : Pressure Fall Fail Failed\n}\n\nstate PEEPControl {\n  [*] --> PEEPControlInit\n  PEEPControlInit --> PEEPControlControl : Commanded PEEP Control\n  PEEPControlControl --> PEEPControlCheck : PEEP Control Check\n  PEEPControlCheck --> PEEPControl : PEEP Control Check Passed\n  PEEPControlCheck --> PEEPControlFail : PEEP Control Check Failed\n}\n\nstate PEEPControlCheck {\n  [*] --> PEEPControlCheckInit\n  PEEPControlCheckInit --> PEEPControlCheckControl : PEEP Control Check Control\n  PEEPControlCheckControl --> PEEPControlCheckResult : PEEP Control Check Result\n  PEEPControlCheckResult --> PEEPControl : PEEP Control Check Passed\n  PEEPControlCheckResult --> PEEPControlFail : PEEP Control Check Failed\n}\n\nstate PEEPControlFail {\n  [*] --> PEEPControlFailInit\n  PEEPControlFailInit --> PEEPControlFailControl : PEEP Control Fail Control\n  PEEPControlFailControl --> PEEPControlFailResult : PEEP Control Fail Result\n  PEEPControlFailResult --> PEEPControl : PEEP Control Fail Passed\n  PEEPControlFailResult --> PEEPControlFailFail : PEEP Control Fail Failed\n}\n\nstate FiO2Control {\n  [*] --> FiO2ControlInit\n  FiO2ControlInit --> FiO2ControlControl : Commanded FiO2 Control\n  FiO2ControlControl --> FiO2ControlCheck : FiO2 Control Check\n  FiO2ControlCheck --> FiO2Control : FiO2 Control Check Passed\n  FiO2ControlCheck --> FiO2ControlFail : FiO2 Control Check Failed\n}\n\nstate FiO2ControlCheck {\n  [*] --> FiO2ControlCheckInit\n  FiO2ControlCheckInit --> FiO2ControlCheckControl : FiO2 Control Check Control\n  FiO2ControlCheckControl --> FiO2ControlCheckResult : FiO2 Control Check Result\n  FiO2ControlCheckResult --> FiO2Control : FiO2 Control Check Passed\n  FiO2ControlCheckResult --> FiO2ControlFail : FiO2 Control Check Failed\n}\n\nstate FiO2ControlFail {\n  [*] --> FiO2ControlFailInit\n  FiO2ControlFailInit --> FiO2ControlFailControl : FiO2 Control Fail Control\n  FiO2ControlFailControl --> FiO2ControlFailResult : FiO2 Control Fail Result\n  FiO2ControlFailResult --> FiO2Control : FiO2 Control Fail Passed\n  FiO2ControlFailResult --> FiO2ControlFailFail : FiO2 Control Fail Failed\n}\n\nstate PressureControl {\n  [*] --> PressureControlInit\n  PressureControlInit --> PressureControlControl : Commanded Pressure Control\n  PressureControlControl --> PressureControlCheck : Pressure Control Check\n  PressureControlCheck --> PressureControl : Pressure Control Check Passed\n  PressureControlCheck --> PressureControlFail : Pressure Control Check Failed\n}\n\nstate PressureControlCheck {\n  [*] --> PressureControlCheckInit\n  PressureControlCheckInit --> PressureControlCheckControl : Pressure Control Check Control\n  PressureControlCheckControl --> PressureControlCheckResult : Pressure Control Check Result\n  PressureControlCheckResult --> PressureControl : Pressure Control Check Passed\n  PressureControlCheckResult --> PressureControlFail : Pressure Control Check Failed\n}\n\nstate PressureControlFail {\n  [*] --> PressureControlFailInit\n  PressureControlFailInit --> PressureControlFailControl : Pressure Control Fail Control\n  PressureControlFailControl --> PressureControlFailResult : Pressure Control Fail Result\n  PressureControlFailResult --> PressureControl : Pressure Control Fail Passed\n  PressureControlFailResult --> PressureControlFailFail : Pressure Control Fail Failed\n}\n\nstate SafetyCheck {\n  [*] --> SafetyCheckInit\n  SafetyCheckInit --> SafetyCheckControl : Safety Check Control\n  SafetyCheckControl --> SafetyCheckResult : Safety Check Result\n  SafetyCheckResult --> SafetyCheck : Safety Check Passed\n  SafetyCheckResult --> SafetyCheckFail : Safety Check Failed\n}\n\nstate SafetyCheckFail {\n  [*] --> SafetyCheckFailInit\n  SafetyCheckFailInit --> SafetyCheckFailControl : Safety Check Fail Control\n  SafetyCheckFailControl --> SafetyCheckFailResult : Safety Check Fail Result\n  SafetyCheckFailResult --> SafetyCheck : Safety Check Passed\n  SafetyCheckFailResult --> SafetyCheckFailFail : Safety Check Fail Failed\n}\n\n@enduml",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Pressure Fall Phase Overshoot",
+          "req_ids": [
+            "RW-SW-63"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in Idle state"
+          ],
+          "inputs": {
+            "name": "commanded_pressure_fall"
+          },
+          "steps": [
+            "Controller enters PressureFall state",
+            "Controller checks pressure fall",
+            "Controller meets commanded pressure fall within 0.8*PEEP-1 cmH2O"
+          ],
+          "expected": [
+            "Controller remains in PressureFall state",
+            "Controller reports pressure fall check passed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test PEEP Control within Tolerance",
+          "req_ids": [
+            "RW-SW-64"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in Idle state"
+          ],
+          "inputs": {
+            "name": "commanded_peep"
+          },
+          "steps": [
+            "Controller enters PEEPControl state",
+            "Controller checks PEEP",
+            "Controller meets commanded PEEP within +-1 H2O + 10%"
+          ],
+          "expected": [
+            "Controller remains in PEEPControl state",
+            "Controller reports PEEP check passed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test FiO2 Control within Tolerance",
+          "req_ids": [
+            "RW-SW-95"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in Idle state"
+          ],
+          "inputs": {
+            "name": "commanded_fio2"
+          },
+          "steps": [
+            "Controller enters FiO2Control state",
+            "Controller checks FiO2",
+            "Controller meets commanded FiO2 within 0.05"
+          ],
+          "expected": [
+            "Controller remains in FiO2Control state",
+            "Controller reports FiO2 check passed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test FiO2 Reporting",
+          "req_ids": [
+            "RW-SW-97"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in Idle state"
+          ],
+          "inputs": {
+            "name": "fio2_measurement"
+          },
+          "steps": [
+            "Controller enters FiO2Control state",
+            "Controller reports FiO2 measurement"
+          ],
+          "expected": [
+            "Controller remains in FiO2Control state",
+            "Controller reports FiO2 measurement"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Pressure Control under Different Air Conditions",
+          "req_ids": [
+            "RW-SW-98"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in Idle state"
+          ],
+          "inputs": {
+            "name": "air_conditions"
+          },
+          "steps": [
+            "Controller enters PressureControl state",
+            "Controller adjusts pressure based on air conditions"
+          ],
+          "expected": [
+            "Controller remains in PressureControl state",
+            "Controller reports pressure control check passed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Assist/Control with Pressure Controlled Ventilation",
+          "req_ids": [
+            "RW-SW-153"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in Idle state"
+          ],
+          "inputs": {
+            "name": "patient_inspiration"
+          },
+          "steps": [
+            "Controller enters PressureControl state",
+            "Controller detects patient inspiration",
+            "Controller triggers inspiration"
+          ],
+          "expected": [
+            "Controller remains in PressureControl state",
+            "Controller reports inspiration triggered"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Safety Check with Absurd Commands",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Controller is in Idle state"
+          ],
+          "inputs": {
+            "name": "absurd_command"
+          },
+          "steps": [
+            "Controller enters SafetyCheck state",
+            "Controller checks safety",
+            "Controller detects absurd command"
+          ],
+          "expected": [
+            "Controller remains in SafetyCheck state",
+            "Controller reports safety check failed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Pressure Fall Check Boundary Values",
+          "req_ids": [
+            "RW-SW-63"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller is in PressureFall state"
+          ],
+          "inputs": {
+            "name": "boundary_pressure_fall"
+          },
+          "steps": [
+            "Controller checks pressure fall",
+            "Controller meets boundary pressure fall"
+          ],
+          "expected": [
+            "Controller remains in PressureFall state",
+            "Controller reports pressure fall check passed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test PEEP Control Boundary Values",
+          "req_ids": [
+            "RW-SW-64"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller is in PEEPControl state"
+          ],
+          "inputs": {
+            "name": "boundary_peep"
+          },
+          "steps": [
+            "Controller checks PEEP",
+            "Controller meets boundary PEEP"
+          ],
+          "expected": [
+            "Controller remains in PEEPControl state",
+            "Controller reports PEEP check passed"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test FiO2 Control Boundary Values",
+          "req_ids": [
+            "RW-SW-95"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller is in FiO2Control state"
+          ],
+          "inputs": {
+            "name": "boundary_fio2"
+          },
+          "steps": [
+            "Controller checks FiO2",
+            "Controller meets boundary FiO2"
+          ],
+          "expected": [
+            "Controller remains in FiO2Control state",
+            "Controller reports FiO2 check passed"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Test Pressure Control Boundary Values",
+          "req_ids": [
+            "RW-SW-98"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller is in PressureControl state"
+          ],
+          "inputs": {
+            "name": "boundary_air_conditions"
+          },
+          "steps": [
+            "Controller adjusts pressure based on boundary air conditions",
+            "Controller checks pressure control"
+          ],
+          "expected": [
+            "Controller remains in PressureControl state",
+            "Controller reports pressure control check passed"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Test Assist/Control with Pressure Controlled Ventilation Boundary Values",
+          "req_ids": [
+            "RW-SW-153"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller is in PressureControl state"
+          ],
+          "inputs": {
+            "name": "boundary_patient_inspiration"
+          },
+          "steps": [
+            "Controller detects boundary patient inspiration",
+            "Controller triggers inspiration"
+          ],
+          "expected": [
+            "Controller remains in PressureControl state",
+            "Controller reports inspiration triggered"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Test Safety Check with Boundary Values",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller is in SafetyCheck state"
+          ],
+          "inputs": {
+            "name": "boundary_absurd_command"
+          },
+          "steps": [
+            "Controller checks safety",
+            "Controller detects boundary absurd command"
+          ],
+          "expected": [
+            "Controller remains in SafetyCheck state",
+            "Controller reports safety check failed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": [
+          "missing: initial state"
+        ]
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.5,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 48,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Boundary test cases do not specify actual numeric boundary values",
+          "Oracle assertions are vague and omit numeric thresholds",
+          "Transition guard conditions are not explicitly tested for both true and false values",
+          "Safety measures under data corruption scenarios are not fully exercised",
+          "State and transition coverage are not explicitly verified in the tests"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.9,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,1178 @@
+{
+  "unit_id": "U17_GUI",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "data_pipeline",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "data_pipeline",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.25,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.625,
+    "oracle_assertiveness": 0.8,
+    "boundary_coverage": 0.8,
+    "groundedness_mg": 0.619,
+    "hallucinated": [
+      {
+        "value": "25 cmH2O",
+        "context": "pressure",
+        "grounded": false
+      },
+      {
+        "value": "19 Hz",
+        "context": "refresh_rate",
+        "grounded": false
+      },
+      {
+        "value": "-1 mL",
+        "context": "volume",
+        "grounded": false
+      },
+      {
+        "value": "1001 mL",
+        "context": "volume",
+        "grounded": false
+      },
+      {
+        "value": "10.1",
+        "context": "ratio",
+        "grounded": false
+      },
+      {
+        "value": "200.0",
+        "context": "ratio",
+        "grounded": false
+      },
+      {
+        "value": "200.1",
+        "context": "ratio",
+        "grounded": false
+      },
+      {
+        "value": "-1 cmH2O",
+        "context": "peep",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 21,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add negative tests for RW-SW-46, RW-SW-48, and RW-SW-54 to cover error paths",
+      "Correct ratio boundary testing for RW-SW-50 to use 0.005–10 instead of 200.0",
+      "Include tests for resolution change at 9.9 and 10.1 for RW-SW-50",
+      "Verify flow rate units (liters/min) in RW-SW-92 tests",
+      "Parameterize test values with realistic ranges to avoid invented constants"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.8069,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: GUI Display and Graphs for Patient Data\n\n  Scenario: GUI displays patient pressure measured at the gas outlet port\n    Given the controller provides a pressure reading of 25 cmH2O\n    When the GUI updates the display\n    Then the GUI displays the patient pressure as 25 cmH2O\n\n  Scenario Outline: GUI graph refresh rate is at least 20 Hz\n    Given the GUI is displaying a graph\n    When the graph updates <refresh_rate> times per second\n    Then the graph refresh rate is >= 20 Hz\n    Examples:\n      | refresh_rate |\n      | 20           |\n      | 25           |\n      | 19           | # Invalid case\n\n  Scenario: GUI graph duration is 30 seconds\n    Given the GUI is displaying a graph\n    When the graph duration is set\n    Then the graph duration is 30 seconds\n\n  Scenario Outline: GUI displays inspiratory tidal volume within range and resolution\n    Given the controller provides an inspiratory tidal volume reading of <volume> mL\n    When the GUI updates the display\n    Then the GUI displays the inspiratory tidal volume as <volume> mL\n    Examples:\n      | volume |\n      | 0      |\n      | 500    |\n      | 1000   |\n      | -1     | # Invalid case\n      | 1001   | # Invalid case\n\n  Scenario Outline: GUI displays the ratio of inspiration time to expiration time\n    Given the controller provides an inspiration to expiration ratio of <ratio>\n    When the GUI updates the display\n    Then the GUI displays the inspiration to expiration ratio as <ratio>\n    Examples:\n      | ratio |\n      | 10.0  |\n      | 5.5   |\n      | 1.0   |\n      | 10.1  |\n      | 200.0 |\n      | 200.1 | # Invalid case\n      | 0.9   | # Invalid case\n\n  Scenario Outline: GUI displays PEEP for the most recent breath\n    Given the controller provides a PEEP reading of <peep> cmH2O\n    When the GUI updates the display\n    Then the GUI displays the PEEP as <peep> cmH2O\n    Examples:\n      | peep |\n      | 0    |\n      | 5    |\n      | 10   |\n      | -1   | # Invalid case\n\n  Scenario: GUI displays a graph of volume provided to the patient\n    Given the controller provides volume data\n    When the GUI updates the display\n    Then the GUI displays a graph of volume provided to the patient\n\n  Scenario Outline: GUI displays flow rate graph with specified duration and refresh rate\n    Given the controller provides flow rate data\n    When the GUI updates the display\n    Then the GUI displays a flow rate graph with a duration of 30 seconds and a refresh rate of >= 20 Hz\n    Examples:\n      | refresh_rate |\n      | 20           |\n      | 25           |\n      | 19           | # Invalid case",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "GUI displays patient pressure measured at the gas outlet port",
+      "req_ids": [
+        "RW-SW-46"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides a pressure reading of 25 cmH2O"
+      ],
+      "inputs": {
+        "pressure": "25 cmH2O"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the patient pressure as 25 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "GUI graph refresh rate is at least 20 Hz",
+      "req_ids": [
+        "RW-SW-47"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is displaying a graph"
+      ],
+      "inputs": {
+        "refresh_rate": "20"
+      },
+      "steps": [
+        "the graph updates 20 times per second"
+      ],
+      "expected": [
+        "the graph refresh rate is >= 20 Hz"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "GUI graph refresh rate is at least 20 Hz",
+      "req_ids": [
+        "RW-SW-47"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is displaying a graph"
+      ],
+      "inputs": {
+        "refresh_rate": "25"
+      },
+      "steps": [
+        "the graph updates 25 times per second"
+      ],
+      "expected": [
+        "the graph refresh rate is >= 20 Hz"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "GUI graph refresh rate is at least 20 Hz",
+      "req_ids": [
+        "RW-SW-47"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the GUI is displaying a graph"
+      ],
+      "inputs": {
+        "refresh_rate": "19"
+      },
+      "steps": [
+        "the graph updates 19 times per second"
+      ],
+      "expected": [
+        "the graph refresh rate is >= 20 Hz"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "GUI graph duration is 30 seconds",
+      "req_ids": [
+        "RW-SW-48"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is displaying a graph"
+      ],
+      "inputs": {},
+      "steps": [
+        "the graph duration is set"
+      ],
+      "expected": [
+        "the graph duration is 30 seconds"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "GUI displays inspiratory tidal volume within range and resolution",
+      "req_ids": [
+        "RW-SW-49"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides an inspiratory tidal volume reading of 0 mL"
+      ],
+      "inputs": {
+        "volume": "0"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiratory tidal volume as 0 mL"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "GUI displays inspiratory tidal volume within range and resolution",
+      "req_ids": [
+        "RW-SW-49"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides an inspiratory tidal volume reading of 500 mL"
+      ],
+      "inputs": {
+        "volume": "500"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiratory tidal volume as 500 mL"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "GUI displays inspiratory tidal volume within range and resolution",
+      "req_ids": [
+        "RW-SW-49"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides an inspiratory tidal volume reading of 1000 mL"
+      ],
+      "inputs": {
+        "volume": "1000"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiratory tidal volume as 1000 mL"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "GUI displays inspiratory tidal volume within range and resolution",
+      "req_ids": [
+        "RW-SW-49"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller provides an inspiratory tidal volume reading of -1 mL"
+      ],
+      "inputs": {
+        "volume": "-1"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiratory tidal volume as -1 mL"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "GUI displays inspiratory tidal volume within range and resolution",
+      "req_ids": [
+        "RW-SW-49"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller provides an inspiratory tidal volume reading of 1001 mL"
+      ],
+      "inputs": {
+        "volume": "1001"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiratory tidal volume as 1001 mL"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "GUI displays the ratio of inspiration time to expiration time",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides an inspiration to expiration ratio of 10.0"
+      ],
+      "inputs": {
+        "ratio": "10.0"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiration to expiration ratio as 10.0"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "GUI displays the ratio of inspiration time to expiration time",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides an inspiration to expiration ratio of 5.5"
+      ],
+      "inputs": {
+        "ratio": "5.5"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiration to expiration ratio as 5.5"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "GUI displays the ratio of inspiration time to expiration time",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides an inspiration to expiration ratio of 1.0"
+      ],
+      "inputs": {
+        "ratio": "1.0"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiration to expiration ratio as 1.0"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "GUI displays the ratio of inspiration time to expiration time",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides an inspiration to expiration ratio of 10.1"
+      ],
+      "inputs": {
+        "ratio": "10.1"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiration to expiration ratio as 10.1"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "GUI displays the ratio of inspiration time to expiration time",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides an inspiration to expiration ratio of 200.0"
+      ],
+      "inputs": {
+        "ratio": "200.0"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiration to expiration ratio as 200.0"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "GUI displays the ratio of inspiration time to expiration time",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller provides an inspiration to expiration ratio of 200.1"
+      ],
+      "inputs": {
+        "ratio": "200.1"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiration to expiration ratio as 200.1"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "GUI displays the ratio of inspiration time to expiration time",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller provides an inspiration to expiration ratio of 0.9"
+      ],
+      "inputs": {
+        "ratio": "0.9"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the inspiration to expiration ratio as 0.9"
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "GUI displays PEEP for the most recent breath",
+      "req_ids": [
+        "RW-SW-53"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides a PEEP reading of 0 cmH2O"
+      ],
+      "inputs": {
+        "peep": "0"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the PEEP as 0 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-019",
+      "title": "GUI displays PEEP for the most recent breath",
+      "req_ids": [
+        "RW-SW-53"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides a PEEP reading of 5 cmH2O"
+      ],
+      "inputs": {
+        "peep": "5"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the PEEP as 5 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-020",
+      "title": "GUI displays PEEP for the most recent breath",
+      "req_ids": [
+        "RW-SW-53"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides a PEEP reading of 10 cmH2O"
+      ],
+      "inputs": {
+        "peep": "10"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the PEEP as 10 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-021",
+      "title": "GUI displays PEEP for the most recent breath",
+      "req_ids": [
+        "RW-SW-53"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller provides a PEEP reading of -1 cmH2O"
+      ],
+      "inputs": {
+        "peep": "-1"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays the PEEP as -1 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-022",
+      "title": "GUI displays a graph of volume provided to the patient",
+      "req_ids": [
+        "RW-SW-54"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides volume data"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays a graph of volume provided to the patient"
+      ]
+    },
+    {
+      "id": "TC-023",
+      "title": "GUI displays flow rate graph with specified duration and refresh rate",
+      "req_ids": [
+        "RW-SW-92"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides flow rate data"
+      ],
+      "inputs": {
+        "refresh_rate": "20"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays a flow rate graph with a duration of 30 seconds and a refresh rate of >= 20 Hz"
+      ]
+    },
+    {
+      "id": "TC-024",
+      "title": "GUI displays flow rate graph with specified duration and refresh rate",
+      "req_ids": [
+        "RW-SW-92"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller provides flow rate data"
+      ],
+      "inputs": {
+        "refresh_rate": "25"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays a flow rate graph with a duration of 30 seconds and a refresh rate of >= 20 Hz"
+      ]
+    },
+    {
+      "id": "TC-025",
+      "title": "GUI displays flow rate graph with specified duration and refresh rate",
+      "req_ids": [
+        "RW-SW-92"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller provides flow rate data"
+      ],
+      "inputs": {
+        "refresh_rate": "19"
+      },
+      "steps": [
+        "the GUI updates the display"
+      ],
+      "expected": [
+        "the GUI displays a flow rate graph with a duration of 30 seconds and a refresh rate of >= 20 Hz"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: GUI Display and Graphs for Patient Data\n\n  Scenario: GUI displays patient pressure measured at the gas outlet port\n    Given the controller provides a pressure reading of 25 cmH2O\n    When the GUI updates the display\n    Then the GUI displays the patient pressure as 25 cmH2O\n\n  Scenario Outline: GUI graph refresh rate is at least 20 Hz\n    Given the GUI is displaying a graph\n    When the graph updates <refresh_rate> times per second\n    Then the graph refresh rate is >= 20 Hz\n    Examples:\n      | refresh_rate |\n      | 20           |\n      | 25           |\n      | 19           | # Invalid case\n\n  Scenario: GUI graph duration is 30 seconds\n    Given the GUI is displaying a graph\n    When the graph duration is set\n    Then the graph duration is 30 seconds\n\n  Scenario Outline: GUI displays inspiratory tidal volume within range and resolution\n    Given the controller provides an inspiratory tidal volume reading of <volume> mL\n    When the GUI updates the display\n    Then the GUI displays the inspiratory tidal volume as <volume> mL\n    Examples:\n      | volume |\n      | 0      |\n      | 500    |\n      | 1000   |\n      | -1     | # Invalid case\n      | 1001   | # Invalid case\n\n  Scenario Outline: GUI displays the ratio of inspiration time to expiration time\n    Given the controller provides an inspiration to expiration ratio of <ratio>\n    When the GUI updates the display\n    Then the GUI displays the inspiration to expiration ratio as <ratio>\n    Examples:\n      | ratio |\n      | 10.0  |\n      | 5.5   |\n      | 1.0   |\n      | 10.1  |\n      | 200.0 |\n      | 200.1 | # Invalid case\n      | 0.9   | # Invalid case\n\n  Scenario Outline: GUI displays PEEP for the most recent breath\n    Given the controller provides a PEEP reading of <peep> cmH2O\n    When the GUI updates the display\n    Then the GUI displays the PEEP as <peep> cmH2O\n    Examples:\n      | peep |\n      | 0    |\n      | 5    |\n      | 10   |\n      | -1   | # Invalid case\n\n  Scenario: GUI displays a graph of volume provided to the patient\n    Given the controller provides volume data\n    When the GUI updates the display\n    Then the GUI displays a graph of volume provided to the patient\n\n  Scenario Outline: GUI displays flow rate graph with specified duration and refresh rate\n    Given the controller provides flow rate data\n    When the GUI updates the display\n    Then the GUI displays a flow rate graph with a duration of 30 seconds and a refresh rate of >= 20 Hz\n    Examples:\n      | refresh_rate |\n      | 20           |\n      | 25           |\n      | 19           | # Invalid case",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI displays patient pressure measured at the gas outlet port",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides a pressure reading of 25 cmH2O"
+          ],
+          "inputs": {
+            "pressure": "25 cmH2O"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the patient pressure as 25 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI graph refresh rate is at least 20 Hz",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is displaying a graph"
+          ],
+          "inputs": {
+            "refresh_rate": "20"
+          },
+          "steps": [
+            "the graph updates 20 times per second"
+          ],
+          "expected": [
+            "the graph refresh rate is >= 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI graph refresh rate is at least 20 Hz",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is displaying a graph"
+          ],
+          "inputs": {
+            "refresh_rate": "25"
+          },
+          "steps": [
+            "the graph updates 25 times per second"
+          ],
+          "expected": [
+            "the graph refresh rate is >= 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI graph refresh rate is at least 20 Hz",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is displaying a graph"
+          ],
+          "inputs": {
+            "refresh_rate": "19"
+          },
+          "steps": [
+            "the graph updates 19 times per second"
+          ],
+          "expected": [
+            "the graph refresh rate is >= 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI graph duration is 30 seconds",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is displaying a graph"
+          ],
+          "inputs": {},
+          "steps": [
+            "the graph duration is set"
+          ],
+          "expected": [
+            "the graph duration is 30 seconds"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI displays inspiratory tidal volume within range and resolution",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides an inspiratory tidal volume reading of 0 mL"
+          ],
+          "inputs": {
+            "volume": "0"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiratory tidal volume as 0 mL"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI displays inspiratory tidal volume within range and resolution",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides an inspiratory tidal volume reading of 500 mL"
+          ],
+          "inputs": {
+            "volume": "500"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiratory tidal volume as 500 mL"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI displays inspiratory tidal volume within range and resolution",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides an inspiratory tidal volume reading of 1000 mL"
+          ],
+          "inputs": {
+            "volume": "1000"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiratory tidal volume as 1000 mL"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI displays inspiratory tidal volume within range and resolution",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller provides an inspiratory tidal volume reading of -1 mL"
+          ],
+          "inputs": {
+            "volume": "-1"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiratory tidal volume as -1 mL"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI displays inspiratory tidal volume within range and resolution",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller provides an inspiratory tidal volume reading of 1001 mL"
+          ],
+          "inputs": {
+            "volume": "1001"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiratory tidal volume as 1001 mL"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "GUI displays the ratio of inspiration time to expiration time",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides an inspiration to expiration ratio of 10.0"
+          ],
+          "inputs": {
+            "ratio": "10.0"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiration to expiration ratio as 10.0"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "GUI displays the ratio of inspiration time to expiration time",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides an inspiration to expiration ratio of 5.5"
+          ],
+          "inputs": {
+            "ratio": "5.5"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiration to expiration ratio as 5.5"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "GUI displays the ratio of inspiration time to expiration time",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides an inspiration to expiration ratio of 1.0"
+          ],
+          "inputs": {
+            "ratio": "1.0"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiration to expiration ratio as 1.0"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "GUI displays the ratio of inspiration time to expiration time",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides an inspiration to expiration ratio of 10.1"
+          ],
+          "inputs": {
+            "ratio": "10.1"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiration to expiration ratio as 10.1"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "GUI displays the ratio of inspiration time to expiration time",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides an inspiration to expiration ratio of 200.0"
+          ],
+          "inputs": {
+            "ratio": "200.0"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiration to expiration ratio as 200.0"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "GUI displays the ratio of inspiration time to expiration time",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller provides an inspiration to expiration ratio of 200.1"
+          ],
+          "inputs": {
+            "ratio": "200.1"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiration to expiration ratio as 200.1"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "GUI displays the ratio of inspiration time to expiration time",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller provides an inspiration to expiration ratio of 0.9"
+          ],
+          "inputs": {
+            "ratio": "0.9"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the inspiration to expiration ratio as 0.9"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "GUI displays PEEP for the most recent breath",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides a PEEP reading of 0 cmH2O"
+          ],
+          "inputs": {
+            "peep": "0"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the PEEP as 0 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "GUI displays PEEP for the most recent breath",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides a PEEP reading of 5 cmH2O"
+          ],
+          "inputs": {
+            "peep": "5"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the PEEP as 5 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "GUI displays PEEP for the most recent breath",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides a PEEP reading of 10 cmH2O"
+          ],
+          "inputs": {
+            "peep": "10"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the PEEP as 10 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "GUI displays PEEP for the most recent breath",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller provides a PEEP reading of -1 cmH2O"
+          ],
+          "inputs": {
+            "peep": "-1"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays the PEEP as -1 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-022",
+          "title": "GUI displays a graph of volume provided to the patient",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides volume data"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays a graph of volume provided to the patient"
+          ]
+        },
+        {
+          "id": "TC-023",
+          "title": "GUI displays flow rate graph with specified duration and refresh rate",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides flow rate data"
+          ],
+          "inputs": {
+            "refresh_rate": "20"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays a flow rate graph with a duration of 30 seconds and a refresh rate of >= 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-024",
+          "title": "GUI displays flow rate graph with specified duration and refresh rate",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller provides flow rate data"
+          ],
+          "inputs": {
+            "refresh_rate": "25"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays a flow rate graph with a duration of 30 seconds and a refresh rate of >= 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-025",
+          "title": "GUI displays flow rate graph with specified duration and refresh rate",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller provides flow rate data"
+          ],
+          "inputs": {
+            "refresh_rate": "19"
+          },
+          "steps": [
+            "the GUI updates the display"
+          ],
+          "expected": [
+            "the GUI displays a flow rate graph with a duration of 30 seconds and a refresh rate of >= 20 Hz"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "data_pipeline",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.25,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.625,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 0.8,
+        "groundedness_mg": 0.619,
+        "hallucinated": [
+          {
+            "value": "25 cmH2O",
+            "context": "pressure",
+            "grounded": false
+          },
+          {
+            "value": "19 Hz",
+            "context": "refresh_rate",
+            "grounded": false
+          },
+          {
+            "value": "-1 mL",
+            "context": "volume",
+            "grounded": false
+          },
+          {
+            "value": "1001 mL",
+            "context": "volume",
+            "grounded": false
+          },
+          {
+            "value": "10.1",
+            "context": "ratio",
+            "grounded": false
+          },
+          {
+            "value": "200.0",
+            "context": "ratio",
+            "grounded": false
+          },
+          {
+            "value": "200.1",
+            "context": "ratio",
+            "grounded": false
+          },
+          {
+            "value": "-1 cmH2O",
+            "context": "peep",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 21,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative tests for RW-SW-46, RW-SW-48, and RW-SW-54 to cover error paths",
+          "Correct ratio boundary testing for RW-SW-50 to use 0.005–10 instead of 200.0",
+          "Include tests for resolution change at 9.9 and 10.1 for RW-SW-50",
+          "Verify flow rate units (liters/min) in RW-SW-92 tests",
+          "Parameterize test values with realistic ranges to avoid invented constants"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.8069,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

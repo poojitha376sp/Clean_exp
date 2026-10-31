@@ -1,0 +1,726 @@
+{
+  "unit_id": "U20_Embedded",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:codegemma:7b",
+  "system_type": "safety_critical",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.8,
+    "sfv_score": 0.9,
+    "threshold": 0.7,
+    "sfv_pass": true,
+    "issues": [
+      "missing: transitions (>=2)"
+    ]
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 0.0,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 0,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add concrete numeric values for overshoot, tolerance, FiO2, etc. to make assertions precise.",
+      "Include boundary tests for thresholds (e.g., ±1 H2O, 0.05 FiO2 tolerance).",
+      "Add negative tests for invalid PEEP, FiO2, and air condition inputs.",
+      "Verify FSM state transitions explicitly (e.g., OFF→pressure_control, IDLE→SET_POINT).",
+      "Assert specific state names and output values rather than vague descriptions."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.64,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "@start\ninitial state: OFF\nmode pressure_control\n\n@event pressure_fall_start\nguard pressure_fall_start_condition\ntransition pressure_fall\n\n@event pressure_fall_end\nguard pressure_fall_end_condition\ntransition pressure_control\n\n@mode pressure_control\ninitial state: IDLE\n\n@event pressure_command\nguard pressure_command_condition\ntransition SET_POINT\n\n@event pressure_setpoint_reached\nguard pressure_setpoint_reached_condition\ntransition IDLE\n\n@end",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Controller should meet commanded pressure during pressure fall phase within overshoot",
+      "req_ids": [
+        "RW-SW-63"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in pressure_control mode."
+      ],
+      "inputs": {
+        "pressure_command": "as specified"
+      },
+      "steps": [
+        "Send pressure_command event."
+      ],
+      "expected": [
+        "Controller meets commanded pressure within overshoot."
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Controller should meet commanded PEEP within specified tolerance",
+      "req_ids": [
+        "RW-SW-64"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in pressure_control mode."
+      ],
+      "inputs": {
+        "peep_command": "as specified"
+      },
+      "steps": [
+        "Send peep_command event."
+      ],
+      "expected": [
+        "Controller meets commanded PEEP within specified tolerance."
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Controller should achieve target FiO2 value within tolerance",
+      "req_ids": [
+        "RW-SW-95"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in pressure_control mode."
+      ],
+      "inputs": {
+        "fio2_target": "as specified"
+      },
+      "steps": [
+        "Send fio2_target event."
+      ],
+      "expected": [
+        "Controller achieves target FiO2 value within tolerance."
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Controller should report FiO2 as measured prior to patient inhale limb",
+      "req_ids": [
+        "RW-SW-97"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in pressure_control mode."
+      ],
+      "inputs": {},
+      "steps": [
+        "Perform inhale limb measurement."
+      ],
+      "expected": [
+        "Controller reports FiO2 as measured prior to patient inhale limb."
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Controller should achieve commanded values under different air conditions",
+      "req_ids": [
+        "RW-SW-98"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in pressure_control mode."
+      ],
+      "inputs": {
+        "air_conditions": "as specified"
+      },
+      "steps": [
+        "Set air conditions."
+      ],
+      "expected": [
+        "Controller achieves commanded values under specified air conditions."
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Controller should implement assist/control with pressure controlled ventilation mode",
+      "req_ids": [
+        "RW-SW-153"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in pressure_control mode."
+      ],
+      "inputs": {
+        "ventilation_mode": "pressure_controlled"
+      },
+      "steps": [
+        "Set ventilation mode."
+      ],
+      "expected": [
+        "Controller implements assist/control with pressure controlled ventilation mode."
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Controller should have safety measures to avoid acting on absurd commands",
+      "req_ids": [
+        "RW-SW-156"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Controller is in pressure_control mode."
+      ],
+      "inputs": {
+        "absurd_command": "as specified"
+      },
+      "steps": [
+        "Send absurd_command event."
+      ],
+      "expected": [
+        "Controller does not act on absurd command."
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "## U20_Embedded Test Suite\n\n**Mode:** Controller\n\n**States:**\n* IDLE\n* PRESSURE_FALL\n* PEEP_DELIVERY\n* INHALATION_TRIGGER\n* INHALING\n* EXHALING\n\n**Transitions:**\n* START -> PRESSURE_FALL\n* PRESSURE_FALL -> PEEP_DELIVERY\n* PEEP_DELIVERY -> INHALATION_TRIGGER\n* INHALATION_TRIGGER -> INHALING\n* INHALING -> EXHALING\n* EXHALING -> IDLE\n\n**Event:**\n* INSP_DETECTED\n\n**Guard:**\n* INSP_DETECTED: pressure >= PEEP_DELIVERY_TARGET\n\n**Initial state:** IDLE\n\n**Test cases:**\n\n**TC-001:** Pressure fall within overshoot\n* Precondition: Controller in IDLE state\n* Input: Command pressure within 0.8*PEEP-1 cmH2O of target pressure\n* Step: Send command pressure\n* Expected: Controller transitions to PEEP_DELIVERY state\n\n**TC-002:** PEEP delivery within tolerance\n* Precondition: Controller in PEEP_DELIVERY state\n* Input: PEEP value within +-1 H2O + 10% of target PEEP\n* Step: Check PEEP value\n* Expected: PEEP value within tolerance\n\n**TC-003:** FiO2 within tolerance\n* Precondition: Controller in INHALING state\n* Input: FiO2 value within 0.05\n* Step: Check FiO2 value\n* Expected: FiO2 value within tolerance\n\n**TC-004:** FiO2 measurement before inhale\n* Precondition: Controller in IDLE state\n* Input: None\n* Step: Check FiO2 value\n* Expected: FiO2 value as measured prior to patient inhale limb\n\n**TC-005:** Controller adjusts for air density changes\n* Precondition: Controller in INHALING state\n* Input: Air density within range\n* Step: Check pressure and FiO2 values\n* Expected: Controller adjusts pressure and FiO2 values to account for air density changes\n\n**TC-006:** Assist/control with pressure controlled ventilation mode\n* Precondition: Controller in IDLE state\n* Input: Assist/control mode set to pressure controlled ventilation\n* Step: Send INSP_DETECTED event\n* Expected: Controller transitions to INHALING state\n\n**TC-007:** Safety measures for absurd commands\n* Precondition: Controller in IDLE state\n* Input: Invalid command or data corruption\n* Step: Send command or corrupt data\n* Expected: Controller remains in IDLE state and does not act on the command",
+      "test_cases": [],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.4,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: transitions (>=2)"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.40). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- missing: transitions (>=2)",
+      "artifact": "## U20_Embedded Test Suite\n\n**Mode:** Controller\n\n**States:**\n* IDLE\n* PRESSURE_FALL\n* PEEP_DELIVERY\n* INHALATION_TRIGGER\n* INHALING\n* EXHALING\n\n**Transitions:**\n* START -> PRESSURE_FALL\n* PRESSURE_FALL -> PEEP_DELIVERY\n* PEEP_DELIVERY -> INHALATION_TRIGGER\n* INHALATION_TRIGGER -> INHALING\n* INHALING -> EXHALING\n* EXHALING -> IDLE\n\n**Events:**\n* START\n* PRESSURE_MET\n* PEEP_MET\n* INHALATION_DETECTED\n* INHALATION_STOPPED\n\n**Guards:**\n* PRESSURE_MET: pressure >= commanded pressure * (1 - overshoot)\n* PEEP_MET: pressure <= commanded PEEP + PEEP_tolerance\n* INHALATION_DETECTED: sensor detects patient inspiration\n* INHALATION_STOPPED: sensor detects patient exhalation\n\n**Test Cases:**",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller meets commanded pressure within overshoot",
+          "req_ids": [
+            "RW-SW-63"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in IDLE state"
+          ],
+          "inputs": {
+            "commanded_pressure": 20,
+            "overshoot": 0.8
+          },
+          "steps": [
+            "START event is sent"
+          ],
+          "expected": [
+            "Controller transitions to PRESSURE_FALL state"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller meets commanded PEEP within tolerance",
+          "req_ids": [
+            "RW-SW-64"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in PEEP_DELIVERY state"
+          ],
+          "inputs": {
+            "commanded_peep": 10,
+            "peep_tolerance": 1
+          },
+          "steps": [
+            "PEEP_MET event is sent"
+          ],
+          "expected": [
+            "Controller transitions to INHALATION_TRIGGER state"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Controller achieves target FiO2 within tolerance",
+          "req_ids": [
+            "RW-SW-95"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in INHALING state"
+          ],
+          "inputs": {
+            "target_fio2": 0.21,
+            "tolerance": 0.05
+          },
+          "steps": [
+            "INHALATION_STOPPED event is sent"
+          ],
+          "expected": [
+            "Controller transitions to EXHALING state"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Controller reports FiO2 as measured prior to inhalation",
+          "req_ids": [
+            "RW-SW-97"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in IDLE state"
+          ],
+          "inputs": {},
+          "steps": [
+            "START event is sent"
+          ],
+          "expected": [
+            "Controller reports FiO2 as measured before inhalation"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller adjusts FiO2 based on air conditions",
+          "req_ids": [
+            "RW-SW-98"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in INHALING state"
+          ],
+          "inputs": {
+            "air_conditions": {
+              "temperature": 20,
+              "altitude": 1000,
+              "humidity": 50
+            }
+          },
+          "steps": [
+            "INHALATION_STOPPED event is sent"
+          ],
+          "expected": [
+            "Controller adjusts FiO2 based on air conditions"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller implements assist/control with pressure-controlled ventilation",
+          "req_ids": [
+            "RW-SW-153"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in IDLE state"
+          ],
+          "inputs": {
+            "mode": "assist/control",
+            "pressure_mode": "pressure"
+          },
+          "steps": [
+            "START event is sent"
+          ],
+          "expected": [
+            "Controller enters assist/control mode with pressure-controlled ventilation"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller prevents acting on absurd commands",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Controller is in IDLE state"
+          ],
+          "inputs": {
+            "command": "nonsense"
+          },
+          "steps": [
+            "Controller receives nonsense command"
+          ],
+          "expected": [
+            "Controller ignores the command"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.6,
+        "sfv_score": 0.8,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.80). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: events/guards",
+      "artifact": "@start\n    Initial state: Idle\n    \n    Pressure Fall Phase:\n        - Event: Set Target Pressure\n        - Guard: Pressure below target pressure\n        - Transition: Start Pressure Fall\n        - Event: Pressure Reached Target\n        - Guard: Pressure within 0.8*PEEP-1 cmH2O of target pressure\n        - Transition: Pressure Fall Completed\n        \n    PEEP Phase:\n        - Event: Set Target PEEP\n        - Guard: PEEP within 1 H2O + 10% of target PEEP\n        - Transition: Start PEEP Adjustment\n        - Event: PEEP Reached Target\n        - Guard: PEEP within 1 H2O + 10% of target PEEP\n        - Transition: PEEP Adjustment Completed\n        \n    FiO2 Phase:\n        - Event: Set Target FiO2\n        - Guard: FiO2 within 0.05 of target FiO2\n        - Transition: Start FiO2 Adjustment\n        - Event: FiO2 Reached Target\n        - Guard: FiO2 within 0.05 of target FiO2\n        - Transition: FiO2 Adjustment Completed\n        \n    Air Conditions Phase:\n        - Event: Set Air Conditions\n        - Guard: Air conditions match target conditions\n        - Transition: Start Air Conditions Adjustment\n        - Event: Air Conditions Reached Target\n        - Guard: Air conditions match target conditions\n        - Transition: Air Conditions Adjustment Completed\n        \n    Assist/Control Phase:\n        - Event: Detect Patient Inspiration\n        - Guard: True\n        - Transition: Start Inspiration\n        \n    Safety Measures Phase:\n        - Event: Receive Absurd Command\n        - Guard: True\n        - Transition: Ignore Command\n        \n@end",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Pressure fall within overshoot",
+          "req_ids": [
+            "RW-SW-63"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure below target pressure"
+          ],
+          "inputs": {
+            "target_pressure": "as specified"
+          },
+          "steps": [
+            "Set Target Pressure"
+          ],
+          "expected": [
+            "Pressure within 0.8*PEEP-1 cmH2O of target pressure"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "PEEP within tolerance",
+          "req_ids": [
+            "RW-SW-64"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PEEP within 1 H2O + 10% of target PEEP"
+          ],
+          "inputs": {
+            "target_peep": "as specified"
+          },
+          "steps": [
+            "Set Target PEEP"
+          ],
+          "expected": [
+            "PEEP within 1 H2O + 10% of target PEEP"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "FiO2 within tolerance",
+          "req_ids": [
+            "RW-SW-95"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "FiO2 within 0.05 of target FiO2"
+          ],
+          "inputs": {
+            "target_fio2": "as specified"
+          },
+          "steps": [
+            "Set Target FiO2"
+          ],
+          "expected": [
+            "FiO2 within 0.05 of target FiO2"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "FiO2 measurement before inhale",
+          "req_ids": [
+            "RW-SW-97"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "FiO2 measurement taken before patient inhale limb"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "FiO2 measurement taken before patient inhale limb"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Air conditions adjustment",
+          "req_ids": [
+            "RW-SW-98"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Air conditions match target conditions"
+          ],
+          "inputs": {
+            "target_air_conditions": "as specified"
+          },
+          "steps": [
+            "Set Air Conditions"
+          ],
+          "expected": [
+            "Air conditions match target conditions"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Assist/Control mode",
+          "req_ids": [
+            "RW-SW-153"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient inspiration detected"
+          ],
+          "inputs": {},
+          "steps": [
+            "Detect Patient Inspiration"
+          ],
+          "expected": [
+            "Inspiration initiated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Ignore absurd commands",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Absurd command received"
+          ],
+          "inputs": {
+            "command": "aspecified"
+          },
+          "steps": [
+            "Receive Absurd Command"
+          ],
+          "expected": [
+            "Command ignored"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.8571,
+        "representation_score": 0.8,
+        "sfv_score": 0.8286,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #4 (TC-004): [] should be non-empty",
+          "missing: transitions (>=2)"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.83). Fix these problems and output the full corrected suite:\n- test case #4 (TC-004): [] should be non-empty\n- missing: transitions (>=2)",
+      "artifact": "@start\ninitial state: OFF\nmode pressure_control\n\n@event pressure_fall_start\nguard pressure_fall_start_condition\ntransition pressure_fall\n\n@event pressure_fall_end\nguard pressure_fall_end_condition\ntransition pressure_control\n\n@mode pressure_control\ninitial state: IDLE\n\n@event pressure_command\nguard pressure_command_condition\ntransition SET_POINT\n\n@event pressure_setpoint_reached\nguard pressure_setpoint_reached_condition\ntransition IDLE\n\n@end",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller should meet commanded pressure during pressure fall phase within overshoot",
+          "req_ids": [
+            "RW-SW-63"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in pressure_control mode."
+          ],
+          "inputs": {
+            "pressure_command": "as specified"
+          },
+          "steps": [
+            "Send pressure_command event."
+          ],
+          "expected": [
+            "Controller meets commanded pressure within overshoot."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller should meet commanded PEEP within specified tolerance",
+          "req_ids": [
+            "RW-SW-64"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in pressure_control mode."
+          ],
+          "inputs": {
+            "peep_command": "as specified"
+          },
+          "steps": [
+            "Send peep_command event."
+          ],
+          "expected": [
+            "Controller meets commanded PEEP within specified tolerance."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Controller should achieve target FiO2 value within tolerance",
+          "req_ids": [
+            "RW-SW-95"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in pressure_control mode."
+          ],
+          "inputs": {
+            "fio2_target": "as specified"
+          },
+          "steps": [
+            "Send fio2_target event."
+          ],
+          "expected": [
+            "Controller achieves target FiO2 value within tolerance."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Controller should report FiO2 as measured prior to patient inhale limb",
+          "req_ids": [
+            "RW-SW-97"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in pressure_control mode."
+          ],
+          "inputs": {},
+          "steps": [
+            "Perform inhale limb measurement."
+          ],
+          "expected": [
+            "Controller reports FiO2 as measured prior to patient inhale limb."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller should achieve commanded values under different air conditions",
+          "req_ids": [
+            "RW-SW-98"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in pressure_control mode."
+          ],
+          "inputs": {
+            "air_conditions": "as specified"
+          },
+          "steps": [
+            "Set air conditions."
+          ],
+          "expected": [
+            "Controller achieves commanded values under specified air conditions."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller should implement assist/control with pressure controlled ventilation mode",
+          "req_ids": [
+            "RW-SW-153"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in pressure_control mode."
+          ],
+          "inputs": {
+            "ventilation_mode": "pressure_controlled"
+          },
+          "steps": [
+            "Set ventilation mode."
+          ],
+          "expected": [
+            "Controller implements assist/control with pressure controlled ventilation mode."
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller should have safety measures to avoid acting on absurd commands",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Controller is in pressure_control mode."
+          ],
+          "inputs": {
+            "absurd_command": "as specified"
+          },
+          "steps": [
+            "Send absurd_command event."
+          ],
+          "expected": [
+            "Controller does not act on absurd command."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": [
+          "missing: transitions (>=2)"
+        ]
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 0,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add concrete numeric values for overshoot, tolerance, FiO2, etc. to make assertions precise.",
+          "Include boundary tests for thresholds (e.g., ±1 H2O, 0.05 FiO2 tolerance).",
+          "Add negative tests for invalid PEEP, FiO2, and air condition inputs.",
+          "Verify FSM state transitions explicitly (e.g., OFF→pressure_control, IDLE→SET_POINT).",
+          "Assert specific state names and output values rather than vague descriptions."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.64,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

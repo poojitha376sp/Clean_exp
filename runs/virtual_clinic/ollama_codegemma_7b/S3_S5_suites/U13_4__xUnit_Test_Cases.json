@@ -1,0 +1,508 @@
+{
+  "unit_id": "U13_4",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:codegemma:7b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.75,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "Headache",
+        "context": "symptom name added",
+        "grounded": false
+      },
+      {
+        "value": "Constant pain in the head",
+        "context": "symptom description",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 2,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Update functionality not tested; add test for updating symptom description.",
+      "Assertion in test_add_symptom is weak; verify returned symptom details match input.",
+      "Use mock or deterministic data store to avoid side effects across tests.",
+      "Verify that delete operation fails when symptom is used; test that symptom remains in database after failed delete.",
+      "Add boundary tests for symptom name length or description length if applicable."
+    ],
+    "traceability": 0.75,
+    "untraced_reqs": [
+      "Req-4"
+    ],
+    "fsa_score": 0.8125,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "from unittest import TestCase\n\nclass SymptomTest(TestCase):\n\n    def test_add_symptom(self):\n        # Add a new symptom with valid data\n        symptom_name = \"Headache\"\n        description = \"Constant pain in the head\"\n\n        # Call the function to add the symptom\n        add_symptom(symptom_name, description)\n\n        # Assert that the symptom was added successfully\n        self.assertEqual(get_symptom_by_name(symptom_name), symptom_name)\n\n    def test_view_symptom_details(self):\n        # Get the symptom details for an existing symptom\n        symptom_name = \"Headache\"\n\n        # Call the function to get the symptom details\n        symptom_details = get_symptom_by_name(symptom_name)\n\n        # Assert that the symptom details are correct\n        self.assertEqual(symptom_details[\"description\"], \"Constant pain in the head\")\n\n    def test_delete_symptom(self):\n        # Delete a symptom that is not used in any consultation request\n        symptom_name = \"Headache\"\n\n        # Call the function to delete the symptom\n        delete_symptom(symptom_name)\n\n        # Assert that the symptom was deleted successfully\n        self.assertIsNone(get_symptom_by_name(symptom_name))\n\n    def test_delete_symptom_with_consultation_request(self):\n        # Try to delete a symptom that is used in a consultation request\n        symptom_name = \"Fever\"\n\n        # Call the function to delete the symptom\n        with self.assertRaises(Exception):\n            delete_symptom(symptom_name)",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Add a new symptom",
+      "req_ids": [
+        "Req-4/1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "symptom_name": "Headache",
+        "description": "Constant pain in the head"
+      },
+      "steps": [
+        "add_symptom"
+      ],
+      "expected": [
+        "symptom_name is in the database"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "View symptom details",
+      "req_ids": [
+        "Req-4/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "symptom_name is in the database"
+      ],
+      "inputs": {
+        "symptom_name": "Headache"
+      },
+      "steps": [
+        "get_symptom_by_name"
+      ],
+      "expected": [
+        "symptom_details['description'] is 'Constant pain in the head'"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Delete symptom",
+      "req_ids": [
+        "Req-4/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "symptom_name is not used in any consultation request"
+      ],
+      "inputs": {
+        "symptom_name": "Headache"
+      },
+      "steps": [
+        "delete_symptom"
+      ],
+      "expected": [
+        "symptom_name is not in the database"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Delete symptom with consultation request",
+      "req_ids": [
+        "Req-4/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "symptom_name is used in a consultation request"
+      ],
+      "inputs": {
+        "symptom_name": "Fever"
+      },
+      "steps": [
+        "delete_symptom"
+      ],
+      "expected": [
+        "Exception is raised"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "using Xunit;\n\npublic class SymptomTest\n{\n    private readonly ISymptomService _symptomService;\n\n    public SymptomTest(ISymptomService symptomService)\n    {\n        _symptomService = symptomService;\n    }\n\n    [Fact]\n    public void AddNewSymptom_ValidInput_Success()\n    {\n        // Arrange\n        var symptom = new Symptom { Name = \"New Symptom\" };\n\n        // Act\n        _symptomService.Add(symptom);\n\n        // Assert\n        Assert.Contains(symptom, _symptomService.GetAll());\n    }\n\n    [Fact]\n    public void ViewAndUpdateSymptom_ValidId_Success()\n    {\n        // Arrange\n        var symptom = new Symptom { Name = \"Symptom 1\" };\n        _symptomService.Add(symptom);\n\n        // Act\n        symptom.Description = \"Updated Description\";\n        _symptomService.Update(symptom);\n\n        // Assert\n        Assert.Equal(\"Updated Description\", _symptomService.GetById(symptom.Id).Description);\n    }\n\n    [Fact]\n    public void DeleteSymptom_NoConsultationRequests_Success()\n    {\n        // Arrange\n        var symptom = new Symptom { Name = \"Symptom 2\" };\n        _symptomService.Add(symptom);\n\n        // Act\n        _symptomService.Delete(symptom.Id);\n\n        // Assert\n        Assert.DoesNotContain(symptom, _symptomService.GetAll());\n    }\n\n    [Fact]\n    public void DeleteSymptom_ConsultationRequestExists_Error()\n    {\n        // Arrange\n        var symptom = new Symptom { Name = \"Symptom 3\" };\n        _symptomService.Add(symptom);\n\n        // Precondition: Create a consultation request using the symptom\n        // ...\n\n        // Act & Assert\n        Assert.Throws<Exception>(() => _symptomService.Delete(symptom.Id));\n    }\n}",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add New Symptom with Valid Input",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "New Symptom"
+          },
+          "steps": [
+            "Add new symptom"
+          ],
+          "expected": [
+            "Symptom is added to the list"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update Symptom with Valid ID",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom with ID 1 exists"
+          ],
+          "inputs": {
+            "id": 1,
+            "description": "Updated Description"
+          },
+          "steps": [
+            "View and update symptom"
+          ],
+          "expected": [
+            "Symptom description is updated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Symptom with No Consultation Requests",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom with ID 2 exists"
+          ],
+          "inputs": {
+            "id": 2
+          },
+          "steps": [
+            "Delete symptom"
+          ],
+          "expected": [
+            "Symptom is deleted"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete Symptom with Consultation Request Exists",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom with ID 3 exists",
+            "Consultation request using symptom with ID 3 exists"
+          ],
+          "inputs": {
+            "id": 3
+          },
+          "steps": [
+            "Delete symptom"
+          ],
+          "expected": [
+            "Exception is thrown"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "Python syntax error: invalid syntax",
+          "No xUnit-style test definitions found."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Python syntax error: invalid syntax\n- No xUnit-style test definitions found.",
+      "artifact": "from unittest import TestCase\n\nclass SymptomTest(TestCase):\n\n    def test_add_symptom(self):\n        # Add a new symptom with valid data\n        symptom_name = \"Headache\"\n        description = \"Constant pain in the head\"\n\n        # Call the function to add the symptom\n        add_symptom(symptom_name, description)\n\n        # Assert that the symptom was added successfully\n        self.assertEqual(get_symptom_by_name(symptom_name), symptom_name)\n\n    def test_view_symptom_details(self):\n        # Get the symptom details for an existing symptom\n        symptom_name = \"Headache\"\n\n        # Call the function to get the symptom details\n        symptom_details = get_symptom_by_name(symptom_name)\n\n        # Assert that the symptom details are correct\n        self.assertEqual(symptom_details[\"description\"], \"Constant pain in the head\")\n\n    def test_delete_symptom(self):\n        # Delete a symptom that is not used in any consultation request\n        symptom_name = \"Headache\"\n\n        # Call the function to delete the symptom\n        delete_symptom(symptom_name)\n\n        # Assert that the symptom was deleted successfully\n        self.assertIsNone(get_symptom_by_name(symptom_name))\n\n    def test_delete_symptom_with_consultation_request(self):\n        # Try to delete a symptom that is used in a consultation request\n        symptom_name = \"Fever\"\n\n        # Call the function to delete the symptom\n        with self.assertRaises(Exception):\n            delete_symptom(symptom_name)",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new symptom",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptom_name": "Headache",
+            "description": "Constant pain in the head"
+          },
+          "steps": [
+            "add_symptom"
+          ],
+          "expected": [
+            "symptom_name is in the database"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View symptom details",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "symptom_name is in the database"
+          ],
+          "inputs": {
+            "symptom_name": "Headache"
+          },
+          "steps": [
+            "get_symptom_by_name"
+          ],
+          "expected": [
+            "symptom_details['description'] is 'Constant pain in the head'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete symptom",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "symptom_name is not used in any consultation request"
+          ],
+          "inputs": {
+            "symptom_name": "Headache"
+          },
+          "steps": [
+            "delete_symptom"
+          ],
+          "expected": [
+            "symptom_name is not in the database"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete symptom with consultation request",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "symptom_name is used in a consultation request"
+          ],
+          "inputs": {
+            "symptom_name": "Fever"
+          },
+          "steps": [
+            "delete_symptom"
+          ],
+          "expected": [
+            "Exception is raised"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.75,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "Headache",
+            "context": "symptom name added",
+            "grounded": false
+          },
+          {
+            "value": "Constant pain in the head",
+            "context": "symptom description",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 2,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Update functionality not tested; add test for updating symptom description.",
+          "Assertion in test_add_symptom is weak; verify returned symptom details match input.",
+          "Use mock or deterministic data store to avoid side effects across tests.",
+          "Verify that delete operation fails when symptom is used; test that symptom remains in database after failed delete.",
+          "Add boundary tests for symptom name length or description length if applicable."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "Req-4"
+        ],
+        "fsa_score": 0.8125,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.8125; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.75, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['Req-4'] (add at least one each)\n- ungrounded value 'Headache' (symptom name added): remove or use the SRS value\n- ungrounded value 'Constant pain in the head' (symptom description): remove or use the SRS value\n- Update functionality not tested; add test for updating symptom description.\n- Assertion in test_add_symptom is weak; verify returned symptom details match input.\n- Use mock or deterministic data store to avoid side effects across tests.\n- Verify that delete operation fails when symptom is used; test that symptom remains in database after failed delete.\n- Add boundary tests for symptom name length or description length if applicable.",
+      "artifact": "using Xunit;\nusing Moq;\n\npublic class SymptomTest\n{\n    private readonly ISymptomService _symptomService;\n\n    public SymptomTest()\n    {\n        _symptomService = new Mock<ISymptomService>().Object;\n    }\n\n    [Fact]\n    public void TestAddSymptom()\n    {\n        var symptom = new Symptom { Name = \"Headache\", Description = \"Constant pain in the head\" };\n\n        var result = _symptomService.AddSymptom(symptom);\n\n        Assert.Equal(symptom, result);\n    }\n\n    [Fact]\n    public void TestUpdateSymptomDescription()\n    {\n        var symptom = new Symptom { Name = \"Headache\", Description = \"Constant pain in the head\" };\n\n        _symptomService.AddSymptom(symptom);\n\n        symptom.Description = \"New description\";\n\n        _symptomService.UpdateSymptom(symptom);\n\n        Assert.Equal(\"New description\", symptom.Description);\n    }\n\n    [Fact]\n    public void TestDeleteSymptom()\n    {\n        var symptom = new Symptom { Name = \"Headache\", Description = \"Constant pain in the head\" };\n\n        _symptomService.AddSymptom(symptom);\n\n        Assert.Throws<Exception>(() => _symptomService.DeleteSymptom(symptom.Id));\n    }\n\n    [Fact]\n    public void TestDeleteSymptom_SymptomUsed()\n    {\n        var symptom = new Symptom { Name = \"Headache\", Description = \"Constant pain in the head\" };\n\n        _symptomService.AddSymptom(symptom);\n\n        // Simulate symptom being used in a consultation request\n        _symptomService.AddConsultationRequest(new ConsultationRequest { SymptomId = symptom.Id });\n\n        Assert.Throws<Exception>(() => _symptomService.DeleteSymptom(symptom.Id));\n    }\n}",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Add Symptom",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "Headache",
+            "description": "Constant pain in the head"
+          },
+          "steps": [
+            "Add symptom"
+          ],
+          "expected": {
+            "name": "Headache",
+            "description": "Constant pain in the head"
+          }
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Update Symptom Description",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom added"
+          ],
+          "inputs": {
+            "description": "New description"
+          },
+          "steps": [
+            "Update symptom description"
+          ],
+          "expected": {
+            "description": "New description"
+          }
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Delete Symptom",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom added"
+          ],
+          "inputs": {},
+          "steps": [
+            "Delete symptom"
+          ],
+          "expected": "Exception"
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Delete Symptom - Symptom Used",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom added",
+            "Symptom used in consultation request"
+          ],
+          "inputs": {},
+          "steps": [
+            "Delete symptom"
+          ],
+          "expected": "Exception"
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): {'name': 'Headache', 'description': 'Constant pain in the head'} is not of type 'array'",
+          "test case #2 (TC-002): {'description': 'New description'} is not of type 'array'",
+          "test case #3 (TC-003): 'Exception' is not of type 'array'",
+          "test case #4 (TC-004): 'Exception' is not of type 'array'",
+          "Python syntax error: invalid syntax",
+          "No xUnit-style test definitions found."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): {'name': 'Headache', 'description': 'Constant pain in the head'} is not of type 'array'\n- test case #2 (TC-002): {'description': 'New description'} is not of type 'array'\n- test case #3 (TC-003): 'Exception' is not of type 'array'\n- test case #4 (TC-004): 'Exception' is not of type 'array'\n- Python syntax error: invalid syntax\n- No xUnit-style test definitions found.",
+      "artifact": "using Xunit;\n\npublic class SymptomTest\n{\n    private readonly ISymptomService _symptomService;\n\n    public SymptomTest(ISymptomService symptomService)\n    {\n        _symptomService = symptomService;\n    }\n\n    [Fact]\n    public void AddSymptom_ValidInput_ReturnsCreatedSymptom()\n    {\n        // Arrange\n        var symptom = new Symptom { Name = \"Headache\", Description = \"Constant pain in the head\" };\n\n        // Act\n        var createdSymptom = _symptomService.AddSymptom(symptom);\n\n        // Assert\n        Assert.Equal(symptom.Name, createdSymptom.Name);\n        Assert.Equal(symptom.Description, createdSymptom.Description);\n    }\n\n    [Fact]\n    public void AddSymptom_InvalidInput_ThrowsArgumentException()\n    {\n        // Arrange\n        var symptom = new Symptom { Description = \"New description\" };\n\n        // Act & Assert\n        Assert.Throws<ArgumentException>(() => _symptomService.AddSymptom(symptom));\n    }\n\n    [Fact]\n    public void UpdateSymptom_ValidInput_ReturnsUpdatedSymptom()\n    {\n        // Arrange\n        var symptom = new Symptom { Name = \"Headache\", Description = \"Constant pain in the head\" };\n        var updatedSymptom = new Symptom { Name = \"Headache\", Description = \"New description\" };\n\n        // Act\n        var updated = _symptomService.UpdateSymptom(symptom.Id, updatedSymptom);\n\n        // Assert\n        Assert.True(updated);\n        Assert.Equal(updatedSymptom.Description, _symptomService.GetSymptom(symptom.Id).Description);\n    }\n\n    [Fact]\n    public void DeleteSymptom_WithNoConsultationRequests_ReturnsTrue()\n    {\n        // Arrange\n        var symptom = new Symptom { Name = \"Headache\", Description = \"Constant pain in the head\" };\n\n        // Act\n        var deleted = _symptomService.DeleteSymptom(symptom.Id);\n\n        // Assert\n        Assert.True(deleted);\n        Assert.Throws<SymptomNotFoundException>(() => _symptomService.GetSymptom(symptom.Id));\n    }\n\n    [Fact]\n    public void DeleteSymptom_WithConsultationRequests_ThrowsSymptomInUseException()\n    {\n        // Arrange\n        var symptom = new Symptom { Name = \"Headache\", Description = \"Constant pain in the head\" };\n        _symptomService.AddSymptom(symptom);\n        // Create a ConsultationRequest with the symptom\n        // ...\n\n        // Act & Assert\n        Assert.Throws<SymptomInUseException>(() => _symptomService.DeleteSymptom(symptom.Id));\n    }\n}",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Python syntax error: invalid syntax",
+          "No xUnit-style test definitions found."
+        ]
+      }
+    }
+  ]
+}

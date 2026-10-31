@@ -1,0 +1,1747 @@
+{
+  "unit_id": "U29_19",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.75,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.1429,
+    "hallucinated": [
+      {
+        "value": "12345",
+        "context": "patient ID",
+        "grounded": false
+      },
+      {
+        "value": "1234",
+        "context": "patient pin-code",
+        "grounded": false
+      },
+      {
+        "value": "9012",
+        "context": "patient pin-code",
+        "grounded": false
+      },
+      {
+        "value": "9",
+        "context": "medicine count",
+        "grounded": false
+      },
+      {
+        "value": "6",
+        "context": "lab test count",
+        "grounded": false
+      },
+      {
+        "value": "today",
+        "context": "appointment date",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 7,
+    "uncovered_clauses": [
+      "VCDLB01",
+      "VCDLB02"
+    ],
+    "weaknesses": [
+      "Lab requirements (VCDLB01, VCDLB02) are not covered",
+      "Lab scenarios incorrectly reference VCDCM01",
+      "Oracle assertions are vague; need concrete expected values or status codes",
+      "Boundary tests do not cover exact boundary values (8 medicines, 5 lab tests, next day appointment)",
+      "Scenario outlines lack Examples tables, reducing parameterization and coverage"
+    ],
+    "traceability": 0.75,
+    "untraced_reqs": [
+      "VCDLB01",
+      "VCDLB02"
+    ],
+    "fsa_score": 0.5764,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Patient Management and Workflow\n\n  Scenario: Query on Patient Id and Modify Details\n    Given a patient with ID \"12345\" and pin-code \"1234\"\n    When I query the patient details\n    Then the patient details should be displayed\n    And I should be able to modify the patient details\n    And the patient pin-code should not be modified to be outside the Zone\n\n  Scenario: Query on Patient Id and Create Appointment\n    Given a patient with ID \"12345\"\n    When I query the patient details\n    And I enter details like Speciality, Symptoms, Consultation request, Appointment date\n    Then an entry should be created into the Patient Appointment file if the Appointment Request is for next day\n\n  Scenario: Doctor Sees Consultation Requests\n    Given a doctor\n    When the doctor sees the workflow consultation requests\n    Then the doctor should be able to select and provide Consultation\n\n  Scenario: Doctor Enters Diagnosis and Prescribes Medicines\n    Given a doctor\n    When the doctor sees the Patient Consultation Requests\n    And enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)\n    Then the prescription should be updated with the diagnosis and medicines\n    And the lab tests should be noted down\n\n  Scenario: Chemist Sees Consultation Requests\n    Given a chemist\n    When the chemist sees the workflow consultation requests\n    Then the chemist should be able to select and provide Medicines\n\n  Scenario: Chemist Dispenses Medicines\n    Given a chemist\n    When the chemist sees the Prescription\n    And dispenses medicines\n    Then the flag in Prescription should be marked\n\n  Scenario: Lab Sees Consultation Requests\n    Given a lab\n    When the lab sees the workflow consultation requests\n    Then the lab should be able to select and note down the Lab Requests\n\n  Scenario: Lab Notes Lab Tests and Adds Report\n    Given a lab\n    When the lab sees the Prescription\n    And notes the lab tests to be done and the Patient details\n    Then the flag in prescription should be marked\n    And the report should be added\n\n  Scenario Outline: Pin-code Zone Boundary Tests\n    Given a patient with ID \"12345\"\n    When I query the patient details\n    And I try to modify the pin-code to be outside the Zone\n    Then the pin-code should not be modified\n\n  Scenario Outline: Medicine Count Boundary Tests\n    Given a doctor\n    When the doctor sees the Patient Consultation Requests\n    And enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)\n    Then the prescription should be updated with the diagnosis and medicines\n    And the lab tests should be noted down\n\n  Scenario Outline: Lab Test Count Boundary Tests\n    Given a lab\n    When the lab sees the Prescription\n    And notes the lab tests to be done and the Patient details\n    Then the flag in prescription should be marked\n    And the report should be added\n\n  Scenario Outline: Appointment Date Boundary Tests\n    Given a doctor\n    When the doctor sees the Patient Consultation Requests\n    And enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)\n    Then the prescription should be updated with the diagnosis and medicines\n    And the lab tests should be noted down\n\n  Scenario Outline: Negative Test for Exceeding Medicine Limit\n    Given a doctor\n    When the doctor sees the Patient Consultation Requests\n    And enters Diagnosis, Prescribes medicines (more than 8) and requests for lab tests (optional) max(5)\n    Then the prescription should not be updated\n    And an error message should be displayed\n\n  Scenario Outline: Negative Test for Exceeding Lab Test Limit\n    Given a lab\n    When the lab sees the Prescription\n    And notes the lab tests to be done (more than 5)\n    Then the flag in prescription should not be marked\n    And an error message should be displayed",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Query on Patient Id and Modify Details",
+      "req_ids": [
+        "VCDPA03"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a patient with ID '12345' and pin-code '1234'"
+      ],
+      "inputs": {},
+      "steps": [
+        "I query the patient details",
+        "I should be able to modify the patient details",
+        "the patient pin-code should not be modified to be outside the Zone"
+      ],
+      "expected": [
+        "patient details should be displayed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Query on Patient Id and Create Appointment",
+      "req_ids": [
+        "VCDPA04"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a patient with ID '12345'"
+      ],
+      "inputs": {},
+      "steps": [
+        "I query the patient details",
+        "I enter details like Speciality, Symptoms, Consultation request, Appointment date",
+        "an entry should be created into the Patient Appointment file if the Appointment Request is for next day"
+      ],
+      "expected": [
+        "an entry should be created into the Patient Appointment file if the Appointment Request is for next day"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Doctor Sees Consultation Requests",
+      "req_ids": [
+        "VCDDR01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a doctor"
+      ],
+      "inputs": {},
+      "steps": [
+        "the doctor sees the workflow consultation requests",
+        "the doctor should be able to select and provide Consultation"
+      ],
+      "expected": [
+        "the doctor should be able to select and provide Consultation"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Doctor Enters Diagnosis and Prescribes Medicines",
+      "req_ids": [
+        "VCDDR02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a doctor"
+      ],
+      "inputs": {},
+      "steps": [
+        "the doctor sees the Patient Consultation Requests",
+        "enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)",
+        "the prescription should be updated with the diagnosis and medicines",
+        "the lab tests should be noted down"
+      ],
+      "expected": [
+        "the prescription should be updated with the diagnosis and medicines",
+        "the lab tests should be noted down"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Chemist Sees Consultation Requests",
+      "req_ids": [
+        "VCDCM01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a chemist"
+      ],
+      "inputs": {},
+      "steps": [
+        "the chemist sees the workflow consultation requests",
+        "the chemist should be able to select and provide Medicines"
+      ],
+      "expected": [
+        "the chemist should be able to select and provide Medicines"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Chemist Dispenses Medicines",
+      "req_ids": [
+        "VCDCM02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a chemist"
+      ],
+      "inputs": {},
+      "steps": [
+        "the chemist sees the Prescription",
+        "dispenses medicines",
+        "the flag in Prescription should be marked"
+      ],
+      "expected": [
+        "the flag in Prescription should be marked"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Lab Sees Consultation Requests",
+      "req_ids": [
+        "VCDCM01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a lab"
+      ],
+      "inputs": {},
+      "steps": [
+        "the lab sees the workflow consultation requests",
+        "the lab should be able to select and note down the Lab Requests"
+      ],
+      "expected": [
+        "the lab should be able to select and note down the Lab Requests"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Lab Notes Lab Tests and Adds Report",
+      "req_ids": [
+        "VCDCM01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a lab"
+      ],
+      "inputs": {},
+      "steps": [
+        "the lab sees the Prescription",
+        "notes the lab tests to be done and the Patient details",
+        "the flag in prescription should be marked",
+        "the report should be added"
+      ],
+      "expected": [
+        "the flag in prescription should be marked",
+        "the report should be added"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Pin-code Zone Boundary Tests",
+      "req_ids": [
+        "VCDPA03"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "a patient with ID '12345'"
+      ],
+      "inputs": {
+        "pin_code": "9012"
+      },
+      "steps": [
+        "I query the patient details",
+        "I try to modify the pin-code to be outside the Zone"
+      ],
+      "expected": [
+        "the pin-code should not be modified"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Medicine Count Boundary Tests",
+      "req_ids": [
+        "VCDDR02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "a doctor"
+      ],
+      "inputs": {
+        "medicine_count": "9"
+      },
+      "steps": [
+        "the doctor sees the Patient Consultation Requests",
+        "enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)"
+      ],
+      "expected": [
+        "the prescription should not be updated",
+        "an error message should be displayed"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Lab Test Count Boundary Tests",
+      "req_ids": [
+        "VCDDR02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "a lab"
+      ],
+      "inputs": {
+        "lab_test_count": "6"
+      },
+      "steps": [
+        "the lab sees the Prescription",
+        "notes the lab tests to be done (more than 5)"
+      ],
+      "expected": [
+        "the flag in prescription should not be marked",
+        "an error message should be displayed"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Appointment Date Boundary Tests",
+      "req_ids": [
+        "VCDPA04"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a doctor"
+      ],
+      "inputs": {
+        "appointment_date": "today"
+      },
+      "steps": [
+        "the doctor sees the Patient Consultation Requests",
+        "enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)"
+      ],
+      "expected": [
+        "the prescription should be updated with the diagnosis and medicines",
+        "the lab tests should be noted down"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Negative Test for Exceeding Medicine Limit",
+      "req_ids": [
+        "VCDDR02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "a doctor"
+      ],
+      "inputs": {
+        "medicine_count": "9"
+      },
+      "steps": [
+        "the doctor sees the Patient Consultation Requests",
+        "enters Diagnosis, Prescribes medicines (more than 8) and requests for lab tests (optional) max(5)"
+      ],
+      "expected": [
+        "the prescription should not be updated",
+        "an error message should be displayed"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Negative Test for Exceeding Lab Test Limit",
+      "req_ids": [
+        "VCDDR02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "a lab"
+      ],
+      "inputs": {
+        "lab_test_count": "6"
+      },
+      "steps": [
+        "the lab sees the Prescription",
+        "notes the lab tests to be done (more than 5)"
+      ],
+      "expected": [
+        "the flag in prescription should not be marked",
+        "an error message should be displayed"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Patient Management and Workflow\n\n  Scenario: Query on Patient Id and Modify Details\n    Given a patient with ID \"P001\" and pin-code \"1234\"\n    When I query for patient ID \"P001\"\n    Then the patient details are displayed\n    And I can modify the patient details\n    And the patient pin-code cannot be modified to be outside the Zone\n\n  Scenario: Query on Patient Id and Create Appointment\n    Given a patient with ID \"P002\"\n    When I query for patient ID \"P002\"\n    Then the patient details are displayed\n    And I enter details like Speciality, Symptoms, Consultation request, Appointment date\n    Then an entry is created into the Patient Appointment file if the Appointment Request is for next day\n\n  Scenario: Doctor Sees Consultation Requests\n    Given a doctor\n    When the doctor sees all the workflow consultation requests\n    Then the doctor selects a consultation request one by one to provide Consultation\n\n  Scenario: Doctor Enters Diagnosis and Prescribes Medicines\n    Given a doctor\n    When the doctor sees a Patient Consultation Request\n    Then the doctor enters Diagnosis\n    And the doctor prescribes medicines (max 8)\n    And the doctor requests for lab tests (optional) max(5)\n\n  Scenario: Chemist Sees Consultation Requests\n    Given a chemist\n    When the chemist sees all the workflow consultation requests\n    Then the chemist selects a consultation request one by one to provide Medicines\n\n  Scenario: Chemist Dispenses Medicines\n    Given a chemist\n    When the chemist sees a Prescription\n    Then the chemist dispenses medicines\n    And the chemist marks the flag in Prescription\n\n  Scenario: Lab Sees Consultation Requests\n    Given a lab\n    When the lab sees all the workflow consultation requests\n    Then the lab selects a consultation request one by one to note down the Lab Requests\n\n  Scenario: Lab Notes Lab Tests and Adds Report\n    Given a lab\n    When the lab sees a Prescription\n    Then the lab notes the lab tests to be done and the Patient details\n    And the lab marks the flag in prescription\n    And the lab adds the report",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Query on Patient Id and Modify Details",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with ID 'P001' and pin-code '1234'"
+          ],
+          "inputs": {
+            "patient_id": "P001"
+          },
+          "steps": [
+            "query for patient ID 'P001'",
+            "display patient details",
+            "modify patient details",
+            "prevent modification of patient pin-code outside the Zone"
+          ],
+          "expected": [
+            "patient details displayed",
+            "patient details modified",
+            "pin-code modification prevented"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Query on Patient Id and Create Appointment",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with ID 'P002'"
+          ],
+          "inputs": {
+            "patient_id": "P002"
+          },
+          "steps": [
+            "query for patient ID 'P002'",
+            "display patient details",
+            "enter details like Speciality, Symptoms, Consultation request, Appointment date",
+            "create an entry into the Patient Appointment file if the Appointment Request is for next day"
+          ],
+          "expected": [
+            "patient details displayed",
+            "appointment entry created"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor Sees Consultation Requests",
+          "req_ids": [
+            "VCDDR01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a doctor"
+          ],
+          "inputs": {},
+          "steps": [
+            "doctor sees all the workflow consultation requests",
+            "doctor selects a consultation request one by one to provide Consultation"
+          ],
+          "expected": [
+            "consultation requests displayed",
+            "consultation provided"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Doctor Enters Diagnosis and Prescribes Medicines",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a doctor"
+          ],
+          "inputs": {},
+          "steps": [
+            "doctor sees a Patient Consultation Request",
+            "doctor enters Diagnosis",
+            "doctor prescribes medicines (max 8)",
+            "doctor requests for lab tests (optional) max(5)"
+          ],
+          "expected": [
+            "diagnosis entered",
+            "medicines prescribed",
+            "lab tests requested"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Chemist Sees Consultation Requests",
+          "req_ids": [
+            "VCDCM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a chemist"
+          ],
+          "inputs": {},
+          "steps": [
+            "chemist sees all the workflow consultation requests",
+            "chemist selects a consultation request one by one to provide Medicines"
+          ],
+          "expected": [
+            "consultation requests displayed",
+            "medicines provided"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Chemist Dispenses Medicines",
+          "req_ids": [
+            "VCDCM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a chemist"
+          ],
+          "inputs": {},
+          "steps": [
+            "chemist sees a Prescription",
+            "chemist dispenses medicines",
+            "chemist marks the flag in Prescription"
+          ],
+          "expected": [
+            "medicines dispensed",
+            "flag marked in prescription"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Lab Sees Consultation Requests",
+          "req_ids": [
+            "VCDCM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a lab"
+          ],
+          "inputs": {},
+          "steps": [
+            "lab sees all the workflow consultation requests",
+            "lab selects a consultation request one by one to note down the Lab Requests"
+          ],
+          "expected": [
+            "consultation requests displayed",
+            "lab requests noted"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Lab Notes Lab Tests and Adds Report",
+          "req_ids": [
+            "VCDCM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a lab"
+          ],
+          "inputs": {},
+          "steps": [
+            "lab sees a Prescription",
+            "lab notes the lab tests to be done and the Patient details",
+            "lab marks the flag in prescription",
+            "lab adds the report"
+          ],
+          "expected": [
+            "lab tests noted",
+            "flag marked in prescription",
+            "report added"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 3,
+        "uncovered_clauses": [
+          "VCDLB01",
+          "VCDLB02"
+        ],
+        "weaknesses": [
+          "Add negative test cases for pin-code zone constraint",
+          "Add boundary tests for medicine count (max 8) and lab test count (max 5)",
+          "Correct mapping of lab requirements to lab scenarios",
+          "Use Scenario Outline with Examples tables for normal, edge, and invalid values",
+          "Make assertions more concrete by checking specific values, status codes, and messages"
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VCDLB01",
+          "VCDLB02"
+        ],
+        "fsa_score": 0.48,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.48; sub-scores {'clause_coverage': 0.75, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.0, 'groundedness_mg': 1.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCDLB01', 'VCDLB02'] (add at least one each)\n- uncovered clause: VCDLB01\n- uncovered clause: VCDLB02\n- Add negative test cases for pin-code zone constraint\n- Add boundary tests for medicine count (max 8) and lab test count (max 5)\n- Correct mapping of lab requirements to lab scenarios\n- Use Scenario Outline with Examples tables for normal, edge, and invalid values\n- Make assertions more concrete by checking specific values, status codes, and messages",
+      "artifact": "Feature: Patient Management and Workflow\n\n  Scenario: Query on Patient Id and Modify Details\n    Given a patient with ID \"P001\" and pin-code \"1234\"\n    When I query for patient ID \"P001\"\n    Then the patient details should be displayed\n    And I should be able to modify the patient details\n    And the patient pin-code should not be modified to be outside the Zone\n\n  Scenario: Query on Patient Id and Enter Details\n    Given a patient with ID \"P002\"\n    When I query for patient ID \"P002\"\n    Then the patient details should be displayed\n    And I should be able to enter details like Speciality, Symptoms, Consultation request, Appointment date\n    And if the Appointment Request is for next day, an entry should be created in the Patient Appointment file\n\n  Scenario: Doctor Sees Consultation Requests\n    Given a doctor\n    When the doctor sees all the workflow consultation requests\n    Then the doctor should be able to select and provide Consultation for each request\n\n  Scenario: Doctor Enters Diagnosis and Prescribes Medicines\n    Given a doctor and a consultation request\n    When the doctor enters Diagnosis and Prescribes medicines (max 8)\n    Then the doctor should be able to request for lab tests (optional, max 5)\n    And the consultation request should be marked as completed\n\n  Scenario: Chemist Sees Consultation Requests\n    Given a chemist\n    When the chemist sees all the workflow consultation requests\n    Then the chemist should be able to select and provide Medicines for each request\n\n  Scenario: Chemist Dispenses Medicines\n    Given a chemist and a prescription\n    When the chemist dispenses medicines\n    Then the prescription should be marked as dispensed\n\n  Scenario: Lab Sees Consultation Requests\n    Given a lab\n    When the lab sees all the workflow consultation requests\n    Then the lab should be able to select and note down the Lab Requests for each request\n\n  Scenario: Lab Notes Lab Tests and Adds Report\n    Given a lab and a prescription\n    When the lab notes the lab tests to be done and the Patient details\n    Then the prescription should be marked as completed and the report should be added\n\n  Scenario Outline: Negative Test Cases for Pin-Code Zone Constraint\n    Given a patient with ID \"P003\" and pin-code \"<pin_code>\"\n    When I query for patient ID \"P003\"\n    Then the patient details should be displayed\n    And I should not be able to modify the patient pin-code to be outside the Zone\n    Examples:\n      | pin_code |\n      | 1234     |\n      | 5678     |\n      | 9012     |\n\n  Scenario Outline: Boundary Tests for Medicine Count (max 8)\n    Given a doctor and a consultation request\n    When the doctor enters Diagnosis and Prescribes medicines (max 8)\n    Then the consultation request should be marked as completed\n    Examples:\n      | medicine_count |\n      | 0              |\n      | 1              |\n      | 4              |\n      | 8              |\n      | 9              |\n\n  Scenario Outline: Boundary Tests for Lab Test Count (max 5)\n    Given a lab and a prescription\n    When the lab notes the lab tests to be done (max 5)\n    Then the prescription should be marked as completed\n    Examples:\n      | lab_test_count |\n      | 0              |\n      | 1              |\n      | 3              |\n      | 5              |\n      | 6              |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Query on Patient Id and Modify Details",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with ID 'P001' and pin-code '1234'"
+          ],
+          "inputs": {},
+          "steps": [
+            "I query for patient ID 'P001'",
+            "the patient details should be displayed",
+            "I should be able to modify the patient details",
+            "the patient pin-code should not be modified to be outside the Zone"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-002",
+          "title": "Query on Patient Id and Enter Details",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with ID 'P002'"
+          ],
+          "inputs": {},
+          "steps": [
+            "I query for patient ID 'P002'",
+            "the patient details should be displayed",
+            "I should be able to enter details like Speciality, Symptoms, Consultation request, Appointment date",
+            "if the Appointment Request is for next day, an entry should be created in the Patient Appointment file"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor Sees Consultation Requests",
+          "req_ids": [
+            "VCDDR01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a doctor"
+          ],
+          "inputs": {},
+          "steps": [
+            "the doctor sees all the workflow consultation requests",
+            "the doctor should be able to select and provide Consultation for each request"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-004",
+          "title": "Doctor Enters Diagnosis and Prescribes Medicines",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a doctor and a consultation request"
+          ],
+          "inputs": {},
+          "steps": [
+            "the doctor enters Diagnosis and Prescribes medicines (max 8)",
+            "the doctor should be able to request for lab tests (optional, max 5)",
+            "the consultation request should be marked as completed"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-005",
+          "title": "Chemist Sees Consultation Requests",
+          "req_ids": [
+            "VCDCM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a chemist"
+          ],
+          "inputs": {},
+          "steps": [
+            "the chemist sees all the workflow consultation requests",
+            "the chemist should be able to select and provide Medicines for each request"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-006",
+          "title": "Chemist Dispenses Medicines",
+          "req_ids": [
+            "VCDCM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a chemist and a prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "the chemist dispenses medicines",
+            "the prescription should be marked as dispensed"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-007",
+          "title": "Lab Sees Consultation Requests",
+          "req_ids": [
+            "VCDLB01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a lab"
+          ],
+          "inputs": {},
+          "steps": [
+            "the lab sees all the workflow consultation requests",
+            "the lab should be able to select and note down the Lab Requests for each request"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-008",
+          "title": "Lab Notes Lab Tests and Adds Report",
+          "req_ids": [
+            "VCDLB02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a lab and a prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "the lab notes the lab tests to be done and the Patient details",
+            "the prescription should be marked as completed and the report should be added"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-009",
+          "title": "Negative Test Cases for Pin-Code Zone Constraint",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a patient with ID 'P003' and pin-code '<pin_code>'"
+          ],
+          "inputs": {},
+          "steps": [
+            "I query for patient ID 'P003'",
+            "the patient details should be displayed",
+            "I should not be able to modify the patient pin-code to be outside the Zone"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-010",
+          "title": "Boundary Tests for Medicine Count (max 8)",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "a doctor and a consultation request"
+          ],
+          "inputs": {},
+          "steps": [
+            "the doctor enters Diagnosis and Prescribes medicines (max 8)",
+            "the consultation request should be marked as completed"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-011",
+          "title": "Boundary Tests for Lab Test Count (max 5)",
+          "req_ids": [
+            "VCDLB02"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "a lab and a prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "the lab notes the lab tests to be done (max 5)",
+            "the prescription should be marked as completed"
+          ],
+          "expected": []
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): [] should be non-empty",
+          "test case #2 (TC-002): [] should be non-empty",
+          "test case #3 (TC-003): [] should be non-empty",
+          "test case #4 (TC-004): [] should be non-empty",
+          "test case #5 (TC-005): [] should be non-empty",
+          "test case #6 (TC-006): [] should be non-empty",
+          "test case #7 (TC-007): [] should be non-empty",
+          "test case #8 (TC-008): [] should be non-empty",
+          "test case #9 (TC-009): [] should be non-empty",
+          "test case #10 (TC-010): [] should be non-empty"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): [] should be non-empty\n- test case #2 (TC-002): [] should be non-empty\n- test case #3 (TC-003): [] should be non-empty\n- test case #4 (TC-004): [] should be non-empty\n- test case #5 (TC-005): [] should be non-empty\n- test case #6 (TC-006): [] should be non-empty\n- test case #7 (TC-007): [] should be non-empty\n- test case #8 (TC-008): [] should be non-empty\n- test case #9 (TC-009): [] should be non-empty\n- test case #10 (TC-010): [] should be non-empty",
+      "artifact": "Feature: Patient Management and Workflow\n\n  Scenario Outline: Query on Patient Id and modify details\n    Given a patient with ID <patient_id> and pin-code <pin_code>\n    When I query the patient details\n    Then the patient details should be displayed\n    And I should be able to modify the details\n    And the pin-code should not be modified to be outside the Zone\n\n    Examples:\n      | patient_id | pin_code |\n      | 12345      | 1234     |\n      | 67890      | 5678     |\n      | 11111      | 9012     |\n\n  Scenario Outline: Query on Patient Id and create appointment\n    Given a patient with ID <patient_id>\n    When I query the patient details\n    And I enter details like Speciality, Symptoms, Consultation request, Appointment date\n    Then an entry should be created in the Patient Appointment file if the Appointment Request is for next day\n\n    Examples:\n      | patient_id | speciality | symptoms | consultation_request | appointment_date |\n      | 12345      | Cardiology | Fever    | Yes                  | 2023-10-05       |\n      | 67890      | Neurology  | Headache | No                   | 2023-10-06       |\n      | 11111      | Pediatrics | Cough    | Yes                  | 2023-10-07       |\n\n  Scenario Outline: Doctor sees consultation requests and provides consultation\n    Given a doctor sees the workflow consultation requests\n    When the doctor selects a consultation request\n    Then the doctor should be able to provide consultation\n    And the doctor should be able to enter Diagnosis, Prescribe medicines, and request for lab tests\n\n    Examples:\n      | consultation_request_id | diagnosis | medicines | lab_tests |\n      | 1001                    | Fever     | Paracetamol | CBC       |\n      | 1002                    | Headache  | Ibuprofen   | Blood Test|\n      | 1003                    | Cough     | Amoxicillin | X-ray     |\n\n  Scenario Outline: Chemist sees prescriptions and dispenses medicines\n    Given a chemist sees the workflow consultation requests\n    When the chemist selects a prescription\n    Then the chemist should be able to dispense medicines\n    And the flag in the prescription should be marked\n\n    Examples:\n      | prescription_id | medicines | flag |\n      | 2001            | Paracetamol | Dispensed |\n      | 2002            | Ibuprofen   | Dispensed |\n      | 2003            | Amoxicillin | Dispensed |\n\n  Scenario Outline: Lab sees prescriptions and notes lab requests\n    Given a lab sees the workflow consultation requests\n    When the lab selects a prescription\n    Then the lab should be able to note down the lab requests\n    And the flag in the prescription should be marked\n    And the lab report should be added\n\n    Examples:\n      | prescription_id | lab_tests | flag | report |\n      | 3001            | CBC       | Noted | CBC Report |\n      | 3002            | Blood Test| Noted | Blood Test Report |\n      | 3003            | X-ray     | Noted | X-ray Report |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Query on Patient Id and modify details",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient with ID 12345 and pin-code 1234 exists"
+          ],
+          "inputs": {
+            "patient_id": "12345",
+            "pin_code": "1234"
+          },
+          "steps": [
+            "Query the patient details",
+            "Modify the details",
+            "Ensure pin-code is not modified"
+          ],
+          "expected": [
+            "Patient details displayed",
+            "Details modified",
+            "Pin-code not modified"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Query on Patient Id and create appointment",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient with ID 67890 exists"
+          ],
+          "inputs": {
+            "patient_id": "67890",
+            "speciality": "Neurology",
+            "symptoms": "Headache",
+            "consultation_request": "Yes",
+            "appointment_date": "2023-10-06"
+          },
+          "steps": [
+            "Query the patient details",
+            "Enter details",
+            "Create appointment entry"
+          ],
+          "expected": [
+            "Patient details displayed",
+            "Details entered",
+            "Appointment entry created"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor sees consultation requests and provides consultation",
+          "req_ids": [
+            "VCDDR01",
+            "VCDDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A doctor sees consultation requests"
+          ],
+          "inputs": {
+            "consultation_request_id": "1001",
+            "diagnosis": "Fever",
+            "medicines": "Paracetamol",
+            "lab_tests": "CBC"
+          },
+          "steps": [
+            "Select consultation request",
+            "Provide consultation",
+            "Enter Diagnosis, Prescribe medicines, and request for lab tests"
+          ],
+          "expected": [
+            "Consultation request selected",
+            "Consultation provided",
+            "Diagnosis, medicines, and lab tests entered"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Chemist sees prescriptions and dispenses medicines",
+          "req_ids": [
+            "VCDCM01",
+            "VCDCM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A chemist sees prescriptions"
+          ],
+          "inputs": {
+            "prescription_id": "2001",
+            "medicines": "Paracetamol",
+            "flag": "Dispensed"
+          },
+          "steps": [
+            "Select prescription",
+            "Dispense medicines",
+            "Mark flag in prescription"
+          ],
+          "expected": [
+            "Prescription selected",
+            "Medicines dispensed",
+            "Flag marked"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Lab sees prescriptions and notes lab requests",
+          "req_ids": [
+            "VCDCM01",
+            "VCDCM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A lab sees prescriptions"
+          ],
+          "inputs": {
+            "prescription_id": "3001",
+            "lab_tests": "CBC",
+            "flag": "Noted",
+            "report": "CBC Report"
+          },
+          "steps": [
+            "Select prescription",
+            "Note lab requests",
+            "Mark flag in prescription",
+            "Add lab report"
+          ],
+          "expected": [
+            "Prescription selected",
+            "Lab requests noted",
+            "Flag marked",
+            "Lab report added"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Query on Patient Id and modify details with invalid pin-code",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient with ID 11111 and pin-code 9012 exists"
+          ],
+          "inputs": {
+            "patient_id": "11111",
+            "pin_code": "9012"
+          },
+          "steps": [
+            "Query the patient details",
+            "Attempt to modify the details",
+            "Ensure pin-code is not modified"
+          ],
+          "expected": [
+            "Patient details displayed",
+            "Attempt to modify details fails",
+            "Pin-code not modified"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Query on Patient Id and create appointment with invalid appointment date",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient with ID 12345 exists"
+          ],
+          "inputs": {
+            "patient_id": "12345",
+            "speciality": "Cardiology",
+            "symptoms": "Fever",
+            "consultation_request": "Yes",
+            "appointment_date": "2023-09-30"
+          },
+          "steps": [
+            "Query the patient details",
+            "Enter details",
+            "Attempt to create appointment entry"
+          ],
+          "expected": [
+            "Patient details displayed",
+            "Attempt to enter details fails",
+            "Appointment entry not created"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Doctor sees consultation requests and provides consultation with invalid diagnosis",
+          "req_ids": [
+            "VCDDR01",
+            "VCDDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A doctor sees consultation requests"
+          ],
+          "inputs": {
+            "consultation_request_id": "1001",
+            "diagnosis": "Invalid",
+            "medicines": "Paracetamol",
+            "lab_tests": "CBC"
+          },
+          "steps": [
+            "Select consultation request",
+            "Attempt to provide consultation",
+            "Enter Diagnosis, Prescribe medicines, and request for lab tests"
+          ],
+          "expected": [
+            "Consultation request selected",
+            "Attempt to provide consultation fails",
+            "Diagnosis, medicines, and lab tests not entered"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Chemist sees prescriptions and dispenses medicines with invalid medicines",
+          "req_ids": [
+            "VCDCM01",
+            "VCDCM02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A chemist sees prescriptions"
+          ],
+          "inputs": {
+            "prescription_id": "2001",
+            "medicines": "Invalid",
+            "flag": "Dispensed"
+          },
+          "steps": [
+            "Select prescription",
+            "Attempt to dispense medicines",
+            "Mark flag in prescription"
+          ],
+          "expected": [
+            "Prescription selected",
+            "Attempt to dispense medicines fails",
+            "Flag not marked"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Lab sees prescriptions and notes lab requests with invalid lab tests",
+          "req_ids": [
+            "VCDCM01",
+            "VCDCM02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A lab sees prescriptions"
+          ],
+          "inputs": {
+            "prescription_id": "3001",
+            "lab_tests": "Invalid",
+            "flag": "Noted",
+            "report": "CBC Report"
+          },
+          "steps": [
+            "Select prescription",
+            "Attempt to note lab requests",
+            "Mark flag in prescription",
+            "Add lab report"
+          ],
+          "expected": [
+            "Prescription selected",
+            "Attempt to note lab requests fails",
+            "Flag not marked",
+            "Lab report not added"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.67,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "12345",
+            "context": "patient_id",
+            "grounded": false
+          },
+          {
+            "value": "67890",
+            "context": "patient_id",
+            "grounded": false
+          },
+          {
+            "value": "11111",
+            "context": "patient_id",
+            "grounded": false
+          },
+          {
+            "value": "1234",
+            "context": "pin_code",
+            "grounded": false
+          },
+          {
+            "value": "5678",
+            "context": "pin_code",
+            "grounded": false
+          },
+          {
+            "value": "9012",
+            "context": "pin_code",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "speciality",
+            "grounded": false
+          },
+          {
+            "value": "Neurology",
+            "context": "speciality",
+            "grounded": false
+          },
+          {
+            "value": "Pediatrics",
+            "context": "speciality",
+            "grounded": false
+          },
+          {
+            "value": "Fever",
+            "context": "symptoms",
+            "grounded": false
+          },
+          {
+            "value": "Headache",
+            "context": "symptoms",
+            "grounded": false
+          },
+          {
+            "value": "Cough",
+            "context": "symptoms",
+            "grounded": false
+          },
+          {
+            "value": "Yes",
+            "context": "consultation_request",
+            "grounded": false
+          },
+          {
+            "value": "No",
+            "context": "consultation_request",
+            "grounded": false
+          },
+          {
+            "value": "2023-10-05",
+            "context": "appointment_date",
+            "grounded": false
+          },
+          {
+            "value": "2023-10-06",
+            "context": "appointment_date",
+            "grounded": false
+          },
+          {
+            "value": "2023-10-07",
+            "context": "appointment_date",
+            "grounded": false
+          },
+          {
+            "value": "2023-09-30",
+            "context": "appointment_date",
+            "grounded": false
+          },
+          {
+            "value": "1001",
+            "context": "consultation_request_id",
+            "grounded": false
+          },
+          {
+            "value": "1002",
+            "context": "consultation_request_id",
+            "grounded": false
+          },
+          {
+            "value": "1003",
+            "context": "consultation_request_id",
+            "grounded": false
+          },
+          {
+            "value": "Paracetamol",
+            "context": "medicines",
+            "grounded": false
+          },
+          {
+            "value": "Ibuprofen",
+            "context": "medicines",
+            "grounded": false
+          },
+          {
+            "value": "Amoxicillin",
+            "context": "medicines",
+            "grounded": false
+          },
+          {
+            "value": "CBC",
+            "context": "lab_tests",
+            "grounded": false
+          },
+          {
+            "value": "Blood Test",
+            "context": "lab_tests",
+            "grounded": false
+          },
+          {
+            "value": "X-ray",
+            "context": "lab_tests",
+            "grounded": false
+          },
+          {
+            "value": "2001",
+            "context": "prescription_id",
+            "grounded": false
+          },
+          {
+            "value": "2002",
+            "context": "prescription_id",
+            "grounded": false
+          },
+          {
+            "value": "2003",
+            "context": "prescription_id",
+            "grounded": false
+          },
+          {
+            "value": "Dispensed",
+            "context": "flag",
+            "grounded": false
+          },
+          {
+            "value": "3001",
+            "context": "prescription_id",
+            "grounded": false
+          },
+          {
+            "value": "3002",
+            "context": "prescription_id",
+            "grounded": false
+          },
+          {
+            "value": "3003",
+            "context": "prescription_id",
+            "grounded": false
+          },
+          {
+            "value": "Noted",
+            "context": "flag",
+            "grounded": false
+          },
+          {
+            "value": "CBC Report",
+            "context": "report",
+            "grounded": false
+          },
+          {
+            "value": "Blood Test Report",
+            "context": "report",
+            "grounded": false
+          },
+          {
+            "value": "X-ray Report",
+            "context": "report",
+            "grounded": false
+          },
+          {
+            "value": "Invalid",
+            "context": "diagnosis",
+            "grounded": false
+          },
+          {
+            "value": "Invalid",
+            "context": "medicines",
+            "grounded": false
+          },
+          {
+            "value": "Invalid",
+            "context": "lab_tests",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 41,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No boundary value tests for medicine count (max 8) and lab test count (max 5).",
+          "Oracle assertions are vague; need to assert specific field values and status codes.",
+          "No tests for pin-code zone boundaries; need to test values at zone limits.",
+          "No tests for appointment date exactly next day vs same day; boundary not exercised.",
+          "Negative tests for exceeding medicine and lab test limits missing."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VCDLB01",
+          "VCDLB02"
+        ],
+        "fsa_score": 0.5305,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.5305; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.67, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCDLB01', 'VCDLB02'] (add at least one each)\n- ungrounded value '12345' (patient_id): remove or use the SRS value\n- ungrounded value '67890' (patient_id): remove or use the SRS value\n- ungrounded value '11111' (patient_id): remove or use the SRS value\n- ungrounded value '1234' (pin_code): remove or use the SRS value\n- ungrounded value '5678' (pin_code): remove or use the SRS value\n- ungrounded value '9012' (pin_code): remove or use the SRS value\n- No boundary value tests for medicine count (max 8) and lab test count (max 5).\n- Oracle assertions are vague; need to assert specific field values and status codes.\n- No tests for pin-code zone boundaries; need to test values at zone limits.\n- No tests for appointment date exactly next day vs same day; boundary not exercised.\n- Negative tests for exceeding medicine and lab test limits missing.",
+      "artifact": "Feature: Patient Management and Workflow\n\n  Scenario: Query on Patient Id and Modify Details\n    Given a patient with ID \"12345\" and pin-code \"1234\"\n    When I query the patient details\n    Then the patient details should be displayed\n    And I should be able to modify the patient details\n    And the patient pin-code should not be modified to be outside the Zone\n\n  Scenario: Query on Patient Id and Create Appointment\n    Given a patient with ID \"12345\"\n    When I query the patient details\n    And I enter details like Speciality, Symptoms, Consultation request, Appointment date\n    Then an entry should be created into the Patient Appointment file if the Appointment Request is for next day\n\n  Scenario: Doctor Sees Consultation Requests\n    Given a doctor\n    When the doctor sees the workflow consultation requests\n    Then the doctor should be able to select and provide Consultation\n\n  Scenario: Doctor Enters Diagnosis and Prescribes Medicines\n    Given a doctor\n    When the doctor sees the Patient Consultation Requests\n    And enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)\n    Then the prescription should be updated with the diagnosis and medicines\n    And the lab tests should be noted down\n\n  Scenario: Chemist Sees Consultation Requests\n    Given a chemist\n    When the chemist sees the workflow consultation requests\n    Then the chemist should be able to select and provide Medicines\n\n  Scenario: Chemist Dispenses Medicines\n    Given a chemist\n    When the chemist sees the Prescription\n    And dispenses medicines\n    Then the flag in Prescription should be marked\n\n  Scenario: Lab Sees Consultation Requests\n    Given a lab\n    When the lab sees the workflow consultation requests\n    Then the lab should be able to select and note down the Lab Requests\n\n  Scenario: Lab Notes Lab Tests and Adds Report\n    Given a lab\n    When the lab sees the Prescription\n    And notes the lab tests to be done and the Patient details\n    Then the flag in prescription should be marked\n    And the report should be added\n\n  Scenario Outline: Pin-code Zone Boundary Tests\n    Given a patient with ID \"12345\"\n    When I query the patient details\n    And I try to modify the pin-code to be outside the Zone\n    Then the pin-code should not be modified\n\n  Scenario Outline: Medicine Count Boundary Tests\n    Given a doctor\n    When the doctor sees the Patient Consultation Requests\n    And enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)\n    Then the prescription should be updated with the diagnosis and medicines\n    And the lab tests should be noted down\n\n  Scenario Outline: Lab Test Count Boundary Tests\n    Given a lab\n    When the lab sees the Prescription\n    And notes the lab tests to be done and the Patient details\n    Then the flag in prescription should be marked\n    And the report should be added\n\n  Scenario Outline: Appointment Date Boundary Tests\n    Given a doctor\n    When the doctor sees the Patient Consultation Requests\n    And enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)\n    Then the prescription should be updated with the diagnosis and medicines\n    And the lab tests should be noted down\n\n  Scenario Outline: Negative Test for Exceeding Medicine Limit\n    Given a doctor\n    When the doctor sees the Patient Consultation Requests\n    And enters Diagnosis, Prescribes medicines (more than 8) and requests for lab tests (optional) max(5)\n    Then the prescription should not be updated\n    And an error message should be displayed\n\n  Scenario Outline: Negative Test for Exceeding Lab Test Limit\n    Given a lab\n    When the lab sees the Prescription\n    And notes the lab tests to be done (more than 5)\n    Then the flag in prescription should not be marked\n    And an error message should be displayed",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Query on Patient Id and Modify Details",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with ID '12345' and pin-code '1234'"
+          ],
+          "inputs": {},
+          "steps": [
+            "I query the patient details",
+            "I should be able to modify the patient details",
+            "the patient pin-code should not be modified to be outside the Zone"
+          ],
+          "expected": [
+            "patient details should be displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Query on Patient Id and Create Appointment",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with ID '12345'"
+          ],
+          "inputs": {},
+          "steps": [
+            "I query the patient details",
+            "I enter details like Speciality, Symptoms, Consultation request, Appointment date",
+            "an entry should be created into the Patient Appointment file if the Appointment Request is for next day"
+          ],
+          "expected": [
+            "an entry should be created into the Patient Appointment file if the Appointment Request is for next day"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor Sees Consultation Requests",
+          "req_ids": [
+            "VCDDR01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a doctor"
+          ],
+          "inputs": {},
+          "steps": [
+            "the doctor sees the workflow consultation requests",
+            "the doctor should be able to select and provide Consultation"
+          ],
+          "expected": [
+            "the doctor should be able to select and provide Consultation"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Doctor Enters Diagnosis and Prescribes Medicines",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a doctor"
+          ],
+          "inputs": {},
+          "steps": [
+            "the doctor sees the Patient Consultation Requests",
+            "enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)",
+            "the prescription should be updated with the diagnosis and medicines",
+            "the lab tests should be noted down"
+          ],
+          "expected": [
+            "the prescription should be updated with the diagnosis and medicines",
+            "the lab tests should be noted down"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Chemist Sees Consultation Requests",
+          "req_ids": [
+            "VCDCM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a chemist"
+          ],
+          "inputs": {},
+          "steps": [
+            "the chemist sees the workflow consultation requests",
+            "the chemist should be able to select and provide Medicines"
+          ],
+          "expected": [
+            "the chemist should be able to select and provide Medicines"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Chemist Dispenses Medicines",
+          "req_ids": [
+            "VCDCM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a chemist"
+          ],
+          "inputs": {},
+          "steps": [
+            "the chemist sees the Prescription",
+            "dispenses medicines",
+            "the flag in Prescription should be marked"
+          ],
+          "expected": [
+            "the flag in Prescription should be marked"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Lab Sees Consultation Requests",
+          "req_ids": [
+            "VCDCM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a lab"
+          ],
+          "inputs": {},
+          "steps": [
+            "the lab sees the workflow consultation requests",
+            "the lab should be able to select and note down the Lab Requests"
+          ],
+          "expected": [
+            "the lab should be able to select and note down the Lab Requests"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Lab Notes Lab Tests and Adds Report",
+          "req_ids": [
+            "VCDCM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a lab"
+          ],
+          "inputs": {},
+          "steps": [
+            "the lab sees the Prescription",
+            "notes the lab tests to be done and the Patient details",
+            "the flag in prescription should be marked",
+            "the report should be added"
+          ],
+          "expected": [
+            "the flag in prescription should be marked",
+            "the report should be added"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Pin-code Zone Boundary Tests",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a patient with ID '12345'"
+          ],
+          "inputs": {
+            "pin_code": "9012"
+          },
+          "steps": [
+            "I query the patient details",
+            "I try to modify the pin-code to be outside the Zone"
+          ],
+          "expected": [
+            "the pin-code should not be modified"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Medicine Count Boundary Tests",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a doctor"
+          ],
+          "inputs": {
+            "medicine_count": "9"
+          },
+          "steps": [
+            "the doctor sees the Patient Consultation Requests",
+            "enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)"
+          ],
+          "expected": [
+            "the prescription should not be updated",
+            "an error message should be displayed"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Lab Test Count Boundary Tests",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a lab"
+          ],
+          "inputs": {
+            "lab_test_count": "6"
+          },
+          "steps": [
+            "the lab sees the Prescription",
+            "notes the lab tests to be done (more than 5)"
+          ],
+          "expected": [
+            "the flag in prescription should not be marked",
+            "an error message should be displayed"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Appointment Date Boundary Tests",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a doctor"
+          ],
+          "inputs": {
+            "appointment_date": "today"
+          },
+          "steps": [
+            "the doctor sees the Patient Consultation Requests",
+            "enters Diagnosis, Prescribes medicines (max 8) and requests for lab tests (optional) max(5)"
+          ],
+          "expected": [
+            "the prescription should be updated with the diagnosis and medicines",
+            "the lab tests should be noted down"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Negative Test for Exceeding Medicine Limit",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a doctor"
+          ],
+          "inputs": {
+            "medicine_count": "9"
+          },
+          "steps": [
+            "the doctor sees the Patient Consultation Requests",
+            "enters Diagnosis, Prescribes medicines (more than 8) and requests for lab tests (optional) max(5)"
+          ],
+          "expected": [
+            "the prescription should not be updated",
+            "an error message should be displayed"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Negative Test for Exceeding Lab Test Limit",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a lab"
+          ],
+          "inputs": {
+            "lab_test_count": "6"
+          },
+          "steps": [
+            "the lab sees the Prescription",
+            "notes the lab tests to be done (more than 5)"
+          ],
+          "expected": [
+            "the flag in prescription should not be marked",
+            "an error message should be displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.1429,
+        "hallucinated": [
+          {
+            "value": "12345",
+            "context": "patient ID",
+            "grounded": false
+          },
+          {
+            "value": "1234",
+            "context": "patient pin-code",
+            "grounded": false
+          },
+          {
+            "value": "9012",
+            "context": "patient pin-code",
+            "grounded": false
+          },
+          {
+            "value": "9",
+            "context": "medicine count",
+            "grounded": false
+          },
+          {
+            "value": "6",
+            "context": "lab test count",
+            "grounded": false
+          },
+          {
+            "value": "today",
+            "context": "appointment date",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 7,
+        "uncovered_clauses": [
+          "VCDLB01",
+          "VCDLB02"
+        ],
+        "weaknesses": [
+          "Lab requirements (VCDLB01, VCDLB02) are not covered",
+          "Lab scenarios incorrectly reference VCDCM01",
+          "Oracle assertions are vague; need concrete expected values or status codes",
+          "Boundary tests do not cover exact boundary values (8 medicines, 5 lab tests, next day appointment)",
+          "Scenario outlines lack Examples tables, reducing parameterization and coverage"
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VCDLB01",
+          "VCDLB02"
+        ],
+        "fsa_score": 0.5764,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

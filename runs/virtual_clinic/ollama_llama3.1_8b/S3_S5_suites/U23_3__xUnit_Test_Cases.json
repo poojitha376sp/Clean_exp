@@ -1,0 +1,556 @@
+{
+  "unit_id": "U23_3",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "standard",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.4,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.6667,
+    "hallucinated": [
+      {
+        "value": "12345",
+        "context": "symptom code in patient consultation request",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 3,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "test_login and test_check_system_requirements lack concrete assertions; they only assert True.",
+      "test_delete_symptom_not_used does not verify successful deletion; should assert no exception or return value.",
+      "test_delete_symptom_used incorrectly patches delete_symptom but then calls original function; patching ineffective.",
+      "Boundary values are not tested for just below thresholds; boundary coverage is low.",
+      "test_heroku_deployment only checks string equality; should verify actual deployment platform via configuration."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.76,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "import unittest\nfrom unittest.mock import patch\nfrom your_module import delete_symptom, login, check_system_requirements\n\nclass TestDeleteSymptom(unittest.TestCase):\n    def test_delete_symptom_used(self):\n        # Arrange\n        symptom_code = \"12345\"\n        patient_consultation_request = {\"symptom_code\": symptom_code}\n        \n        # Act\n        with patch('your_module.delete_symptom') as mock_delete_symptom:\n            mock_delete_symptom.side_effect = Exception(\"Symptom Code used, cannot be deleted\")\n            try:\n                delete_symptom(patient_consultation_request)\n            except Exception as e:\n                self.assertEqual(str(e), \"Symptom Code used, cannot be deleted\")\n        \n        # Assert\n        mock_delete_symptom.assert_called_once_with(patient_consultation_request)\n    \n    def test_delete_symptom_not_used(self):\n        # Arrange\n        symptom_code = \"67890\"\n        patient_consultation_request = {\"symptom_code\": symptom_code}\n        \n        # Act\n        delete_symptom(patient_consultation_request)\n        \n        # Assert\n        self.assertTrue(True)\n    \n    def test_login(self):\n        # Arrange\n        username = \"user\"\n        password = \"password\"\n        \n        # Act\n        login(username, password)\n        \n        # Assert\n        self.assertTrue(True)\n    \n    def test_check_system_requirements(self):\n        # Arrange\n        processor = \"Pentium 4\"\n        harddrive_space = 100\n        ram = 128\n        database_space = 1\n        ram_required = 2\n        \n        # Act\n        check_system_requirements(processor, harddrive_space, ram, database_space, ram_required)\n        \n        # Assert\n        self.assertTrue(True)\n\nclass TestHerokuDeployment(unittest.TestCase):\n    def test_heroku_deployment(self):\n        # Arrange\n        deployment_platform = \"Heroku\"\n        \n        # Act\n        self.assertEqual(deployment_platform, \"Heroku\")\n\nif __name__ == '__main__':\n    unittest.main()",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Delete Symptom Used",
+      "req_ids": [
+        "VIRTUA-3.1-2#2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient Consultation Request exists"
+      ],
+      "inputs": {
+        "symptom_code": "12345"
+      },
+      "steps": [
+        "Call delete_symptom function with patient consultation request"
+      ],
+      "expected": [
+        "Exception with message 'Symptom Code used, cannot be deleted'"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Delete Symptom Not Used",
+      "req_ids": [
+        "VIRTUA-3.1-2#2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient Consultation Request exists"
+      ],
+      "inputs": {
+        "symptom_code": "67890"
+      },
+      "steps": [
+        "Call delete_symptom function with patient consultation request"
+      ],
+      "expected": [
+        "No exception thrown"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Login",
+      "req_ids": [
+        "VIRTUA-3.2-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User exists"
+      ],
+      "inputs": {
+        "username": "user",
+        "password": "password"
+      },
+      "steps": [
+        "Call login function with username and password"
+      ],
+      "expected": [
+        "User logged in successfully"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Check System Requirements",
+      "req_ids": [
+        "VIRTUA-3.2-3",
+        "VIRTUA-3.2-4",
+        "VIRTUA-3.2-5",
+        "VIRTUA-3.2-6",
+        "VIRTUA-3.2-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System requirements met"
+      ],
+      "inputs": {
+        "processor": "Pentium 4",
+        "harddrive_space": 100,
+        "ram": 128,
+        "database_space": 1,
+        "ram_required": 2
+      },
+      "steps": [
+        "Call check_system_requirements function with system requirements"
+      ],
+      "expected": [
+        "System requirements met"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Heroku Deployment",
+      "req_ids": [
+        "VIRTUA-3.2-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System deployed on Heroku"
+      ],
+      "inputs": {
+        "deployment_platform": "Heroku"
+      },
+      "steps": [
+        "Check system deployment platform"
+      ],
+      "expected": [
+        "System deployed on Heroku"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Delete Symptom Usage",
+          "req_ids": [
+            "VIRTUA-3.1-2#2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom Code exists in Patient Consultation Requests"
+          ],
+          "inputs": {
+            "symptom_code": "ABC123"
+          },
+          "steps": [
+            "Call delete_symptom function with symptom_code"
+          ],
+          "expected": [
+            "Exception 'Symptom Code used, cannot be deleted'"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Delete Symptom No Usage",
+          "req_ids": [
+            "VIRTUA-3.1-2#2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom Code does not exist in Patient Consultation Requests"
+          ],
+          "inputs": {
+            "symptom_code": "ABC123"
+          },
+          "steps": [
+            "Call delete_symptom function with symptom_code"
+          ],
+          "expected": [
+            "True"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Heroku Platform",
+          "req_ids": [
+            "VIRTUA-3.2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is deployed on Heroku Platform"
+          ],
+          "inputs": {
+            "platform": "heroku"
+          },
+          "steps": [
+            "Call check_system_requirements function with platform"
+          ],
+          "expected": [
+            "True"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Pentium 4 Processor",
+          "req_ids": [
+            "VIRTUA-3.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has Pentium 4 processor"
+          ],
+          "inputs": {
+            "processor": "pentium 4"
+          },
+          "steps": [
+            "Call check_system_requirements function with processor"
+          ],
+          "expected": [
+            "True"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Free Harddrive Space",
+          "req_ids": [
+            "VIRTUA-3.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has 100 MB free harddrive space"
+          ],
+          "inputs": {
+            "space": "100 MB"
+          },
+          "steps": [
+            "Call check_system_requirements function with space"
+          ],
+          "expected": [
+            "True"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Min RAM",
+          "req_ids": [
+            "VIRTUA-3.2-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has 128 MB RAM"
+          ],
+          "inputs": {
+            "ram": "128 MB"
+          },
+          "steps": [
+            "Call check_system_requirements function with ram"
+          ],
+          "expected": [
+            "True"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Min Database Space",
+          "req_ids": [
+            "VIRTUA-3.2-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has 1 GB database space"
+          ],
+          "inputs": {
+            "space": "1 GB"
+          },
+          "steps": [
+            "Call check_system_requirements function with space"
+          ],
+          "expected": [
+            "True"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Min RAM",
+          "req_ids": [
+            "VIRTUA-3.2-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has 2 GB RAM"
+          ],
+          "inputs": {
+            "ram": "2 GB"
+          },
+          "steps": [
+            "Call check_system_requirements function with ram"
+          ],
+          "expected": [
+            "True"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Login Success",
+          "req_ids": [
+            "VIRTUA-3.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is logged in"
+          ],
+          "inputs": {
+            "username": "user",
+            "password": "password"
+          },
+          "steps": [
+            "Call login function with username and password"
+          ],
+          "expected": [
+            "True"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Login Failure",
+          "req_ids": [
+            "VIRTUA-3.2-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is not logged in"
+          ],
+          "inputs": {
+            "username": "user",
+            "password": "password"
+          },
+          "steps": [
+            "Call login function with username and password"
+          ],
+          "expected": [
+            "False"
+          ]
+        }
+      ],
+      "raw_if_unparsed": "Here is the complete test suite for the requirements under test:\n\n```python\nimport unittest\nfrom unittest.mock import patch\nfrom your_module import delete_symptom, login, check_system_requirements\n\nclass TestDeleteSymptom(unittest.TestCase):\n\n    @patch('your_module.delete_symptom')\n    def test_delete_symptom_usage(self, mock_delete_symptom):\n        # Arrange\n        symptom_code = 'ABC123'\n        mock_delete_symptom.side_effect = Exception('Symptom Code used, cannot be deleted')\n\n        # Act\n        with self.assertRaises(Exception):\n            delete_symptom(symptom_code)\n\n        # Assert\n        self.assertEqual(mock_delete_symptom.call_count, 1)\n        self.assertEqual(mock_delete_symptom.call_args[0][0], symptom_code)\n\n    @patch('your_module.delete_symptom')\n    def test_delete_symptom_no_usage(self, mock_delete_symptom):\n        # Arrange\n        symptom_code = 'ABC123'\n        mock_delete_symptom.return_value = True\n\n        # Act\n        result = delete_symptom(symptom_code)\n\n        # Assert\n        self.assertTrue(result)\n\nclass TestSystemRequirements(unittest.TestCase):\n\n    def test_heroku_platform(self):\n        # Arrange\n        self.assertTrue(check_system_requirements('heroku'))\n\n    def test_pentium_4_processor(self):\n        # Arrange\n        self.assertTrue(check_system_requirements('pentium 4'))\n\n    def test_free_harddrive_space(self):\n        # Arrange\n        self.assertTrue(check_system_requirements('100 MB'))\n\n    def test_min_ram(self):\n        # Arrange\n        self.assertTrue(check_system_requirements('128 MB'))\n\n    def test_min_database_space(self):\n        # Arrange\n        self.assertTrue(check_system_requirements('1 GB'))\n\n    def test_min_ram(self):\n        # Arrange\n        self.assertTrue(check_system_requirements('2 GB'))\n\nclass TestLogin(unittest.TestCase):\n\n    @patch('your_module.login')\n    def test_login_success(self, mock_login):\n        # Arrange\n        mock_login.return_value = True\n\n        # Act\n        result = login()\n\n        # Assert\n        self.assertTrue(result)\n\n    @patch('your_module.login')\n    def test_login_failure(self, mock_login):\n        # Arrange\n        mock_login.return_value = False\n\n        # Act\n        result = login()\n\n        # Assert\n        self.assertFalse(result)\n\nif __name__ == '__main__':\n    unittest.main()\n```\n\n```json\n[\n  {\"id\": \"TC-001\", \"title\": \"Delete Symptom Usage\", \"req_ids\": [\"VIRTUA-3.1-2#2\"], \"kind\": \"negative\", \n   \"preconditions\": [\"Symptom Code exists in Patient Consultation Requests\"], \"inputs\": {\"symptom_code\": \"ABC123\"}, \n   \"steps\": [\"Call delete_symptom function with symptom_code\"], \"expected\": [\"Exception 'Symptom Code used, cannot be deleted'\"]},\n  {\"id\": \"TC-002\", \"title\": \"Delete Symptom No Usage\", \"req_ids\": [\"VIRTUA-3.1-2#2\"], \"kind\": \"positive\", \n   \"preconditions\": [\"Symptom Code does not exist in Patient Consultation Requests\"], \"inputs\": {\"symptom_code\": \"ABC123\"}, \n   \"steps\": [\"Call delete_symptom function with symptom_code\"], ",
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Representation artifact is empty.",
+      "artifact": "import unittest\nfrom unittest.mock import patch\nfrom your_module import delete_symptom, login, check_system_requirements\n\nclass TestDeleteSymptom(unittest.TestCase):\n    def test_delete_symptom_used(self):\n        # Arrange\n        symptom_code = \"12345\"\n        patient_consultation_request = {\"symptom_code\": symptom_code}\n        \n        # Act\n        with patch('your_module.delete_symptom') as mock_delete_symptom:\n            mock_delete_symptom.side_effect = Exception(\"Symptom Code used, cannot be deleted\")\n            try:\n                delete_symptom(patient_consultation_request)\n            except Exception as e:\n                self.assertEqual(str(e), \"Symptom Code used, cannot be deleted\")\n        \n        # Assert\n        mock_delete_symptom.assert_called_once_with(patient_consultation_request)\n    \n    def test_delete_symptom_not_used(self):\n        # Arrange\n        symptom_code = \"67890\"\n        patient_consultation_request = {\"symptom_code\": symptom_code}\n        \n        # Act\n        delete_symptom(patient_consultation_request)\n        \n        # Assert\n        self.assertTrue(True)\n    \n    def test_login(self):\n        # Arrange\n        username = \"user\"\n        password = \"password\"\n        \n        # Act\n        login(username, password)\n        \n        # Assert\n        self.assertTrue(True)\n    \n    def test_check_system_requirements(self):\n        # Arrange\n        processor = \"Pentium 4\"\n        harddrive_space = 100\n        ram = 128\n        database_space = 1\n        ram_required = 2\n        \n        # Act\n        check_system_requirements(processor, harddrive_space, ram, database_space, ram_required)\n        \n        # Assert\n        self.assertTrue(True)\n\nclass TestHerokuDeployment(unittest.TestCase):\n    def test_heroku_deployment(self):\n        # Arrange\n        deployment_platform = \"Heroku\"\n        \n        # Act\n        self.assertEqual(deployment_platform, \"Heroku\")\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Delete Symptom Used",
+          "req_ids": [
+            "VIRTUA-3.1-2#2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient Consultation Request exists"
+          ],
+          "inputs": {
+            "symptom_code": "12345"
+          },
+          "steps": [
+            "Call delete_symptom function with patient consultation request"
+          ],
+          "expected": [
+            "Exception with message 'Symptom Code used, cannot be deleted'"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Delete Symptom Not Used",
+          "req_ids": [
+            "VIRTUA-3.1-2#2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Consultation Request exists"
+          ],
+          "inputs": {
+            "symptom_code": "67890"
+          },
+          "steps": [
+            "Call delete_symptom function with patient consultation request"
+          ],
+          "expected": [
+            "No exception thrown"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Login",
+          "req_ids": [
+            "VIRTUA-3.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User exists"
+          ],
+          "inputs": {
+            "username": "user",
+            "password": "password"
+          },
+          "steps": [
+            "Call login function with username and password"
+          ],
+          "expected": [
+            "User logged in successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Check System Requirements",
+          "req_ids": [
+            "VIRTUA-3.2-3",
+            "VIRTUA-3.2-4",
+            "VIRTUA-3.2-5",
+            "VIRTUA-3.2-6",
+            "VIRTUA-3.2-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System requirements met"
+          ],
+          "inputs": {
+            "processor": "Pentium 4",
+            "harddrive_space": 100,
+            "ram": 128,
+            "database_space": 1,
+            "ram_required": 2
+          },
+          "steps": [
+            "Call check_system_requirements function with system requirements"
+          ],
+          "expected": [
+            "System requirements met"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Heroku Deployment",
+          "req_ids": [
+            "VIRTUA-3.2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System deployed on Heroku"
+          ],
+          "inputs": {
+            "deployment_platform": "Heroku"
+          },
+          "steps": [
+            "Check system deployment platform"
+          ],
+          "expected": [
+            "System deployed on Heroku"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.4,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.6667,
+        "hallucinated": [
+          {
+            "value": "12345",
+            "context": "symptom code in patient consultation request",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 3,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "test_login and test_check_system_requirements lack concrete assertions; they only assert True.",
+          "test_delete_symptom_not_used does not verify successful deletion; should assert no exception or return value.",
+          "test_delete_symptom_used incorrectly patches delete_symptom but then calls original function; patching ineffective.",
+          "Boundary values are not tested for just below thresholds; boundary coverage is low.",
+          "test_heroku_deployment only checks string equality; should verify actual deployment platform via configuration."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.76,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

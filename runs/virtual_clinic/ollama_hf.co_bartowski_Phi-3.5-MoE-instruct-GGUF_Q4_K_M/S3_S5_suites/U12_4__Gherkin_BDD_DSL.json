@@ -1,0 +1,1344 @@
+{
+  "unit_id": "U12_4",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:hf.co/bartowski/Phi-3.5-MoE-instruct-GGUF:Q4_K_M",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 0.8,
+    "sfv_score": 0.9,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": [
+      "some scenarios have <2 steps (18 steps total)"
+    ]
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.33,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "John Doe",
+        "context": "doctor name",
+        "grounded": false
+      },
+      {
+        "value": "Jane Smith",
+        "context": "doctor name",
+        "grounded": false
+      },
+      {
+        "value": "35",
+        "context": "doctor age",
+        "grounded": false
+      },
+      {
+        "value": "40",
+        "context": "doctor age",
+        "grounded": false
+      },
+      {
+        "value": "M",
+        "context": "doctor sex",
+        "grounded": false
+      },
+      {
+        "value": "F",
+        "context": "doctor sex",
+        "grounded": false
+      },
+      {
+        "value": "MD",
+        "context": "doctor qualification",
+        "grounded": false
+      },
+      {
+        "value": "PhD",
+        "context": "doctor qualification",
+        "grounded": false
+      },
+      {
+        "value": "10",
+        "context": "doctor experience",
+        "grounded": false
+      },
+      {
+        "value": "5",
+        "context": "doctor experience",
+        "grounded": false
+      },
+      {
+        "value": "Cardiology",
+        "context": "doctor speciality",
+        "grounded": false
+      },
+      {
+        "value": "Neurology",
+        "context": "doctor speciality",
+        "grounded": false
+      },
+      {
+        "value": "None",
+        "context": "consultation status",
+        "grounded": false
+      },
+      {
+        "value": "Pending",
+        "context": "consultation status",
+        "grounded": false
+      },
+      {
+        "value": "67890",
+        "context": "pincode",
+        "grounded": false
+      },
+      {
+        "value": "12345",
+        "context": "pincode",
+        "grounded": false
+      },
+      {
+        "value": "Doctor added",
+        "context": "expected message",
+        "grounded": false
+      },
+      {
+        "value": "Doctor details updated",
+        "context": "expected message",
+        "grounded": false
+      },
+      {
+        "value": "Doctor deleted",
+        "context": "expected message",
+        "grounded": false
+      },
+      {
+        "value": "Doctor not deleted",
+        "context": "expected message",
+        "grounded": false
+      },
+      {
+        "value": "Chemist added",
+        "context": "expected message",
+        "grounded": false
+      },
+      {
+        "value": "Chemist details updated",
+        "context": "expected message",
+        "grounded": false
+      },
+      {
+        "value": "Chemist deleted",
+        "context": "expected message",
+        "grounded": false
+      },
+      {
+        "value": "Chemist not deleted",
+        "context": "expected message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 24,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Missing negative test for speciality update constraint",
+      "Missing negative test for pincode update constraint",
+      "No test for enforcing single lab per pincode",
+      "Expected results are vague; need precise assertions (status codes, DB state)",
+      "No boundary value analysis for numeric fields (age, experience, pincode)"
+    ],
+    "traceability": 0.8571,
+    "untraced_reqs": [
+      "Req-3"
+    ],
+    "fsa_score": 0.596,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Doctor and Chemist/Lab Management\n\n  Scenario: Add a new Doctor\n  Given a system with no doctors\n  When I add a new doctor with a unique name, age, sex, qualification, experience, and speciality\n  Then the doctor should be added to the system\n\n  Scenario Outline: Add a new doctor with varying details\n  | Name       | Age | Sex | Qualification | Experience | Speciality |\n  | \"<Name>\"  | \"<Age>\" | \"<Sex>\" | \"<Qualification>\" | \"<Experience>\" | \"<Speciality>\" |\n\n  Examples:\n  | John Doe | 35  | M   | MD            | 10        | Cardiology  |\n  | Jane Smith| 40  | F   | PhD           | 5         | Neurology   |\n\n  Scenario: View and update doctor details\n  Given a system with existing doctors\n  When I view and update a doctor's details\n  Then the doctor's details should be updated\n\n  Scenario Outline: View and update doctor details with varying speciality\n  | Name       | Speciality |\n  | \"<Name>\"  | \"<Speciality>\" |\n\n  Examples:\n  | John Doe | Cardiology  |\n  | Jane Smith| Neurology   |\n\n  Scenario: Delete a doctor\n  Given a system with existing doctors and pending consultations\n  When I delete a doctor\n  Then the doctor should be deleted if no new consultations are pending\n\n  Scenario Outline: Delete a doctor with varying conditions\n  | Name       | Consultations |\n  | \"<Name>\"  | \"<Consultations>\" |\n\n  Examples:\n  | John Doe | None         |\n  | Jane Smith| Pending      |\n\n\n  Scenario: Add a new Chemist or Lab\n  Given a system with no chemists or labs\n  When I add a new chemist or lab with a unique pincode\n  Then the chemist or lab should be added to the system\n\n  Scenario Outline: Add a new chemist or lab with varying pincode\n  | Pincode    |\n  | \"<Pincode>\" |\n\n  Examples:\n  | 12345      | 67890       |\n\n  Scenario: View and update chemist/lab details\n  Given a system with existing chemists or labs\n  When I view and update a chemist or lab's details\n  Then the chemist or lab's details should be updated\n\n  Scenario Outline: View and update chemist/lab details with varying pincode\n  | Pincode    |\n  | \"<Pincode>\" |\n\n  Examples:\n  | 67890       | 12345       |\n\n  Scenario: Delete a chemist or lab\n  Given a system with existing chemists or labs and pending prescriptions\n  When I delete a chemist or lab\n  Then the chemist or lab should be deleted if no new prescriptions are pending\n\n  Scenario Outline: Delete a chemist or lab with varying conditions\n  | Pincode    | Prescriptions |\n  | \"<Pincode>\" | \"<Prescriptions>\" |\n\n  Examples:\n  | 67890       | None         |\n  | 12345       | Pending      |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Add a new doctor with unique details",
+      "req_ids": [
+        "Req-2/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has no doctors"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "age": "35",
+        "sex": "M",
+        "qualification": "MD",
+        "experience": "10",
+        "speciality": "Cardiology"
+      },
+      "steps": [
+        "Add doctor to system"
+      ],
+      "expected": [
+        "Doctor added"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Add a new doctor with unique details",
+      "req_ids": [
+        "Req-2/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has no doctors"
+      ],
+      "inputs": {
+        "name": "Jane Smith",
+        "age": "40",
+        "sex": "F",
+        "qualification": "PhD",
+        "experience": "5",
+        "speciality": "Neurology"
+      },
+      "steps": [
+        "Add doctor to system"
+      ],
+      "expected": [
+        "Doctor added"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "View and update doctor details",
+      "req_ids": [
+        "Req-2/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has existing doctors"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "speciality": "Cardiology"
+      },
+      "steps": [
+        "Update doctor details"
+      ],
+      "expected": [
+        "Doctor details updated"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "View and update doctor details",
+      "req_ids": [
+        "Req-2/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has existing doctors"
+      ],
+      "inputs": {
+        "name": "Jane Smith",
+        "speciality": "Neurology"
+      },
+      "steps": [
+        "Update doctor details"
+      ],
+      "expected": [
+        "Doctor details updated"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Delete a doctor",
+      "req_ids": [
+        "Req-2/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has existing doctors and no pending consultations"
+      ],
+      "inputs": {
+        "name": "John Doe"
+      },
+      "steps": [
+        "Delete doctor from system"
+      ],
+      "expected": [
+        "Doctor deleted"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Delete a doctor",
+      "req_ids": [
+        "Req-2/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has existing doctors and pending consultations"
+      ],
+      "inputs": {
+        "name": "Jane Smith"
+      },
+      "steps": [
+        "Delete doctor from system"
+      ],
+      "expected": [
+        "Doctor not deleted"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Add a new chemist or lab",
+      "req_ids": [
+        "Req-3/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has no chemists or labs"
+      ],
+      "inputs": {
+        "pincode": "67890"
+      },
+      "steps": [
+        "Add chemist to system"
+      ],
+      "expected": [
+        "Chemist added"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Add a new chemist or lab",
+      "req_ids": [
+        "Req-3/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has no chemists or labs"
+      ],
+      "inputs": {
+        "pincode": "12345"
+      },
+      "steps": [
+        "Add chemist to system"
+      ],
+      "expected": [
+        "Chemist added"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "View and update chemist/lab details",
+      "req_ids": [
+        "Req-3/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has existing chemists or labs"
+      ],
+      "inputs": {
+        "pincode": "67890"
+      },
+      "steps": [
+        "Update chemist details"
+      ],
+      "expected": [
+        "Chemist details updated"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "View and update chemist/lab details",
+      "req_ids": [
+        "Req-3/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has existing chemists or labs"
+      ],
+      "inputs": {
+        "pincode": "12345"
+      },
+      "steps": [
+        "Update chemist details"
+      ],
+      "expected": [
+        "Chemist details updated"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Delete a chemist or lab",
+      "req_ids": [
+        "Req-3/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has existing chemists or labs and no pending prescriptions"
+      ],
+      "inputs": {
+        "pincode": "67890"
+      },
+      "steps": [
+        "Delete chemist from system"
+      ],
+      "expected": [
+        "Chemist deleted"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Delete a chemist or lab",
+      "req_ids": [
+        "Req-3/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has existing chemists or labs and pending prescriptions"
+      ],
+      "inputs": {
+        "pincode": "12345"
+      },
+      "steps": [
+        "Delete chemist from system"
+      ],
+      "expected": [
+        "Chemist not deleted"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Doctor and Chemist/Lab Management\n\n  Scenario: Add a new Doctor\n  Given a system with no doctors\n  When I add a new doctor with a unique name, age, sex, qualification, experience, and speciality\n  Then the doctor should be added to the system\n\n  Scenario Outline: Add a new doctor with varying details\n  | Name       | Age | Sex | Qualification | Experience | Speciality |\n  | \"<Name>\"  | \"<Age>\" | \"<Sex>\" | \"<Qualification>\" | \"<Experience>\" | \"<Speciality>\" |\n\n  Examples:\n  | John Doe | 35  | M   | MD            | 10        | Cardiology  |\n  | Jane Smith| 40  | F   | PhD           | 5         | Neurology   |\n\n  Scenario: View and update doctor details\n  Given a system with existing doctors\n  When I view and update a doctor's details\n  Then the doctor's details should be updated\n\n  Scenario Outline: View and update doctor details with varying speciality\n  | Name       | Speciality |\n  | \"<Name>\"  | \"<Speciality>\" |\n\n  Examples:\n  | John Doe | Cardiology  |\n  | Jane Smith| Neurology   |\n\n  Scenario: Delete a doctor\n  Given a system with existing doctors and pending consultations\n  When I delete a doctor\n  Then the doctor should be deleted if no new consultations are pending\n\n  Scenario Outline: Delete a doctor with varying conditions\n  | Name       | Consultations |\n  | \"<Name>\"  | \"<Consultations>\" |\n\n  Examples:\n  | John Doe | None         |\n  | Jane Smith| Pending      |\n\n\n  Scenario: Add a new Chemist or Lab\n  Given a system with no chemists or labs\n  When I add a new chemist or lab with a unique pincode\n  Then the chemist or lab should be added to the system\n\n  Scenario Outline: Add a new chemist or lab with varying pincode\n  | Pincode    |\n  | \"<Pincode>\" |\n\n  Examples:\n  | 12345      | 67890       |\n\n  Scenario: View and update chemist/lab details\n  Given a system with existing chemists or labs\n  When I view and update a chemist or lab's details\n  Then the chemist or lab's details should be updated\n\n  Scenario Outline: View and update chemist/lab details with varying pincode\n  | Pincode    |\n  | \"<Pincode>\" |\n\n  Examples:\n  | 67890       | 12345       |\n\n  Scenario: Delete a chemist or lab\n  Given a system with existing chemists or labs and pending prescriptions\n  When I delete a chemist or lab\n  Then the chemist or lab should be deleted if no new prescriptions are pending\n\n  Scenario Outline: Delete a chemist or lab with varying conditions\n  | Pincode    | Prescriptions |\n  | \"<Pincode>\" | \"<Prescriptions>\" |\n\n  Examples:\n  | 67890       | None         |\n  | 12345       | Pending      |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new doctor with unique details",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has no doctors"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": "35",
+            "sex": "M",
+            "qualification": "MD",
+            "experience": "10",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Add doctor to system"
+          ],
+          "expected": [
+            "Doctor added"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Add a new doctor with unique details",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has no doctors"
+          ],
+          "inputs": {
+            "name": "Jane Smith",
+            "age": "40",
+            "sex": "F",
+            "qualification": "PhD",
+            "experience": "5",
+            "speciality": "Neurology"
+          },
+          "steps": [
+            "Add doctor to system"
+          ],
+          "expected": [
+            "Doctor added"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "View and update doctor details",
+          "req_ids": [
+            "Req-2/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing doctors"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Update doctor details"
+          ],
+          "expected": [
+            "Doctor details updated"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "View and update doctor details",
+          "req_ids": [
+            "Req-2/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing doctors"
+          ],
+          "inputs": {
+            "name": "Jane Smith",
+            "speciality": "Neurology"
+          },
+          "steps": [
+            "Update doctor details"
+          ],
+          "expected": [
+            "Doctor details updated"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete a doctor",
+          "req_ids": [
+            "Req-2/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing doctors and no pending consultations"
+          ],
+          "inputs": {
+            "name": "John Doe"
+          },
+          "steps": [
+            "Delete doctor from system"
+          ],
+          "expected": [
+            "Doctor deleted"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete a doctor",
+          "req_ids": [
+            "Req-2/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing doctors and pending consultations"
+          ],
+          "inputs": {
+            "name": "Jane Smith"
+          },
+          "steps": [
+            "Delete doctor from system"
+          ],
+          "expected": [
+            "Doctor not deleted"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Add a new chemist or lab",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has no chemists or labs"
+          ],
+          "inputs": {
+            "pincode": "67890"
+          },
+          "steps": [
+            "Add chemist to system"
+          ],
+          "expected": [
+            "Chemist added"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Add a new chemist or lab",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has no chemists or labs"
+          ],
+          "inputs": {
+            "pincode": "12345"
+          },
+          "steps": [
+            "Add chemist to system"
+          ],
+          "expected": [
+            "Chemist added"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "View and update chemist/lab details",
+          "req_ids": [
+            "Req-3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing chemists or labs"
+          ],
+          "inputs": {
+            "pincode": "67890"
+          },
+          "steps": [
+            "Update chemist details"
+          ],
+          "expected": [
+            "Chemist details updated"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "View and update chemist/lab details",
+          "req_ids": [
+            "Req-3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing chemists or labs"
+          ],
+          "inputs": {
+            "pincode": "12345"
+          },
+          "steps": [
+            "Update chemist details"
+          ],
+          "expected": [
+            "Chemist details updated"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Delete a chemist or lab",
+          "req_ids": [
+            "Req-3/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing chemists or labs and no pending prescriptions"
+          ],
+          "inputs": {
+            "pincode": "67890"
+          },
+          "steps": [
+            "Delete chemist from system"
+          ],
+          "expected": [
+            "Chemist deleted"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Delete a chemist or lab",
+          "req_ids": [
+            "Req-3/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing chemists or labs and pending prescriptions"
+          ],
+          "inputs": {
+            "pincode": "12345"
+          },
+          "steps": [
+            "Delete chemist from system"
+          ],
+          "expected": [
+            "Chemist not deleted"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": [
+          "some scenarios have <2 steps (18 steps total)"
+        ]
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.33,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Jane Smith",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "35",
+            "context": "doctor age",
+            "grounded": false
+          },
+          {
+            "value": "40",
+            "context": "doctor age",
+            "grounded": false
+          },
+          {
+            "value": "M",
+            "context": "doctor sex",
+            "grounded": false
+          },
+          {
+            "value": "F",
+            "context": "doctor sex",
+            "grounded": false
+          },
+          {
+            "value": "MD",
+            "context": "doctor qualification",
+            "grounded": false
+          },
+          {
+            "value": "PhD",
+            "context": "doctor qualification",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "doctor experience",
+            "grounded": false
+          },
+          {
+            "value": "5",
+            "context": "doctor experience",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "doctor speciality",
+            "grounded": false
+          },
+          {
+            "value": "Neurology",
+            "context": "doctor speciality",
+            "grounded": false
+          },
+          {
+            "value": "None",
+            "context": "consultation status",
+            "grounded": false
+          },
+          {
+            "value": "Pending",
+            "context": "consultation status",
+            "grounded": false
+          },
+          {
+            "value": "67890",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "12345",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "Doctor added",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Doctor details updated",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Doctor deleted",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Doctor not deleted",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Chemist added",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Chemist details updated",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Chemist deleted",
+            "context": "expected message",
+            "grounded": false
+          },
+          {
+            "value": "Chemist not deleted",
+            "context": "expected message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 24,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Missing negative test for speciality update constraint",
+          "Missing negative test for pincode update constraint",
+          "No test for enforcing single lab per pincode",
+          "Expected results are vague; need precise assertions (status codes, DB state)",
+          "No boundary value analysis for numeric fields (age, experience, pincode)"
+        ],
+        "traceability": 0.8571,
+        "untraced_reqs": [
+          "Req-3"
+        ],
+        "fsa_score": 0.596,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.596; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.33, 'oracle_assertiveness': 0.2, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['Req-3'] (add at least one each)\n- ungrounded value 'John Doe' (doctor name): remove or use the SRS value\n- ungrounded value 'Jane Smith' (doctor name): remove or use the SRS value\n- ungrounded value '35' (doctor age): remove or use the SRS value\n- ungrounded value '40' (doctor age): remove or use the SRS value\n- ungrounded value 'M' (doctor sex): remove or use the SRS value\n- ungrounded value 'F' (doctor sex): remove or use the SRS value\n- Missing negative test for speciality update constraint\n- Missing negative test for pincode update constraint\n- No test for enforcing single lab per pincode\n- Expected results are vague; need precise assertions (status codes, DB state)\n- No boundary value analysis for numeric fields (age, experience, pincode)",
+      "artifact": "Feature: Doctor and Chemist/Lab Management\n\n  Scenario: Adding a new Doctor\n  Given a system with no doctors\n  When I add a new doctor with a unique name, age, sex, qualification, experience, and speciality\n  Then the doctor should be added to the system\n\n  Scenario Outline: Adding a new doctor with various attributes\n  | Name       | Age | Sex | Qualification | Experience | Speciality |\n  | John Doe   | 35  | M   | MD            | 10        | Cardiology  |\n  | Jane Smith | 40  | F   | PhD           | 15        | Neurology   |\n\n  Scenario: Viewing and updating doctor details\n  Given a system with existing doctors\n  When I view a doctor's details\n  Then I should see the doctor's current details\n\n  Scenario Outline: Viewing and updating doctor details with various attributes\n  | Name       | Age | Sex | Qualification | Experience | Speciality |\n  | John Doe   | 35  | M   | MD            | 10        | Cardiology  |\n  | Jane Smith | 40  | F   | PhD           | 15        | Neurology   |\n\n  Scenario: Deleting a doctor\n  Given a system with existing doctors and pending consultations\n  When I delete a doctor\n  Then the doctor should be deleted only if no consultations are pending\n\n  Scenario Outline: Deleting a doctor with various attributes\n  | Name       | Age | Sex | Qualification | Experience | Speciality |\n  | John Doe   | 35  | M   | MD            | 10        | Cardiology  |\n  | Jane Smith | 40  | F   | PhD           | 15        | Neurology   |\n\n  Scenario: Adding a new Chemist or Lab\n  Given a system with no chemists or labs\n  When I add a new chemist or lab with a unique pincode\n  Then the chemist or lab should be added to the system\n\n  Scenario Outline: Adding a chemist or lab with various pincodes\n  | Pincode    |\n  | 12345      |\n  | 67890      |\n\n  Scenario: Viewing and updating chemist/lab details\n  Given a system with existing chemists or labs\n  When I view a chemist or lab's details\n  Then I should see the chemist or lab's current details\n\n  Scenario Outline: Viewing and updating chemist/lab details with various pincodes\n  | Pincode    |\n  | 12345      |\n  | 67890      |\n\n  Scenario: Deleting a chemist or lab\n  Given a system with existing chemists or labs and pending prescriptions\n  When I delete a chemist or lab\n  Then the chemist or lab should be deleted only if no prescriptions are pending\n\n\nFeature: Maintaining Chemist and Lab\n\n  Scenario: Adding a new Chemist or Lab\n  Given a system with no chemists or labs\n  When I add a new chemist or lab with a unique pincode\n  Then the chemist or lab should be added to the system\n\n  Scenario Outline: Adding a chemist or lab with various pincodes\n  | Pincode    |\n  | 12345      |\n  | 67890      |\n\n  Scenario: Viewing and updating chemist/lab details\n  Given a system with existing chemists or labs\n  When I view a chemist or lab's details\n  Then I should see the chemist or lab's current details\n\n  Scenario Outline: Viewing and updating chemist/lab details with various pincodes\n  | Pincode    |\n  | 12345      |\n  | 67890      |\n\n  Scenario: Deleting a chemist or lab\n  Given a system with existing chemists or labs and pending prescriptions\n  When I delete a chemist or lab\n  Then the chemist or lab should be deleted only if no prescriptions are pending",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new doctor with unique attributes",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has no doctors"
+          ],
+          "inputs": {
+            "name": "John Doe"
+          },
+          "steps": [
+            "Add a new doctor with unique attributes"
+          ],
+          "expected": [
+            "Doctor should be added to the system"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Add a new doctor with unique attributes",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has no doctors"
+          ],
+          "inputs": {
+            "name": "Jane Smith"
+          },
+          "steps": [
+            "Add a new doctor with unique attributes"
+          ],
+          "expected": [
+            "Doctor should be added to the system"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "View doctor details",
+          "req_ids": [
+            "Req-2/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing doctors"
+          ],
+          "inputs": {
+            "name": "John Doe"
+          },
+          "steps": [
+            "View doctor details"
+          ],
+          "expected": [
+            "Doctor's current details should be seen"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "View doctor details",
+          "req_ids": [
+            "Req-2/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing doctors"
+          ],
+          "inputs": {
+            "name": "Jane Smith"
+          },
+          "steps": [
+            "View doctor details"
+          ],
+          "expected": [
+            "Doctor's current details should be seen"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete a doctor",
+          "req_ids": [
+            "Req-2/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing doctors and pending consultations"
+          ],
+          "inputs": {
+            "name": "John Doe"
+          },
+          "steps": [
+            "Delete a doctor"
+          ],
+          "expected": [
+            "Doctor should be deleted only if no consultations are pending"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Add a new chemist or lab with unique pincode",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has no chemists or labs"
+          ],
+          "inputs": {
+            "name": "12345"
+          },
+          "steps": [
+            "Add a new chemist or lab with unique pincode"
+          ],
+          "expected": [
+            "Chemist or lab should be added to the system"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Add a new chemist or lab with unique pincode",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has no chemists or labs"
+          ],
+          "inputs": {
+            "name": "67890"
+          },
+          "steps": [
+            "Add a new chemist or lab with unique pincode"
+          ],
+          "expected": [
+            "Chemist or lab should be added to the system"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "View chemist or lab details",
+          "req_ids": [
+            "Req-3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing chemists or labs"
+          ],
+          "inputs": {
+            "name": "12345"
+          },
+          "steps": [
+            "View chemist or lab details"
+          ],
+          "expected": [
+            "Chemist or lab's current details should be seen"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Delete a chemist or lab",
+          "req_ids": [
+            "Req-3/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has existing chemists or labs and pending prescriptions"
+          ],
+          "inputs": {
+            "name": "12345"
+          },
+          "steps": [
+            "Delete a chemist or lab"
+          ],
+          "expected": [
+            "Chemist or lab should be deleted only if no prescriptions are pending"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Gherkin parse error: Parser errors:",
+      "artifact": "Feature: Doctor and Chemist/Lab Management\n\n  Scenario: Add a new Doctor\n  Given a system with no doctors\n  When I add a new doctor with a unique name, age, sex, qualification, experience, and speciality\n  Then the doctor should be added successfully\n\n  Scenario Outline: Add a new doctor with varying details\n  | Name       | Age | Sex | Qualification | Experience | Speciality |\n  | \"<Name>\"  | \"<Age>\" | \"<Sex>\" | \"<Qualification>\" | \"<Experience>\" | \"<Speciality>\" |\n\n  Scenario: View and update doctor details\n  Given a system with existing doctors\n  When I view and update a doctor's details\n  Then the doctor's details should be updated successfully\n  Except when the speciality is updated\n\n  Scenario Outline: View and update doctor details with varying speciality\n  | Name       | Speciality |\n  | \"<Name>\"  | \"<Speciality>\" |\n\n  Scenario: Delete a doctor\n  Given a system with existing doctors\n  When I delete a doctor\n  Then the doctor should be deleted successfully\n  Except when there are pending consultation requests\n\n  Scenario Outline: Delete a doctor with varying conditions\n  | Name       | Pending Requests |\n  | \"<Name>\"  | \"<Pending Requests>\" |\n\n  Scenario: Add a new Chemist or Lab\n  Given a system with no chemists or labs\n  When I add a new chemist or lab with a unique pincode\n  Then the chemist or lab should be added successfully\n  Except when there is already a lab in the same pincode\n\n  Scenario Outline: Add a chemist or lab with varying pincode\n  | Pincode |\n  | \"<Pincode>\" |\n\n  Scenario: View and update chemist/lab details\n  Given a system with existing chemists or labs\n  When I view and update a chemist or lab's details\n  Then the details should be updated successfully\n  Except when the pincode is updated\n\n  Scenario: Delete a chemist or lab\n  Given a system with existing chemists or labs\n  When I delete a chemist or lab\n  Then the chemist or lab should be deleted successfully\n  Except when there are pending prescriptions\n\n\nFeature: Maintain Chemist & Lab\n\n  Scenario: Add a new Chemist or Lab\n  Given a system with no chemists or labs\n  When I add a new chemist or lab with a unique pincode\n  Then the chemist or lab should be added successfully\n  Except when there is already a lab in the same pincode\n\n  Scenario Outline: Add a chemist or lab with varying pincode\n  | Pincode |\n  | \"<Pincode>\" |\n\n  Scenario: View and update chemist/lab details\n  Given a system with existing chemists or labs\n  When I view and update a chemist or lab's details\n  Then the details should be updated successfully\n  Except when the pincode is updated\n\n  Scenario: Delete a chemist or lab\n  Given a system with existing chemists or labs\n  When I delete a chemist or lab\n  Then the chemist or lab should be deleted successfully\n  Except when there are pending prescriptions",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new doctor with unique details",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with no doctors"
+          ],
+          "inputs": {
+            "name": "Doctor Name"
+          },
+          "steps": [
+            "Add a new doctor"
+          ],
+          "expected": [
+            "Doctor added successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and update doctor details",
+          "req_ids": [
+            "Req-2/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with existing doctors"
+          ],
+          "inputs": {
+            "name": "Doctor Name",
+            "speciality": "Doctor Speciality"
+          },
+          "steps": [
+            "View and update doctor details"
+          ],
+          "expected": [
+            "Doctor details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete a doctor with no pending requests",
+          "req_ids": [
+            "Req-2/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with existing doctors",
+            "No pending requests"
+          ],
+          "inputs": {
+            "name": "Doctor Name"
+          },
+          "steps": [
+            "Delete a doctor"
+          ],
+          "expected": [
+            "Doctor deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add a new Chemist or Lab with unique pincode",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with no chemists or labs"
+          ],
+          "inputs": {
+            "name": "Pincode"
+          },
+          "steps": [
+            "Add a new chemist or lab"
+          ],
+          "expected": [
+            "Chemist or lab added successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "View and update chemist/lab details",
+          "req_ids": [
+            "Req-3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with existing chemists or labs"
+          ],
+          "inputs": {
+            "name": "Pincode"
+          },
+          "steps": [
+            "View and update chemist or lab details"
+          ],
+          "expected": [
+            "Chemist or lab details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete a chemist or lab with no pending prescriptions",
+          "req_ids": [
+            "Req-3/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with existing chemists or labs",
+            "No pending prescriptions"
+          ],
+          "inputs": {
+            "name": "Pincode"
+          },
+          "steps": [
+            "Delete a chemist or lab"
+          ],
+          "expected": [
+            "Chemist or lab deleted successfully"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Gherkin parse error: Parser errors:",
+      "artifact": "Feature: Doctor and Chemist/Lab Management\n\n  Scenario: Add a new Doctor\n  Given a system with no doctors\n  When I add a new doctor with a unique name, age, sex, qualification, experience, and speciality\n  Then the doctor should be added successfully\n\n  Scenario Outline: Add a new doctor with varying details\n  | Name       | Age | Sex | Qualification | Experience | Speciality |\n  | \"<Name>\"  | \"<Age>\" | \"<Sex>\" | \"<Qualification>\" | \"<Experience>\" | \"<Speciality>\" |\n\n  Scenario: View and update doctor details\n  Given a system with existing doctors\n  When I view and update a doctor's details\n  Then the doctor's details should be updated successfully\n  Except when the speciality is updated\n\n  Scenario Outline: View and update doctor details with varying speciality\n  | Name       | Speciality |\n  | \"<Name>\"  | \"<Speciality>\" |\n\n  Scenario: Delete a doctor\n  Given a system with existing doctors\n  When I delete a doctor\n  Then the doctor should be deleted successfully\n  Except when there are pending consultation requests\n\n  Scenario Outline: Delete a doctor with varying conditions\n  | Name       | Pending Requests |\n  | \"<Name>\"  | \"<Pending Requests>\" |\n\n  Scenario: Add a new Chemist or Lab\n  Given a system with no chemists or labs\n  When I add a new chemist or lab with a unique pincode\n  Then the chemist or lab should be added successfully\n  Except when there is already a lab in the same pincode\n\n  Scenario Outline: Add a chemist or lab with varying pincode\n  | Pincode |\n  | \"<Pincode>\" |\n\n  Scenario: View and update chemist/lab details\n  Given a system with existing chemists or labs\n  When I view and update a chemist or lab's details\n  Then the details should be updated successfully\n  Except when the pincode is updated\n\n  Scenario: Delete a chemist or lab\n  Given a system with existing chemists or labs\n  When I delete a chemist or lab\n  Then the chemist or lab should be deleted successfully\n  Except when there are pending prescriptions\n\n\nFeature: Maintain Chemist & Lab\n\n  Scenario: Add a new Chemist or Lab\n  Given a system with no chemists or labs\n  When I add a new chemist or lab with a unique pincode\n  Then the chemist or lab should be added successfully\n  Except when there is already a lab in the same pincode\n\n  Scenario Outline: Add a chemist or lab with varying pincode\n  | Pincode |\n  | \"<Pincode>\" |\n\n  Scenario: View and update chemist/lab details\n  Given a system with existing chemists or labs\n  When I view and update a chemist or lab's details\n  Then the details should be updated successfully\n  Except when the pincode is updated\n\n  Scenario: Delete a chemist or lab\n  Given a system with existing chemists or labs\n  When I delete a chemist or lab\n  Then the chemist or lab should be deleted successfully\n  Except when there are pending prescriptions",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new doctor with unique details",
+          "req_ids": [
+            "Req-2/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with no doctors"
+          ],
+          "inputs": {
+            "name": "Doctor Name"
+          },
+          "steps": [
+            "Add a new doctor"
+          ],
+          "expected": [
+            "Doctor added successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and update doctor details",
+          "req_ids": [
+            "Req-2/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with existing doctors"
+          ],
+          "inputs": {
+            "name": "Doctor Name",
+            "speciality": "Doctor Speciality"
+          },
+          "steps": [
+            "View and update doctor details"
+          ],
+          "expected": [
+            "Doctor details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete a doctor with no pending requests",
+          "req_ids": [
+            "Req-2/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with existing doctors",
+            "No pending requests"
+          ],
+          "inputs": {
+            "name": "Doctor Name"
+          },
+          "steps": [
+            "Delete a doctor"
+          ],
+          "expected": [
+            "Doctor deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add a new Chemist or Lab with unique pincode",
+          "req_ids": [
+            "Req-3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with no chemists or labs"
+          ],
+          "inputs": {
+            "name": "Pincode"
+          },
+          "steps": [
+            "Add a new chemist or lab"
+          ],
+          "expected": [
+            "Chemist or lab added successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "View and update chemist/lab details",
+          "req_ids": [
+            "Req-3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with existing chemists or labs"
+          ],
+          "inputs": {
+            "name": "Pincode"
+          },
+          "steps": [
+            "View and update chemist or lab details"
+          ],
+          "expected": [
+            "Chemist or lab details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete a chemist or lab with no pending prescriptions",
+          "req_ids": [
+            "Req-3/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System with existing chemists or labs",
+            "No pending prescriptions"
+          ],
+          "inputs": {
+            "name": "Pincode"
+          },
+          "steps": [
+            "Delete a chemist or lab"
+          ],
+          "expected": [
+            "Chemist or lab deleted successfully"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    }
+  ]
+}

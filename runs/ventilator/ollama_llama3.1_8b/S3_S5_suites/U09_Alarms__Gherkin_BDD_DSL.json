@@ -1,0 +1,1330 @@
+{
+  "unit_id": "U09_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 1.0,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.8947,
+    "hallucinated": [
+      {
+        "value": "leakage computed as -1ml/min",
+        "context": "leakage value",
+        "grounded": false
+      },
+      {
+        "value": "sensor readings are -1ml/min",
+        "context": "sensor reading",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 19,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Scenario outlines for alarm priority include values not required by the SRS (e.g., high and low) which may dilute focus.",
+      "Negative test for leakage with a negative sensor reading is not supported by the SRS and should be removed or justified.",
+      "The suite does not explicitly verify that the obstruction alarm priority remains high when active; it only checks activation.",
+      "The suite does not test that the proximal tube disconnect alarm priority stays medium under all conditions; it only checks one scenario.",
+      "The test for VTI exactly 100ml when tube disconnected could be combined with other edge cases to reduce redundancy."
+    ],
+    "traceability": 0.875,
+    "untraced_reqs": [
+      "RW-SW-107"
+    ],
+    "fsa_score": 0.9842,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Alarms\n\n  Scenario: Proximal tube connected\n    Given the proximal tube is connected\n    When the system is initialized\n    Then the system reports the proximal tube is connected\n\n  Scenario: Proximal tube disconnected\n    Given the proximal tube is disconnected\n    When the system is initialized\n    Then the system reports the proximal tube is disconnected\n    And the \"proximal tube disconnected\" alarm is active\n    And the alarm priority is medium\n\n  Scenario: Obstruction detected\n    Given the VTI is 50ml\n    When the system is initialized\n    Then the system detects obstruction\n    And the \"obstruction\" alarm is active\n    And the alarm priority is high\n\n  Scenario: Obstruction not detected\n    Given the VTI is 150ml\n    When the system is initialized\n    Then the system does not detect obstruction\n    And the \"obstruction\" alarm is inactive\n\n  Scenario: Leakage computation\n    Given the sensor readings are 10ml/min\n    When the system is initialized\n    Then the system computes the amount of leakage as 10ml/min\n\n  Scenario Outline: Proximal tube disconnect alarm priority\n    Given the proximal tube is disconnected\n    When the system is initialized\n    Then the alarm priority is medium\n\n    Examples:\n      | alarm_priority |\n      | medium         |\n      | high           |\n      | low            |\n\n  Scenario Outline: Obstruction alarm priority\n    Given the VTI is 50ml\n    When the system is initialized\n    Then the alarm priority is high\n\n    Examples:\n      | alarm_priority |\n      | high           |\n      | medium         |\n      | low            |\n\n  Scenario Outline: Leakage computation with invalid values\n    Given the sensor readings are <sensor_readings>\n    When the system is initialized\n    Then the system computes the amount of leakage as <leakage>\n\n    Examples:\n      | sensor_readings | leakage |\n      | 0               | 0       |\n      | -1              | -1      |\n      | 1000            | 1000    |\n\n  Scenario Outline: VTI exactly 100ml when tube disconnected\n    Given the proximal tube is disconnected\n    And the VTI is 100ml\n    When the system is initialized\n    Then the system reports the proximal tube is disconnected\n    And the \"proximal tube disconnected\" alarm is active\n    And the alarm priority is medium\n\n    Examples:\n      | VTI |\n      | 100 |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Proximal tube connected",
+      "req_ids": [
+        "RW-SW-103"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system initialized"
+      ],
+      "inputs": {
+        "proximal_tube_connected": "true"
+      },
+      "steps": [
+        "system reports proximal tube connected"
+      ],
+      "expected": [
+        "proximal tube connected"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Proximal tube disconnected",
+      "req_ids": [
+        "RW-SW-104"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system initialized"
+      ],
+      "inputs": {
+        "proximal_tube_disconnected": "true"
+      },
+      "steps": [
+        "system reports proximal tube disconnected",
+        "alarm active"
+      ],
+      "expected": [
+        "proximal tube disconnected",
+        "alarm active"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Obstruction detected",
+      "req_ids": [
+        "RW-SW-106"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system initialized"
+      ],
+      "inputs": {
+        "VTI": "50"
+      },
+      "steps": [
+        "system detects obstruction",
+        "alarm active"
+      ],
+      "expected": [
+        "obstruction detected",
+        "alarm active"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Obstruction not detected",
+      "req_ids": [
+        "RW-SW-108"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system initialized"
+      ],
+      "inputs": {
+        "VTI": "150"
+      },
+      "steps": [
+        "system does not detect obstruction",
+        "alarm inactive"
+      ],
+      "expected": [
+        "obstruction not detected",
+        "alarm inactive"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Leakage computation",
+      "req_ids": [
+        "RW-SW-110"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system initialized"
+      ],
+      "inputs": {
+        "sensor_readings": "10"
+      },
+      "steps": [
+        "system computes leakage"
+      ],
+      "expected": [
+        "leakage computed as 10ml/min"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Proximal tube disconnect alarm priority",
+      "req_ids": [
+        "RW-SW-105"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system initialized"
+      ],
+      "inputs": {
+        "alarm_priority": "medium"
+      },
+      "steps": [
+        "alarm priority is medium"
+      ],
+      "expected": [
+        "alarm priority is medium"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Obstruction alarm priority",
+      "req_ids": [
+        "RW-SW-109"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system initialized"
+      ],
+      "inputs": {
+        "alarm_priority": "high"
+      },
+      "steps": [
+        "alarm priority is high"
+      ],
+      "expected": [
+        "alarm priority is high"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Leakage computation with invalid values",
+      "req_ids": [
+        "RW-SW-110"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "system initialized"
+      ],
+      "inputs": {
+        "sensor_readings": "-1"
+      },
+      "steps": [
+        "system computes leakage"
+      ],
+      "expected": [
+        "leakage computed as -1ml/min"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "VTI exactly 100ml when tube disconnected",
+      "req_ids": [
+        "RW-SW-103",
+        "RW-SW-104"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system initialized"
+      ],
+      "inputs": {
+        "VTI": "100",
+        "proximal_tube_disconnected": "true"
+      },
+      "steps": [
+        "system reports proximal tube disconnected",
+        "alarm active"
+      ],
+      "expected": [
+        "proximal tube disconnected",
+        "alarm active"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarms\n  As a user\n  I want the system to report alarms for proximal tube disconnection and obstruction\n  So that I can take corrective action\n\n  Scenario: Proximal tube connected\n    Given the proximal tube is connected\n    When the system checks the tube connection\n    Then the system reports \"Proximal tube connected\"\n\n  Scenario: Proximal tube disconnected\n    Given the proximal tube is disconnected\n    When the system checks the tube connection\n    Then the system reports \"Proximal tube disconnected\" with medium priority\n\n  Scenario: Obstruction detected\n    Given the VTI is less than 100ml\n    When the system checks for obstruction\n    Then the system reports \"Obstruction\" with high priority\n\n  Scenario: Obstruction not detected\n    Given the VTI is 100ml or more\n    When the system checks for obstruction\n    Then the system reports \"No obstruction\"\n\n  Scenario: Proximal tube disconnected and obstruction detected\n    Given the proximal tube is disconnected and the VTI is less than 100ml\n    When the system checks the tube connection and obstruction\n    Then the system reports \"Proximal tube disconnected\" with medium priority and \"Obstruction\" with high priority\n\n  Scenario Outline: Proximal tube connection and obstruction detection with varying VTI values\n    Given the proximal tube is connected/disconnected and the VTI is <VTI>\n    When the system checks the tube connection and obstruction\n    Then the system reports \"Proximal tube connected/disconnected\" with medium priority and \"No obstruction/Obstruction\" with high priority\n\n    Examples:\n      | VTI | Proximal Tube Connected | Obstruction Detected |\n      | 0   | false                   | true                 |\n      | 100 | true                    | false                |\n      | 99  | true                    | true                 |\n      | 101 | false                   | false                |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Proximal tube connected",
+          "req_ids": [
+            "RW-SW-103"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "proximal tube connected"
+          ],
+          "inputs": {
+            "proximal_tube_connected": "true"
+          },
+          "steps": [
+            "system checks the tube connection"
+          ],
+          "expected": [
+            "system reports 'Proximal tube connected'"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Proximal tube disconnected",
+          "req_ids": [
+            "RW-SW-104"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "proximal tube disconnected"
+          ],
+          "inputs": {
+            "proximal_tube_disconnected": "true"
+          },
+          "steps": [
+            "system checks the tube connection"
+          ],
+          "expected": [
+            "system reports 'Proximal tube disconnected' with medium priority"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Obstruction detected",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI < 100ml"
+          ],
+          "inputs": {
+            "VTI": "99"
+          },
+          "steps": [
+            "system checks for obstruction"
+          ],
+          "expected": [
+            "system reports 'Obstruction' with high priority"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Obstruction not detected",
+          "req_ids": [
+            "RW-SW-108"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI >= 100ml"
+          ],
+          "inputs": {
+            "VTI": "101"
+          },
+          "steps": [
+            "system checks for obstruction"
+          ],
+          "expected": [
+            "system reports 'No obstruction'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Proximal tube disconnected and obstruction detected",
+          "req_ids": [
+            "RW-SW-104",
+            "RW-SW-106"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "proximal tube disconnected and VTI < 100ml"
+          ],
+          "inputs": {
+            "proximal_tube_disconnected": "true",
+            "VTI": "99"
+          },
+          "steps": [
+            "system checks the tube connection and obstruction"
+          ],
+          "expected": [
+            "system reports 'Proximal tube disconnected' with medium priority and 'Obstruction' with high priority"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Proximal tube connection and obstruction detection with varying VTI values",
+          "req_ids": [
+            "RW-SW-103",
+            "RW-SW-106"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "proximal tube connected/disconnected and VTI < 100ml"
+          ],
+          "inputs": {
+            "proximal_tube_connected": "true",
+            "VTI": "99"
+          },
+          "steps": [
+            "system checks the tube connection and obstruction"
+          ],
+          "expected": [
+            "system reports 'Proximal tube connected' with medium priority and 'Obstruction' with high priority"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Proximal tube connection and obstruction detection with VTI = 100ml",
+          "req_ids": [
+            "RW-SW-103",
+            "RW-SW-106"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "proximal tube connected and VTI = 100ml"
+          ],
+          "inputs": {
+            "proximal_tube_connected": "true",
+            "VTI": "100"
+          },
+          "steps": [
+            "system checks the tube connection and obstruction"
+          ],
+          "expected": [
+            "system reports 'Proximal tube connected' with medium priority and 'No obstruction'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Proximal tube connection and obstruction detection with VTI = 101ml",
+          "req_ids": [
+            "RW-SW-103",
+            "RW-SW-106"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "proximal tube connected and VTI = 101ml"
+          ],
+          "inputs": {
+            "proximal_tube_connected": "true",
+            "VTI": "101"
+          },
+          "steps": [
+            "system checks the tube connection and obstruction"
+          ],
+          "expected": [
+            "system reports 'Proximal tube connected' with medium priority and 'No obstruction'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Proximal tube disconnection and obstruction detection with VTI = 99ml",
+          "req_ids": [
+            "RW-SW-104",
+            "RW-SW-106"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "proximal tube disconnected and VTI = 99ml"
+          ],
+          "inputs": {
+            "proximal_tube_disconnected": "true",
+            "VTI": "99"
+          },
+          "steps": [
+            "system checks the tube connection and obstruction"
+          ],
+          "expected": [
+            "system reports 'Proximal tube disconnected' with medium priority and 'Obstruction' with high priority"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Proximal tube disconnection and obstruction detection with VTI = 101ml",
+          "req_ids": [
+            "RW-SW-104",
+            "RW-SW-106"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "proximal tube disconnected and VTI = 101ml"
+          ],
+          "inputs": {
+            "proximal_tube_disconnected": "true",
+            "VTI": "101"
+          },
+          "steps": [
+            "system checks the tube connection and obstruction"
+          ],
+          "expected": [
+            "system reports 'Proximal tube disconnected' with medium priority and 'No obstruction'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.89,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 12,
+        "uncovered_clauses": [
+          "RW-SW-110"
+        ],
+        "weaknesses": [
+          "Missing test for leakage computation (RW-SW-110).",
+          "No test for invalid or extreme VTI values (negative, zero, very high).",
+          "Priority codes are only asserted textually; numeric or enum values not tested.",
+          "Scenario Outline examples table mismatches placeholders, potentially causing confusion.",
+          "Edge case of VTI exactly 100ml when tube disconnected is not covered."
+        ],
+        "traceability": 0.5,
+        "untraced_reqs": [
+          "RW-SW-105",
+          "RW-SW-107",
+          "RW-SW-109",
+          "RW-SW-110"
+        ],
+        "fsa_score": 0.956,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.956; sub-scores {'clause_coverage': 0.89, 'negative_coverage': 1.0, 'oracle_assertiveness': 1.0, 'boundary_coverage': 1.0, 'groundedness_mg': 1.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-105', 'RW-SW-107', 'RW-SW-109', 'RW-SW-110'] (add at least one each)\n- uncovered clause: RW-SW-110\n- Missing test for leakage computation (RW-SW-110).\n- No test for invalid or extreme VTI values (negative, zero, very high).\n- Priority codes are only asserted textually; numeric or enum values not tested.\n- Scenario Outline examples table mismatches placeholders, potentially causing confusion.\n- Edge case of VTI exactly 100ml when tube disconnected is not covered.",
+      "artifact": "Feature: Alarms\n\n  Scenario: Proximal tube connected\n    Given the proximal tube is connected\n    When the system is initialized\n    Then the system reports the proximal tube is connected\n\n  Scenario: Proximal tube disconnected\n    Given the proximal tube is disconnected\n    When the system is initialized\n    Then the system reports the proximal tube is disconnected\n    And the \"proximal tube disconnected\" alarm is active\n    And the alarm priority is medium\n\n  Scenario: Obstruction detected\n    Given the VTI is 50ml\n    When the system is initialized\n    Then the system detects obstruction\n    And the \"obstruction\" alarm is active\n    And the alarm priority is high\n\n  Scenario: Obstruction not detected\n    Given the VTI is 150ml\n    When the system is initialized\n    Then the system does not detect obstruction\n    And the \"obstruction\" alarm is inactive\n\n  Scenario: Leakage computation\n    Given the sensor readings are 10ml/min\n    When the system is initialized\n    Then the system computes the amount of leakage as 10ml/min\n\n  Scenario Outline: Proximal tube disconnect alarm priority\n    Given the proximal tube is disconnected\n    When the system is initialized\n    Then the alarm priority is medium\n\n    Examples:\n      | alarm_priority |\n      | medium         |\n      | high           |\n      | low            |\n\n  Scenario Outline: Obstruction alarm priority\n    Given the VTI is 50ml\n    When the system is initialized\n    Then the alarm priority is high\n\n    Examples:\n      | alarm_priority |\n      | high           |\n      | medium         |\n      | low            |\n\n  Scenario Outline: Leakage computation with invalid values\n    Given the sensor readings are <sensor_readings>\n    When the system is initialized\n    Then the system computes the amount of leakage as <leakage>\n\n    Examples:\n      | sensor_readings | leakage |\n      | 0               | 0       |\n      | -1              | -1      |\n      | 1000            | 1000    |\n\n  Scenario Outline: VTI exactly 100ml when tube disconnected\n    Given the proximal tube is disconnected\n    And the VTI is 100ml\n    When the system is initialized\n    Then the system reports the proximal tube is disconnected\n    And the \"proximal tube disconnected\" alarm is active\n    And the alarm priority is medium\n\n    Examples:\n      | VTI |\n      | 100 |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Proximal tube connected",
+          "req_ids": [
+            "RW-SW-103"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "proximal_tube_connected": "true"
+          },
+          "steps": [
+            "system reports proximal tube connected"
+          ],
+          "expected": [
+            "proximal tube connected"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Proximal tube disconnected",
+          "req_ids": [
+            "RW-SW-104"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "proximal_tube_disconnected": "true"
+          },
+          "steps": [
+            "system reports proximal tube disconnected",
+            "alarm active"
+          ],
+          "expected": [
+            "proximal tube disconnected",
+            "alarm active"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Obstruction detected",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "VTI": "50"
+          },
+          "steps": [
+            "system detects obstruction",
+            "alarm active"
+          ],
+          "expected": [
+            "obstruction detected",
+            "alarm active"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Obstruction not detected",
+          "req_ids": [
+            "RW-SW-108"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "VTI": "150"
+          },
+          "steps": [
+            "system does not detect obstruction",
+            "alarm inactive"
+          ],
+          "expected": [
+            "obstruction not detected",
+            "alarm inactive"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Leakage computation",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "sensor_readings": "10"
+          },
+          "steps": [
+            "system computes leakage"
+          ],
+          "expected": [
+            "leakage computed as 10ml/min"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Proximal tube disconnect alarm priority",
+          "req_ids": [
+            "RW-SW-105"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "alarm_priority": "medium"
+          },
+          "steps": [
+            "alarm priority is medium"
+          ],
+          "expected": [
+            "alarm priority is medium"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Obstruction alarm priority",
+          "req_ids": [
+            "RW-SW-109"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "alarm_priority": "high"
+          },
+          "steps": [
+            "alarm priority is high"
+          ],
+          "expected": [
+            "alarm priority is high"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Leakage computation with invalid values",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "sensor_readings": "-1"
+          },
+          "steps": [
+            "system computes leakage"
+          ],
+          "expected": [
+            "leakage computed as -1ml/min"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "VTI exactly 100ml when tube disconnected",
+          "req_ids": [
+            "RW-SW-103",
+            "RW-SW-104"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "VTI": "100",
+            "proximal_tube_disconnected": "true"
+          },
+          "steps": [
+            "system reports proximal tube disconnected",
+            "alarm active"
+          ],
+          "expected": [
+            "proximal tube disconnected",
+            "alarm active"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.8947,
+        "hallucinated": [
+          {
+            "value": "leakage computed as -1ml/min",
+            "context": "leakage value",
+            "grounded": false
+          },
+          {
+            "value": "sensor readings are -1ml/min",
+            "context": "sensor reading",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 19,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Scenario outlines for alarm priority include values not required by the SRS (e.g., high and low) which may dilute focus.",
+          "Negative test for leakage with a negative sensor reading is not supported by the SRS and should be removed or justified.",
+          "The suite does not explicitly verify that the obstruction alarm priority remains high when active; it only checks activation.",
+          "The suite does not test that the proximal tube disconnect alarm priority stays medium under all conditions; it only checks one scenario.",
+          "The test for VTI exactly 100ml when tube disconnected could be combined with other edge cases to reduce redundancy."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-107"
+        ],
+        "fsa_score": 0.9842,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.9842; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 1.0, 'boundary_coverage': 1.0, 'groundedness_mg': 0.8947}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-107'] (add at least one each)\n- ungrounded value 'leakage computed as -1ml/min' (leakage value): remove or use the SRS value\n- ungrounded value 'sensor readings are -1ml/min' (sensor reading): remove or use the SRS value\n- Scenario outlines for alarm priority include values not required by the SRS (e.g., high and low) which may dilute focus.\n- Negative test for leakage with a negative sensor reading is not supported by the SRS and should be removed or justified.\n- The suite does not explicitly verify that the obstruction alarm priority remains high when active; it only checks activation.\n- The suite does not test that the proximal tube disconnect alarm priority stays medium under all conditions; it only checks one scenario.\n- The test for VTI exactly 100ml when tube disconnected could be combined with other edge cases to reduce redundancy.",
+      "artifact": "Feature: Alarms\n\n  Scenario: Proximal tube connected\n    Given the proximal tube is connected\n    When the system is initialized\n    Then the system reports the proximal tube is connected\n\n  Scenario: Proximal tube disconnected\n    Given the proximal tube is disconnected\n    When the system is initialized\n    Then the system reports the proximal tube is disconnected\n    And the \"proximal tube disconnected\" alarm is active\n    And the alarm priority is medium\n\n  Scenario: Obstruction detected\n    Given the VTI is less than 100ml\n    When the system is initialized\n    Then the obstruction alarm is active\n    And the alarm priority is high\n\n  Scenario: Obstruction not detected\n    Given the VTI is 100ml or more\n    When the system is initialized\n    Then the obstruction alarm is inactive\n\n  Scenario: Leakage computed\n    Given the sensor reading is 50ml/min\n    When the system is initialized\n    Then the leakage is computed as 50ml/min\n\n  Scenario Outline: Alarm priority\n    Given the alarm is active\n    When the system is initialized\n    Then the alarm priority is <priority>\n\n    Examples:\n      | priority |\n      | medium   |\n      | high     |\n\n  Scenario Outline: Proximal tube disconnect alarm priority\n    Given the proximal tube is disconnected\n    When the system is initialized\n    Then the \"proximal tube disconnected\" alarm priority is medium\n\n    Examples:\n      | priority |\n      | medium   |\n\n  Scenario Outline: Obstruction alarm priority\n    Given the VTI is less than 100ml\n    When the system is initialized\n    Then the obstruction alarm priority is high\n\n    Examples:\n      | priority |\n      | high     |\n\n  Scenario: Negative sensor reading\n    Given the sensor reading is -1ml/min\n    When the system is initialized\n    Then the system reports an error\n\n  Scenario: VTI exactly 100ml when tube disconnected\n    Given the VTI is exactly 100ml and the proximal tube is disconnected\n    When the system is initialized\n    Then the obstruction alarm is active\n    And the alarm priority is high",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Proximal tube connected",
+          "req_ids": [
+            "RW-SW-103"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "proximal tube connected": "true"
+          },
+          "steps": [
+            "system reports proximal tube connected"
+          ],
+          "expected": [
+            "proximal tube connected reported"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Proximal tube disconnected",
+          "req_ids": [
+            "RW-SW-104"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "proximal tube disconnected": "true"
+          },
+          "steps": [
+            "proximal tube disconnected alarm active",
+            "alarm priority is medium"
+          ],
+          "expected": [
+            "proximal tube disconnected alarm active",
+            "alarm priority is medium"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Obstruction detected",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "VTI": "less than 100ml"
+          },
+          "steps": [
+            "obstruction alarm active",
+            "alarm priority is high"
+          ],
+          "expected": [
+            "obstruction alarm active",
+            "alarm priority is high"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Obstruction not detected",
+          "req_ids": [
+            "RW-SW-108"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "VTI": "100ml or more"
+          },
+          "steps": [
+            "obstruction alarm inactive"
+          ],
+          "expected": [
+            "obstruction alarm inactive"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Leakage computed",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "sensor reading": "50ml/min"
+          },
+          "steps": [
+            "leakage computed as 50ml/min"
+          ],
+          "expected": [
+            "leakage computed as 50ml/min"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Alarm priority",
+          "req_ids": [
+            "RW-SW-105",
+            "RW-SW-109"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "alarm priority": "medium"
+          },
+          "steps": [
+            "alarm priority is medium"
+          ],
+          "expected": [
+            "alarm priority is medium"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Proximal tube disconnect alarm priority",
+          "req_ids": [
+            "RW-SW-104"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "proximal tube disconnected": "true"
+          },
+          "steps": [
+            "proximal tube disconnected alarm priority is medium"
+          ],
+          "expected": [
+            "proximal tube disconnected alarm priority is medium"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Obstruction alarm priority",
+          "req_ids": [
+            "RW-SW-109"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "VTI": "less than 100ml"
+          },
+          "steps": [
+            "obstruction alarm priority is high"
+          ],
+          "expected": [
+            "obstruction alarm priority is high"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Negative sensor reading",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "sensor reading": "-1ml/min"
+          },
+          "steps": [
+            "system reports error"
+          ],
+          "expected": [
+            "system reports error"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "VTI exactly 100ml when tube disconnected",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "VTI": "exactly 100ml",
+            "proximal tube disconnected": "true"
+          },
+          "steps": [
+            "obstruction alarm active",
+            "alarm priority is high"
+          ],
+          "expected": [
+            "obstruction alarm active",
+            "alarm priority is high"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "error": "ollama:gpt-oss:20b returned an empty response",
+        "fsa_pass": false,
+        "fsa_score": 0.0
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.0; sub-scores {'clause_coverage': None, 'negative_coverage': None, 'oracle_assertiveness': None, 'boundary_coverage': None, 'groundedness_mg': None}). Output the full improved suite addressing:",
+      "artifact": "Feature: Alarms\n\n  Scenario: Proximal tube connected\n    Given the proximal tube is connected\n    When the system is initialized\n    Then the controller reports the proximal tube is connected\n\n  Scenario: Proximal tube disconnected\n    Given the proximal tube is disconnected\n    When the system is initialized\n    Then the GUI computes a \"proximal tube disconnect\" alarm\n    And the alarm has medium priority\n\n  Scenario: Obstruction detected\n    Given the VTI is less than 100ml\n    When the system is initialized\n    Then the GUI activates an \"obstruction\" alarm\n    And the alarm has high priority\n\n  Scenario: Obstruction not detected\n    Given the VTI is 100ml or more\n    When the system is initialized\n    Then the GUI does not activate an \"obstruction\" alarm\n\n  Scenario: Leakage computation\n    Given the sensor readings are valid\n    When the system is initialized\n    Then the GUI computes the amount of leakage (L/min) based on the sensor readings\n\n  Scenario Outline: Proximal tube disconnect alarm priority\n    Given the proximal tube is disconnected\n    When the system is initialized\n    Then the \"proximal tube disconnect\" alarm has medium priority\n    Examples:\n      | priority |\n      | medium   |\n      | high     |\n      | low      |\n\n  Scenario Outline: Obstruction alarm priority\n    Given the VTI is less than 100ml\n    When the system is initialized\n    Then the \"obstruction\" alarm has high priority\n    Examples:\n      | priority |\n      | high     |\n      | medium   |\n      | low      |\n\n  Scenario Outline: Leakage computation with invalid sensor readings\n    Given the sensor readings are invalid\n    When the system is initialized\n    Then the GUI does not compute the amount of leakage (L/min)\n    Examples:\n      | sensor_reading |\n      | invalid        |\n      | null           |\n      | empty string   |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Proximal tube connected",
+          "req_ids": [
+            "RW-SW-103"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "proximal_tube_connected": "true"
+          },
+          "steps": [
+            "given the proximal tube is connected",
+            "when the system is initialized",
+            "then the controller reports the proximal tube is connected"
+          ],
+          "expected": [
+            "controller reports proximal tube connected"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Proximal tube disconnected",
+          "req_ids": [
+            "RW-SW-104"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "proximal_tube_connected": "false"
+          },
+          "steps": [
+            "given the proximal tube is disconnected",
+            "when the system is initialized",
+            "then the GUI computes a 'proximal tube disconnect' alarm",
+            "and the alarm has medium priority"
+          ],
+          "expected": [
+            "GUI computes proximal tube disconnect alarm",
+            "alarm has medium priority"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Obstruction detected",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "VTI": "less than 100ml"
+          },
+          "steps": [
+            "given the VTI is less than 100ml",
+            "when the system is initialized",
+            "then the GUI activates an 'obstruction' alarm",
+            "and the alarm has high priority"
+          ],
+          "expected": [
+            "GUI activates obstruction alarm",
+            "alarm has high priority"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Obstruction not detected",
+          "req_ids": [
+            "RW-SW-108"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "VTI": "100ml or more"
+          },
+          "steps": [
+            "given the VTI is 100ml or more",
+            "when the system is initialized",
+            "then the GUI does not activate an 'obstruction' alarm"
+          ],
+          "expected": [
+            "GUI does not activate obstruction alarm"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Leakage computation",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "sensor_readings": "valid"
+          },
+          "steps": [
+            "given the sensor readings are valid",
+            "when the system is initialized",
+            "then the GUI computes the amount of leakage (L/min) based on the sensor readings"
+          ],
+          "expected": [
+            "GUI computes leakage"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Proximal tube disconnect alarm priority",
+          "req_ids": [
+            "RW-SW-105"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "proximal_tube_connected": "false"
+          },
+          "steps": [
+            "given the proximal tube is disconnected",
+            "when the system is initialized",
+            "then the 'proximal tube disconnect' alarm has medium priority"
+          ],
+          "expected": [
+            "alarm has medium priority"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Obstruction alarm priority",
+          "req_ids": [
+            "RW-SW-109"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "VTI": "less than 100ml"
+          },
+          "steps": [
+            "given the VTI is less than 100ml",
+            "when the system is initialized",
+            "then the 'obstruction' alarm has high priority"
+          ],
+          "expected": [
+            "alarm has high priority"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Leakage computation with invalid sensor readings",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "sensor_readings": "invalid"
+          },
+          "steps": [
+            "given the sensor readings are invalid",
+            "when the system is initialized",
+            "then the GUI does not compute the amount of leakage (L/min)"
+          ],
+          "expected": [
+            "GUI does not compute leakage"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Proximal tube disconnect alarm priority (medium)",
+          "req_ids": [
+            "RW-SW-105"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "proximal_tube_connected": "false",
+            "priority": "medium"
+          },
+          "steps": [
+            "given the proximal tube is disconnected",
+            "when the system is initialized",
+            "then the 'proximal tube disconnect' alarm has medium priority"
+          ],
+          "expected": [
+            "alarm has medium priority"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Obstruction alarm priority (high)",
+          "req_ids": [
+            "RW-SW-109"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system initialized"
+          ],
+          "inputs": {
+            "VTI": "less than 100ml",
+            "priority": "high"
+          },
+          "steps": [
+            "given the VTI is less than 100ml",
+            "when the system is initialized",
+            "then the 'obstruction' alarm has high priority"
+          ],
+          "expected": [
+            "alarm has high priority"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.6667,
+        "hallucinated": [
+          {
+            "value": "sensor readings are valid",
+            "context": "input",
+            "grounded": false
+          },
+          {
+            "value": "sensor readings are invalid",
+            "context": "input",
+            "grounded": false
+          },
+          {
+            "value": "does not compute leakage",
+            "context": "output",
+            "grounded": false
+          },
+          {
+            "value": "low",
+            "context": "priority value",
+            "grounded": false
+          },
+          {
+            "value": "invalid",
+            "context": "sensor reading value",
+            "grounded": false
+          },
+          {
+            "value": "null",
+            "context": "sensor reading value",
+            "grounded": false
+          },
+          {
+            "value": "empty string",
+            "context": "sensor reading value",
+            "grounded": false
+          },
+          {
+            "value": "system initialized",
+            "context": "precondition",
+            "grounded": false
+          },
+          {
+            "value": "GUI does not compute leakage",
+            "context": "output",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 27,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Multiple scenarios test the same requirement, violating the unique‑scenario rule",
+          "VTI threshold is not exercised via a scenario outline with examples",
+          "Leakage computation tests do not assert actual leakage values",
+          "Invalid sensor reading values (null, empty string) are not grounded in the SRS",
+          "Priority value 'low' is used though not specified in the requirements"
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-107"
+        ],
+        "fsa_score": 0.92,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

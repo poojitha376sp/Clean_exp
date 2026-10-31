@@ -1,0 +1,1008 @@
+{
+  "unit_id": "U13_4",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 3,
+  "repairs_used": 2,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 1.0,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "Fever",
+        "context": "Symptom name",
+        "grounded": false
+      },
+      {
+        "value": "High body temperature",
+        "context": "Symptom description",
+        "grounded": false
+      },
+      {
+        "value": "Elevated body temperature",
+        "context": "Updated symptom description",
+        "grounded": false
+      },
+      {
+        "value": "Symptom 'Fever' not found",
+        "context": "Error message for update non-existent",
+        "grounded": false
+      },
+      {
+        "value": "Symptom 'Fever' cannot be deleted as it is used in consultation requests",
+        "context": "Error message for delete with consultation",
+        "grounded": false
+      },
+      {
+        "value": "Symptom name cannot be empty",
+        "context": "Error message for empty name",
+        "grounded": false
+      },
+      {
+        "value": "Symptom description cannot be empty",
+        "context": "Error message for empty description",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 7,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No test for duplicate symptom addition",
+      "No test for updating when multiple symptoms share the same name",
+      "No test for delete when symptom is used in multiple consultation requests",
+      "No test verifying that get_symptom_list returns a copy, not the internal list",
+      "No test for boundary conditions such as extremely long names or descriptions"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.85,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "import unittest\nfrom unittest.mock import MagicMock, patch\nfrom some_module import SymptomsManager, Symptom, ConsultationRequest\n\nclass TestSymptomsManager(unittest.TestCase):\n\n    def setUp(self):\n        self.symptoms_manager = SymptomsManager()\n\n    @patch('some_module.Symptom')\n    def test_add_new_symptom(self, MockSymptom):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"High body temperature\"\n        MockSymptom.return_value = Symptom(symptom_name, symptom_description)\n\n        # Act\n        self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n\n        # Assert\n        MockSymptom.assert_called_once_with(symptom_name, symptom_description)\n        self.assertIn(MockSymptom.return_value, self.symptoms_manager.symptoms)\n\n    def test_view_and_update_symptom(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"High body temperature\"\n        updated_description = \"Elevated body temperature\"\n        symptom = Symptom(symptom_name, symptom_description)\n        self.symptoms_manager.symptoms.append(symptom)\n\n        # Act\n        self.symptoms_manager.update_symptom(symptom_name, updated_description)\n\n        # Assert\n        self.assertEqual(symptom.description, updated_description)\n\n    def test_view_and_update_non_existent_symptom(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        updated_description = \"Elevated body temperature\"\n\n        # Act & Assert\n        with self.assertRaisesRegex(ValueError, f\"Symptom '{symptom_name}' not found\"):\n            self.symptoms_manager.update_symptom(symptom_name, updated_description)\n\n    def test_delete_symptom_no_consultation_request(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"High body temperature\"\n        symptom = Symptom(symptom_name, symptom_description)\n        self.symptoms_manager.symptoms.append(symptom)\n\n        # Act\n        self.symptoms_manager.delete_symptom(symptom_name)\n\n        # Assert\n        self.assertNotIn(symptom, self.symptoms_manager.symptoms)\n\n    def test_delete_symptom_with_consultation_request(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"High body temperature\"\n        symptom = Symptom(symptom_name, symptom_description)\n        consultation_request = ConsultationRequest(symptom)\n        self.symptoms_manager.symptoms.append(symptom)\n        self.symptoms_manager.consultation_requests.append(consultation_request)\n\n        # Act & Assert\n        with self.assertRaisesRegex(ValueError, f\"Symptom '{symptom_name}' cannot be deleted as it is used in consultation requests\"):\n            self.symptoms_manager.delete_symptom(symptom_name)\n\n    def test_add_symptom_with_empty_name(self):\n        # Arrange\n        symptom_name = \"\"\n        symptom_description = \"High body temperature\"\n\n        # Act & Assert\n        with self.assertRaisesRegex(ValueError, \"Symptom name cannot be empty\"):\n            self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n\n    def test_add_symptom_with_empty_description(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"\"\n\n        # Act & Assert\n        with self.assertRaisesRegex(ValueError, \"Symptom description cannot be empty\"):\n            self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n\n    def test_view_symptom_list(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"High body temperature\"\n        symptom = Symptom(symptom_name, symptom_description)\n        self.symptoms_manager.symptoms.append(symptom)\n\n        # Act\n        symptom_list = self.symptoms_manager.get_symptom_list()\n\n        # Assert\n        self.assertIn(symptom, symptom_list)\n\nif __name__ == '__main__':\n    unittest.main()",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Add a new Symptom",
+      "req_ids": [
+        "Req-4/1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "name": "Fever",
+        "description": "High body temperature"
+      },
+      "steps": [
+        "Add a new symptom with name 'Fever' and description 'High body temperature'"
+      ],
+      "expected": [
+        "Symptom is added to the master list"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "View and Update the details of an existing Symptom",
+      "req_ids": [
+        "Req-4/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Symptom 'Fever' exists in the master list"
+      ],
+      "inputs": {
+        "name": "Fever",
+        "updated_description": "Elevated body temperature"
+      },
+      "steps": [
+        "Update the description of symptom 'Fever' to 'Elevated body temperature'"
+      ],
+      "expected": [
+        "Symptom description is updated"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "View and Update a non-existent Symptom",
+      "req_ids": [
+        "Req-4/2"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "name": "Fever",
+        "updated_description": "Elevated body temperature"
+      },
+      "steps": [
+        "Attempt to update the description of non-existent symptom 'Fever'"
+      ],
+      "expected": [
+        "ValueError is raised with message 'Symptom 'Fever' not found'"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Delete Symptom with no Consultation Request",
+      "req_ids": [
+        "Req-4/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Symptom 'Fever' exists in the master list"
+      ],
+      "inputs": {
+        "name": "Fever"
+      },
+      "steps": [
+        "Delete symptom 'Fever' which is not used in any consultation request"
+      ],
+      "expected": [
+        "Symptom is removed from the master list"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Delete Symptom with Consultation Request",
+      "req_ids": [
+        "Req-4/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Symptom 'Fever' exists in the master list and is used in a consultation request"
+      ],
+      "inputs": {
+        "name": "Fever"
+      },
+      "steps": [
+        "Attempt to delete symptom 'Fever' which is used in a consultation request"
+      ],
+      "expected": [
+        "ValueError is raised with message 'Symptom 'Fever' cannot be deleted as it is used in consultation requests'"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Add Symptom with Empty Name",
+      "req_ids": [
+        "Req-4/1"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "name": "",
+        "description": "High body temperature"
+      },
+      "steps": [
+        "Attempt to add a symptom with empty name"
+      ],
+      "expected": [
+        "ValueError is raised with message 'Symptom name cannot be empty'"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Add Symptom with Empty Description",
+      "req_ids": [
+        "Req-4/1"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "name": "Fever",
+        "description": ""
+      },
+      "steps": [
+        "Attempt to add a symptom with empty description"
+      ],
+      "expected": [
+        "ValueError is raised with message 'Symptom description cannot be empty'"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "View Symptom List",
+      "req_ids": [
+        "Req-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Symptom 'Fever' exists in the master list"
+      ],
+      "inputs": {},
+      "steps": [
+        "Retrieve the list of symptoms"
+      ],
+      "expected": [
+        "Symptom 'Fever' is in the list of symptoms"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\nfrom symptoms_module import SymptomsManager, Symptom, ConsultationRequest\n\nclass TestSymptomsManager(unittest.TestCase):\n\n    def setUp(self):\n        self.symptoms_manager = SymptomsManager()\n\n    def test_add_new_symptom(self):\n        # Test adding a new symptom\n        symptom_name = \"Fever\"\n        symptom_description = \"High body temperature\"\n        self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n        self.assertIn(symptom_name, self.symptoms_manager.symptoms)\n        self.assertEqual(self.symptoms_manager.symptoms[symptom_name].description, symptom_description)\n\n    def test_view_and_update_symptom(self):\n        # Test viewing and updating an existing symptom\n        symptom_name = \"Cough\"\n        symptom_description = \"Persistent coughing\"\n        self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n        updated_description = \"Severe coughing\"\n        self.symptoms_manager.update_symptom(symptom_name, updated_description)\n        self.assertEqual(self.symptoms_manager.symptoms[symptom_name].description, updated_description)\n\n    def test_delete_symptom_no_consultation_request(self):\n        # Test deleting a symptom with no consultation request\n        symptom_name = \"Headache\"\n        symptom_description = \"Pain in the head\"\n        self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n        self.symptoms_manager.delete_symptom(symptom_name)\n        self.assertNotIn(symptom_name, self.symptoms_manager.symptoms)\n\n    def test_delete_symptom_with_consultation_request(self):\n        # Test deleting a symptom with an existing consultation request\n        symptom_name = \"Nausea\"\n        symptom_description = \"Feeling of sickness\"\n        self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n        consultation_request = ConsultationRequest(symptom_name)\n        self.symptoms_manager.consultation_requests.append(consultation_request)\n        with self.assertRaises(Exception) as context:\n            self.symptoms_manager.delete_symptom(symptom_name)\n        self.assertTrue(\"Cannot delete symptom as it is used in a consultation request\" in str(context.exception))\n\n    def test_add_existing_symptom(self):\n        # Test adding an existing symptom\n        symptom_name = \"Fatigue\"\n        symptom_description = \"Feeling very tired\"\n        self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n        with self.assertRaises(Exception) as context:\n            self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n        self.assertTrue(\"Symptom already exists\" in str(context.exception))\n\n    def test_update_nonexistent_symptom(self):\n        # Test updating a non-existent symptom\n        symptom_name = \"Dizziness\"\n        updated_description = \"Feeling unsteady\"\n        with self.assertRaises(Exception) as context:\n            self.symptoms_manager.update_symptom(symptom_name, updated_description)\n        self.assertTrue(\"Symptom does not exist\" in str(context.exception))\n\n    def test_delete_nonexistent_symptom(self):\n        # Test deleting a non-existent symptom\n        symptom_name = \"Vomiting\"\n        with self.assertRaises(Exception) as context:\n            self.symptoms_manager.delete_symptom(symptom_name)\n        self.assertTrue(\"Symptom does not exist\" in str(context.exception))\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new Symptom",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "Fever",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "Add a new symptom"
+          ],
+          "expected": [
+            "Symptom is added successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update the details of an existing Symptom",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom 'Cough' exists"
+          ],
+          "inputs": {
+            "name": "Cough",
+            "updated_description": "Severe coughing"
+          },
+          "steps": [
+            "Update symptom description"
+          ],
+          "expected": [
+            "Symptom description is updated successfully"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete the Symptom Details - No Consultation Request",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom 'Headache' exists",
+            "No consultation request uses 'Headache'"
+          ],
+          "inputs": {
+            "name": "Headache"
+          },
+          "steps": [
+            "Delete symptom"
+          ],
+          "expected": [
+            "Symptom is deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete the Symptom Details - With Consultation Request",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom 'Nausea' exists",
+            "Consultation request uses 'Nausea'"
+          ],
+          "inputs": {
+            "name": "Nausea"
+          },
+          "steps": [
+            "Delete symptom"
+          ],
+          "expected": [
+            "Exception raised: Cannot delete symptom as it is used in a consultation request"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Add Existing Symptom",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom 'Fatigue' exists"
+          ],
+          "inputs": {
+            "name": "Fatigue",
+            "description": "Feeling very tired"
+          },
+          "steps": [
+            "Add existing symptom"
+          ],
+          "expected": [
+            "Exception raised: Symptom already exists"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Update Nonexistent Symptom",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "Dizziness",
+            "updated_description": "Feeling unsteady"
+          },
+          "steps": [
+            "Update non-existent symptom"
+          ],
+          "expected": [
+            "Exception raised: Symptom does not exist"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Delete Nonexistent Symptom",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "Vomiting"
+          },
+          "steps": [
+            "Delete non-existent symptom"
+          ],
+          "expected": [
+            "Exception raised: Symptom does not exist"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "Fever",
+            "context": "symptom name added",
+            "grounded": false
+          },
+          {
+            "value": "High body temperature",
+            "context": "symptom description",
+            "grounded": false
+          },
+          {
+            "value": "Cough",
+            "context": "symptom name added",
+            "grounded": false
+          },
+          {
+            "value": "Persistent coughing",
+            "context": "symptom description",
+            "grounded": false
+          },
+          {
+            "value": "Severe coughing",
+            "context": "updated symptom description",
+            "grounded": false
+          },
+          {
+            "value": "Headache",
+            "context": "symptom name added",
+            "grounded": false
+          },
+          {
+            "value": "Pain in the head",
+            "context": "symptom description",
+            "grounded": false
+          },
+          {
+            "value": "Nausea",
+            "context": "symptom name added",
+            "grounded": false
+          },
+          {
+            "value": "Feeling of sickness",
+            "context": "symptom description",
+            "grounded": false
+          },
+          {
+            "value": "Fatigue",
+            "context": "symptom name added",
+            "grounded": false
+          },
+          {
+            "value": "Feeling very tired",
+            "context": "symptom description",
+            "grounded": false
+          },
+          {
+            "value": "Dizziness",
+            "context": "symptom name for update",
+            "grounded": false
+          },
+          {
+            "value": "Feeling unsteady",
+            "context": "updated symptom description",
+            "grounded": false
+          },
+          {
+            "value": "Vomiting",
+            "context": "symptom name for delete",
+            "grounded": false
+          },
+          {
+            "value": "Cannot delete symptom as it is used in a consultation request",
+            "context": "exception message",
+            "grounded": false
+          },
+          {
+            "value": "Symptom already exists",
+            "context": "exception message",
+            "grounded": false
+          },
+          {
+            "value": "Symptom does not exist",
+            "context": "exception message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Use pytest.raises for exception verification instead of unittest's assertRaises for consistency",
+          "Parameterize tests to reduce duplication and improve readability",
+          "Add fixtures or setup methods to avoid repeated code",
+          "Verify that delete with consultation checks all requests, not just one",
+          "Avoid relying on internal data structures (e.g., symptoms dict) in assertions; test via public API only"
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "Req-4"
+        ],
+        "fsa_score": 0.85,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.85; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 1.0, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['Req-4'] (add at least one each)\n- ungrounded value 'Fever' (symptom name added): remove or use the SRS value\n- ungrounded value 'High body temperature' (symptom description): remove or use the SRS value\n- ungrounded value 'Cough' (symptom name added): remove or use the SRS value\n- ungrounded value 'Persistent coughing' (symptom description): remove or use the SRS value\n- ungrounded value 'Severe coughing' (updated symptom description): remove or use the SRS value\n- ungrounded value 'Headache' (symptom name added): remove or use the SRS value\n- Use pytest.raises for exception verification instead of unittest's assertRaises for consistency\n- Parameterize tests to reduce duplication and improve readability\n- Add fixtures or setup methods to avoid repeated code\n- Verify that delete with consultation checks all requests, not just one\n- Avoid relying on internal data structures (e.g., symptoms dict) in assertions; test via public API only",
+      "artifact": "import pytest\nfrom unittest.mock import MagicMock\n\n# Assuming the following API functions are available:\n# add_symptom(name, description)\n# get_symptom(name)\n# update_symptom(name, description)\n# delete_symptom(name)\n# has_symptom_in_consultation_requests(name)\n\n@pytest.fixture\ndef mock_api():\n    api = MagicMock()\n    api.add_symptom = MagicMock()\n    api.get_symptom = MagicMock()\n    api.update_symptom = MagicMock()\n    api.delete_symptom = MagicMock()\n    api.has_symptom_in_consultation_requests = MagicMock()\n    return api\n\ndef test_add_new_symptom(mock_api):\n    mock_api.add_symptom.return_value = True\n    assert mock_api.add_symptom(\"SymptomName\", \"SymptomDescription\") == True\n\ndef test_view_symptom_details(mock_api):\n    mock_api.get_symptom.return_value = {\"name\": \"SymptomName\", \"description\": \"SymptomDescription\"}\n    symptom = mock_api.get_symptom(\"SymptomName\")\n    assert symptom[\"name\"] == \"SymptomName\"\n    assert symptom[\"description\"] == \"SymptomDescription\"\n\ndef test_update_symptom_details(mock_api):\n    mock_api.update_symptom.return_value = True\n    assert mock_api.update_symptom(\"SymptomName\", \"UpdatedDescription\") == True\n\ndef test_delete_symptom_no_consultation(mock_api):\n    mock_api.has_symptom_in_consultation_requests.return_value = False\n    mock_api.delete_symptom.return_value = True\n    assert mock_api.delete_symptom(\"SymptomName\") == True\n\ndef test_delete_symptom_with_consultation(mock_api):\n    mock_api.has_symptom_in_consultation_requests.return_value = True\n    with pytest.raises(Exception):\n        mock_api.delete_symptom(\"SymptomName\")\n\n@pytest.mark.parametrize(\"symptom_name, symptom_description\", [\n    (\"SymptomName\", \"SymptomDescription\"),\n    (\"AnotherSymptom\", \"AnotherDescription\")\n])\ndef test_add_multiple_symptoms(mock_api, symptom_name, symptom_description):\n    mock_api.add_symptom.return_value = True\n    assert mock_api.add_symptom(symptom_name, symptom_description) == True\n\n@pytest.mark.parametrize(\"symptom_name, symptom_description\", [\n    (\"SymptomName\", \"UpdatedDescription\"),\n    (\"AnotherSymptom\", \"UpdatedDescription\")\n])\ndef test_update_multiple_symptoms(mock_api, symptom_name, symptom_description):\n    mock_api.update_symptom.return_value = True\n    assert mock_api.update_symptom(symptom_name, symptom_description) == True",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new Symptom",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "SymptomName",
+            "description": "SymptomDescription"
+          },
+          "steps": [
+            "add_symptom('SymptomName', 'SymptomDescription')"
+          ],
+          "expected": [
+            "True"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View Symptom Details",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "SymptomName exists"
+          ],
+          "inputs": {
+            "name": "SymptomName"
+          },
+          "steps": [
+            "get_symptom('SymptomName')"
+          ],
+          "expected": [
+            "{'name': 'SymptomName', 'description': 'SymptomDescription'}"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Update Symptom Details",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "SymptomName exists"
+          ],
+          "inputs": {
+            "name": "SymptomName",
+            "description": "UpdatedDescription"
+          },
+          "steps": [
+            "update_symptom('SymptomName', 'UpdatedDescription')"
+          ],
+          "expected": [
+            "True"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete Symptom with no Consultation",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "SymptomName exists",
+            "No consultation requests with SymptomName"
+          ],
+          "inputs": {
+            "name": "SymptomName"
+          },
+          "steps": [
+            "delete_symptom('SymptomName')"
+          ],
+          "expected": [
+            "True"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete Symptom with Consultation",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "SymptomName exists",
+            "Consultation requests with SymptomName"
+          ],
+          "inputs": {
+            "name": "SymptomName"
+          },
+          "steps": [
+            "delete_symptom('SymptomName')"
+          ],
+          "expected": [
+            "Exception"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Add Multiple Symptoms",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": [
+              "SymptomName",
+              "AnotherSymptom"
+            ],
+            "description": [
+              "SymptomDescription",
+              "AnotherDescription"
+            ]
+          },
+          "steps": [
+            "add_symptom('SymptomName', 'SymptomDescription')",
+            "add_symptom('AnotherSymptom', 'AnotherDescription')"
+          ],
+          "expected": [
+            "True",
+            "True"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Update Multiple Symptoms",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "SymptomName exists",
+            "AnotherSymptom exists"
+          ],
+          "inputs": {
+            "name": [
+              "SymptomName",
+              "AnotherSymptom"
+            ],
+            "description": [
+              "UpdatedDescription",
+              "UpdatedDescription"
+            ]
+          },
+          "steps": [
+            "update_symptom('SymptomName', 'UpdatedDescription')",
+            "update_symptom('AnotherSymptom', 'UpdatedDescription')"
+          ],
+          "expected": [
+            "True",
+            "True"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "SymptomName",
+            "context": "symptom name",
+            "grounded": false
+          },
+          {
+            "value": "SymptomDescription",
+            "context": "symptom description",
+            "grounded": false
+          },
+          {
+            "value": "AnotherSymptom",
+            "context": "symptom name",
+            "grounded": false
+          },
+          {
+            "value": "AnotherDescription",
+            "context": "symptom description",
+            "grounded": false
+          },
+          {
+            "value": "UpdatedDescription",
+            "context": "symptom description",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "operation success",
+            "grounded": false
+          },
+          {
+            "value": false,
+            "context": "operation failure",
+            "grounded": false
+          },
+          {
+            "value": "Exception",
+            "context": "error type",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 8,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "1. Tests use MagicMock; real API integration should be exercised to validate behavior.\n2. No test covers viewing or updating a non‑existent symptom.\n3. Boundary conditions such as empty or null symptom names/descriptions are not tested.\n4. The requirement about the master symptom list being selectable by patients is not exercised.\n5. Exception type and message are not explicitly asserted; use pytest.raises with specific exception class and message."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "Req-4"
+        ],
+        "fsa_score": 0.85,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.85; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 1.0, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['Req-4'] (add at least one each)\n- ungrounded value 'SymptomName' (symptom name): remove or use the SRS value\n- ungrounded value 'SymptomDescription' (symptom description): remove or use the SRS value\n- ungrounded value 'AnotherSymptom' (symptom name): remove or use the SRS value\n- ungrounded value 'AnotherDescription' (symptom description): remove or use the SRS value\n- ungrounded value 'UpdatedDescription' (symptom description): remove or use the SRS value\n- ungrounded value 'True' (operation success): remove or use the SRS value\n- 1. Tests use MagicMock; real API integration should be exercised to validate behavior.\n2. No test covers viewing or updating a non‑existent symptom.\n3. Boundary conditions such as empty or null symptom names/descriptions are not tested.\n4. The requirement about the master symptom list being selectable by patients is not exercised.\n5. Exception type and message are not explicitly asserted; use pytest.raises with specific exception class and message.",
+      "artifact": "import unittest\nfrom unittest.mock import MagicMock, patch\nfrom some_module import SymptomsManager, Symptom, ConsultationRequest\n\nclass TestSymptomsManager(unittest.TestCase):\n\n    def setUp(self):\n        self.symptoms_manager = SymptomsManager()\n\n    @patch('some_module.Symptom')\n    def test_add_new_symptom(self, MockSymptom):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"High body temperature\"\n        MockSymptom.return_value = Symptom(symptom_name, symptom_description)\n\n        # Act\n        self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n\n        # Assert\n        MockSymptom.assert_called_once_with(symptom_name, symptom_description)\n        self.assertIn(MockSymptom.return_value, self.symptoms_manager.symptoms)\n\n    def test_view_and_update_symptom(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"High body temperature\"\n        updated_description = \"Elevated body temperature\"\n        symptom = Symptom(symptom_name, symptom_description)\n        self.symptoms_manager.symptoms.append(symptom)\n\n        # Act\n        self.symptoms_manager.update_symptom(symptom_name, updated_description)\n\n        # Assert\n        self.assertEqual(symptom.description, updated_description)\n\n    def test_view_and_update_non_existent_symptom(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        updated_description = \"Elevated body temperature\"\n\n        # Act & Assert\n        with self.assertRaisesRegex(ValueError, f\"Symptom '{symptom_name}' not found\"):\n            self.symptoms_manager.update_symptom(symptom_name, updated_description)\n\n    def test_delete_symptom_no_consultation_request(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"High body temperature\"\n        symptom = Symptom(symptom_name, symptom_description)\n        self.symptoms_manager.symptoms.append(symptom)\n\n        # Act\n        self.symptoms_manager.delete_symptom(symptom_name)\n\n        # Assert\n        self.assertNotIn(symptom, self.symptoms_manager.symptoms)\n\n    def test_delete_symptom_with_consultation_request(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"High body temperature\"\n        symptom = Symptom(symptom_name, symptom_description)\n        consultation_request = ConsultationRequest(symptom)\n        self.symptoms_manager.symptoms.append(symptom)\n        self.symptoms_manager.consultation_requests.append(consultation_request)\n\n        # Act & Assert\n        with self.assertRaisesRegex(ValueError, f\"Symptom '{symptom_name}' cannot be deleted as it is used in consultation requests\"):\n            self.symptoms_manager.delete_symptom(symptom_name)\n\n    def test_add_symptom_with_empty_name(self):\n        # Arrange\n        symptom_name = \"\"\n        symptom_description = \"High body temperature\"\n\n        # Act & Assert\n        with self.assertRaisesRegex(ValueError, \"Symptom name cannot be empty\"):\n            self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n\n    def test_add_symptom_with_empty_description(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"\"\n\n        # Act & Assert\n        with self.assertRaisesRegex(ValueError, \"Symptom description cannot be empty\"):\n            self.symptoms_manager.add_symptom(symptom_name, symptom_description)\n\n    def test_view_symptom_list(self):\n        # Arrange\n        symptom_name = \"Fever\"\n        symptom_description = \"High body temperature\"\n        symptom = Symptom(symptom_name, symptom_description)\n        self.symptoms_manager.symptoms.append(symptom)\n\n        # Act\n        symptom_list = self.symptoms_manager.get_symptom_list()\n\n        # Assert\n        self.assertIn(symptom, symptom_list)\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new Symptom",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "Fever",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "Add a new symptom with name 'Fever' and description 'High body temperature'"
+          ],
+          "expected": [
+            "Symptom is added to the master list"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update the details of an existing Symptom",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom 'Fever' exists in the master list"
+          ],
+          "inputs": {
+            "name": "Fever",
+            "updated_description": "Elevated body temperature"
+          },
+          "steps": [
+            "Update the description of symptom 'Fever' to 'Elevated body temperature'"
+          ],
+          "expected": [
+            "Symptom description is updated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "View and Update a non-existent Symptom",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "Fever",
+            "updated_description": "Elevated body temperature"
+          },
+          "steps": [
+            "Attempt to update the description of non-existent symptom 'Fever'"
+          ],
+          "expected": [
+            "ValueError is raised with message 'Symptom 'Fever' not found'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete Symptom with no Consultation Request",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom 'Fever' exists in the master list"
+          ],
+          "inputs": {
+            "name": "Fever"
+          },
+          "steps": [
+            "Delete symptom 'Fever' which is not used in any consultation request"
+          ],
+          "expected": [
+            "Symptom is removed from the master list"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete Symptom with Consultation Request",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom 'Fever' exists in the master list and is used in a consultation request"
+          ],
+          "inputs": {
+            "name": "Fever"
+          },
+          "steps": [
+            "Attempt to delete symptom 'Fever' which is used in a consultation request"
+          ],
+          "expected": [
+            "ValueError is raised with message 'Symptom 'Fever' cannot be deleted as it is used in consultation requests'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Add Symptom with Empty Name",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "Attempt to add a symptom with empty name"
+          ],
+          "expected": [
+            "ValueError is raised with message 'Symptom name cannot be empty'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Add Symptom with Empty Description",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "Fever",
+            "description": ""
+          },
+          "steps": [
+            "Attempt to add a symptom with empty description"
+          ],
+          "expected": [
+            "ValueError is raised with message 'Symptom description cannot be empty'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "View Symptom List",
+          "req_ids": [
+            "Req-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom 'Fever' exists in the master list"
+          ],
+          "inputs": {},
+          "steps": [
+            "Retrieve the list of symptoms"
+          ],
+          "expected": [
+            "Symptom 'Fever' is in the list of symptoms"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "Fever",
+            "context": "Symptom name",
+            "grounded": false
+          },
+          {
+            "value": "High body temperature",
+            "context": "Symptom description",
+            "grounded": false
+          },
+          {
+            "value": "Elevated body temperature",
+            "context": "Updated symptom description",
+            "grounded": false
+          },
+          {
+            "value": "Symptom 'Fever' not found",
+            "context": "Error message for update non-existent",
+            "grounded": false
+          },
+          {
+            "value": "Symptom 'Fever' cannot be deleted as it is used in consultation requests",
+            "context": "Error message for delete with consultation",
+            "grounded": false
+          },
+          {
+            "value": "Symptom name cannot be empty",
+            "context": "Error message for empty name",
+            "grounded": false
+          },
+          {
+            "value": "Symptom description cannot be empty",
+            "context": "Error message for empty description",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 7,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No test for duplicate symptom addition",
+          "No test for updating when multiple symptoms share the same name",
+          "No test for delete when symptom is used in multiple consultation requests",
+          "No test verifying that get_symptom_list returns a copy, not the internal list",
+          "No test for boundary conditions such as extremely long names or descriptions"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.85,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

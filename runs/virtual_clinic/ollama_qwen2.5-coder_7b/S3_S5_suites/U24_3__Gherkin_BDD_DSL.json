@@ -1,0 +1,1477 @@
+{
+  "unit_id": "U24_3",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "data_pipeline",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "data_pipeline",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.25,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.5714,
+    "hallucinated": [
+      {
+        "value": "valid_chemist",
+        "context": "input username",
+        "grounded": false
+      },
+      {
+        "value": "valid_password",
+        "context": "input password",
+        "grounded": false
+      },
+      {
+        "value": "valid_patient",
+        "context": "input username",
+        "grounded": false
+      },
+      {
+        "value": "valid_patient_id",
+        "context": "input patient_id",
+        "grounded": false
+      },
+      {
+        "value": "invalid_user",
+        "context": "input username",
+        "grounded": false
+      },
+      {
+        "value": "invalid_password",
+        "context": "input password",
+        "grounded": false
+      },
+      {
+        "value": "invalid_patient_id",
+        "context": "input patient_id",
+        "grounded": false
+      },
+      {
+        "value": "login should fail",
+        "context": "expected state",
+        "grounded": false
+      },
+      {
+        "value": "email should not be sent to the patient's email address",
+        "context": "expected state",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 21,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add explicit checks for status codes or error messages in login failures",
+      "Verify email content format and attachment presence",
+      "Test payment gateway error handling (e.g., declined card)",
+      "Include OS-specific tests for supported OSes",
+      "Add tests for data isolation to ensure no third‑party data sharing"
+    ],
+    "traceability": 0.875,
+    "untraced_reqs": [
+      "VIRTUA-3.3-4"
+    ],
+    "fsa_score": 0.8371,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: System Security and Functionality\n\n  Scenario: Chemist and Lab Login\n    Given a Chemist or Lab user with a valid username and password\n    When the user logs into the system\n    Then the user should be able to access the Prescriptions\n\n  Scenario: Patient Login\n    Given a Patient with a valid username and password\n    When the user logs into the system\n    Then the user should be able to access the Prescriptions\n\n  Scenario: Email Notification for Patients\n    Given a Patient with a valid email address\n    When a prescription is generated for the patient\n    Then an email should be sent to the patient's email address\n    And the email should contain the full prescription and Invoice\n\n  Scenario: Payment Gateway Integration\n    Given a valid payment method (Debit/Credit Card/Net banking)\n    When the user selects the payment method\n    Then the payment should be securely accepted\n\n  Scenario: Django 2.0 Usage\n    Given the system is running on Django 2.0\n    When the system is started\n    Then Django 2.0 should be used\n\n  Scenario: MySQL Usage\n    Given the system is using MySQL\n    When the system is started\n    Then MySQL should be used\n\n  Scenario: Browser Compatibility\n    Given a user is using a supported browser (Google Chrome, Mozilla Firefox, Safari, etc.)\n    When the user accesses the system\n    Then the system should be accessible\n\n  Scenario: OS Compatibility\n    Given a user is using a supported operating system\n    When the user accesses the system\n    Then the system should be accessible\n\n  Scenario Outline: Normal Login\n    Given a user with username \"<username>\" and password \"<password>\"\n    When the user logs into the system\n    Then the user should be able to access the Prescriptions\n\n    Examples:\n      | username | password |\n      | valid_chemist | valid_password |\n      | valid_patient | valid_password |\n\n  Scenario Outline: Edge Login\n    Given a user with username \"<username>\" and password \"<password>\"\n    When the user logs into the system\n    Then the user should be able to access the Prescriptions\n\n    Examples:\n      | username | password |\n      | \"\" | \"\" |\n      | \"admin\" | \"admin123\" |\n\n  Scenario Outline: Invalid Login\n    Given a user with username \"<username>\" and password \"<password>\"\n    When the user logs into the system\n    Then the login should fail\n\n    Examples:\n      | username | password |\n      | invalid_user | invalid_password |\n      | \"\" | valid_password |\n\n  Scenario Outline: Normal Email Notification\n    Given a patient with username \"<patient_id>\"\n    When a prescription is generated for the patient\n    Then an email should be sent to the patient's email address\n    And the email should contain the full prescription and Invoice\n\n    Examples:\n      | patient_id |\n      | valid_patient_id |\n\n  Scenario Outline: Edge Email Notification\n    Given a patient with username \"<patient_id>\"\n    When a prescription is generated for the patient\n    Then an email should be sent to the patient's email address\n    And the email should contain the full prescription and Invoice\n\n    Examples:\n      | patient_id |\n      | \"\" |\n      | \"nonexistent_patient\" |\n\n  Scenario Outline: Invalid Email Notification\n    Given a patient with username \"<patient_id>\"\n    When a prescription is generated for the patient\n    Then an email should not be sent to the patient's email address\n\n    Examples:\n      | patient_id |\n      | invalid_patient_id |\n      | \"\" |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Chemist and Lab Login",
+      "req_ids": [
+        "VIRTUA-3.3-1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "username": "valid_chemist",
+        "password": "valid_password"
+      },
+      "steps": [
+        "Given a Chemist or Lab user with a valid username and password",
+        "When the user logs into the system",
+        "Then the user should be able to access the Prescriptions"
+      ],
+      "expected": [
+        "User should be able to access the Prescriptions"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Patient Login",
+      "req_ids": [
+        "VIRTUA-3.3-1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "username": "valid_patient",
+        "password": "valid_password"
+      },
+      "steps": [
+        "Given a Patient with a valid username and password",
+        "When the user logs into the system",
+        "Then the user should be able to access the Prescriptions"
+      ],
+      "expected": [
+        "User should be able to access the Prescriptions"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Email Notification for Patients",
+      "req_ids": [
+        "VIRTUA-3.3-2"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "patient_id": "valid_patient_id"
+      },
+      "steps": [
+        "Given a Patient with a valid email address",
+        "When a prescription is generated for the patient",
+        "Then an email should be sent to the patient's email address",
+        "And the email should contain the full prescription and Invoice"
+      ],
+      "expected": [
+        "Email should be sent to the patient's email address",
+        "Email should contain the full prescription and Invoice"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Payment Gateway Integration",
+      "req_ids": [
+        "VIRTUA-3.3-3"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "payment_method": "Debit/Credit Card/Net banking"
+      },
+      "steps": [
+        "Given a valid payment method (Debit/Credit Card/Net banking)",
+        "When the user selects the payment method",
+        "Then the payment should be securely accepted"
+      ],
+      "expected": [
+        "Payment should be securely accepted"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Django 2.0 Usage",
+      "req_ids": [
+        "VIRTUA-3.3-1#2"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Given the system is running on Django 2.0",
+        "When the system is started",
+        "Then Django 2.0 should be used"
+      ],
+      "expected": [
+        "Django 2.0 should be used"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "MySQL Usage",
+      "req_ids": [
+        "VIRTUA-3.3-2#2"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Given the system is using MySQL",
+        "When the system is started",
+        "Then MySQL should be used"
+      ],
+      "expected": [
+        "MySQL should be used"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Browser Compatibility",
+      "req_ids": [
+        "VIRTUA-3.3-3#2"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "browser": "Google Chrome"
+      },
+      "steps": [
+        "Given a user is using a supported browser (Google Chrome, Mozilla Firefox, Safari, etc.)",
+        "When the user accesses the system",
+        "Then the system should be accessible"
+      ],
+      "expected": [
+        "System should be accessible"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "OS Compatibility",
+      "req_ids": [
+        "VIRTUA-3.3-4#2"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Given a user is using a supported operating system",
+        "When the user accesses the system",
+        "Then the system should be accessible"
+      ],
+      "expected": [
+        "System should be accessible"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Normal Login",
+      "req_ids": [
+        "VIRTUA-3.3-1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "username": "valid_chemist",
+        "password": "valid_password"
+      },
+      "steps": [
+        "Given a user with username \"<username>\" and password \"<password>\"",
+        "When the user logs into the system",
+        "Then the user should be able to access the Prescriptions"
+      ],
+      "expected": [
+        "User should be able to access the Prescriptions"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Edge Login",
+      "req_ids": [
+        "VIRTUA-3.3-1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "username": "",
+        "password": ""
+      },
+      "steps": [
+        "Given a user with username \"<username>\" and password \"<password>\"",
+        "When the user logs into the system",
+        "Then the user should be able to access the Prescriptions"
+      ],
+      "expected": [
+        "User should be able to access the Prescriptions"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Invalid Login",
+      "req_ids": [
+        "VIRTUA-3.3-1"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "username": "invalid_user",
+        "password": "invalid_password"
+      },
+      "steps": [
+        "Given a user with username \"<username>\" and password \"<password>\"",
+        "When the user logs into the system",
+        "Then the login should fail"
+      ],
+      "expected": [
+        "Login should fail"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Normal Email Notification",
+      "req_ids": [
+        "VIRTUA-3.3-2"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "patient_id": "valid_patient_id"
+      },
+      "steps": [
+        "Given a patient with username \"<patient_id>\"",
+        "When a prescription is generated for the patient",
+        "Then an email should be sent to the patient's email address",
+        "And the email should contain the full prescription and Invoice"
+      ],
+      "expected": [
+        "Email should be sent to the patient's email address",
+        "Email should contain the full prescription and Invoice"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Edge Email Notification",
+      "req_ids": [
+        "VIRTUA-3.3-2"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "patient_id": ""
+      },
+      "steps": [
+        "Given a patient with username \"<patient_id>\"",
+        "When a prescription is generated for the patient",
+        "Then an email should be sent to the patient's email address",
+        "And the email should contain the full prescription and Invoice"
+      ],
+      "expected": [
+        "Email should be sent to the patient's email address",
+        "Email should contain the full prescription and Invoice"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Invalid Email Notification",
+      "req_ids": [
+        "VIRTUA-3.3-2"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "patient_id": "invalid_patient_id"
+      },
+      "steps": [
+        "Given a patient with username \"<patient_id>\"",
+        "When a prescription is generated for the patient",
+        "Then an email should not be sent to the patient's email address"
+      ],
+      "expected": [
+        "Email should not be sent to the patient's email address"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: System Security and Functionality\n\n  Scenario: Chemists and Labs can log into the system\n    Given the system is up and running\n    When a Chemist or Lab logs in with valid credentials\n    Then they should be able to access the Prescriptions\n\n  Scenario: Patients can log into the system\n    Given the system is up and running\n    When a Patient logs in with valid credentials\n    Then they should be able to access their Prescriptions\n\n  Scenario: Emails are sent to Patients including the full prescription and Invoice\n    Given a Patient has a valid email address\n    When a prescription is generated for the Patient\n    Then an email should be sent to the Patient's email address with the full prescription and Invoice\n\n  Scenario: Payments can be securely accepted via Debit/Credit Cards and Net banking\n    Given a Patient is logged into the system\n    When they click on the payment button\n    Then a secure payment interface should be displayed\n    And the payment should be processed securely\n\n  Scenario: System is self-contained and no data is shared with any third party\n    Given the system is up and running\n    When a Chemist or Lab logs in with valid credentials\n    Then their data should not be shared with any third party\n    And when a Patient logs in with valid credentials\n    Then their data should not be shared with any third party\n\n  Scenario: System supports browsers: Google Chrome, Mozilla Firefox, Safari, etc.\n    Given the system is up and running\n    When a Chemist or Lab logs in with valid credentials using Google Chrome\n    Then they should be able to access the Prescriptions\n    And when a Patient logs in with valid credentials using Mozilla Firefox\n    Then they should be able to access their Prescriptions\n    And when a Chemist or Lab logs in with valid credentials using Safari\n    Then they should be able to access the Prescriptions\n\n  Scenario: System supports operating systems that support the above browsers\n    Given the system is up and running\n    When a Chemist or Lab logs in with valid credentials on a Windows machine\n    Then they should be able to access the Prescriptions\n    And when a Patient logs in with valid credentials on a Mac machine\n    Then they should be able to access their Prescriptions\n    And when a Chemist or Lab logs in with valid credentials on a Linux machine\n    Then they should be able to access the Prescriptions",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Chemists and Labs can log into the system",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is up and running"
+          ],
+          "inputs": {
+            "username": "valid_chemist",
+            "password": "valid_password"
+          },
+          "steps": [
+            "a Chemist or Lab logs in with valid credentials"
+          ],
+          "expected": [
+            "they should be able to access the Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patients can log into the system",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is up and running"
+          ],
+          "inputs": {
+            "username": "valid_patient",
+            "password": "valid_password"
+          },
+          "steps": [
+            "a Patient logs in with valid credentials"
+          ],
+          "expected": [
+            "they should be able to access their Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Emails are sent to Patients including the full prescription and Invoice",
+          "req_ids": [
+            "VIRTUA-3.3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a Patient has a valid email address"
+          ],
+          "inputs": {
+            "patient_id": "valid_patient_id"
+          },
+          "steps": [
+            "a prescription is generated for the Patient"
+          ],
+          "expected": [
+            "an email should be sent to the Patient's email address with the full prescription and Invoice"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Payments can be securely accepted via Debit/Credit Cards and Net banking",
+          "req_ids": [
+            "VIRTUA-3.3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a Patient is logged into the system"
+          ],
+          "inputs": {
+            "payment_method": "Debit/Credit Card/Net banking"
+          },
+          "steps": [
+            "they click on the payment button"
+          ],
+          "expected": [
+            "a secure payment interface should be displayed",
+            "the payment should be processed securely"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "System is self-contained and no data is shared with any third party",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is up and running"
+          ],
+          "inputs": {
+            "username": "valid_chemist",
+            "password": "valid_password"
+          },
+          "steps": [
+            "a Chemist or Lab logs in with valid credentials"
+          ],
+          "expected": [
+            "their data should not be shared with any third party"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "System is self-contained and no data is shared with any third party",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is up and running"
+          ],
+          "inputs": {
+            "username": "valid_patient",
+            "password": "valid_password"
+          },
+          "steps": [
+            "a Patient logs in with valid credentials"
+          ],
+          "expected": [
+            "their data should not be shared with any third party"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "System supports browsers: Google Chrome, Mozilla Firefox, Safari, etc.",
+          "req_ids": [
+            "VIRTUA-3.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is up and running"
+          ],
+          "inputs": {
+            "browser": "Google Chrome"
+          },
+          "steps": [
+            "a Chemist or Lab logs in with valid credentials using Google Chrome"
+          ],
+          "expected": [
+            "they should be able to access the Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "System supports browsers: Google Chrome, Mozilla Firefox, Safari, etc.",
+          "req_ids": [
+            "VIRTUA-3.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is up and running"
+          ],
+          "inputs": {
+            "browser": "Mozilla Firefox"
+          },
+          "steps": [
+            "a Patient logs in with valid credentials using Mozilla Firefox"
+          ],
+          "expected": [
+            "they should be able to access their Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "System supports browsers: Google Chrome, Mozilla Firefox, Safari, etc.",
+          "req_ids": [
+            "VIRTUA-3.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is up and running"
+          ],
+          "inputs": {
+            "browser": "Safari"
+          },
+          "steps": [
+            "a Chemist or Lab logs in with valid credentials using Safari"
+          ],
+          "expected": [
+            "they should be able to access the Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "System supports operating systems that support the above browsers",
+          "req_ids": [
+            "VIRTUA-3.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is up and running"
+          ],
+          "inputs": {
+            "os": "Windows"
+          },
+          "steps": [
+            "a Chemist or Lab logs in with valid credentials on a Windows machine"
+          ],
+          "expected": [
+            "they should be able to access the Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "System supports operating systems that support the above browsers",
+          "req_ids": [
+            "VIRTUA-3.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is up and running"
+          ],
+          "inputs": {
+            "os": "Mac"
+          },
+          "steps": [
+            "a Patient logs in with valid credentials on a Mac machine"
+          ],
+          "expected": [
+            "they should be able to access their Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "System supports operating systems that support the above browsers",
+          "req_ids": [
+            "VIRTUA-3.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is up and running"
+          ],
+          "inputs": {
+            "os": "Linux"
+          },
+          "steps": [
+            "a Chemist or Lab logs in with valid credentials on a Linux machine"
+          ],
+          "expected": [
+            "they should be able to access the Prescriptions"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "data_pipeline",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.25,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "valid_chemist",
+            "context": "username",
+            "grounded": false
+          },
+          {
+            "value": "valid_password",
+            "context": "password",
+            "grounded": false
+          },
+          {
+            "value": "valid_patient",
+            "context": "username",
+            "grounded": false
+          },
+          {
+            "value": "valid_patient_id",
+            "context": "patient_id",
+            "grounded": false
+          },
+          {
+            "value": "Debit/Credit Card/Net banking",
+            "context": "payment_method",
+            "grounded": false
+          },
+          {
+            "value": "Google Chrome",
+            "context": "browser",
+            "grounded": false
+          },
+          {
+            "value": "Mozilla Firefox",
+            "context": "browser",
+            "grounded": false
+          },
+          {
+            "value": "Safari",
+            "context": "browser",
+            "grounded": false
+          },
+          {
+            "value": "Windows",
+            "context": "os",
+            "grounded": false
+          },
+          {
+            "value": "Mac",
+            "context": "os",
+            "grounded": false
+          },
+          {
+            "value": "Linux",
+            "context": "os",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 11,
+        "uncovered_clauses": [
+          "VIRTUA-3.3-1#2",
+          "VIRTUA-3.3-2#2"
+        ],
+        "weaknesses": [
+          "Add tests to verify Django 2.0 and MySQL usage.",
+          "Include scenario outlines with examples for normal, edge, and invalid values.",
+          "Assert concrete outcomes such as HTTP status codes, email content, and database entries.",
+          "Test negative scenarios for data leakage and invalid login attempts.",
+          "Verify browser and OS compatibility with actual supported versions."
+        ],
+        "traceability": 0.5,
+        "untraced_reqs": [
+          "VIRTUA-3.3-1#2",
+          "VIRTUA-3.3-2#2",
+          "VIRTUA-3.3-3#2",
+          "VIRTUA-3.3-4#2"
+        ],
+        "fsa_score": 0.505,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.505; sub-scores {'clause_coverage': 0.75, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-3.3-1#2', 'VIRTUA-3.3-2#2', 'VIRTUA-3.3-3#2', 'VIRTUA-3.3-4#2'] (add at least one each)\n- uncovered clause: VIRTUA-3.3-1#2\n- uncovered clause: VIRTUA-3.3-2#2\n- ungrounded value 'valid_chemist' (username): remove or use the SRS value\n- ungrounded value 'valid_password' (password): remove or use the SRS value\n- ungrounded value 'valid_patient' (username): remove or use the SRS value\n- ungrounded value 'valid_patient_id' (patient_id): remove or use the SRS value\n- ungrounded value 'Debit/Credit Card/Net banking' (payment_method): remove or use the SRS value\n- ungrounded value 'Google Chrome' (browser): remove or use the SRS value\n- Add tests to verify Django 2.0 and MySQL usage.\n- Include scenario outlines with examples for normal, edge, and invalid values.\n- Assert concrete outcomes such as HTTP status codes, email content, and database entries.\n- Test negative scenarios for data leakage and invalid login attempts.\n- Verify browser and OS compatibility with actual supported versions.",
+      "artifact": "Feature: System Security and Functionality\n\n  Scenario: Chemist and Lab Login\n    Given a Chemist or Lab user with a valid username and password\n    When the user logs into the system\n    Then the user should be able to access the Prescriptions\n\n  Scenario: Patient Login\n    Given a Patient with a valid username and password\n    When the user logs into the system\n    Then the user should be able to access the Prescriptions\n\n  Scenario: Email Notification for Patients\n    Given a Patient with a valid email address\n    When a prescription is generated for the patient\n    Then an email should be sent to the patient's email address\n    And the email should contain the full prescription and Invoice\n\n  Scenario: Payment Gateway Integration\n    Given a valid payment method (Debit/Credit Card/Net banking)\n    When the user selects the payment method\n    Then the payment should be securely accepted\n\n  Scenario: Django 2.0 Usage\n    Given the system is running on Django 2.0\n    When the system is started\n    Then Django 2.0 should be used\n\n  Scenario: MySQL Usage\n    Given the system is using MySQL\n    When the system is started\n    Then MySQL should be used\n\n  Scenario: Browser Compatibility\n    Given a user is using a supported browser (Google Chrome, Mozilla Firefox, Safari, etc.)\n    When the user accesses the system\n    Then the system should be accessible\n\n  Scenario: OS Compatibility\n    Given a user is using a supported operating system\n    When the user accesses the system\n    Then the system should be accessible\n\n  Scenario Outline: Normal Login\n    Given a user with username \"<username>\" and password \"<password>\"\n    When the user logs into the system\n    Then the user should be able to access the Prescriptions\n\n    Examples:\n      | username | password |\n      | valid_chemist | valid_password |\n      | valid_patient | valid_password |\n\n  Scenario Outline: Edge Login\n    Given a user with username \"<username>\" and password \"<password>\"\n    When the user logs into the system\n    Then the user should be able to access the Prescriptions\n\n    Examples:\n      | username | password |\n      | \"\" | \"\" |\n      | \"admin\" | \"admin123\" |\n\n  Scenario Outline: Invalid Login\n    Given a user with username \"<username>\" and password \"<password>\"\n    When the user logs into the system\n    Then the login should fail\n\n    Examples:\n      | username | password |\n      | invalid_user | invalid_password |\n      | \"\" | valid_password |\n\n  Scenario Outline: Normal Email Notification\n    Given a patient with username \"<patient_id>\"\n    When a prescription is generated for the patient\n    Then an email should be sent to the patient's email address\n    And the email should contain the full prescription and Invoice\n\n    Examples:\n      | patient_id |\n      | valid_patient_id |\n\n  Scenario Outline: Edge Email Notification\n    Given a patient with username \"<patient_id>\"\n    When a prescription is generated for the patient\n    Then an email should be sent to the patient's email address\n    And the email should contain the full prescription and Invoice\n\n    Examples:\n      | patient_id |\n      | \"\" |\n      | \"nonexistent_patient\" |\n\n  Scenario Outline: Invalid Email Notification\n    Given a patient with username \"<patient_id>\"\n    When a prescription is generated for the patient\n    Then an email should not be sent to the patient's email address\n\n    Examples:\n      | patient_id |\n      | invalid_patient_id |\n      | \"\" |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Chemist and Lab Login",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "username": "valid_chemist",
+            "password": "valid_password"
+          },
+          "steps": [
+            "Given a Chemist or Lab user with a valid username and password",
+            "When the user logs into the system",
+            "Then the user should be able to access the Prescriptions"
+          ],
+          "expected": [
+            "User should be able to access the Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient Login",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "username": "valid_patient",
+            "password": "valid_password"
+          },
+          "steps": [
+            "Given a Patient with a valid username and password",
+            "When the user logs into the system",
+            "Then the user should be able to access the Prescriptions"
+          ],
+          "expected": [
+            "User should be able to access the Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Email Notification for Patients",
+          "req_ids": [
+            "VIRTUA-3.3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_id": "valid_patient_id"
+          },
+          "steps": [
+            "Given a Patient with a valid email address",
+            "When a prescription is generated for the patient",
+            "Then an email should be sent to the patient's email address",
+            "And the email should contain the full prescription and Invoice"
+          ],
+          "expected": [
+            "Email should be sent to the patient's email address",
+            "Email should contain the full prescription and Invoice"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Payment Gateway Integration",
+          "req_ids": [
+            "VIRTUA-3.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "payment_method": "Debit/Credit Card/Net banking"
+          },
+          "steps": [
+            "Given a valid payment method (Debit/Credit Card/Net banking)",
+            "When the user selects the payment method",
+            "Then the payment should be securely accepted"
+          ],
+          "expected": [
+            "Payment should be securely accepted"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Django 2.0 Usage",
+          "req_ids": [
+            "VIRTUA-3.3-1#2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given the system is running on Django 2.0",
+            "When the system is started",
+            "Then Django 2.0 should be used"
+          ],
+          "expected": [
+            "Django 2.0 should be used"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "MySQL Usage",
+          "req_ids": [
+            "VIRTUA-3.3-2#2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given the system is using MySQL",
+            "When the system is started",
+            "Then MySQL should be used"
+          ],
+          "expected": [
+            "MySQL should be used"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Browser Compatibility",
+          "req_ids": [
+            "VIRTUA-3.3-3#2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "browser": "Google Chrome"
+          },
+          "steps": [
+            "Given a user is using a supported browser (Google Chrome, Mozilla Firefox, Safari, etc.)",
+            "When the user accesses the system",
+            "Then the system should be accessible"
+          ],
+          "expected": [
+            "System should be accessible"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "OS Compatibility",
+          "req_ids": [
+            "VIRTUA-3.3-4#2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given a user is using a supported operating system",
+            "When the user accesses the system",
+            "Then the system should be accessible"
+          ],
+          "expected": [
+            "System should be accessible"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Normal Login",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "username": "valid_chemist",
+            "password": "valid_password"
+          },
+          "steps": [
+            "Given a user with username \"<username>\" and password \"<password>\"",
+            "When the user logs into the system",
+            "Then the user should be able to access the Prescriptions"
+          ],
+          "expected": [
+            "User should be able to access the Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Edge Login",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "username": "",
+            "password": ""
+          },
+          "steps": [
+            "Given a user with username \"<username>\" and password \"<password>\"",
+            "When the user logs into the system",
+            "Then the user should be able to access the Prescriptions"
+          ],
+          "expected": [
+            "User should be able to access the Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Invalid Login",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "username": "invalid_user",
+            "password": "invalid_password"
+          },
+          "steps": [
+            "Given a user with username \"<username>\" and password \"<password>\"",
+            "When the user logs into the system",
+            "Then the login should fail"
+          ],
+          "expected": [
+            "Login should fail"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Normal Email Notification",
+          "req_ids": [
+            "VIRTUA-3.3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_id": "valid_patient_id"
+          },
+          "steps": [
+            "Given a patient with username \"<patient_id>\"",
+            "When a prescription is generated for the patient",
+            "Then an email should be sent to the patient's email address",
+            "And the email should contain the full prescription and Invoice"
+          ],
+          "expected": [
+            "Email should be sent to the patient's email address",
+            "Email should contain the full prescription and Invoice"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Edge Email Notification",
+          "req_ids": [
+            "VIRTUA-3.3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_id": ""
+          },
+          "steps": [
+            "Given a patient with username \"<patient_id>\"",
+            "When a prescription is generated for the patient",
+            "Then an email should be sent to the patient's email address",
+            "And the email should contain the full prescription and Invoice"
+          ],
+          "expected": [
+            "Email should be sent to the patient's email address",
+            "Email should contain the full prescription and Invoice"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Invalid Email Notification",
+          "req_ids": [
+            "VIRTUA-3.3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "patient_id": "invalid_patient_id"
+          },
+          "steps": [
+            "Given a patient with username \"<patient_id>\"",
+            "When a prescription is generated for the patient",
+            "Then an email should not be sent to the patient's email address"
+          ],
+          "expected": [
+            "Email should not be sent to the patient's email address"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "data_pipeline",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.25,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.5714,
+        "hallucinated": [
+          {
+            "value": "valid_chemist",
+            "context": "input username",
+            "grounded": false
+          },
+          {
+            "value": "valid_password",
+            "context": "input password",
+            "grounded": false
+          },
+          {
+            "value": "valid_patient",
+            "context": "input username",
+            "grounded": false
+          },
+          {
+            "value": "valid_patient_id",
+            "context": "input patient_id",
+            "grounded": false
+          },
+          {
+            "value": "invalid_user",
+            "context": "input username",
+            "grounded": false
+          },
+          {
+            "value": "invalid_password",
+            "context": "input password",
+            "grounded": false
+          },
+          {
+            "value": "invalid_patient_id",
+            "context": "input patient_id",
+            "grounded": false
+          },
+          {
+            "value": "login should fail",
+            "context": "expected state",
+            "grounded": false
+          },
+          {
+            "value": "email should not be sent to the patient's email address",
+            "context": "expected state",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 21,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add explicit checks for status codes or error messages in login failures",
+          "Verify email content format and attachment presence",
+          "Test payment gateway error handling (e.g., declined card)",
+          "Include OS-specific tests for supported OSes",
+          "Add tests for data isolation to ensure no third‑party data sharing"
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "VIRTUA-3.3-4"
+        ],
+        "fsa_score": 0.8371,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.8371; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 1.0, 'groundedness_mg': 0.5714}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-3.3-4'] (add at least one each)\n- ungrounded value 'valid_chemist' (input username): remove or use the SRS value\n- ungrounded value 'valid_password' (input password): remove or use the SRS value\n- ungrounded value 'valid_patient' (input username): remove or use the SRS value\n- ungrounded value 'valid_patient_id' (input patient_id): remove or use the SRS value\n- ungrounded value 'invalid_user' (input username): remove or use the SRS value\n- ungrounded value 'invalid_password' (input password): remove or use the SRS value\n- Add explicit checks for status codes or error messages in login failures\n- Verify email content format and attachment presence\n- Test payment gateway error handling (e.g., declined card)\n- Include OS-specific tests for supported OSes\n- Add tests for data isolation to ensure no third‑party data sharing",
+      "artifact": "Feature: System Security and Functionality\n\n  Scenario: Chemist and Lab Login\n    Given the system is up and running\n    When a Chemist or Lab logs in with valid credentials\n    Then the system should allow access to the Prescriptions\n\n  Scenario: Patient Login\n    Given the system is up and running\n    When a Patient logs in with valid credentials\n    Then the system should allow access to the Prescriptions\n\n  Scenario: Email Notification for Patients\n    Given a Patient has a valid email address\n    When a prescription is generated for the Patient\n    Then an email should be sent to the Patient's email address\n    And the email should contain the full prescription and Invoice\n\n  Scenario: Payment Gateway Integration\n    Given the system is up and running\n    When a Patient clicks the payment button\n    Then the system should redirect to the Payment Gateway\n    And the payment should be securely accepted via Debit/Credit Cards and Net banking\n\n  Scenario: Data Isolation\n    Given a Chemist or Lab logs in\n    When the Chemist or Lab attempts to access a Patient's data\n    Then the system should deny access\n    And the Chemist or Lab should receive an error message\n\n  Scenario: Invalid User Login\n    Given the system is up and running\n    When an invalid user attempts to log in\n    Then the system should deny access\n    And the system should display an error message\n\n  Scenario: Invalid Password Login\n    Given the system is up and running\n    When a valid user attempts to log in with an invalid password\n    Then the system should deny access\n    And the system should display an error message\n\n  Scenario: Payment Gateway Decline\n    Given the system is up and running\n    When a Patient attempts to make a payment with a declined card\n    Then the system should display an error message\n    And the payment should not be processed\n\n  Scenario Outline: Browser Compatibility\n    Given the system is up and running\n    When a user logs in using <browser>\n    Then the system should allow access to the Prescriptions\n    Examples:\n      | browser       |\n      | Google Chrome |\n      | Mozilla Firefox |\n      | Safari        |\n\n  Scenario Outline: OS Compatibility\n    Given the system is up and running\n    When a user logs in using <OS>\n    Then the system should allow access to the Prescriptions\n    Examples:\n      | OS             |\n      | Windows        |\n      | macOS          |\n      | Linux          |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Chemist and Lab Login",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is up and running"
+          ],
+          "inputs": {
+            "username": "valid_chemist",
+            "password": "valid_password"
+          },
+          "steps": [
+            "Chemist or Lab logs in with valid credentials"
+          ],
+          "expected": [
+            "system allows access to the Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient Login",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is up and running"
+          ],
+          "inputs": {
+            "username": "valid_patient",
+            "password": "valid_password"
+          },
+          "steps": [
+            "Patient logs in with valid credentials"
+          ],
+          "expected": [
+            "system allows access to the Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Email Notification for Patients",
+          "req_ids": [
+            "VIRTUA-3.3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has a valid email address"
+          ],
+          "inputs": {
+            "patient_id": "valid_patient_id"
+          },
+          "steps": [
+            "prescription is generated for the Patient"
+          ],
+          "expected": [
+            "email sent to the Patient's email address",
+            "email contains the full prescription and Invoice"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Payment Gateway Integration",
+          "req_ids": [
+            "VIRTUA-3.3-3",
+            "VIRTUA-3.3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is up and running"
+          ],
+          "inputs": {
+            "patient_id": "valid_patient_id"
+          },
+          "steps": [
+            "Patient clicks the payment button"
+          ],
+          "expected": [
+            "system redirects to the Payment Gateway",
+            "payment securely accepted via Debit/Credit Cards and Net banking"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Data Isolation",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist or Lab logs in"
+          ],
+          "inputs": {
+            "patient_id": "valid_patient_id"
+          },
+          "steps": [
+            "Chemist or Lab attempts to access a Patient's data"
+          ],
+          "expected": [
+            "system denies access",
+            "Chemist or Lab receives an error message"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Invalid User Login",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system is up and running"
+          ],
+          "inputs": {
+            "username": "invalid_user",
+            "password": "valid_password"
+          },
+          "steps": [
+            "invalid user attempts to log in"
+          ],
+          "expected": [
+            "system denies access",
+            "system displays an error message"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Invalid Password Login",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system is up and running"
+          ],
+          "inputs": {
+            "username": "valid_patient",
+            "password": "invalid_password"
+          },
+          "steps": [
+            "valid user attempts to log in with an invalid password"
+          ],
+          "expected": [
+            "system denies access",
+            "system displays an error message"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Payment Gateway Decline",
+          "req_ids": [
+            "VIRTUA-3.3-3",
+            "VIRTUA-3.3-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system is up and running"
+          ],
+          "inputs": {
+            "patient_id": "valid_patient_id"
+          },
+          "steps": [
+            "Patient attempts to make a payment with a declined card"
+          ],
+          "expected": [
+            "system displays an error message",
+            "payment not processed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Browser Compatibility",
+          "req_ids": [
+            "VIRTUA-3.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is up and running"
+          ],
+          "inputs": {
+            "username": "valid_chemist",
+            "password": "valid_password"
+          },
+          "steps": [
+            "user logs in using <browser>"
+          ],
+          "expected": [
+            "system allows access to the Prescriptions"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "OS Compatibility",
+          "req_ids": [
+            "VIRTUA-3.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is up and running"
+          ],
+          "inputs": {
+            "username": "valid_chemist",
+            "password": "valid_password"
+          },
+          "steps": [
+            "user logs in using <OS>"
+          ],
+          "expected": [
+            "system allows access to the Prescriptions"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "data_pipeline",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.25,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "valid_chemist",
+            "context": "username",
+            "grounded": false
+          },
+          {
+            "value": "valid_password",
+            "context": "password",
+            "grounded": false
+          },
+          {
+            "value": "valid_patient",
+            "context": "username",
+            "grounded": false
+          },
+          {
+            "value": "valid_patient_id",
+            "context": "patient_id",
+            "grounded": false
+          },
+          {
+            "value": "invalid_user",
+            "context": "username",
+            "grounded": false
+          },
+          {
+            "value": "invalid_password",
+            "context": "password",
+            "grounded": false
+          },
+          {
+            "value": "Google Chrome",
+            "context": "browser",
+            "grounded": false
+          },
+          {
+            "value": "Mozilla Firefox",
+            "context": "browser",
+            "grounded": false
+          },
+          {
+            "value": "Safari",
+            "context": "browser",
+            "grounded": false
+          },
+          {
+            "value": "Windows",
+            "context": "OS",
+            "grounded": false
+          },
+          {
+            "value": "macOS",
+            "context": "OS",
+            "grounded": false
+          },
+          {
+            "value": "Linux",
+            "context": "OS",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 12,
+        "uncovered_clauses": [
+          "VIRTUA-3.3-1#2",
+          "VIRTUA-3.3-2#2"
+        ],
+        "weaknesses": [
+          "Add explicit assertions for error messages, status codes, and email content to improve oracle assertiveness.",
+          "Include boundary tests for login credentials (e.g., maximum length, special characters) to cover edge cases.",
+          "Verify data isolation by attempting cross-user data access in separate sessions.",
+          "Test system behavior when the payment gateway is unavailable or returns unexpected responses.",
+          "Add tests to confirm the system uses Django 2.0 and MySQL as specified (e.g., check framework version and database type)."
+        ],
+        "traceability": 0.5,
+        "untraced_reqs": [
+          "VIRTUA-3.3-1#2",
+          "VIRTUA-3.3-2#2",
+          "VIRTUA-3.3-3#2",
+          "VIRTUA-3.3-4#2"
+        ],
+        "fsa_score": 0.78,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.78; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-3.3-1#2', 'VIRTUA-3.3-2#2', 'VIRTUA-3.3-3#2', 'VIRTUA-3.3-4#2'] (add at least one each)\n- uncovered clause: VIRTUA-3.3-1#2\n- uncovered clause: VIRTUA-3.3-2#2\n- ungrounded value 'valid_chemist' (username): remove or use the SRS value\n- ungrounded value 'valid_password' (password): remove or use the SRS value\n- ungrounded value 'valid_patient' (username): remove or use the SRS value\n- ungrounded value 'valid_patient_id' (patient_id): remove or use the SRS value\n- ungrounded value 'invalid_user' (username): remove or use the SRS value\n- ungrounded value 'invalid_password' (password): remove or use the SRS value\n- Add explicit assertions for error messages, status codes, and email content to improve oracle assertiveness.\n- Include boundary tests for login credentials (e.g., maximum length, special characters) to cover edge cases.\n- Verify data isolation by attempting cross-user data access in separate sessions.\n- Test system behavior when the payment gateway is unavailable or returns unexpected responses.\n- Add tests to confirm the system uses Django 2.0 and MySQL as specified (e.g., check framework version and database type).",
+      "artifact": "Feature: System Security and Functionality\n\n  Scenario: Chemist and Lab Login\n    Given a Chemist with username \"valid_chemist\" and password \"valid_password\"\n    When the Chemist logs into the system\n    Then the Chemist should be able to access the Prescriptions\n    And the Chemist should not be able to access the Prescriptions of other users\n\n  Scenario: Patient Login\n    Given a Patient with username \"valid_patient\" and password \"valid_password\"\n    When the Patient logs into the system\n    Then the Patient should be able to access their Prescriptions\n    And the Patient should not be able to access the Prescriptions of other users\n\n  Scenario: Email Notification for Patients\n    Given a Patient with username \"valid_patient\" and password \"valid_password\"\n    When the Patient logs into the system and receives a prescription\n    Then an email should be sent to the Patient's email address\n    And the email should contain the full prescription and Invoice\n\n  Scenario: Payment Gateway Integration\n    Given a Patient with username \"valid_patient\" and password \"valid_password\"\n    When the Patient logs into the system and attempts to pay using a valid Debit/Credit Card or Net banking\n    Then the payment should be processed securely\n    And a confirmation message should be displayed to the Patient\n\n  Scenario: Constraint: Django 2.0\n    Given the system is running\n    When the system checks its framework version\n    Then the framework version should be 2.0\n\n  Scenario: Constraint: MySQL\n    Given the system is running\n    When the system checks its database type\n    Then the database type should be MySQL\n\n  Scenario: Constraint: Browser Support\n    Given the system is running\n    When a user accesses the system using Google Chrome\n    Then the system should function correctly\n\n  Scenario: Constraint: Browser Support\n    Given the system is running\n    When a user accesses the system using Mozilla Firefox\n    Then the system should function correctly\n\n  Scenario: Constraint: Browser Support\n    Given the system is running\n    When a user accesses the system using Safari\n    Then the system should function correctly\n\n  Scenario: Constraint: Browser Support\n    Given the system is running\n    When a user accesses the system using an unsupported browser\n    Then the system should display an error message\n\n  Scenario: Constraint: Operating System Support\n    Given the system is running\n    When a user accesses the system using an operating system that supports the above browsers\n    Then the system should function correctly\n\n  Scenario: Constraint: Operating System Support\n    Given the system is running\n    When a user accesses the system using an operating system that does not support the above browsers\n    Then the system should display an error message\n\n  Scenario: Negative Path: Invalid Chemist Login\n    Given an invalid Chemist with username \"invalid_user\" and password \"invalid_password\"\n    When the Chemist attempts to log into the system\n    Then the Chemist should not be able to access the system\n    And an error message should be displayed\n\n  Scenario: Negative Path: Invalid Patient Login\n    Given an invalid Patient with username \"invalid_user\" and password \"invalid_password\"\n    When the Patient attempts to log into the system\n    Then the Patient should not be able to access the system\n    And an error message should be displayed\n\n  Scenario: Boundary Path: Maximum Length Username\n    Given a Chemist with username \"a\" repeated 100 times and password \"valid_password\"\n    When the Chemist attempts to log into the system\n    Then the Chemist should not be able to access the system\n    And an error message should be displayed\n\n  Scenario: Boundary Path: Minimum Length Username\n    Given a Chemist with username \"a\" repeated 5 times and password \"valid_password\"\n    When the Chemist attempts to log into the system\n    Then the Chemist should be able to access the system\n\n  Scenario: Boundary Path: Maximum Length Password\n    Given a Chemist with username \"valid_chemist\" and password \"a\" repeated 100 times\n    When the Chemist attempts to log into the system\n    Then the Chemist should not be able to access the system\n    And an error message should be displayed\n\n  Scenario: Boundary Path: Minimum Length Password\n    Given a Chemist with username \"valid_chemist\" and password \"a\" repeated 5 times\n    When the Chemist attempts to log into the system\n    Then the Chemist should be able to access the system\n\n  Scenario: Boundary Path: Special Characters in Username\n    Given a Chemist with username \"valid_chemist!\" and password \"valid_password\"\n    When the Chemist attempts to log into the system\n    Then the Chemist should be able to access the system\n\n  Scenario: Boundary Path: Special Characters in Password\n    Given a Chemist with username \"valid_chemist\" and password \"valid_password!\"\n    When the Chemist attempts to log into the system\n    Then the Chemist should be able to access the system\n\n  Scenario: Negative Path: Payment Gateway Unavailable\n    Given the payment gateway is unavailable\n    When a Patient attempts to pay using a valid Debit/Credit Card or Net banking\n    Then the payment should not be processed\n    And an error message should be displayed\n\n  Scenario: Negative Path: Payment Gateway Unexpected Response\n    Given the payment gateway returns an unexpected response\n    When a Patient attempts to pay using a valid Debit/Credit Card or Net banking\n    Then the payment should not be processed\n    And an error message should be displayed",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    }
+  ]
+}

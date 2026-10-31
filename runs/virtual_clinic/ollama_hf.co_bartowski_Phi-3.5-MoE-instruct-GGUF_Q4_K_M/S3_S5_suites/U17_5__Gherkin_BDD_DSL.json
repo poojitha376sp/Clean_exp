@@ -1,0 +1,545 @@
+{
+  "unit_id": "U17_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:hf.co/bartowski/Phi-3.5-MoE-instruct-GGUF:Q4_K_M",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 0.0,
+    "sfv_score": 0.5,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "Gherkin parse error: Parser errors:"
+    ]
+  },
+  "fsa": null,
+  "artifact": "Feature: System Access and User Management\n\n  As a user, I want to access the system only on specified pin codes\n  So that I can ensure the system is available in designated zones\n\nScenario Outline: Accessing the system on specified pin codes\n  Given the system is configured with pin codes in the Parameter Control File\n  When I attempt to access the system using a valid pin code\n  Then I should be granted access\n  And when I attempt to access the system using an invalid pin code\n  Then I should be denied access\n\nExamples:\n  | Pin Code | Access Granted | Access Denied |\n  | 1234     | Yes            | No            |\n  | 5678     | Yes            | No            |\n  | 9012     | No            | Yes           |\n\nFeature: User Authentication\n\n  As a user, I want to authenticate using a login/user-id and password\n  So that I can securely access the system\n\nScenario Outline: Authenticating with login/user-id and password\n  Given the system requires user authentication\n  When I provide a valid login/user-id and password\n  Then I should be authenticated\n  And when I provide an invalid login/user-id or password\n  Then I should not be authenticated\n\nExamples:\n  | Login/User-ID | Password | Authenticated | Not Authenticated |\n  | user123       | pass123  | Yes          | No               |\n  | user456       | pass456  | No          | Yes              |\n  | user789       | pass789  | Yes          | No               |\n\nFeature: Speciality and Doctor Linkage\n\n  As a doctor, I want to be linked to a speciality\n  So that I can provide consultations to patients\n\nScenario Outline: Linking a doctor to a speciality\n  Given the system requires a doctor to be linked to a speciality\n  When I link a doctor to a speciality\n  Then I should be linked to that speciality\n  And when I link a doctor to a non-existent speciality\n  Then I should not be linked\n\nExamples:\n  | Doctor ID | Speciality | Linked | Not Linked |\n  | doc123     | Cardiology | Yes    | No         |\n  | doc456     | Neurology  | Yes    | No         |\n  | doc789     | None      | No     | Yes        |\n\nFeature: Patient Registration and Consultation Requests\n\n  As a patient, I want to register and request consultations\n  So that I can receive medical services\n\nScenario Outline: Registering and requesting consultations\n  Given the system requires a patient to register and request consultations\n  When I register as a patient\n  Then I should be registered\n  And when I request a consultation\n  Then I should be linked to a speciality\n  And when I request multiple consultations\n  Then I should be linked to multiple specialities\n\nExamples:\n  | Patient ID | Speciality | Consultation Requests | Registered |\n  | patient123  | Cardiology | 1                     | Yes       |\n  | patient456  | Neurology  | 2                     | Yes       |\n  | patient789  | None      | 0                     | Yes       |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Accessing the system on specified pin codes",
+      "req_ids": [
+        "BR-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is configured with pin codes in the Parameter Control File"
+      ],
+      "inputs": {
+        "name": "Pin Code"
+      },
+      "steps": [
+        "Attempt to access the system using a valid pin code",
+        "Attempt to access the system using an invalid pin code"
+      ],
+      "expected": [
+        "Granted access",
+        "Denied access"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Authenticating with login/user-id and password",
+      "req_ids": [
+        "BR-2-1",
+        "BR-2-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System requires user authentication"
+      ],
+      "inputs": {
+        "name": "Login/User-ID",
+        "password": "Password"
+      },
+      "steps": [
+        "Provide a valid login/user-id and password",
+        "Provide an invalid login/user-id or password"
+      ],
+      "expected": [
+        "Authenticated",
+        "Not Authenticated"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Linking a doctor to a speciality",
+      "req_ids": [
+        "BR-3",
+        "BR-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System requires a doctor to be linked to a speciality"
+      ],
+      "inputs": {
+        "name": "Doctor ID",
+        "speciality": "Speciality Name"
+      },
+      "steps": [
+        "Link a doctor to a speciality",
+        "Link a doctor to a non-existent speciality"
+      ],
+      "expected": [
+        "Linked to that speciality",
+        "Not Linked"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Registering as a patient and requesting consultations",
+      "req_ids": [
+        "BR-5",
+        "BR-6",
+        "BR-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System requires a patient to register and request consultations"
+      ],
+      "inputs": {
+        "name": "Patient ID",
+        "speciality": "Speciality Name",
+        "consultation requests": "Number of Requests"
+      },
+      "steps": [
+        "Register as a patient",
+        "Request a consultation",
+        "Register multiple consultations"
+      ],
+      "expected": [
+        "Registered",
+        "Linked to a speciality",
+        "Linked to multiple specialities"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: System Access and User Management\n\n  Scenario: System is available on specified pin codes\n  Given the system is configured with the Parameter Control File\n  When a user attempts to access the system from a non-specified pin code\n  Then the system should deny access\n\n  Scenario Outline: System access on specified pin codes\n  Examples:\n    | Pin Code | Expected Result |\n    | 1234     | Access granted    |\n    | 5678     | Access denied     |\n    | 9012     | Access denied     |\n\n  Scenario: User login\n  Given a user is registered in the system\n  When the user attempts to login with valid credentials\n  Then access to the system is granted\n\n  Scenario Outline: User login\n  Examples:\n    | User ID | Password | Expected Result |\n    | User1   | Pass123  | Access granted    |\n    | User2   | Pass456  | Access denied     |\n    | User3   | Pass789  | Access denied     |\n\n  Scenario: Doctor-Speciality linkage\n  Given a doctor is registered in the system\n  When the doctor attempts to link to a speciality\n  Then the link is established if the speciality exists\n\n  Scenario Outline: Doctor-Speciality linkage\n  Examples:\n    | Doctor ID | Speciality | Expected Result |\n    | Doc1     | Speciality1 | Link established    |\n    | Doc2     | Speciality2 | Link established    |\n    | Doc3     | Speciality3 | Link denied     |\n\n  Scenario: Patient registration\n  Given a patient is not registered in the system\n  When the patient attempts to register with valid details\n  Then the patient is registered and a unique id is generated\n\n  Scenario Outline: Patient registration\n  Examples:\n    | Patient Name | Patient ID | Expected Result |\n    | Patient1     | ID123456   | Registered        |\n    | Patient2     | ID234567   | Registered        |\n    | Patient3     | ID345678   | Registered        |\n\n  Scenario: Consultation request\n  Given a patient is registered in the system\n  When the patient attempts to request a consultation\n  Then the request is linked to the patient's speciality\n\n  Scenario Outline: Consultation request\n  Examples:\n    | Patient ID | Speciality | Expected Result |\n    | ID123456   | Speciality1 | Request linked    |\n    | ID234567   | Speciality2 | Request linked    |\n    | ID345678   | Speciality3 | Request denied     |",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.4,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "some scenarios have <2 steps (15 steps total)"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.40). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- some scenarios have <2 steps (15 steps total)",
+      "artifact": "Feature: System Access and User Management\n\n  As a user, I want to access the system only on specified pin codes\n  So that I can ensure the system is available in designated zones\n\nScenario Outline: Accessing the system on specified pin codes\n  Given the system is configured with pin codes in the Parameter Control File\n  When I attempt to access the system using a valid pin code\n  Then I should be granted access\n  And when I attempt to access the system using an invalid pin code\n  Then I should be denied access\n\nExamples:\n  | Pin Code | Access Granted | Access Denied |\n  | 1234     | Yes            | No            |\n  | 5678     | Yes            | No            |\n  | 9012     | No            | Yes           |\n\nFeature: User Authentication\n\n  As a user, I want to authenticate using a login/user-id and password\n  So that I can securely access the system\n\nScenario Outline: Authenticating with login/user-id and password\n  Given the system requires user authentication\n  When I provide a valid login/user-id and password\n  Then I should be authenticated\n  And when I provide an invalid login/user-id or password\n  Then I should not be authenticated\n\nExamples:\n  | Login/User-ID | Password | Authenticated | Not Authenticated |\n  | user123       | pass123  | Yes          | No               |\n  | user456       | pass456  | No          | Yes              |\n  | user789       | pass789  | Yes          | No               |\n\nFeature: Speciality and Doctor Linkage\n\n  As a doctor, I want to be linked to a speciality\n  So that I can provide consultations to patients\n\nScenario Outline: Linking a doctor to a speciality\n  Given the system requires a doctor to be linked to a speciality\n  When I link a doctor to a speciality\n  Then I should be linked to that speciality\n  And when I link a doctor to a non-existent speciality\n  Then I should not be linked\n\nExamples:\n  | Doctor ID | Speciality | Linked | Not Linked |\n  | doc123     | Cardiology | Yes    | No         |\n  | doc456     | Neurology  | Yes    | No         |\n  | doc789     | None      | No     | Yes        |\n\nFeature: Patient Registration and Consultation Requests\n\n  As a patient, I want to register and request consultations\n  So that I can receive medical services\n\nScenario Outline: Registering and requesting consultations\n  Given the system requires a patient to register and request consultations\n  When I register as a patient\n  Then I should be registered\n  And when I request a consultation\n  Then I should be linked to a speciality\n  And when I request multiple consultations\n  Then I should be linked to multiple specialities\n\nExamples:\n  | Patient ID | Speciality | Consultation Requests | Registered |\n  | patient123  | Cardiology | 1                     | Yes       |\n  | patient456  | Neurology  | 2                     | Yes       |\n  | patient789  | None      | 0                     | Yes       |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Accessing the system on specified pin codes",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is configured with pin codes in the Parameter Control File"
+          ],
+          "inputs": {
+            "name": "Pin Code"
+          },
+          "steps": [
+            "Attempt to access the system using a valid pin code",
+            "Attempt to access the system using an invalid pin code"
+          ],
+          "expected": [
+            "Granted access",
+            "Denied access"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Authenticating with login/user-id and password",
+          "req_ids": [
+            "BR-2-1",
+            "BR-2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System requires user authentication"
+          ],
+          "inputs": {
+            "name": "Login/User-ID",
+            "password": "Password"
+          },
+          "steps": [
+            "Provide a valid login/user-id and password",
+            "Provide an invalid login/user-id or password"
+          ],
+          "expected": [
+            "Authenticated",
+            "Not Authenticated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Linking a doctor to a speciality",
+          "req_ids": [
+            "BR-3",
+            "BR-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System requires a doctor to be linked to a speciality"
+          ],
+          "inputs": {
+            "name": "Doctor ID",
+            "speciality": "Speciality Name"
+          },
+          "steps": [
+            "Link a doctor to a speciality",
+            "Link a doctor to a non-existent speciality"
+          ],
+          "expected": [
+            "Linked to that speciality",
+            "Not Linked"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Registering as a patient and requesting consultations",
+          "req_ids": [
+            "BR-5",
+            "BR-6",
+            "BR-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System requires a patient to register and request consultations"
+          ],
+          "inputs": {
+            "name": "Patient ID",
+            "speciality": "Speciality Name",
+            "consultation requests": "Number of Requests"
+          },
+          "steps": [
+            "Register as a patient",
+            "Request a consultation",
+            "Register multiple consultations"
+          ],
+          "expected": [
+            "Registered",
+            "Linked to a speciality",
+            "Linked to multiple specialities"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Gherkin parse error: Parser errors:",
+      "artifact": "Feature: System Access and User Management\n\n  Scenario: System availability on specified pin codes\n  Given the system is configured with specified pin codes in the Parameter Control File\n  When a user attempts to access the system from a non-specified pin code\n  Then the system should deny access\n\n  Scenario Outline: System access for different pin codes\n  Given the system is configured with specified pin codes in the Parameter Control File\n  When a user attempts to access the system from <pin_code>\n  Then the system should <access_result>\n\n  Examples:\n    | pin_code | access_result |\n    | 1234     | deny access    |\n    | 5678     | allow access   |\n\nFeature: User Login and Password Management\n\n  Scenario: User login with valid credentials\n  Given a user has valid login credentials\n  When the user attempts to log in\n  Then the system should grant access\n\n  Scenario Outline: User login with different credentials\n  Given a user has <credentials>\n  When the user attempts to log in\n  Then the system should <login_result>\n\n  Examples:\n    | credentials | login_result |\n    | valid       | grant access   |\n    | invalid     | deny access    |\n\nFeature: Doctor and Speciality Linkage\n\n  Scenario: Doctor linked to a speciality\n  Given a doctor is linked to a speciality\n  When the doctor attempts to access the speciality\n  Then the system should grant access\n\n  Scenario Outline: Doctor access to multiple specialities\n  Given a doctor is linked to <specialities>\n  When the doctor attempts to access the specialities\n  Then the system should <access_result>\n\n  Examples:\n    | specialities | access_result |\n    | single       | grant access   |\n    | multiple    | deny access    |\n\nFeature: Patient and Doctor Linkage\n\n  Scenario: Patient linked to a doctor\n  Given a patient is linked to a doctor\n  When the patient attempts to access the doctor\n  Then the system should grant access\n\n  Scenario Outline: Patient access to multiple doctors\n  Given a patient is linked to <doctors>\n  When the patient attempts to access the doctors\n  Then the system should <access_result>\n\n  Examples:\n    | doctors | access_result |\n    | single   | grant access   |\n    | multiple | deny access    |\n\nFeature: Patient Registration and Consultation Requests\n\n  Scenario: Patient registration with unique id\n  Given a patient registers with a unique id\n  When the patient attempts to register\n  Then the system should grant access\n\n  Scenario Outline: Patient registration with different ids\n  Given a patient registers with <id>\n  When the patient attempts to register\n  Then the system should <registration_result>\n\n  Examples:\n    | id | registration_result |\n    | unique | grant access   |\n    | duplicate | deny access    |\n\n  Scenario: Patient consultation request\n  Given a patient requests a consultation\n  When the patient attempts to request\n  Then the system should grant access\n\n  Scenario Outline: Patient consultation request with different ids\n  Given a patient requests <id>\n  When the patient attempts to request\n  Then the system should <request_result>\n\n  Examples:\n    | id | request_result |\n    | unique | grant access   |\n    | duplicate | deny access    |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "System access on non-specified pin codes",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is configured with specified pin codes in the Parameter Control File"
+          ],
+          "inputs": {
+            "name": "pin_code"
+          },
+          "steps": [
+            "User attempts to access the system from <pin_code>"
+          ],
+          "expected": [
+            "System should deny access"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "User login with valid credentials",
+          "req_ids": [
+            "BR-2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A user has valid login credentials"
+          ],
+          "inputs": {
+            "name": "credentials"
+          },
+          "steps": [
+            "User attempts to log in"
+          ],
+          "expected": [
+            "System should grant access"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor linked to a single speciality",
+          "req_ids": [
+            "BR-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A doctor is linked to a speciality"
+          ],
+          "inputs": {
+            "name": "specialities"
+          },
+          "steps": [
+            "Doctor attempts to access the speciality"
+          ],
+          "expected": [
+            "System should grant access"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Patient linked to a single doctor",
+          "req_ids": [
+            "BR-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is linked to a doctor"
+          ],
+          "inputs": {
+            "name": "doctors"
+          },
+          "steps": [
+            "Patient attempts to access the doctor"
+          ],
+          "expected": [
+            "System should grant access"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Patient registration with unique id",
+          "req_ids": [
+            "BR-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient registers with a unique id"
+          ],
+          "inputs": {
+            "name": "id"
+          },
+          "steps": [
+            "Patient attempts to register"
+          ],
+          "expected": [
+            "System should grant access"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient consultation request with unique id",
+          "req_ids": [
+            "BR-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient requests a consultation with a unique id"
+          ],
+          "inputs": {
+            "name": "id"
+          },
+          "steps": [
+            "Patient attempts to request"
+          ],
+          "expected": [
+            "System should grant access"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Gherkin parse error: Parser errors:",
+      "artifact": "Feature: System Access and User Management\n\n  Scenario: System availability on specified pin codes\n  Given the system is configured with specified pin codes in the Parameter Control File\n  When a user attempts to access the system from a non-specified pin code\n  Then the system should deny access\n\n  Scenario Outline: System access for different pin codes\n  Given the system is configured with specified pin codes in the Parameter Control File\n  When a user attempts to access the system from <pin_code>\n  Then the system should <access_result>\n\n  Examples:\n    | pin_code | access_result |\n    | 1234     | deny access    |\n    | 5678     | allow access   |\n\nFeature: User Login and Password Management\n\n  Scenario: User login with valid credentials\n  Given a user has valid login credentials\n  When the user attempts to log in\n  Then the system should grant access\n\n  Scenario Outline: User login with different credentials\n  Given a user has <credentials>\n  When the user attempts to log in\n  Then the system should <login_result>\n\n  Examples:\n    | credentials | login_result |\n    | valid       | grant access   |\n    | invalid     | deny access    |\n\nFeature: Doctor and Speciality Linkage\n\n  Scenario: Doctor linked to a speciality\n  Given a doctor is linked to a speciality\n  When the doctor attempts to access the speciality\n  Then the system should grant access\n\n  Scenario Outline: Doctor access to multiple specialities\n  Given a doctor is linked to <specialities>\n  When the doctor attempts to access the specialities\n  Then the system should <access_result>\n\n  Examples:\n    | specialities | access_result |\n    | single       | grant access   |\n    | multiple    | deny access    |\n\nFeature: Patient and Doctor Linkage\n\n  Scenario: Patient linked to a doctor\n  Given a patient is linked to a doctor\n  When the patient attempts to access the doctor\n  Then the system should grant access\n\n  Scenario Outline: Patient access to multiple doctors\n  Given a patient is linked to <doctors>\n  When the patient attempts to access the doctors\n  Then the system should <access_result>\n\n  Examples:\n    | doctors | access_result |\n    | single   | grant access   |\n    | multiple | deny access    |\n\nFeature: Patient Registration and Consultation Requests\n\n  Scenario: Patient registration with unique id\n  Given a patient registers with a unique id\n  When the patient attempts to register\n  Then the system should grant access\n\n  Scenario Outline: Patient registration with different ids\n  Given a patient registers with <id>\n  When the patient attempts to register\n  Then the system should <registration_result>\n\n  Examples:\n    | id | registration_result |\n    | unique | grant access   |\n    | duplicate | deny access    |\n\n  Scenario: Patient consultation request\n  Given a patient requests a consultation\n  When the patient attempts to request\n  Then the system should grant access\n\n  Scenario Outline: Patient consultation request with different ids\n  Given a patient requests <id>\n  When the patient attempts to request\n  Then the system should <request_result>\n\n  Examples:\n    | id | request_result |\n    | unique | grant access   |\n    | duplicate | deny access    |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "System access on non-specified pin codes",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is configured with specified pin codes in the Parameter Control File"
+          ],
+          "inputs": {
+            "name": "pin_code"
+          },
+          "steps": [
+            "User attempts to access the system from <pin_code>"
+          ],
+          "expected": [
+            "System should deny access"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "User login with valid credentials",
+          "req_ids": [
+            "BR-2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A user has valid login credentials"
+          ],
+          "inputs": {
+            "name": "credentials"
+          },
+          "steps": [
+            "User attempts to log in"
+          ],
+          "expected": [
+            "System should grant access"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor linked to a single speciality",
+          "req_ids": [
+            "BR-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A doctor is linked to a speciality"
+          ],
+          "inputs": {
+            "name": "specialities"
+          },
+          "steps": [
+            "Doctor attempts to access the speciality"
+          ],
+          "expected": [
+            "System should grant access"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Patient linked to a single doctor",
+          "req_ids": [
+            "BR-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is linked to a doctor"
+          ],
+          "inputs": {
+            "name": "doctors"
+          },
+          "steps": [
+            "Patient attempts to access the doctor"
+          ],
+          "expected": [
+            "System should grant access"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Patient registration with unique id",
+          "req_ids": [
+            "BR-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient registers with a unique id"
+          ],
+          "inputs": {
+            "name": "id"
+          },
+          "steps": [
+            "Patient attempts to register"
+          ],
+          "expected": [
+            "System should grant access"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient consultation request with unique id",
+          "req_ids": [
+            "BR-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient requests a consultation with a unique id"
+          ],
+          "inputs": {
+            "name": "id"
+          },
+          "steps": [
+            "Patient attempts to request"
+          ],
+          "expected": [
+            "System should grant access"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    }
+  ]
+}

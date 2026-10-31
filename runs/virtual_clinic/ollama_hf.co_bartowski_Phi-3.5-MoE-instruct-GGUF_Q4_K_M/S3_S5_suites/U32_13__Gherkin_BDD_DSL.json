@@ -1,0 +1,1252 @@
+{
+  "unit_id": "U32_13",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:hf.co/bartowski/Phi-3.5-MoE-instruct-GGUF:Q4_K_M",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 0.333,
+    "groundedness_mg": 0.5714,
+    "hallucinated": [
+      {
+        "value": "29 days ago",
+        "context": "backup rotation date",
+        "grounded": false
+      },
+      {
+        "value": "29 days old",
+        "context": "backup data age",
+        "grounded": false
+      },
+      {
+        "value": "29 days old",
+        "context": "user-id age",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 7,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Separate scenarios for each requirement clause to satisfy unique mapping.",
+      "Use Scenario Outline with Examples for each scenario to cover normal, edge, and invalid values.",
+      "Replace vague assertions with concrete state checks (e.g., verify backup timestamp, password complexity, report content).",
+      "Correct boundary test preconditions (e.g., use 30 days old for backup rotation, last day of month for reports).",
+      "Remove incorrect boundary tests that refer to unrelated clauses."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.4823,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: System Backup and User Authentication\n\n  Scenario: Nightly Backup and Password Change\n  Given the system is operational at the end of the day\n  When the system initiates a full backup\n  Then the backup data should be sent to the remote site\n  And the backup data should be rotated every 30 days\n\n  Scenario: Password Change for Doctors/Chemists/Labs\n  Given a doctor, chemist, or lab has valid credentials\n  When they attempt to change their password\n  Then the system should accept the new password\n\n  Scenario: Patient Registration and User-id Creation\n  Given a patient is registering\n  When they create a user-id and password\n  Then the system should use the user-id for authentication\n\n  Scenario: Doctor Appointment Report Generation\n  Given a doctor is logged in\n  When they request an appointment report for the next 5 days\n  Then the system should generate the report\n\n  Scenario: Speciality Consultation Report Generation\n  Given a doctor is logged in\n  When they request a consultation report for the last day of the month\n  Then the system should generate the report\n\n  Scenario: Speciality Revenue Report Generation\n  Given a doctor is logged in\n  When they request a revenue report for the last day of the month\n  Then the system should generate the report\n\n\nExamples:\n  | Backup rotation | Date       | Expected outcome |\n  | 1st rotation    | 30 days ago | Success          |\n  | 2nd rotation    | 29 days ago | Success          |\n  | ...            | ...        | ...             |\n  | 30th rotation   | Today      | Success          |\n\n  | Password change | New password | Success          |\n  | Password change | Old password | Failure          |\n  | Password change | Empty       | Failure          |\n  | User-id creation | Valid id    | Success          |\n  | User-id creation | Invalid id  | Failure          |\n  | User-id creation | Empty       | Failure          |\n  | Appointment report | Valid request | Success          |\n  | Appointment report | Invalid request | Failure          |\n  | Consultation report | Valid request | Success          |\n  | Consultation report | Invalid request | Failure          |\n  | Revenue report | Valid request | Success          |\n  | Revenue report | Invalid request | Failure          |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Nightly Backup and Password Change",
+      "req_ids": [
+        "Req-13",
+        "VIRTUA-13-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is operational at the end of the day"
+      ],
+      "inputs": {
+        "name": "system status"
+      },
+      "steps": [
+        "Initiate full backup",
+        "Send backup to remote site",
+        "Rotate backup"
+      ],
+      "expected": [
+        "Backup data sent to remote site",
+        "Backup data rotated"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Password Change for Doctors/Chemists/Labs",
+      "req_ids": [
+        "VIRTUA-13-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A doctor, chemist, or lab has valid credentials"
+      ],
+      "inputs": {
+        "name": "credentials"
+      },
+      "steps": [
+        "Change password"
+      ],
+      "expected": [
+        "New password accepted"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Patient Registration and User-id Creation",
+      "req_ids": [
+        "Req-16",
+        "VIRTUA-13-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A patient is registering"
+      ],
+      "inputs": {
+        "name": "user-id and password"
+      },
+      "steps": [
+        "Create user-id and password"
+      ],
+      "expected": [
+        "User-id used for authentication"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Doctor Appointment Report Generation",
+      "req_ids": [
+        "Req-16",
+        "VIRTUA-13-3.1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A doctor is logged in"
+      ],
+      "inputs": {
+        "name": "request for appointment report"
+      },
+      "steps": [
+        "Request appointment report"
+      ],
+      "expected": [
+        "Appointment report generated"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Speciality Consultation Report Generation",
+      "req_ids": [
+        "Req-16",
+        "VIRTUA-13-3.2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A doctor is logged in"
+      ],
+      "inputs": {
+        "name": "request for consultation report"
+      },
+      "steps": [
+        "Request consultation report"
+      ],
+      "expected": [
+        "Consultation report generated"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Speciality Revenue Report Generation",
+      "req_ids": [
+        "Req-16",
+        "VIRTUA-13-3.3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A doctor is logged in"
+      ],
+      "inputs": {
+        "name": "request for revenue report"
+      },
+      "steps": [
+        "Request revenue report"
+      ],
+      "expected": [
+        "Revenue report generated"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Boundary Test - Backup Rotation",
+      "req_ids": [
+        "Req-13"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Backup data is 29 days old"
+      ],
+      "inputs": {
+        "name": "backup data age"
+      },
+      "steps": [
+        "Rotate backup"
+      ],
+      "expected": [
+        "Backup data rotated"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Boundary Test - Password Change",
+      "req_ids": [
+        "VIRTUA-13-1"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Backup data is 29 days old"
+      ],
+      "inputs": {
+        "name": "credentials"
+      },
+      "steps": [
+        "Change password"
+      ],
+      "expected": [
+        "New password accepted"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Boundary Test - User-id Creation",
+      "req_ids": [
+        "VIRTUA-13-2"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "User-id is 29 days old"
+      ],
+      "inputs": {
+        "name": "user-id"
+      },
+      "steps": [
+        "Create user-id and password"
+      ],
+      "expected": [
+        "User-id used for authentication"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Boundary Test - Appointment Report",
+      "req_ids": [
+        "VIRTUA-13-3.1"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "User-id is 29 days old"
+      ],
+      "inputs": {
+        "name": "user-id"
+      },
+      "steps": [
+        "Create user-id and password"
+      ],
+      "expected": [
+        "User-id used for authentication"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Boundary Test - Consultation Report",
+      "req_ids": [
+        "VIRTUA-13-3.2"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "User-id is 29 days old"
+      ],
+      "inputs": {
+        "name": "user-id"
+      },
+      "steps": [
+        "Create user-id and password"
+      ],
+      "expected": [
+        "User-id used for authentication"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Boundary Test - Revenue Report",
+      "req_ids": [
+        "VIRTUA-13-3.3"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "User-id is 29 days old"
+      ],
+      "inputs": {
+        "name": "user-id"
+      },
+      "steps": [
+        "Create user-id and password"
+      ],
+      "expected": [
+        "User-id used for authentication"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: System Backup and User Authentication\n\n  Scenario: Nightly Backup and Password Change\n  Given the system is operational at the end of the day\n  When the system initiates a full backup\n  Then the backup data should be sent to the remote site\n  And the backup data should be rotated every 30 days\n\n  Scenario: Password Change for Doctors/Chemists/Labs\n  Given a doctor, chemist, or lab has valid credentials\n  When they attempt to change their password\n  Then the system should accept the new password\n\n  Scenario: Patient Registration and User-id Creation\n  Given a patient is registering\n  When they create a user-id and password\n  Then the system should use the user-id for authentication\n\n  Scenario: Doctor Appointment Report Generation\n  Given a doctor is logged in\n  When they request an appointment report for the next 5 days\n  Then the system should generate the report\n\n  Scenario: Speciality Consultation Report Generation\n  Given a doctor is logged in\n  When they request a consultation report for the last day of the month\n  Then the system should generate the report\n\n  Scenario: Speciality Revenue Report Generation\n  Given a doctor is logged in\n  When they request a revenue report for the last day of the month\n  Then the system should generate the report\n\n\nExamples:\n  | Backup rotation | Date       | Expected outcome |\n  | 1st rotation    | 30 days ago | Success          |\n  | 2nd rotation    | 29 days ago | Success          |\n  | ...            | ...        | ...             |\n  | 30th rotation   | Today      | Success          |\n\n  | Password change | New password | Success          |\n  | Password change | Old password | Failure          |\n  | Password change | Empty       | Failure          |\n  | User-id creation | Valid id    | Success          |\n  | User-id creation | Invalid id  | Failure          |\n  | User-id creation | Empty       | Failure          |\n  | Appointment report | Valid request | Success          |\n  | Appointment report | Invalid request | Failure          |\n  | Consultation report | Valid request | Success          |\n  | Consultation report | Invalid request | Failure          |\n  | Revenue report | Valid request | Success          |\n  | Revenue report | Invalid request | Failure          |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Nightly Backup and Password Change",
+          "req_ids": [
+            "Req-13",
+            "VIRTUA-13-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational at the end of the day"
+          ],
+          "inputs": {
+            "name": "system status"
+          },
+          "steps": [
+            "Initiate full backup",
+            "Send backup to remote site",
+            "Rotate backup"
+          ],
+          "expected": [
+            "Backup data sent to remote site",
+            "Backup data rotated"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Password Change for Doctors/Chemists/Labs",
+          "req_ids": [
+            "VIRTUA-13-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A doctor, chemist, or lab has valid credentials"
+          ],
+          "inputs": {
+            "name": "credentials"
+          },
+          "steps": [
+            "Change password"
+          ],
+          "expected": [
+            "New password accepted"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Patient Registration and User-id Creation",
+          "req_ids": [
+            "Req-16",
+            "VIRTUA-13-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is registering"
+          ],
+          "inputs": {
+            "name": "user-id and password"
+          },
+          "steps": [
+            "Create user-id and password"
+          ],
+          "expected": [
+            "User-id used for authentication"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Doctor Appointment Report Generation",
+          "req_ids": [
+            "Req-16",
+            "VIRTUA-13-3.1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A doctor is logged in"
+          ],
+          "inputs": {
+            "name": "request for appointment report"
+          },
+          "steps": [
+            "Request appointment report"
+          ],
+          "expected": [
+            "Appointment report generated"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Speciality Consultation Report Generation",
+          "req_ids": [
+            "Req-16",
+            "VIRTUA-13-3.2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A doctor is logged in"
+          ],
+          "inputs": {
+            "name": "request for consultation report"
+          },
+          "steps": [
+            "Request consultation report"
+          ],
+          "expected": [
+            "Consultation report generated"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Speciality Revenue Report Generation",
+          "req_ids": [
+            "Req-16",
+            "VIRTUA-13-3.3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A doctor is logged in"
+          ],
+          "inputs": {
+            "name": "request for revenue report"
+          },
+          "steps": [
+            "Request revenue report"
+          ],
+          "expected": [
+            "Revenue report generated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Boundary Test - Backup Rotation",
+          "req_ids": [
+            "Req-13"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Backup data is 29 days old"
+          ],
+          "inputs": {
+            "name": "backup data age"
+          },
+          "steps": [
+            "Rotate backup"
+          ],
+          "expected": [
+            "Backup data rotated"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Boundary Test - Password Change",
+          "req_ids": [
+            "VIRTUA-13-1"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Backup data is 29 days old"
+          ],
+          "inputs": {
+            "name": "credentials"
+          },
+          "steps": [
+            "Change password"
+          ],
+          "expected": [
+            "New password accepted"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Boundary Test - User-id Creation",
+          "req_ids": [
+            "VIRTUA-13-2"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User-id is 29 days old"
+          ],
+          "inputs": {
+            "name": "user-id"
+          },
+          "steps": [
+            "Create user-id and password"
+          ],
+          "expected": [
+            "User-id used for authentication"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Boundary Test - Appointment Report",
+          "req_ids": [
+            "VIRTUA-13-3.1"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User-id is 29 days old"
+          ],
+          "inputs": {
+            "name": "user-id"
+          },
+          "steps": [
+            "Create user-id and password"
+          ],
+          "expected": [
+            "User-id used for authentication"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Boundary Test - Consultation Report",
+          "req_ids": [
+            "VIRTUA-13-3.2"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User-id is 29 days old"
+          ],
+          "inputs": {
+            "name": "user-id"
+          },
+          "steps": [
+            "Create user-id and password"
+          ],
+          "expected": [
+            "User-id used for authentication"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Boundary Test - Revenue Report",
+          "req_ids": [
+            "VIRTUA-13-3.3"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User-id is 29 days old"
+          ],
+          "inputs": {
+            "name": "user-id"
+          },
+          "steps": [
+            "Create user-id and password"
+          ],
+          "expected": [
+            "User-id used for authentication"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.333,
+        "groundedness_mg": 0.5714,
+        "hallucinated": [
+          {
+            "value": "29 days ago",
+            "context": "backup rotation date",
+            "grounded": false
+          },
+          {
+            "value": "29 days old",
+            "context": "backup data age",
+            "grounded": false
+          },
+          {
+            "value": "29 days old",
+            "context": "user-id age",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 7,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Separate scenarios for each requirement clause to satisfy unique mapping.",
+          "Use Scenario Outline with Examples for each scenario to cover normal, edge, and invalid values.",
+          "Replace vague assertions with concrete state checks (e.g., verify backup timestamp, password complexity, report content).",
+          "Correct boundary test preconditions (e.g., use 30 days old for backup rotation, last day of month for reports).",
+          "Remove incorrect boundary tests that refer to unrelated clauses."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.4823,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.4823; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.333, 'groundedness_mg': 0.5714}). Output the full improved suite addressing:\n- ungrounded value '29 days ago' (backup rotation date): remove or use the SRS value\n- ungrounded value '29 days old' (backup data age): remove or use the SRS value\n- ungrounded value '29 days old' (user-id age): remove or use the SRS value\n- Separate scenarios for each requirement clause to satisfy unique mapping.\n- Use Scenario Outline with Examples for each scenario to cover normal, edge, and invalid values.\n- Replace vague assertions with concrete state checks (e.g., verify backup timestamp, password complexity, report content).\n- Correct boundary test preconditions (e.g., use 30 days old for backup rotation, last day of month for reports).\n- Remove incorrect boundary tests that refer to unrelated clauses.",
+      "artifact": "Feature: System Backup and User Authentication\n\n  Scenario: Nightly Backup Rotation\n  Given the system is operational at the end of the day\n  When the backup process is initiated\n  Then the backup should be completed and sent to the remote site\n  And the backup rotation should be set for 30 days from the current date\n\n  Scenario Outline: Backup Rotation Examples\n    | Backup Date       | Expected Result                                  |\n    | <Today + 30 days> | Backup is successfully rotated and stored remotely |\n    | <Today + 29 days> | Backup is pending rotation, not yet stored remotely |\n    | <Today + 1 day>  | Backup is overdue, rotation failed                 |\n\n  Scenario: User Password Change\n  Given a user is logged in with valid credentials\n  When the user requests to change their password\n  Then the password change should be processed\n  And the user should be able to log in with the new credentials\n\n  Scenario Outline: Password Change Examples\n    | New Password | Expected Result                                  |\n    | <Valid Password> | Password change is successful, user can log in |\n    | <Invalid Password> | Password change fails, user cannot log in |\n\n  Scenario: Patient Registration and User-id Creation\n  Given a patient is registering for the first time\n  When the patient is prompted to create a user-id and password\n  Then the user-id and password should be created\n  And the patient should be able to log in with the new credentials\n\n  Scenario Outline: User-id Creation Examples\n    | User-id and Password | Expected Result                                  |\n    | <Valid User-id and Password> | User-id and password creation is successful, patient can log in |\n    | <Invalid User-id and Password> | User-id and password creation fails, patient cannot log in |\n\n  Scenario: Doctor Appointment Report Generation\n  Given it is the last day of the month\n  When the system generates the doctor appointment report\n  Then the report should contain appointments for the next 5 days\n\n  Scenario Outline: Doctor Appointment Report Examples\n    | Report Content | Expected Result                                  |\n    | <Valid Appointments> | Report contains valid appointments for the next 5 days |\n    | <Invalid Appointments> | Report contains invalid appointments for the next 5 days |\n\n  Scenario: Speciality Consultation Report Generation\n  Given it is the last day of the month\n  When the system generates the speciality consultation report\n  Then the report should contain consultations for the current month/quarter/year\n\n  Scenario Outline: Speciality Consultation Report Examples\n    | Report Content | Expected Result                                  |\n    | <Valid Consultations> | Report contains valid consultations for the current month/quarter/year |\n    | <Invalid Consultations> | Report contains invalid consultations for the current month/quarter/year |\n\n  Scenario: Speciality Revenue Report Generation\n  Given it is the last day of the month\n  When the system generates the speciality revenue report\n  Then the report should contain revenue for the current month/quarter/year\n\n  Scenario Outline: Speciality Revenue Report Examples\n    | Report Content | Expected Result                                  |\n    | <Valid Revenue> | Report contains valid revenue for the current month/quarter/year |\n    | <Invalid Revenue> | Report contains invalid revenue for the current month/quarter/year |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Nightly Backup Rotation",
+          "req_ids": [
+            "Req-13",
+            "VIRTUA-13-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System operational at end of day"
+          ],
+          "inputs": {
+            "name": "Backup Date"
+          },
+          "steps": [
+            "Backup process initiated",
+            "Backup rotation set for 30 days"
+          ],
+          "expected": [
+            "Backup is successfully rotated and stored remotely"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Backup Rotation Edge Case",
+          "req_ids": [
+            "Req-13"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System operational at end of day"
+          ],
+          "inputs": {
+            "name": "Backup Date"
+          },
+          "steps": [
+            "Backup process initiated",
+            "Backup rotation set for 30 days"
+          ],
+          "expected": [
+            "Backup is pending rotation, not yet stored remotely"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Backup Rotation Failure",
+          "req_ids": [
+            "Req-13"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System operational at end of day"
+          ],
+          "inputs": {
+            "name": "Backup Date"
+          },
+          "steps": [
+            "Backup process initiated",
+            "Backup rotation set for 30 days"
+          ],
+          "expected": [
+            "Backup is overdue, rotation failed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "User Password Change",
+          "req_ids": [
+            "VIRTUA-13-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is logged in with valid credentials"
+          ],
+          "inputs": {
+            "name": "New Password"
+          },
+          "steps": [
+            "Password change is processed"
+          ],
+          "expected": [
+            "User can log in with new credentials"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "User Password Change Failure",
+          "req_ids": [
+            "VIRTUA-13-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User is logged in with valid credentials"
+          ],
+          "inputs": {
+            "name": "New Password"
+          },
+          "steps": [
+            "Password change fails"
+          ],
+          "expected": [
+            "User cannot log in with new credentials"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient Registration and User-id Creation",
+          "req_ids": [
+            "VIRTUA-13-3.1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registering for the first time"
+          ],
+          "inputs": {
+            "name": "User-id and Password"
+          },
+          "steps": [
+            "User-id and password creation",
+            "Patient can log in"
+          ],
+          "expected": [
+            "Patient can log in with new credentials"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient Registration and User-id Creation Failure",
+          "req_ids": [
+            "VIRTUA-13-3.1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient is registering for the first time"
+          ],
+          "inputs": {
+            "name": "User-id and Password"
+          },
+          "steps": [
+            "User-id and password creation fails",
+            "Patient cannot log in"
+          ],
+          "expected": [
+            "Patient cannot log in with new credentials"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Doctor Appointment Report Generation",
+          "req_ids": [
+            "VIRTUA-13-3.2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "It is the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report Content"
+          },
+          "steps": [
+            "Report contains valid appointments for the next 5 days"
+          ],
+          "expected": [
+            "Report contains valid appointments for the next 5 days"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Doctor Appointment Report Failure",
+          "req_ids": [
+            "VIRTUA-13-3.2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "It is the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report Content"
+          },
+          "steps": [
+            "Report contains invalid appointments for the next 5 days"
+          ],
+          "expected": [
+            "Report contains invalid appointments for the next 5 days"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Speciality Consultation Report Generation",
+          "req_ids": [
+            "VIRTUA-13-3.3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "It is the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report Content"
+          },
+          "steps": [
+            "Report contains valid consultations for the current month/quarter/year"
+          ],
+          "expected": [
+            "Report contains valid consultations for the current month/quarter/year"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Speciality Consultation Report Failure",
+          "req_ids": [
+            "VIRTUA-13-3.3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "It is the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report Content"
+          },
+          "steps": [
+            "Report contains invalid consultations for the current month/quarter/year"
+          ],
+          "expected": [
+            "Report contains invalid consultations for the current month/quarter/year"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Speciality Revenue Report Generation",
+          "req_ids": [
+            "VIRTUA-13-3.4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "It is the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report Content"
+          },
+          "steps": [
+            "Report contains valid revenue for the current month/quarter/year"
+          ],
+          "expected": [
+            "Report contains valid revenue for the current month/quarter/year"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Speciality Revenue Report Failure",
+          "req_ids": [
+            "VIRTUA-13-3.4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "It is the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report Content"
+          },
+          "steps": [
+            "Report contains invalid revenue for the current month/quarter/year"
+          ],
+          "expected": [
+            "Report contains invalid revenue for the current month/quarter/year"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.8462,
+        "representation_score": 0.8,
+        "sfv_score": 0.8231,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #12 (TC-012): traces to unknown requirement ids ['VIRTUA-13-3.4']",
+          "test case #13 (TC-013): traces to unknown requirement ids ['VIRTUA-13-3.4']",
+          "some scenarios have <2 steps (21 steps total)"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.82). Fix these problems and output the full corrected suite:\n- test case #12 (TC-012): traces to unknown requirement ids ['VIRTUA-13-3.4']\n- test case #13 (TC-013): traces to unknown requirement ids ['VIRTUA-13-3.4']\n- some scenarios have <2 steps (21 steps total)",
+      "artifact": "Feature: System Backup and User Authentication\n\n  Scenario: Nightly system backup rotation\n  Given the system is operational at the end of the day\n  When the backup process is initiated\n  Then the backup files should be stored at the remote site\n  And the backup files should be rotated every 30 days\n\n  Scenario Outline: Backup rotation with examples\n  | Backup type | Rotation period | Expected result                                  |\n  | Full       | 30 days        | Backup files stored and rotated correctly             |\n  | Full       | 60 days        | Backup files stored but not rotated correctly       |\n  | Incremental| 30 days        | Incremental backup files stored and rotated correctly |\n  | Incremental| 60 days        | Incremental backup files stored but not rotated correctly |\n\n  Scenario: User credential change\n  Given a user is authenticated\n  When the user changes their credentials\n  Then the system should accept the new credentials\n\n  Scenario Outline: Credential change with examples\n  | User type | Credential change | Expected result                                  |\n  | Doctor    | Password change    | Credentials accepted and updated                     |\n  | Chemist   | Password change    | Credentials accepted and updated                     |\n  | Lab       | Password change    | Credentials accepted and updated                     |\n  | Patient   | User-id creation    | User-id and password created and accepted           |\n\n  Scenario: Report generation\n  Given the system is operational\n  When the report generation is requested\n  Then the system should generate the requested report\n\n  Scenario Outline: Report generation with examples\n  | Report type                   | Expected result                                  |\n  | Doctor wise Appointment file | Next 5 days appointments                         |\n  | Speciality wise Consultations | Last day of the month consultations                 |\n  | Speciality wise Revenue | Last day of the month revenue                     |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Nightly system backup rotation",
+          "req_ids": [
+            "Req-13",
+            "VIRTUA-13-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System operational at end of day"
+          ],
+          "inputs": {
+            "name": "Backup type"
+          },
+          "steps": [
+            "Backup process is initiated",
+            "Backup files stored at remote site",
+            "Backup files rotated correctly"
+          ],
+          "expected": [
+            "Backup files stored and rotated correctly"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "User credential change",
+          "req_ids": [
+            "VIRTUA-13-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User authenticated"
+          ],
+          "inputs": {
+            "name": "Credential change"
+          },
+          "steps": [
+            "User changes credentials",
+            "System accepts new credentials"
+          ],
+          "expected": [
+            "Credentials accepted and updated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Report generation",
+          "req_ids": [
+            "Req-16",
+            "VIRTUA-13-3.1",
+            "VIRTUA-13-3.2",
+            "VIRTUA-13-3.3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System operational"
+          ],
+          "inputs": {
+            "name": "Report type"
+          },
+          "steps": [
+            "Report generation requested",
+            "System generates requested report"
+          ],
+          "expected": [
+            "Requested report generated"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": [
+          "some scenarios have <2 steps (10 steps total)"
+        ]
+      },
+      "fsa": {
+        "error": "ollama:gpt-oss:20b returned an empty response",
+        "fsa_pass": false,
+        "fsa_score": 0.0
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.0; sub-scores {'clause_coverage': None, 'negative_coverage': None, 'oracle_assertiveness': None, 'boundary_coverage': None, 'groundedness_mg': None}). Output the full improved suite addressing:",
+      "artifact": "Feature: System Backup and User Authentication\n\n  As a system administrator, I want to ensure that the system performs nightly backups and rotates them every 30 days.\n  As a doctor, I want to change my password and log in using my credentials.\n  As a patient, I want to create a user-id and password for authentication purposes.\n  As a system analyst, I want to generate specific reports for doctors, specialties, and patients.\n\nScenario Outline: System Backup and User Authentication\n  Given the system is operational at midnight\n    When the backup process starts\n      Then the backup of the database and code should be initiated\n      And the backup should be rotated every 30 days\n\n  Given a doctor has valid credentials\n    When the doctor changes the password\n      Then the system should accept the new password\n      And the doctor should be able to log in\n\n  Given a patient has valid credentials\n    When the patient creates a user-id and password\n      Then the system should accept the new credentials\n      And the patient should be able to authenticate\n\n  Given the system is operational on the last day of the month\n    When the report generation process starts\n      Then the system should generate the specified reports\n\nScenario Outline: Reports Generation\n  Given the system is operational on the last day of the month\n    When the report generation process starts\n      Then the system should generate the following reports:\n      - Doctor wise Appointment file for next 5 days\n      - Speciality wise - Number of Consultations by Doctor per month/quarter/year\n      - Speciality wise - Revenue Earned per month/quarter/year\n\nExamples:\n  | Backup rotation | Validity |\n  | Every 30 days | True |\n  | Every 31 days | False |\n\n  | Password change | Validity |\n  | Valid | True |\n  | Invalid | False |\n\n  | User-id creation | Validity |\n  | Valid | True |\n  | Invalid | False |\n\n  | Report generation | Validity |\n  | Valid | True |\n  | Invalid | False |\n\nGiven:\n  | Report type | Validity |\n  | Doctor wise Appointment | True |\n  | Speciality wise - Consultations | True |\n  | Speciality wise - Revenue | True |\n  | Invalid | False |\n\nGiven:\n  | Report timing | Validity |\n  | Last day of the month | True |\n  | Any other day | False |\n\nGiven:\n  | Report period | Validity |\n  | Next 5 days | True |\n  | Next 6 days | False |\n  | Next 30 days | False |\n  | Next 365 days | False |\n\nGiven:\n  | Report frequency | Validity |\n  | Monthly | True |\n  | Quarterly | True |\n  | Yearly | True |\n  | Invalid | False |\n\nGiven:\n  | Report type | Validity |\n  | Doctor wise Appointment | True |\n  | Speciality wise - Consultations | True |\n  | Speciality wise - Revenue | True |\n  | Invalid | False |\n\nGiven:\n  | Report period | Validity |\n  | Next 5 days | True |\n  | Next 6 days | False |\n  | Next 30 days | False |\n  | Next 365 days | False |\n\nGiven:\n  | Report frequency | Validity |\n  | Monthly | True |\n  | Quarterly | True |\n  | Yearly | True |\n  | Invalid | False |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "System Backup and User Authentication - Nightly Backup",
+          "req_ids": [
+            "Req-13",
+            "VIRTUA-13-1",
+            "VIRTUA-13-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System operational at midnight"
+          ],
+          "inputs": {
+            "name": "Backup process"
+          },
+          "steps": [
+            "Backup of the database and code should be initiated",
+            "Backup should be rotated every 30 days"
+          ],
+          "expected": [
+            "Backup initiated",
+            "Backup rotated"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "System Backup and User Authentication - Password Change",
+          "req_ids": [
+            "VIRTUA-13-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor has valid credentials"
+          ],
+          "inputs": {
+            "name": "Password"
+          },
+          "steps": [
+            "System should accept the new password",
+            "Doctor should be able to log in"
+          ],
+          "expected": [
+            "New password accepted",
+            "Doctor logged in"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "System Backup and User Authentication - User-id Creation",
+          "req_ids": [
+            "VIRTUA-13-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has valid credentials"
+          ],
+          "inputs": {
+            "name": "User-id and password"
+          },
+          "steps": [
+            "System should accept the new credentials",
+            "Patient should be able to authenticate"
+          ],
+          "expected": [
+            "New credentials accepted",
+            "Patient authenticated"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Reports Generation - Doctor wise Appointment",
+          "req_ids": [
+            "Req-16",
+            "VIRTUA-13-3.1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System operational on the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report generation process"
+          },
+          "steps": [
+            "System should generate the Doctor wise Appointment file for next 5 days"
+          ],
+          "expected": [
+            "Doctor wise Appointment file generated"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Reports Generation - Speciality wise Consultations",
+          "req_ids": [
+            "Req-16",
+            "VIRTUA-13-3.2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System operational on the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report generation process"
+          },
+          "steps": [
+            "System should generate the Speciality wise Consultations by Doctor per month/quarter/year"
+          ],
+          "expected": [
+            "Speciality wise Consultations file generated"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Reports Generation - Speciality wise Revenue",
+          "req_ids": [
+            "Req-16",
+            "VIRTUA-13-3.3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System operational on the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report generation process"
+          },
+          "steps": [
+            "System should generate the Speciality wise Revenue Earned per month/quarter/year"
+          ],
+          "expected": [
+            "Speciality wise Revenue file generated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Reports Generation - Report Timing",
+          "req_ids": [
+            "VIRTUA-13-3.1",
+            "VIRTUA-13-3.2",
+            "VIRTUA-13-3.3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System operational on the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report generation process"
+          },
+          "steps": [
+            "System should generate the reports on any other day"
+          ],
+          "expected": [
+            "Reports generated on any other day"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Reports Generation - Report Period",
+          "req_ids": [
+            "VIRTUA-13-3.1",
+            "VIRTUA-13-3.2",
+            "VIRTUA-13-3.3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System operational on the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report generation process"
+          },
+          "steps": [
+            "System should generate the reports on next 6 days"
+          ],
+          "expected": [
+            "Reports generated on next 6 days"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Reports Generation - Report Frequency",
+          "req_ids": [
+            "VIRTUA-13-3.1",
+            "VIRTUA-13-3.2",
+            "VIRTUA-13-3.3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System operational on the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report generation process"
+          },
+          "steps": [
+            "System should generate the reports on next 30 days"
+          ],
+          "expected": [
+            "Reports generated on next 30 days"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Reports Generation - Report Type",
+          "req_ids": [
+            "VIRTUA-13-3.1",
+            "VIRTUA-13-3.2",
+            "VIRTUA-13-3.3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System operational on the last day of the month"
+          ],
+          "inputs": {
+            "name": "Report generation process"
+          },
+          "steps": [
+            "System should generate the invalid report type"
+          ],
+          "expected": [
+            "Invalid report type generated"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,1231 @@
+{
+  "unit_id": "U16_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "standard",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "John",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": "Jane",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": "Bob",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": "Alice",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": "1990-01-01",
+        "context": "date of birth",
+        "grounded": false
+      },
+      {
+        "value": "1995-06-01",
+        "context": "date of birth",
+        "grounded": false
+      },
+      {
+        "value": "1980-03-01",
+        "context": "date of birth",
+        "grounded": false
+      },
+      {
+        "value": "1992-01-01",
+        "context": "date of birth",
+        "grounded": false
+      },
+      {
+        "value": "1 day",
+        "context": "rollback duration",
+        "grounded": false
+      },
+      {
+        "value": "month",
+        "context": "rollback duration",
+        "grounded": false
+      },
+      {
+        "value": "3 years",
+        "context": "consultation request window",
+        "grounded": false
+      },
+      {
+        "value": "Mangalore HQ",
+        "context": "location",
+        "grounded": false
+      },
+      {
+        "value": "25 KM",
+        "context": "distance",
+        "grounded": false
+      },
+      {
+        "value": "fire proof cabinet",
+        "context": "storage",
+        "grounded": false
+      },
+      {
+        "value": "dummy production system",
+        "context": "system",
+        "grounded": false
+      },
+      {
+        "value": "back-up",
+        "context": "backup",
+        "grounded": false
+      },
+      {
+        "value": "Patient is registered successfully",
+        "context": "message",
+        "grounded": false
+      },
+      {
+        "value": "Patient's details are updated successfully",
+        "context": "message",
+        "grounded": false
+      },
+      {
+        "value": "Deletion is not allowed due to pending consultation request",
+        "context": "message",
+        "grounded": false
+      },
+      {
+        "value": "Registration is not allowed due to duplicate patient",
+        "context": "message",
+        "grounded": false
+      },
+      {
+        "value": "Medicines are delivered successfully",
+        "context": "message",
+        "grounded": false
+      },
+      {
+        "value": "system is rolled back successfully",
+        "context": "message",
+        "grounded": false
+      },
+      {
+        "value": "Back-up is restored successfully",
+        "context": "message",
+        "grounded": false
+      },
+      {
+        "value": "Database is purged successfully",
+        "context": "message",
+        "grounded": false
+      },
+      {
+        "value": "Back-up is stored successfully",
+        "context": "message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 25,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Oracle assertions are vague; assert concrete status codes or DB state",
+      "No tests for invalid input values (e.g., bad DOB format)",
+      "No boundary tests for patient name length or special characters",
+      "Hardcoded names risk collisions; use unique identifiers",
+      "Missing concurrency/race condition tests for patient registration"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.73,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Patient Management\n\n  Scenario: Register a new Patient\n    Given a new patient with name \"John\" and date of birth \"1990-01-01\"\n    When I register the patient\n    Then the patient is registered successfully\n\n  Scenario: View and Update the details of an existing Patient\n    Given a patient with name \"Jane\" and date of birth \"1995-06-01\" is already registered\n    When I view the patient's details\n    And I update the patient's details\n    Then the patient's details are updated successfully\n\n  Scenario: Delete the Patient Details\n    Given a patient with name \"Bob\" and date of birth \"1980-03-01\" is already registered\n    And there is a consultation request for the patient within the last 3 years\n    When I try to delete the patient's details\n    Then the deletion is not allowed due to pending consultation request\n\n  Scenario: Rollback by a month\n    Given a patient with name \"Alice\" and date of birth \"1992-01-01\" is already registered\n    When I rollback the system by a month\n    Then the system is rolled back successfully\n\n  Scenario: Restore the back-up\n    Given a back-up of the system is available\n    When I restore the back-up on a dummy production system\n    Then the back-up is restored successfully\n\n  Scenario: Purge the dummy production database\n    Given a dummy production database is available\n    When I purge the database\n    Then the database is purged successfully\n\n  Scenario: Maintain the back-up in a fire proof cabinet\n    Given a fire proof cabinet is available in Mangalore HQ\n    When I store the back-up in the cabinet\n    Then the back-up is stored successfully\n\n  Scenario Outline: Medicines are delivered as prescribed by the doctor (offline)\n    Given a patient with name \"<patient_name>\" and date of birth \"<date_of_birth>\" is already registered\n    And a doctor has prescribed medicines for the patient\n    When I deliver the medicines to the patient\n    Then the medicines are delivered successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: View and Update the details of an existing Patient (latest details only)\n    Given a patient with name \"<patient_name>\" and date of birth \"<date_of_birth>\" is already registered\n    When I view the patient's details\n    And I update the patient's details\n    Then the patient's details are updated successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: Delete the Patient Details (pending consultation request)\n    Given a patient with name \"<patient_name>\" and date of birth \"<date_of_birth>\" is already registered\n    And there is a consultation request for the patient within the last 3 years\n    When I try to delete the patient's details\n    Then the deletion is not allowed due to pending consultation request\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: Rollback by a month (boundary tests)\n    Given a patient with name \"<patient_name>\" and date of birth \"<date_of_birth>\" is already registered\n    When I rollback the system by a month\n    Then the system is rolled back successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: Restore the back-up (boundary tests)\n    Given a back-up of the system is available\n    When I restore the back-up on a dummy production system\n    Then the back-up is restored successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: Purge the dummy production database (boundary tests)\n    Given a dummy production database is available\n    When I purge the database\n    Then the database is purged successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: Maintain the back-up in a fire proof cabinet (boundary tests)\n    Given a fire proof cabinet is available in Mangalore HQ\n    When I store the back-up in the cabinet\n    Then the back-up is stored successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario: Duplicate patient registration\n    Given a patient with name \"John\" and date of birth \"1990-01-01\" is already registered\n    When I try to register the patient again\n    Then the registration is not allowed due to duplicate patient\n\n  Scenario: Exact 3-year boundary for pending consultation request\n    Given a patient with name \"John\" and date of birth \"1990-01-01\" is already registered\n    And there is a consultation request for the patient exactly 3 years ago\n    When I try to delete the patient's details\n    Then the deletion is not allowed due to pending consultation request\n\n  Scenario: 1 day before/after rollback boundary\n    Given a patient with name \"John\" and date of birth \"1990-01-01\" is already registered\n    When I rollback the system by 1 day\n    Then the system is rolled back successfully\n\n  Scenario: 1 day before/after restore boundary\n    Given a back-up of the system is available\n    When I restore the back-up on a dummy production system\n    Then the back-up is restored successfully\n\n  Scenario: 1 day before/after purge boundary\n    Given a dummy production database is available\n    When I purge the database\n    Then the database is purged successfully\n\n  Scenario: 1 day before/after store boundary\n    Given a fire proof cabinet is available in Mangalore HQ\n    When I store the back-up in the cabinet\n    Then the back-up is stored successfully",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Register a new Patient",
+      "req_ids": [
+        "Req-5/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "No patient with the same name and date of birth exists"
+      ],
+      "inputs": {
+        "name": "John",
+        "date_of_birth": "1990-01-01"
+      },
+      "steps": [
+        "Register the patient"
+      ],
+      "expected": [
+        "Patient is registered successfully"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "View and Update the details of an existing Patient",
+      "req_ids": [
+        "Req-5/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient with the same name and date of birth exists"
+      ],
+      "inputs": {
+        "name": "Jane",
+        "date_of_birth": "1995-06-01"
+      },
+      "steps": [
+        "View the patient's details",
+        "Update the patient's details"
+      ],
+      "expected": [
+        "Patient's details are updated successfully"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Delete the Patient Details",
+      "req_ids": [
+        "Req-5/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient with the same name and date of birth exists",
+        "There is a consultation request for the patient within the last 3 years"
+      ],
+      "inputs": {
+        "name": "Bob",
+        "date_of_birth": "1980-03-01"
+      },
+      "steps": [
+        "Try to delete the patient's details"
+      ],
+      "expected": [
+        "Deletion is not allowed due to pending consultation request"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Rollback by a month",
+      "req_ids": [
+        "VIRTUA-5.5-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient with the same name and date of birth exists"
+      ],
+      "inputs": {
+        "name": "Alice",
+        "date_of_birth": "1992-01-01"
+      },
+      "steps": [
+        "Rollback the system by a month"
+      ],
+      "expected": [
+        "System is rolled back successfully"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Restore the back-up",
+      "req_ids": [
+        "VIRTUA-5.5-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Back-up of the system is available"
+      ],
+      "inputs": {
+        "name": "John",
+        "date_of_birth": "1990-01-01"
+      },
+      "steps": [
+        "Restore the back-up on a dummy production system"
+      ],
+      "expected": [
+        "Back-up is restored successfully"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Purge the dummy production database",
+      "req_ids": [
+        "VIRTUA-5.5-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Dummy production database is available"
+      ],
+      "inputs": {
+        "name": "Jane",
+        "date_of_birth": "1995-06-01"
+      },
+      "steps": [
+        "Purge the database"
+      ],
+      "expected": [
+        "Database is purged successfully"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Maintain the back-up in a fire proof cabinet",
+      "req_ids": [
+        "VIRTUA-5.5-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Fire proof cabinet is available in Mangalore HQ"
+      ],
+      "inputs": {
+        "name": "Bob",
+        "date_of_birth": "1980-03-01"
+      },
+      "steps": [
+        "Store the back-up in the cabinet"
+      ],
+      "expected": [
+        "Back-up is stored successfully"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Medicines are delivered as prescribed by the doctor (offline)",
+      "req_ids": [
+        "VIRTUA-5-17"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient with the same name and date of birth exists",
+        "Doctor has prescribed medicines for the patient"
+      ],
+      "inputs": {
+        "name": "John",
+        "date_of_birth": "1990-01-01"
+      },
+      "steps": [
+        "Deliver the medicines to the patient"
+      ],
+      "expected": [
+        "Medicines are delivered successfully"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Duplicate patient registration",
+      "req_ids": [
+        "Req-5/1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient with the same name and date of birth exists"
+      ],
+      "inputs": {
+        "name": "John",
+        "date_of_birth": "1990-01-01"
+      },
+      "steps": [
+        "Try to register the patient again"
+      ],
+      "expected": [
+        "Registration is not allowed due to duplicate patient"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Exact 3-year boundary for pending consultation request",
+      "req_ids": [
+        "Req-5/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient with the same name and date of birth exists",
+        "There is a consultation request for the patient exactly 3 years ago"
+      ],
+      "inputs": {
+        "name": "John",
+        "date_of_birth": "1990-01-01"
+      },
+      "steps": [
+        "Try to delete the patient's details"
+      ],
+      "expected": [
+        "Deletion is not allowed due to pending consultation request"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "1 day before/after rollback boundary",
+      "req_ids": [
+        "VIRTUA-5.5-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient with the same name and date of birth exists"
+      ],
+      "inputs": {
+        "name": "Alice",
+        "date_of_birth": "1992-01-01"
+      },
+      "steps": [
+        "Rollback the system by 1 day"
+      ],
+      "expected": [
+        "System is rolled back successfully"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "1 day before/after restore boundary",
+      "req_ids": [
+        "VIRTUA-5.5-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Back-up of the system is available"
+      ],
+      "inputs": {
+        "name": "John",
+        "date_of_birth": "1990-01-01"
+      },
+      "steps": [
+        "Restore the back-up on a dummy production system"
+      ],
+      "expected": [
+        "Back-up is restored successfully"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "1 day before/after purge boundary",
+      "req_ids": [
+        "VIRTUA-5.5-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Dummy production database is available"
+      ],
+      "inputs": {
+        "name": "Jane",
+        "date_of_birth": "1995-06-01"
+      },
+      "steps": [
+        "Purge the database"
+      ],
+      "expected": [
+        "Database is purged successfully"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "1 day before/after store boundary",
+      "req_ids": [
+        "VIRTUA-5.5-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Fire proof cabinet is available in Mangalore HQ"
+      ],
+      "inputs": {
+        "name": "Bob",
+        "date_of_birth": "1980-03-01"
+      },
+      "steps": [
+        "Store the back-up in the cabinet"
+      ],
+      "expected": [
+        "Back-up is stored successfully"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Patient Management\n\n  Scenario: Register a new Patient\n    Given a new patient with name \"John Doe\" and date of birth \"1990-01-01\"\n    When the patient is registered\n    Then the patient is saved in the database\n\n  Scenario: View and Update the details of an existing Patient\n    Given a patient with name \"Jane Doe\" and date of birth \"1995-06-01\" already registered\n    When the patient's details are viewed and updated\n    Then the latest details are saved in the database\n\n  Scenario: Delete the Patient Details\n    Given a patient with name \"Bob Smith\" and date of birth \"1980-03-01\" already registered\n    When the patient's details are deleted\n    Then the patient's details are not deleted if there is one or more Consultation Requests in last 3 years\n\n  Scenario: Rollback by a month\n    Given a patient with name \"Alice Johnson\" and date of birth \"1992-09-01\" already registered\n    When the system is rolled back by a month\n    Then the patient's details are restored to the previous state\n\n  Scenario: Restore back-up\n    Given a patient with name \"Mike Brown\" and date of birth \"1975-12-01\" already registered\n    When the back-up is restored\n    Then the patient's details are restored from the back-up\n\n  Scenario: Purge dummy production database\n    Given a patient with name \"Emma Taylor\" and date of birth \"1985-06-01\" already registered\n    When the dummy production database is purged\n    Then the patient's details are deleted from the dummy production database\n\n  Scenario: Store back-up in fire proof cabinet\n    Given a patient with name \"David Lee\" and date of birth \"1998-03-01\" already registered\n    When the back-up is stored in a fire proof cabinet 25 KM away from the Hospital\n    Then the back-up is stored in a fire proof cabinet 25 KM away from the Hospital",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Register a new Patient",
+          "req_ids": [
+            "VIRTUA-5-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "no patient registered"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "date_of_birth": "1990-01-01"
+          },
+          "steps": [
+            "register patient",
+            "verify patient saved in database"
+          ],
+          "expected": [
+            "patient saved in database"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update the details of an existing Patient",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient already registered"
+          ],
+          "inputs": {
+            "name": "Jane Doe",
+            "date_of_birth": "1995-06-01"
+          },
+          "steps": [
+            "view patient details",
+            "update patient details",
+            "verify latest details saved in database"
+          ],
+          "expected": [
+            "latest details saved in database"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete the Patient Details",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "patient already registered",
+            "one or more Consultation Requests in last 3 years"
+          ],
+          "inputs": {
+            "name": "Bob Smith",
+            "date_of_birth": "1980-03-01"
+          },
+          "steps": [
+            "delete patient details",
+            "verify patient details not deleted"
+          ],
+          "expected": [
+            "patient details not deleted"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Rollback by a month",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient already registered"
+          ],
+          "inputs": {
+            "name": "Alice Johnson",
+            "date_of_birth": "1992-09-01"
+          },
+          "steps": [
+            "rollback system by a month",
+            "verify patient details restored to previous state"
+          ],
+          "expected": [
+            "patient details restored to previous state"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Restore back-up",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "back-up available"
+          ],
+          "inputs": {
+            "name": "Mike Brown",
+            "date_of_birth": "1975-12-01"
+          },
+          "steps": [
+            "restore back-up",
+            "verify patient details restored from back-up"
+          ],
+          "expected": [
+            "patient details restored from back-up"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Purge dummy production database",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "dummy production database available"
+          ],
+          "inputs": {
+            "name": "Emma Taylor",
+            "date_of_birth": "1985-06-01"
+          },
+          "steps": [
+            "purge dummy production database",
+            "verify patient details deleted from dummy production database"
+          ],
+          "expected": [
+            "patient details deleted from dummy production database"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Store back-up in fire proof cabinet",
+          "req_ids": [
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "fire proof cabinet available"
+          ],
+          "inputs": {
+            "name": "David Lee",
+            "date_of_birth": "1998-03-01"
+          },
+          "steps": [
+            "store back-up in fire proof cabinet",
+            "verify back-up stored in fire proof cabinet"
+          ],
+          "expected": [
+            "back-up stored in fire proof cabinet"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 0.2,
+        "groundedness_mg": 0.3,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "1990-01-01",
+            "context": "date of birth",
+            "grounded": false
+          },
+          {
+            "value": "Jane Doe",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "1995-06-01",
+            "context": "date of birth",
+            "grounded": false
+          },
+          {
+            "value": "Bob Smith",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "1980-03-01",
+            "context": "date of birth",
+            "grounded": false
+          },
+          {
+            "value": "Alice Johnson",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "1992-09-01",
+            "context": "date of birth",
+            "grounded": false
+          },
+          {
+            "value": "Mike Brown",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "1975-12-01",
+            "context": "date of birth",
+            "grounded": false
+          },
+          {
+            "value": "Emma Taylor",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "1985-06-01",
+            "context": "date of birth",
+            "grounded": false
+          },
+          {
+            "value": "David Lee",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "1998-03-01",
+            "context": "date of birth",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 20,
+        "uncovered_clauses": [
+          "VIRTUA-5-17"
+        ],
+        "weaknesses": [
+          "Mislabeling of requirement in TC-001 (references VIRTUA-5-17 instead of Req-5/1).",
+          "No negative test for Register a new Patient (e.g., duplicate patient).",
+          "No boundary tests for \"last 3 years\" (exact 3-year boundary).",
+          "No boundary tests for \"rollback by a month\" (e.g., 1 day before/after).",
+          "Concrete values (patient names, dates) are arbitrary and not grounded; tests should use realistic or parameterized data."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "Req-5/1"
+        ],
+        "fsa_score": 0.5925,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.5925; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.3, 'boundary_coverage': 0.2, 'groundedness_mg': 0.3}). Output the full improved suite addressing:\n- requirements with NO test case: ['Req-5/1'] (add at least one each)\n- uncovered clause: VIRTUA-5-17\n- ungrounded value 'John Doe' (patient name): remove or use the SRS value\n- ungrounded value '1990-01-01' (date of birth): remove or use the SRS value\n- ungrounded value 'Jane Doe' (patient name): remove or use the SRS value\n- ungrounded value '1995-06-01' (date of birth): remove or use the SRS value\n- ungrounded value 'Bob Smith' (patient name): remove or use the SRS value\n- ungrounded value '1980-03-01' (date of birth): remove or use the SRS value\n- Mislabeling of requirement in TC-001 (references VIRTUA-5-17 instead of Req-5/1).\n- No negative test for Register a new Patient (e.g., duplicate patient).\n- No boundary tests for \"last 3 years\" (exact 3-year boundary).\n- No boundary tests for \"rollback by a month\" (e.g., 1 day before/after).\n- Concrete values (patient names, dates) are arbitrary and not grounded; tests should use realistic or parameterized data.",
+      "artifact": "Feature: Patient Management\n\n  Scenario: Register a new Patient\n    Given a new patient with name \"John\" and date of birth \"1990-01-01\"\n    When I register the patient\n    Then the patient is registered successfully\n\n  Scenario: View and Update the details of an existing Patient\n    Given a patient with name \"Jane\" and date of birth \"1995-06-01\" is already registered\n    When I view the patient's details\n    And I update the patient's details\n    Then the patient's details are updated successfully\n\n  Scenario: Delete the Patient Details\n    Given a patient with name \"Bob\" and date of birth \"1980-03-01\" is already registered\n    And there is a consultation request for the patient within the last 3 years\n    When I try to delete the patient's details\n    Then the deletion is not allowed due to pending consultation request\n\n  Scenario: Rollback by a month\n    Given a patient with name \"Alice\" and date of birth \"1992-01-01\" is already registered\n    When I rollback the system by a month\n    Then the system is rolled back successfully\n\n  Scenario: Restore the back-up\n    Given a back-up of the system is available\n    When I restore the back-up on a dummy production system\n    Then the back-up is restored successfully\n\n  Scenario: Purge the dummy production database\n    Given a dummy production database is available\n    When I purge the database\n    Then the database is purged successfully\n\n  Scenario: Maintain the back-up in a fire proof cabinet\n    Given a fire proof cabinet is available in Mangalore HQ\n    When I store the back-up in the cabinet\n    Then the back-up is stored successfully\n\n  Scenario Outline: Medicines are delivered as prescribed by the doctor (offline)\n    Given a patient with name \"<patient_name>\" and date of birth \"<date_of_birth>\" is already registered\n    And a doctor has prescribed medicines for the patient\n    When I deliver the medicines to the patient\n    Then the medicines are delivered successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: View and Update the details of an existing Patient (latest details only)\n    Given a patient with name \"<patient_name>\" and date of birth \"<date_of_birth>\" is already registered\n    When I view the patient's details\n    And I update the patient's details\n    Then the patient's details are updated successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: Delete the Patient Details (pending consultation request)\n    Given a patient with name \"<patient_name>\" and date of birth \"<date_of_birth>\" is already registered\n    And there is a consultation request for the patient within the last 3 years\n    When I try to delete the patient's details\n    Then the deletion is not allowed due to pending consultation request\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: Rollback by a month (boundary tests)\n    Given a patient with name \"<patient_name>\" and date of birth \"<date_of_birth>\" is already registered\n    When I rollback the system by a month\n    Then the system is rolled back successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: Restore the back-up (boundary tests)\n    Given a back-up of the system is available\n    When I restore the back-up on a dummy production system\n    Then the back-up is restored successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: Purge the dummy production database (boundary tests)\n    Given a dummy production database is available\n    When I purge the database\n    Then the database is purged successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario Outline: Maintain the back-up in a fire proof cabinet (boundary tests)\n    Given a fire proof cabinet is available in Mangalore HQ\n    When I store the back-up in the cabinet\n    Then the back-up is stored successfully\n    Examples:\n      | patient_name | date_of_birth |\n      | John         | 1990-01-01     |\n      | Jane         | 1995-06-01     |\n      | Bob          | 1980-03-01     |\n      | Alice        | 1992-01-01     |\n\n  Scenario: Duplicate patient registration\n    Given a patient with name \"John\" and date of birth \"1990-01-01\" is already registered\n    When I try to register the patient again\n    Then the registration is not allowed due to duplicate patient\n\n  Scenario: Exact 3-year boundary for pending consultation request\n    Given a patient with name \"John\" and date of birth \"1990-01-01\" is already registered\n    And there is a consultation request for the patient exactly 3 years ago\n    When I try to delete the patient's details\n    Then the deletion is not allowed due to pending consultation request\n\n  Scenario: 1 day before/after rollback boundary\n    Given a patient with name \"John\" and date of birth \"1990-01-01\" is already registered\n    When I rollback the system by 1 day\n    Then the system is rolled back successfully\n\n  Scenario: 1 day before/after restore boundary\n    Given a back-up of the system is available\n    When I restore the back-up on a dummy production system\n    Then the back-up is restored successfully\n\n  Scenario: 1 day before/after purge boundary\n    Given a dummy production database is available\n    When I purge the database\n    Then the database is purged successfully\n\n  Scenario: 1 day before/after store boundary\n    Given a fire proof cabinet is available in Mangalore HQ\n    When I store the back-up in the cabinet\n    Then the back-up is stored successfully",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Register a new Patient",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No patient with the same name and date of birth exists"
+          ],
+          "inputs": {
+            "name": "John",
+            "date_of_birth": "1990-01-01"
+          },
+          "steps": [
+            "Register the patient"
+          ],
+          "expected": [
+            "Patient is registered successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update the details of an existing Patient",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient with the same name and date of birth exists"
+          ],
+          "inputs": {
+            "name": "Jane",
+            "date_of_birth": "1995-06-01"
+          },
+          "steps": [
+            "View the patient's details",
+            "Update the patient's details"
+          ],
+          "expected": [
+            "Patient's details are updated successfully"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete the Patient Details",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient with the same name and date of birth exists",
+            "There is a consultation request for the patient within the last 3 years"
+          ],
+          "inputs": {
+            "name": "Bob",
+            "date_of_birth": "1980-03-01"
+          },
+          "steps": [
+            "Try to delete the patient's details"
+          ],
+          "expected": [
+            "Deletion is not allowed due to pending consultation request"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Rollback by a month",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient with the same name and date of birth exists"
+          ],
+          "inputs": {
+            "name": "Alice",
+            "date_of_birth": "1992-01-01"
+          },
+          "steps": [
+            "Rollback the system by a month"
+          ],
+          "expected": [
+            "System is rolled back successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Restore the back-up",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Back-up of the system is available"
+          ],
+          "inputs": {
+            "name": "John",
+            "date_of_birth": "1990-01-01"
+          },
+          "steps": [
+            "Restore the back-up on a dummy production system"
+          ],
+          "expected": [
+            "Back-up is restored successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Purge the dummy production database",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Dummy production database is available"
+          ],
+          "inputs": {
+            "name": "Jane",
+            "date_of_birth": "1995-06-01"
+          },
+          "steps": [
+            "Purge the database"
+          ],
+          "expected": [
+            "Database is purged successfully"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Maintain the back-up in a fire proof cabinet",
+          "req_ids": [
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Fire proof cabinet is available in Mangalore HQ"
+          ],
+          "inputs": {
+            "name": "Bob",
+            "date_of_birth": "1980-03-01"
+          },
+          "steps": [
+            "Store the back-up in the cabinet"
+          ],
+          "expected": [
+            "Back-up is stored successfully"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Medicines are delivered as prescribed by the doctor (offline)",
+          "req_ids": [
+            "VIRTUA-5-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient with the same name and date of birth exists",
+            "Doctor has prescribed medicines for the patient"
+          ],
+          "inputs": {
+            "name": "John",
+            "date_of_birth": "1990-01-01"
+          },
+          "steps": [
+            "Deliver the medicines to the patient"
+          ],
+          "expected": [
+            "Medicines are delivered successfully"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Duplicate patient registration",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient with the same name and date of birth exists"
+          ],
+          "inputs": {
+            "name": "John",
+            "date_of_birth": "1990-01-01"
+          },
+          "steps": [
+            "Try to register the patient again"
+          ],
+          "expected": [
+            "Registration is not allowed due to duplicate patient"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Exact 3-year boundary for pending consultation request",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient with the same name and date of birth exists",
+            "There is a consultation request for the patient exactly 3 years ago"
+          ],
+          "inputs": {
+            "name": "John",
+            "date_of_birth": "1990-01-01"
+          },
+          "steps": [
+            "Try to delete the patient's details"
+          ],
+          "expected": [
+            "Deletion is not allowed due to pending consultation request"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "1 day before/after rollback boundary",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient with the same name and date of birth exists"
+          ],
+          "inputs": {
+            "name": "Alice",
+            "date_of_birth": "1992-01-01"
+          },
+          "steps": [
+            "Rollback the system by 1 day"
+          ],
+          "expected": [
+            "System is rolled back successfully"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "1 day before/after restore boundary",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Back-up of the system is available"
+          ],
+          "inputs": {
+            "name": "John",
+            "date_of_birth": "1990-01-01"
+          },
+          "steps": [
+            "Restore the back-up on a dummy production system"
+          ],
+          "expected": [
+            "Back-up is restored successfully"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "1 day before/after purge boundary",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Dummy production database is available"
+          ],
+          "inputs": {
+            "name": "Jane",
+            "date_of_birth": "1995-06-01"
+          },
+          "steps": [
+            "Purge the database"
+          ],
+          "expected": [
+            "Database is purged successfully"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "1 day before/after store boundary",
+          "req_ids": [
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Fire proof cabinet is available in Mangalore HQ"
+          ],
+          "inputs": {
+            "name": "Bob",
+            "date_of_birth": "1980-03-01"
+          },
+          "steps": [
+            "Store the back-up in the cabinet"
+          ],
+          "expected": [
+            "Back-up is stored successfully"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "John",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "Jane",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "Bob",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "Alice",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "1990-01-01",
+            "context": "date of birth",
+            "grounded": false
+          },
+          {
+            "value": "1995-06-01",
+            "context": "date of birth",
+            "grounded": false
+          },
+          {
+            "value": "1980-03-01",
+            "context": "date of birth",
+            "grounded": false
+          },
+          {
+            "value": "1992-01-01",
+            "context": "date of birth",
+            "grounded": false
+          },
+          {
+            "value": "1 day",
+            "context": "rollback duration",
+            "grounded": false
+          },
+          {
+            "value": "month",
+            "context": "rollback duration",
+            "grounded": false
+          },
+          {
+            "value": "3 years",
+            "context": "consultation request window",
+            "grounded": false
+          },
+          {
+            "value": "Mangalore HQ",
+            "context": "location",
+            "grounded": false
+          },
+          {
+            "value": "25 KM",
+            "context": "distance",
+            "grounded": false
+          },
+          {
+            "value": "fire proof cabinet",
+            "context": "storage",
+            "grounded": false
+          },
+          {
+            "value": "dummy production system",
+            "context": "system",
+            "grounded": false
+          },
+          {
+            "value": "back-up",
+            "context": "backup",
+            "grounded": false
+          },
+          {
+            "value": "Patient is registered successfully",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Patient's details are updated successfully",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Deletion is not allowed due to pending consultation request",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Registration is not allowed due to duplicate patient",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Medicines are delivered successfully",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "system is rolled back successfully",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Back-up is restored successfully",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Database is purged successfully",
+            "context": "message",
+            "grounded": false
+          },
+          {
+            "value": "Back-up is stored successfully",
+            "context": "message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 25,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Oracle assertions are vague; assert concrete status codes or DB state",
+          "No tests for invalid input values (e.g., bad DOB format)",
+          "No boundary tests for patient name length or special characters",
+          "Hardcoded names risk collisions; use unique identifiers",
+          "Missing concurrency/race condition tests for patient registration"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.73,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

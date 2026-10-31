@@ -1,0 +1,571 @@
+{
+  "unit_id": "U34_13",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:phi3.5:3.8b",
+  "system_type": "data_pipeline",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 0.0,
+    "representation_score": 0.6,
+    "sfv_score": 0.3,
+    "threshold": 0.7,
+    "sfv_pass": false,
+    "issues": [
+      "No canonical test cases found (expected a JSON list).",
+      "missing: transitions (>=2)",
+      "missing: states declared"
+    ]
+  },
+  "fsa": null,
+  "artifact": "// Finite State Machines / Statecharts Representation\n\n// Statechart Diagram\n[States]\nstart\n  |-> AvailabilityCheck\n  |\n  |-> BackupProcess\n    |-> BackupComplete\n      |-> DailyRestore\n        |-> RestoreSuccess\n          |-> PurgeDatabase\n            |-> PurgingComplete\n              |-> BackupProcess\n                |-> BackupComplete\n                  |-> MonthlyRollback\n                    |-> RestoreSuccess\n                      |-> AvailabilityCheck\n                        |-> SystemAvailability\n                          |-> HighAvailability\n                            |-> OutageWindow\n                              |-> Sunday\n                                |-> 2nd Sunday\n                                  |-> 10 mts\n                                    |-> Pass\n                                |-> Else\n                                  |-> ContinueAvailabilityCheck\n                                |-> Fail\n                              |-> End\n                            |-> End\n                          |-> End\n                        |-> End\n                      |-> End\n                    |-> End\n                  |-> End\n                |-> End\n            |-> End\n          |-> End\n        |-> End\n      |-> End\n    |-> End\n  |-> End\n  |-> OutageWindow\n    |-> Pass\n    |-> Fail\n  |-> End\n|-> End\n\n// JSON Test Cases\n[\n  {\"id\": \"TC-001\", \"title\": \"AvailabilityCheck\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Sunday\"}, \"steps\": [\"Check if today is Sunday\"], \"expected\": [\"True\"]},\n  {\"id\": \"TC-0gy\", \"title\": \"AvailabilityCheck\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Sunday\", \"outageWindow\": \"Not 10 mts\"}, \"steps\": [\"Check if today'n outage window is 10 mts\"], \"expected\": [\"False\"]},\n  {\"id\": \"TC-002\", \"title\": \"AvailabilityCheck\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Sunday\", \"outageWindow\": \"10 mts\"}, \"steps\": [\"Check if today's outage window is exactly 10 mts\"], \"expected\": [\"True\"]},\n  {\"id\": \"TC-003\", \"title\": \"AvailabilityCheck\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Sunday\", \"outageWindow\": \"10 mts\"}, \"steps\": [\"Check if today's outage window is within the allowed limit\"], \"expected\": [\"True\"]},\n  {\"id\": \"TC-004\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"positive\", \"preconditions\": [\"AvailabilityCheck Pass\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Initiate daily backup\"], \"expected\": [\"BackupInitiated\"]},\n  {\"id\": \"TC-005\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"negative\", \"preconditions\": [\"AvailabilityCheck Fail\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to initiate daily backup\"], \"expected\": [\"BackupFailed\"]},\n  {\"id\": \"TC-006\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Initiate backup at the end of the 30-day cycle\"], \"expected\": [\"BackupInitiated\"]},\n  {\"id\": \"TC-007\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"positive\", \"preconditions\": [\"BackupComplete\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Verify backup completeness\"], \"expected\": [\"BackupVerified\"]},\n  {\"id\": \"TC-008\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"negative\", \"preconditions\": [\"BackupComplete\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Verify backup but find inconsistencies\"], \"expected\": [\"BackupInconsistenciesDetected\"]},\n  {\"id\": \"TC-009\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"End of 30-day cycle\"}, \"steps\": [\"Initiate backup verification\"], \"expected\": [\"BackupVerified\"]},\n  {\"id\": \"TC-010\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"positive\", \"preconditions\": [\"RestoreSuccess\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Restore data on dummy system\"], \"expected\": [\"DataRestoredSuccessfully\"]},\n  {\"id\": \"TC-011\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"negative\", \"preconditions\": [\"RestoreSuccess\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to restore data on dummy system with errors\"], \"expected\": [\"RestoreFailed\"]},\n  {\"id\": \"TC-012\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"End of 30-day cycle\"}, \"steps\": [\"Restore data on dummy system\"], \"expected\": [\"DataRestoredSuccessfully\"]},\n  {\"id\": \"TC-013\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"PurgeDatabase\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Initiate purge after restore\"], \"expected\": [\"PurgeInitiated\"]},\n  {\"id\": \"TC-014\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"PurgeDatabase\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to initiate purge after restore with errors\"], \"expected\": [\"PurgeFailed\"]},\n  {\"id\": \"TC-015\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Verify purge after restore\"], \"expected\": [\"PurgeSuccessful\"]},\n  {\"id\": \"TC-016\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"PurgeSuccessful\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Ensure compliance with health care regulations\"], \"expected\": [\"Compliant\"]},\n  {\"id\": \"TC-017\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"Non-compliance\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to restore without compliance\"], \"expected\": [\"RestoreFailed\"]},\n  {\"id\": \"TC-018\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Check compliance with health care regulations\"], \"expected\": [\"Compliant\"]},\n  {\"id\": \"TC-019\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"MonthlyRollback\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Initiate monthly rollback\"], \"expected\": [\"RollbackInitiated\"]},\n  {\"id\": \"TC-020\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"MonthlyRollback\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to initiate rollback with errors\"], \"expected\": [\"RollbackFailed\"]},\n  {\"id\": \"TC-021\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Verify rollback\"], \"expected\": [\"RollbackSuccessful\"]},\n  {\"id\": \"TC-022\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"RestoreSuccess\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Check data confidentiality post-restore\"], \"expected\": [\"DataConfidential\"]},\n  {\"id\": \"TC-023\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"Non-confidential data\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to restore non-confidential data\"], \"expected\": [\"RestoreFailed\"]},\n  {\"id\": \"TC-024\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Data confidentiality check post-restore\"], \"expected\": [\"DataConfidential\"]},\n  {\"id\": \"TC-025\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"Data confidentiality post-restore\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Ensure data is in Mangalore HQ\"], \"expected\": [\"DataMovedToMangalore\"]},\n  {\"id\": \"TC-026\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"Data not in Mangalore HQ\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to ensure data is in Mangalore HQ with errors\"], \"expected\": [\"MoveFailed\"]},\n  {\"id\": \"TC-027\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Ensure data is in Mangalore HQ\"], \"expected\": [\"DataConfidentialAndSecure\"]},\n  {\"id\": \"TC-028\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"Data confidentiality post-restore\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Check data compliance with health care regulations post-restore\"], \"expected\": [\"Compliant\"]},\n  {\"id\": \"TC-029\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"Non-compliance post-restore\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to restore non-compliant data\"], \"expected\": [\"RestoreFailed\"]},\n  {\"id\": \"TC-030\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Check system compliance with health care regulations post-restore\"], \"expected\": [\"Compliant\"]},\n]",
+  "test_cases": null,
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "// Finite State Machines / Statecharts Representation\n\n// Statechart Diagram\n[States]\nstart\n  |-> AvailabilityCheck\n  |\n  |-> BackupProcess\n    |-> BackupComplete\n      |-> DailyRestore\n        |-> RestoreSuccess\n          |-> PurgeDatabase\n            |-> PurgingComplete\n              |-> BackupProcess\n                |-> BackupComplete\n                  |-> MonthlyRollback\n                    |-> RestoreSuccess\n                      |-> AvailabilityCheck\n                        |-> SystemAvailability\n                          |-> HighAvailability\n                            |-> OutageWindow\n                              |-> Sunday\n                                |-> 2nd Sunday\n                                  |-> 10 mts\n                                    |-> Pass\n                                |-> Else\n                                  |-> ContinueAvailabilityCheck\n                                |-> Fail\n                              |-> End\n                            |-> End\n                          |-> End\n                        |-> End\n                      |-> End\n                    |-> End\n                  |-> End\n                |-> End\n            |-> End\n          |-> End\n        |-> End\n      |-> End\n    |-> End\n  |-> End\n  |-> OutageWindow\n    |-> Pass\n    |-> Fail\n  |-> End\n|-> End\n\n// JSON Test Cases\n[\n  {\"id\": \"TC-001\", \"title\": \"AvailabilityCheck\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Sunday\"}, \"steps\": [\"Check if today is Sunday\"], \"expected\": [\"True\"]},\n  {\"id\": \"TC-0gy\", \"title\": \"AvailabilityCheck\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Sunday\", \"outageWindow\": \"Not 10 mts\"}, \"steps\": [\"Check if today'n outage window is 10 mts\"], \"expected\": [\"False\"]},\n  {\"id\": \"TC-002\", \"title\": \"AvailabilityCheck\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Sunday\", \"outageWindow\": \"10 mts\"}, \"steps\": [\"Check if today's outage window is exactly 10 mts\"], \"expected\": [\"True\"]},\n  {\"id\": \"TC-003\", \"title\": \"AvailabilityCheck\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Sunday\", \"outageWindow\": \"10 mts\"}, \"steps\": [\"Check if today's outage window is within the allowed limit\"], \"expected\": [\"True\"]},\n  {\"id\": \"TC-004\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"positive\", \"preconditions\": [\"AvailabilityCheck Pass\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Initiate daily backup\"], \"expected\": [\"BackupInitiated\"]},\n  {\"id\": \"TC-005\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"negative\", \"preconditions\": [\"AvailabilityCheck Fail\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to initiate daily backup\"], \"expected\": [\"BackupFailed\"]},\n  {\"id\": \"TC-006\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Initiate backup at the end of the 30-day cycle\"], \"expected\": [\"BackupInitiated\"]},\n  {\"id\": \"TC-007\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"positive\", \"preconditions\": [\"BackupComplete\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Verify backup completeness\"], \"expected\": [\"BackupVerified\"]},\n  {\"id\": \"TC-008\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"negative\", \"preconditions\": [\"BackupComplete\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Verify backup but find inconsistencies\"], \"expected\": [\"BackupInconsistenciesDetected\"]},\n  {\"id\": \"TC-009\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"End of 30-day cycle\"}, \"steps\": [\"Initiate backup verification\"], \"expected\": [\"BackupVerified\"]},\n  {\"id\": \"TC-010\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"positive\", \"preconditions\": [\"RestoreSuccess\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Restore data on dummy system\"], \"expected\": [\"DataRestoredSuccessfully\"]},\n  {\"id\": \"TC-011\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"negative\", \"preconditions\": [\"RestoreSuccess\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to restore data on dummy system with errors\"], \"expected\": [\"RestoreFailed\"]},\n  {\"id\": \"TC-012\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-11\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"End of 30-day cycle\"}, \"steps\": [\"Restore data on dummy system\"], \"expected\": [\"DataRestoredSuccessfully\"]},\n  {\"id\": \"TC-013\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"PurgeDatabase\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Initiate purge after restore\"], \"expected\": [\"PurgeInitiated\"]},\n  {\"id\": \"TC-014\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"PurgeDatabase\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to initiate purge after restore with errors\"], \"expected\": [\"PurgeFailed\"]},\n  {\"id\": \"TC-015\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Verify purge after restore\"], \"expected\": [\"PurgeSuccessful\"]},\n  {\"id\": \"TC-016\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"PurgeSuccessful\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Ensure compliance with health care regulations\"], \"expected\": [\"Compliant\"]},\n  {\"id\": \"TC-017\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"Non-compliance\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to restore without compliance\"], \"expected\": [\"RestoreFailed\"]},\n  {\"id\": \"TC-018\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Check compliance with health care regulations\"], \"expected\": [\"Compliant\"]},\n  {\"id\": \"TC-019\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"MonthlyRollback\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Initiate monthly rollback\"], \"expected\": [\"RollbackInitiated\"]},\n  {\"id\": \"TC-020\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"MonthlyRollback\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to initiate rollback with errors\"], \"expected\": [\"RollbackFailed\"]},\n  {\"id\": \"TC-021\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Verify rollback\"], \"expected\": [\"RollbackSuccessful\"]},\n  {\"id\": \"TC-022\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"RestoreSuccess\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Check data confidentiality post-restore\"], \"expected\": [\"DataConfidential\"]},\n  {\"id\": \"TC-023\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"Non-confidential data\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to restore non-confidential data\"], \"expected\": [\"RestoreFailed\"]},\n  {\"id\": \"TC-024\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Data confidentiality check post-restore\"], \"expected\": [\"DataConfidential\"]},\n  {\"id\": \"TC-025\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"Data confidentiality post-restore\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Ensure data is in Mangalore HQ\"], \"expected\": [\"DataMovedToMangalore\"]},\n  {\"id\": \"TC-026\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"Data not in Mangalore HQ\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to ensure data is in Mangalore HQ with errors\"], \"expected\": [\"MoveFailed\"]},\n  {\"id\": \"TC-027\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Ensure data is in Mangalore HQ\"], \"expected\": [\"DataConfidentialAndSecure\"]},\n  {\"id\": \"TC-028\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"positive\", \"preconditions\": [\"Data confidentiality post-restore\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Check data compliance with health care regulations post-restore\"], \"expected\": [\"Compliant\"]},\n  {\"id\": \"TC-029\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"negative\", \"preconditions\": [\"Non-compliance post-restore\"], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Attempt to restore non-compliant data\"], \"expected\": [\"RestoreFailed\"]},\n  {\"id\": \"TC-030\", \"title\": \"BackupProcess\", \"req_ids\": [\"U34-13\"], \"kind\": \"boundary\", \"preconditions\": [], \"inputs\": {\"dayOfWeek\": \"Any\"}, \"steps\": [\"Check system compliance with health care regulations post-restore\"], \"expected\": [\"Compliant\"]},\n]",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.6,
+        "sfv_score": 0.3,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: transitions (>=2)",
+          "missing: states declared"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.30). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- missing: transitions (>=2)\n- missing: states declared",
+      "artifact": "<Finite State Machines / Statecharts Representation>",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.1,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.10). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Availability High Nonfunctional Requirement (VIRTUA-13-10)",
+          "req_ids": [
+            "U34_13"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "outageWindow": "10 mts"
+          },
+          "steps": [
+            "Simulate system operation for a period longer than 99.999% of the time.",
+            "Trigger outage event.",
+            "Verify system resumes operation within the specified outage window."
+          ],
+          "expected": [
+            "System resumes operation within 10 mts after triggering outage."
+          ]
+        },
+        {
+          "id": "TC-0UB1",
+          "title": "Nightly Backup Cycle Nonfunctional Requirement (VIRTUA-13-11)",
+          "req_ids": [
+            "U34_11"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "backupCycle": "30 days"
+          },
+          "steps": [
+            "Initiate backup process.",
+            "Simulate 30-day backup cycle completion.",
+            "Verify full backup completion."
+          ],
+          "expected": [
+            "Backup completed successfully for a 30-day cycle."
+          ]
+        },
+        {
+          "id": "TC-0UB2",
+          "title": "Rollback Capability Nonfunctional Requirement (VIRTUA-13-12)",
+          "req_ids": [
+            "U34_12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Backup completed successfully for a 30-day cycle."
+          ],
+          "inputs": {
+            "rollbackPeriod": "1 month"
+          },
+          "steps": [
+            "Initiate rollback process.",
+            "Verify system state matches the state before the most recent backup."
+          ],
+          "expected": [
+            "System state matches the state before the most recent backup."
+          ]
+        },
+        {
+          "id": "TC-0UB3",
+          "title": "Post-Backup Restoration Nonfunctional Requirement (VIRTUA-13-13)",
+          "req_ids": [
+            "U34_13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Rollback process verified"
+          ],
+          "inputs": {
+            "restoreToDummy": true
+          },
+          "steps": [
+            "Restore backup to dummy production system.",
+            "Verify restoration completeness and correctness.",
+            "Verify dummy production system state matches the restored backup."
+          ],
+          "expected": [
+            "Dummy production system state matches the restored backup."
+          ]
+        },
+        {
+          "id": "TC-0UB4",
+          "title": "Post-Backup Purge Nonfunctional Requirement (VIRTUA-13-14)",
+          "req_ids": [
+            "U34_14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Restoration to dummy production system verified"
+          ],
+          "inputs": {
+            "purge": true
+          },
+          "steps": [
+            "Purge dummy production system.",
+            "Verify that the dummy production system is cleared of backup data."
+          ],
+          "expected": [
+            "Dummy production system is cleared of backup data."
+          ]
+        },
+        {
+          "id": "TC-0UB5",
+          "title": "Data Security Nonfunctional Requirement (VIRTUA-13-15)",
+          "req_ids": [
+            "U34_15"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "location": "Mangalore HQ",
+            "securityLevel": "fire proof cabinet"
+          },
+          "steps": [
+            "Verify the physical security of the fire proof cabinet.",
+            "Check for unauthorized access attempts."
+          ],
+          "expected": [
+            "Physical security of the fire proof cabinet is intact and unauthorized access is prevented."
+          ]
+        },
+        {
+          "id": "TC-0UB6",
+          "title": "Compliance with Health Care Regulations Nonfunctional Requirement (VIRTUA-13-16)",
+          "req_ids": [
+            "U34_16"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "regulations": "Government of India"
+          },
+          "steps": [
+            "Review system design against Government of India health care regulations.",
+            "Identify any non-compliance issues."
+          ],
+          "expected": [
+            "System complies with all relevant Government of India health care regulations."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.1,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U34_13']",
+          "test case #2 (TC-0UB1): traces to unknown requirement ids ['U34_11']",
+          "test case #3 (TC-0UB2): traces to unknown requirement ids ['U34_12']",
+          "test case #4 (TC-0UB3): traces to unknown requirement ids ['U34_13']",
+          "test case #5 (TC-0UB4): traces to unknown requirement ids ['U34_14']",
+          "test case #6 (TC-0UB5): traces to unknown requirement ids ['U34_15']",
+          "test case #7 (TC-0UB6): traces to unknown requirement ids ['U34_16']",
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.10). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): traces to unknown requirement ids ['U34_13']\n- test case #2 (TC-0UB1): traces to unknown requirement ids ['U34_11']\n- test case #3 (TC-0UB2): traces to unknown requirement ids ['U34_12']\n- test case #4 (TC-0UB3): traces to unknown requirement ids ['U34_13']\n- test case #5 (TC-0UB4): traces to unknown requirement ids ['U34_14']\n- test case #6 (TC-0UB5): traces to unknown requirement ids ['U34_15']\n- test case #7 (TC-0UB6): traces to unknown requirement ids ['U34_16']\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<the test suite written in Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Availability High Nonfunctional Requirement U34-13",
+          "req_ids": [
+            "U34_13"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "value": "High Availability Trigger"
+          },
+          "steps": [
+            "Simulate system start-up",
+            "Verify system enters 'Operational' state",
+            "Monitor system for 10 minutes",
+            "Check if system remains in 'Operational' state without failure",
+            "Record time and any potential issues"
+          ],
+          "expected": [
+            "System remains in 'Operational' state for 10 minutes",
+            "No failures detected within the outage window"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Nightly Backup Cycle for Requirement U34-11",
+          "req_ids": [
+            "U34_11"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "value": "Nightly Backup Trigger"
+          },
+          "steps": [
+            "Simulate system time at 11:59 PM daily",
+            "Trigger nightly backup process",
+            "Verify system enters 'Backup' state",
+            "Monitor backup process for 30 minutes",
+            "Check if backup completes successfully",
+            "Record time and any potential issues"
+          ],
+          "expected": [
+            "System enters 'Backup' state",
+            "Backup process completes within 30 minutes",
+            "Data integrity maintained post-backup"
+          ]
+        },
+        {
+          "idency": "TC-003",
+          "title": "Test Rollback Capability for Requirement U34-12",
+          "req_ids": [
+            "U34_12"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "value": "Rollback Trigger"
+          },
+          "steps": [
+            "Simulate system time at 11:59 PM daily",
+            "Trigger rollback process",
+            "Verify system enters 'Rollback' state",
+            "Monitor rollback process for 30 minutes",
+            "Check if system reverts to previous state",
+            "Record time and any potential issues"
+          ],
+          "expected": [
+            "System enters 'Rollback' state",
+            "System reverts to previous state within 30 minutes"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Restoration of Daily Backup on Dummy Production System for Requirement U34-13",
+          "req_ids": [
+            "U34_13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Daily backup completed"
+          ],
+          "inputs": {
+            "value": "Restore Dummy System Trigger"
+          },
+          "steps": [
+            "Trigger restoration of dummy production system with daily backup",
+            "Verify system enters 'Restore' state",
+            "Monitor restoration process for 30 minutes",
+            "Check if restored data matches the daily backup",
+            "Record time and any potential issues"
+          ],
+          "expected": [
+            "System enters 'Restore' state",
+            "Data matches the daily backup within 30 minutes",
+            "No discrepanency detected"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Dummy Production System Purge for Requirement U34-14",
+          "req_ids": [
+            "U34_14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Daily backup and restoration completed"
+          ],
+          "inputs": {
+            "value": "Purge Dummy System Trigger"
+          },
+          "steps": [
+            "Trigger purge of dummy production system",
+            "Verify system enters 'Purge' state",
+            "Monitor purge process for 30 minutes",
+            "Check if all backup data is removed",
+            "Record time and any potential issues"
+          ],
+          "expected": [
+            "System enters 'Purge' state",
+            "All backup data is removed within 30 minutes",
+            "No discrepancy detected"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Compliance with Health Care Regulations for Requirement U34-16",
+          "req_ids": [
+            "U34_16"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "value": "Compliance Trigger"
+          },
+          "steps": [
+            "Simulate system compliance check",
+            "Verify system enters 'Compliance' state",
+            "Check if system adheres to all health care regulations as per Government of India",
+            "Record compliance results and any potential issues"
+          ],
+          "expected": [
+            "System enters 'Compliance' state",
+            "All regulations adhered to",
+            "Compliance results recorded"
+          ]
+        },
+        {
+          "id": "TC-0UB1",
+          "title": "Test Availability High Nonfunctional Requirement U34-13 with False Condition",
+          "req_ids": [
+            "U34_13"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "value": "False Availability Trigger"
+          },
+          "steps": [
+            "Simulate system start-up",
+            "Trigger system failure within the outage window",
+            "Monitor system for failure duration",
+            "Check if system fails within the outage window",
+            "Record time and any potential issues"
+          ],
+          "expected": [
+            "System fails within the outage window",
+            "Availability below 99.999% outside the outage window"
+          ]
+        },
+        {
+          "id": "TC-0UB2",
+          "title": "Test Nightly Backup Cycle for Requirement U34-11 with False Condition",
+          "req_ids": [
+            "U34_11"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "value": "False Nightly Backup Trigger"
+          },
+          "steps": [
+            "Simulate system time at 11:59 PM daily",
+            "Trigger failed backup process",
+            "Monitor failed backup process for 30 minutes",
+            "Check if backup fails",
+            "Record time and any potential issues"
+          ],
+          "expected": [
+            "Backup process fails",
+            "Data integrity compromised"
+          ]
+        },
+        {
+          "id": "TC-0UB3",
+          "title": "Test Rollback Capability for Requirement U34-12 with False Condition",
+          "req_ids": [
+            "U34_12"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "value": "False Rollback Trigger"
+          },
+          "steps": [
+            "Simulate system time at 11:59 PM daily",
+            "Trigger failed rollback process",
+            "Monitor failed rollback process for 30 minutes",
+            "Check if system does not revert to previous state",
+            "Record time and any potential issues"
+          ],
+          "expected": [
+            "System does not revert to previous state",
+            "Rollback process fails"
+          ]
+        },
+        {
+          "id": "TC-0UB4",
+          "title": "Test Restoration of Daily Backup on Dummy Production System for Requirement U34-13 with False Condition",
+          "req_ids": [
+            "U34_13"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Daily backup and restoration completed"
+          ],
+          "inputs": {
+            "value": "False Restore Dummy System Trigger"
+          },
+          "steps": [
+            "Trigger failed restoration of dummy production system with daily backup",
+            "Verify system enters 'Failed Restore' state",
+            "Monitor failed restore process for 30 minutes",
+            "Check if data does not match the daily backup",
+            "Record time and any potential issues"
+          ],
+          "expected": [
+            "System enters 'Failed Restore' state",
+            "Data does not match the daily backup",
+            "Failed restore process within 30 minutes"
+          ]
+        },
+        {
+          "id": "TC-0UB5",
+          "title": "Test Dummy Production System Purge for Requirement U34-14 with False Condition",
+          "req_ids": [
+            "U34_14"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Daily backup and restoration completed"
+          ],
+          "inputs": {
+            "value": "False Purge Dummy System Trigger"
+          },
+          "steps": [
+            "Trigger failed purge of dummy production system",
+            "Verify system enters 'Failed Purge' state",
+            "Monitor failed purge process for 30 minutes",
+            "Check if backup data remains",
+            "Record time and any potential issues"
+          ],
+          "expected": [
+            "System enters 'Failed Purge' state",
+            "Backup data remains after purge attempt",
+            "Failed purge process within 30 minutes"
+          ]
+        },
+        {
+          "id": "TC-0UB6",
+          "title": "Test Compliance with Health Care Regulations for Requirement U34-16 with False Condition",
+          "req_ids": [
+            "U34_16"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "value": "False Compliance Trigger"
+          },
+          "steps": [
+            "Simulate system non-compliance check",
+            "Verify system enters 'Non-Compliance' state",
+            "Check if system violates any health care regulations",
+            "Record non-compliance results and any potential issues"
+          ],
+          "expected": [
+            "System enters 'Non-Compliance' state",
+            "One or more regulations violated",
+            "Non-compliance results recorded"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.1,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U34_13']",
+          "test case #2 (TC-002): traces to unknown requirement ids ['U34_11']",
+          "test case #3 (None): 'id' is a required property; traces to unknown requirement ids ['U34_12']",
+          "test case #4 (TC-004): traces to unknown requirement ids ['U34_13']",
+          "test case #5 (TC-005): traces to unknown requirement ids ['U34_14']",
+          "test case #6 (TC-006): traces to unknown requirement ids ['U34_16']",
+          "test case #7 (TC-0UB1): traces to unknown requirement ids ['U34_13']",
+          "test case #8 (TC-0UB2): traces to unknown requirement ids ['U34_11']",
+          "test case #9 (TC-0UB3): traces to unknown requirement ids ['U34_12']",
+          "test case #10 (TC-0UB4): traces to unknown requirement ids ['U34_13']",
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    }
+  ]
+}

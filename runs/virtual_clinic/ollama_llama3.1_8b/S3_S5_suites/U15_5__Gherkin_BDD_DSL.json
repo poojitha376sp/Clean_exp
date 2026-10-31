@@ -1,0 +1,584 @@
+{
+  "unit_id": "U15_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "standard",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.5,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.8,
+    "hallucinated": [
+      {
+        "value": "Invalid Value",
+        "context": "prescription_type",
+        "grounded": false
+      },
+      {
+        "value": "Invalid Value",
+        "context": "lab_or_chemist",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 10,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Duplicate scenarios for lab tests and medicines reduce clarity; consolidate into single scenario per requirement.",
+      "Assertions are vague; replace with concrete state checks (e.g., verify prescription ID exists).",
+      "Negative tests only cover prescription type; add negative tests for viewing appointments and generating prescriptions.",
+      "Scenario outlines lack edge cases for boundary values (e.g., maximum number of prescriptions per patient).",
+      "Use explicit status codes or messages in expected outcomes for better automation."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.75,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Doctor Consultation and Prescription\n\n  Scenario: Doctor can view appointments/consultation request pending in his list\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor views his list of pending consultations\n    Then the patient's consultation request is displayed in the list\n\n  Scenario: Consultation is provided by the doctor and prescription is generated\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor provides a consultation to the patient\n    And the doctor generates a prescription for the patient\n    Then the consultation and prescription are recorded in the system\n\n  Scenario: Doctors can prescribe lab tests\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor prescribes a lab test for the patient\n    Then the lab test is created and the lab is requested to perform the test\n\n  Scenario: Lab Test for the patient is created and lab is requested to perform the lab test\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor prescribes a lab test for the patient\n    Then the lab test is created and the lab is requested to perform the test\n\n  Scenario: Doctors can prescribe medicines\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor prescribes medicines for the patient\n    Then the medicines are requested to the concerned Chemist for delivery\n\n  Scenario: Medicines for the patient are requested to the concerned Chemist for delivery\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor prescribes medicines for the patient\n    Then the medicines are requested to the concerned Chemist for delivery\n\n  Scenario: Lab tests are performed and reports for corresponding patient are updated (Offline)\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    And a lab test has been prescribed for the patient\n    When the lab performs the test and updates the report\n    Then the report is updated in the system for the patient\n\n  Scenario: Lab report for the patient is released to view (Offline)\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    And a lab test has been prescribed for the patient\n    And the lab report has been updated\n    When the doctor releases the lab report for the patient to view\n    Then the lab report is displayed to the patient\n\n  Scenario Outline: Normal, Edge, and Invalid Values\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor prescribes a <prescription_type> for the patient\n    Then the <prescription_type> is created and the <lab_or_chemist> is requested to perform the test or deliver the medicines\n\n    Examples:\n      | prescription_type | lab_or_chemist |\n      | Lab Test          | Lab             |\n      | Medicines         | Chemist         |\n      | Invalid Value     | Invalid Value   |\n\n  Scenario Outline: Negative/ Error Paths and Boundary Values\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor tries to prescribe a <prescription_type> for the patient with an invalid <input_value>\n    Then an error message is displayed to the doctor\n\n    Examples:\n      | prescription_type | input_value |\n      | Lab Test          | Invalid Value |\n      | Medicines         | Invalid Value |\n      | Invalid Value     | Invalid Value |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Doctor can view appointments/consultation request pending in his list",
+      "req_ids": [
+        "VIRTUA-5-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "doctor logged in",
+        "patient with consultation request pending"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "doctor views list of pending consultations",
+        "patient's consultation request is displayed in the list"
+      ],
+      "expected": [
+        "consultation request is displayed in the list"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Consultation is provided by the doctor and prescription is generated",
+      "req_ids": [
+        "VIRTUA-5-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "doctor logged in",
+        "patient with consultation request pending"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "doctor provides consultation to patient",
+        "doctor generates prescription for patient"
+      ],
+      "expected": [
+        "consultation and prescription are recorded in the system"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Doctors can prescribe lab tests",
+      "req_ids": [
+        "VIRTUA-5-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "doctor logged in",
+        "patient with consultation request pending"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "doctor prescribes lab test for patient"
+      ],
+      "expected": [
+        "lab test is created and lab is requested to perform the test"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Lab Test for the patient is created and lab is requested to perform the lab test",
+      "req_ids": [
+        "VIRTUA-5-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "doctor logged in",
+        "patient with consultation request pending"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "doctor prescribes lab test for patient"
+      ],
+      "expected": [
+        "lab test is created and lab is requested to perform the test"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Doctors can prescribe medicines",
+      "req_ids": [
+        "VIRTUA-5-13"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "doctor logged in",
+        "patient with consultation request pending"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "doctor prescribes medicines for patient"
+      ],
+      "expected": [
+        "medicines are requested to the concerned Chemist for delivery"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Medicines for the patient are requested to the concerned Chemist for delivery",
+      "req_ids": [
+        "VIRTUA-5-14"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "doctor logged in",
+        "patient with consultation request pending"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "doctor prescribes medicines for patient"
+      ],
+      "expected": [
+        "medicines are requested to the concerned Chemist for delivery"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Lab tests are performed and reports for corresponding patient are updated (Offline)",
+      "req_ids": [
+        "VIRTUA-5-15"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "doctor logged in",
+        "patient with consultation request pending",
+        "lab test has been prescribed for patient"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "lab performs test and updates report"
+      ],
+      "expected": [
+        "report is updated in the system for patient"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Lab report for the patient is released to view (Offline)",
+      "req_ids": [
+        "VIRTUA-5-16"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "doctor logged in",
+        "patient with consultation request pending",
+        "lab test has been prescribed for patient",
+        "lab report has been updated"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "doctor releases lab report for patient to view"
+      ],
+      "expected": [
+        "lab report is displayed to patient"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Normal, Edge, and Invalid Values",
+      "req_ids": [
+        "VIRTUA-5-9",
+        "VIRTUA-5-10",
+        "VIRTUA-5-11",
+        "VIRTUA-5-12",
+        "VIRTUA-5-13",
+        "VIRTUA-5-14",
+        "VIRTUA-5-15",
+        "VIRTUA-5-16"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "doctor logged in",
+        "patient with consultation request pending"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "doctor prescribes <prescription_type> for patient"
+      ],
+      "expected": [
+        "<prescription_type> is created and <lab_or_chemist> is requested to perform the test or deliver the medicines"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Negative/ Error Paths and Boundary Values",
+      "req_ids": [
+        "VIRTUA-5-9",
+        "VIRTUA-5-10",
+        "VIRTUA-5-11",
+        "VIRTUA-5-12",
+        "VIRTUA-5-13",
+        "VIRTUA-5-14",
+        "VIRTUA-5-15",
+        "VIRTUA-5-16"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "doctor logged in",
+        "patient with consultation request pending"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "doctor tries to prescribe <prescription_type> for patient with an invalid <input_value>"
+      ],
+      "expected": [
+        "error message is displayed to doctor"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Doctor Consultation and Prescription\n\n  Scenario: Doctor can view appointments/consultation request pending in his list\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor views his list of pending consultations\n    Then the patient's consultation request is displayed in the list\n\n  Scenario: Consultation is provided by the doctor and prescription is generated\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor provides a consultation to the patient\n    And the doctor generates a prescription for the patient\n    Then the consultation and prescription are recorded in the system\n\n  Scenario: Doctors can prescribe lab tests\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor prescribes a lab test for the patient\n    Then the lab test is created and the lab is requested to perform the test\n\n  Scenario: Lab Test for the patient is created and lab is requested to perform the lab test\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor prescribes a lab test for the patient\n    Then the lab test is created and the lab is requested to perform the test\n\n  Scenario: Doctors can prescribe medicines\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor prescribes medicines for the patient\n    Then the medicines are requested to the concerned Chemist for delivery\n\n  Scenario: Medicines for the patient are requested to the concerned Chemist for delivery\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor prescribes medicines for the patient\n    Then the medicines are requested to the concerned Chemist for delivery\n\n  Scenario: Lab tests are performed and reports for corresponding patient are updated (Offline)\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    And a lab test has been prescribed for the patient\n    When the lab performs the test and updates the report\n    Then the report is updated in the system for the patient\n\n  Scenario: Lab report for the patient is released to view (Offline)\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    And a lab test has been prescribed for the patient\n    And the lab report has been updated\n    When the doctor releases the lab report for the patient to view\n    Then the lab report is displayed to the patient\n\n  Scenario Outline: Normal, Edge, and Invalid Values\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor prescribes a <prescription_type> for the patient\n    Then the <prescription_type> is created and the <lab_or_chemist> is requested to perform the test or deliver the medicines\n\n    Examples:\n      | prescription_type | lab_or_chemist |\n      | Lab Test          | Lab             |\n      | Medicines         | Chemist         |\n      | Invalid Value     | Invalid Value   |\n\n  Scenario Outline: Negative/ Error Paths and Boundary Values\n    Given a doctor is logged in\n    And there is a patient with a consultation request pending\n    When the doctor tries to prescribe a <prescription_type> for the patient with an invalid <input_value>\n    Then an error message is displayed to the doctor\n\n    Examples:\n      | prescription_type | input_value |\n      | Lab Test          | Invalid Value |\n      | Medicines         | Invalid Value |\n      | Invalid Value     | Invalid Value |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Doctor can view appointments/consultation request pending in his list",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor logged in",
+            "patient with consultation request pending"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "doctor views list of pending consultations",
+            "patient's consultation request is displayed in the list"
+          ],
+          "expected": [
+            "consultation request is displayed in the list"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Consultation is provided by the doctor and prescription is generated",
+          "req_ids": [
+            "VIRTUA-5-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor logged in",
+            "patient with consultation request pending"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "doctor provides consultation to patient",
+            "doctor generates prescription for patient"
+          ],
+          "expected": [
+            "consultation and prescription are recorded in the system"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctors can prescribe lab tests",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor logged in",
+            "patient with consultation request pending"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "doctor prescribes lab test for patient"
+          ],
+          "expected": [
+            "lab test is created and lab is requested to perform the test"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Lab Test for the patient is created and lab is requested to perform the lab test",
+          "req_ids": [
+            "VIRTUA-5-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor logged in",
+            "patient with consultation request pending"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "doctor prescribes lab test for patient"
+          ],
+          "expected": [
+            "lab test is created and lab is requested to perform the test"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctors can prescribe medicines",
+          "req_ids": [
+            "VIRTUA-5-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor logged in",
+            "patient with consultation request pending"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "doctor prescribes medicines for patient"
+          ],
+          "expected": [
+            "medicines are requested to the concerned Chemist for delivery"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Medicines for the patient are requested to the concerned Chemist for delivery",
+          "req_ids": [
+            "VIRTUA-5-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor logged in",
+            "patient with consultation request pending"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "doctor prescribes medicines for patient"
+          ],
+          "expected": [
+            "medicines are requested to the concerned Chemist for delivery"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Lab tests are performed and reports for corresponding patient are updated (Offline)",
+          "req_ids": [
+            "VIRTUA-5-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor logged in",
+            "patient with consultation request pending",
+            "lab test has been prescribed for patient"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "lab performs test and updates report"
+          ],
+          "expected": [
+            "report is updated in the system for patient"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Lab report for the patient is released to view (Offline)",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor logged in",
+            "patient with consultation request pending",
+            "lab test has been prescribed for patient",
+            "lab report has been updated"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "doctor releases lab report for patient to view"
+          ],
+          "expected": [
+            "lab report is displayed to patient"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Normal, Edge, and Invalid Values",
+          "req_ids": [
+            "VIRTUA-5-9",
+            "VIRTUA-5-10",
+            "VIRTUA-5-11",
+            "VIRTUA-5-12",
+            "VIRTUA-5-13",
+            "VIRTUA-5-14",
+            "VIRTUA-5-15",
+            "VIRTUA-5-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor logged in",
+            "patient with consultation request pending"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "doctor prescribes <prescription_type> for patient"
+          ],
+          "expected": [
+            "<prescription_type> is created and <lab_or_chemist> is requested to perform the test or deliver the medicines"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Negative/ Error Paths and Boundary Values",
+          "req_ids": [
+            "VIRTUA-5-9",
+            "VIRTUA-5-10",
+            "VIRTUA-5-11",
+            "VIRTUA-5-12",
+            "VIRTUA-5-13",
+            "VIRTUA-5-14",
+            "VIRTUA-5-15",
+            "VIRTUA-5-16"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "doctor logged in",
+            "patient with consultation request pending"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "doctor tries to prescribe <prescription_type> for patient with an invalid <input_value>"
+          ],
+          "expected": [
+            "error message is displayed to doctor"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.5,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.8,
+        "hallucinated": [
+          {
+            "value": "Invalid Value",
+            "context": "prescription_type",
+            "grounded": false
+          },
+          {
+            "value": "Invalid Value",
+            "context": "lab_or_chemist",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 10,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Duplicate scenarios for lab tests and medicines reduce clarity; consolidate into single scenario per requirement.",
+          "Assertions are vague; replace with concrete state checks (e.g., verify prescription ID exists).",
+          "Negative tests only cover prescription type; add negative tests for viewing appointments and generating prescriptions.",
+          "Scenario outlines lack edge cases for boundary values (e.g., maximum number of prescriptions per patient).",
+          "Use explicit status codes or messages in expected outcomes for better automation."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.75,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

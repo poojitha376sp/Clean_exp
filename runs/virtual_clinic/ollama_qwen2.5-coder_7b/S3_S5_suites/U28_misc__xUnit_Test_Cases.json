@@ -1,0 +1,654 @@
+{
+  "unit_id": "U28_misc",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 0.0,
+    "sfv_score": 0.5,
+    "threshold": 1.0,
+    "sfv_pass": false,
+    "issues": [
+      "Python syntax error: invalid syntax",
+      "No xUnit-style test definitions found."
+    ]
+  },
+  "fsa": null,
+  "artifact": "using Xunit;\n\npublic class ChemistLabTests\n{\n    [Fact]\n    public void TestEditUpdateChemistLab()\n    {\n        // Arrange\n        var chemistLabService = new ChemistLabService();\n        var chemistLabId = \"12345\";\n        var updatedChemistLab = new ChemistLab { Id = chemistLabId, Name = \"Updated Chemist\", Address = \"Updated Address\", ContactDetails = \"Updated Contact\" };\n\n        // Act\n        chemistLabService.EditUpdateChemistLab(chemistLabId, updatedChemistLab);\n\n        // Assert\n        var retrievedChemistLab = chemistLabService.GetChemistLab(chemistLabId);\n        Assert.Equal(updatedChemistLab.Name, retrievedChemistLab.Name);\n        Assert.Equal(updatedChemistLab.Address, retrievedChemistLab.Address);\n        Assert.Equal(updatedChemistLab.ContactDetails, retrievedChemistLab.ContactDetails);\n    }\n\n    [Fact]\n    public void TestChemistLabDoesNotExist()\n    {\n        // Arrange\n        var chemistLabService = new ChemistLabService();\n        var nonExistentChemistLabId = \"99999\";\n\n        // Act & Assert\n        Assert.Throws<Exception>(() => chemistLabService.GetChemistLab(nonExistentChemistLabId));\n    }\n\n    [Fact]\n    public void TestDeleteChemistLabWithOpenPrescriptions()\n    {\n        // Arrange\n        var chemistLabService = new ChemistLabService();\n        var chemistLabId = \"12345\";\n        var prescriptionService = new PrescriptionService();\n        prescriptionService.AddPrescription(chemistLabId, \"Open Prescription\");\n\n        // Act & Assert\n        Assert.Throws<Exception>(() => chemistLabService.DeleteChemistLab(chemistLabId));\n    }\n\n    [Fact]\n    public void TestDeleteChemistLabWithoutOpenPrescriptions()\n    {\n        // Arrange\n        var chemistLabService = new ChemistLabService();\n        var chemistLabId = \"12345\";\n\n        // Act\n        chemistLabService.DeleteChemistLab(chemistLabId);\n\n        // Assert\n        Assert.Throws<Exception>(() => chemistLabService.GetChemistLab(chemistLabId));\n    }\n}\n\npublic class SymptomTests\n{\n    [Fact]\n    public void TestAddSymptomCode()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptomCode = \"SYM001\";\n        var symptomDescription = \"Symptom Description\";\n\n        // Act\n        symptomService.AddSymptomCode(symptomCode, symptomDescription);\n\n        // Assert\n        var retrievedSymptom = symptomService.GetSymptomCode(symptomCode);\n        Assert.Equal(symptomDescription, retrievedSymptom.Description);\n    }\n\n    [Fact]\n    public void TestEditUpdateSymptomCode()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptomCode = \"SYM001\";\n        var updatedSymptomDescription = \"Updated Symptom Description\";\n\n        // Act\n        symptomService.EditUpdateSymptomCode(symptomCode, updatedSymptomDescription);\n\n        // Assert\n        var retrievedSymptom = symptomService.GetSymptomCode(symptomCode);\n        Assert.Equal(updatedSymptomDescription, retrievedSymptom.Description);\n    }\n\n    [Fact]\n    public void TestSymptomCodeDoesNotExist()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var nonExistentSymptomCode = \"SYM999\";\n\n        // Act & Assert\n        Assert.Throws<Exception>(() => symptomService.GetSymptomCode(nonExistentSymptomCode));\n    }\n}\n\npublic class PatientProfileTests\n{\n    [Fact]\n    public void TestUpdatePatientProfile()\n    {\n        // Arrange\n        var patientProfileService = new PatientProfileService();\n        var patientId = \"P001\";\n        var updatedPatientProfile = new PatientProfile { Id = patientId, Name = \"Updated Patient\", Age = 30, Sex = \"Male\", Address = \"Updated Address\", ContactDetails = \"Updated Contact\" };\n\n        // Act\n        patientProfileService.UpdatePatientProfile(patientId, updatedPatientProfile);\n\n        // Assert\n        var retrievedPatientProfile = patientProfileService.GetPatientProfile(patientId);\n        Assert.Equal(updatedPatientProfile.Name, retrievedPatientProfile.Name);\n        Assert.Equal(updatedPatientProfile.Age, retrievedPatientProfile.Age);\n        Assert.Equal(updatedPatientProfile.Sex, retrievedPatientProfile.Sex);\n        Assert.Equal(updatedPatientProfile.Address, retrievedPatientProfile.Address);\n        Assert.Equal(updatedPatientProfile.ContactDetails, retrievedPatientProfile.ContactDetails);\n    }\n\n    [Fact]\n    public void TestPatientProfileRegistration()\n    {\n        // Arrange\n        var patientProfileService = new PatientProfileService();\n        var newPatientProfile = new PatientProfile { Name = \"New Patient\", Age = 25, Sex = \"Female\", Address = \"New Address\", ContactDetails = \"New Contact\" };\n\n        // Act\n        patientProfileService.RegisterPatientProfile(newPatientProfile);\n\n        // Assert\n        var retrievedPatientProfile = patientProfileService.GetPatientProfile(newPatientProfile.Id);\n        Assert.Equal(newPatientProfile.Name, retrievedPatientProfile.Name);\n        Assert.Equal(newPatientProfile.Age, retrievedPatientProfile.Age);\n        Assert.Equal(newPatientProfile.Sex, retrievedPatientProfile.Sex);\n        Assert.Equal(newPatientProfile.Address, retrievedPatientProfile.Address);\n        Assert.Equal(newPatientProfile.ContactDetails, retrievedPatientProfile.ContactDetails);\n    }\n}",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Edit/Update Chemist/Lab",
+      "req_ids": [
+        "VCMCL03-1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "chemistLabId": "12345",
+        "updatedChemistLab": {
+          "Name": "Updated Chemist",
+          "Address": "Updated Address",
+          "ContactDetails": "Updated Contact"
+        }
+      },
+      "steps": [
+        "Edit/Update Chemist/Lab"
+      ],
+      "expected": [
+        "Chemist/Lab details updated successfully"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Chemist/Lab Does Not Exist",
+      "req_ids": [
+        "VCMCL03-2"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "chemistLabId": "99999"
+      },
+      "steps": [
+        "Get Chemist/Lab"
+      ],
+      "expected": [
+        "Chemist or Lab does not exist"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Delete Chemist/Lab with Open Prescriptions",
+      "req_ids": [
+        "VCMCL03-3"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "chemistLabId": "12345"
+      },
+      "steps": [
+        "Delete Chemist/Lab"
+      ],
+      "expected": [
+        "Chemist or Lab has open Prescription Requests - cannot delete"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Delete Chemist/Lab Without Open Prescriptions",
+      "req_ids": [
+        "VCMCL03-3"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "chemistLabId": "12345"
+      },
+      "steps": [
+        "Delete Chemist/Lab"
+      ],
+      "expected": [
+        "Chemist/Lab deleted successfully"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Add Symptom Code",
+      "req_ids": [
+        "VCMSYM02"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "symptomCode": "SYM001",
+        "symptomDescription": "Symptom Description"
+      },
+      "steps": [
+        "Add Symptom Code"
+      ],
+      "expected": [
+        "Symptom Code added successfully"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Edit/Update Symptom Code",
+      "req_ids": [
+        "VCMSYM03"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "symptomCode": "SYM001",
+        "updatedSymptomDescription": "Updated Symptom Description"
+      },
+      "steps": [
+        "Edit/Update Symptom Code"
+      ],
+      "expected": [
+        "Symptom Code updated successfully"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Symptom Code Does Not Exist",
+      "req_ids": [
+        "VCMSYM03"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "symptomCode": "SYM999"
+      },
+      "steps": [
+        "Get Symptom Code"
+      ],
+      "expected": [
+        "Symptom Code does not exist"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Update Patient Profile",
+      "req_ids": [
+        "VCMPA01"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "patientId": "P001",
+        "updatedPatientProfile": {
+          "Name": "Updated Patient",
+          "Age": 30,
+          "Sex": "Male",
+          "Address": "Updated Address",
+          "ContactDetails": "Updated Contact"
+        }
+      },
+      "steps": [
+        "Update Patient Profile"
+      ],
+      "expected": [
+        "Patient Profile updated successfully"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Patient Profile Registration",
+      "req_ids": [
+        "VCMPA01"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "newPatientProfile": {
+          "Name": "New Patient",
+          "Age": 25,
+          "Sex": "Female",
+          "Address": "New Address",
+          "ContactDetails": "New Contact"
+        }
+      },
+      "steps": [
+        "Register Patient Profile"
+      ],
+      "expected": [
+        "Patient Profile registered successfully"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "using Xunit;\n\npublic class ChemistLabTests\n{\n    [Fact]\n    public void TestEditUpdateChemistLab()\n    {\n        // Arrange\n        var chemistLabService = new ChemistLabService();\n        var chemistLabId = \"12345\";\n        var updatedChemistLab = new ChemistLab { Id = chemistLabId, Name = \"Updated Chemist\", Address = \"Updated Address\", ContactDetails = \"Updated Contact\" };\n\n        // Act\n        chemistLabService.EditUpdateChemistLab(chemistLabId, updatedChemistLab);\n\n        // Assert\n        var retrievedChemistLab = chemistLabService.GetChemistLab(chemistLabId);\n        Assert.Equal(updatedChemistLab.Name, retrievedChemistLab.Name);\n        Assert.Equal(updatedChemistLab.Address, retrievedChemistLab.Address);\n        Assert.Equal(updatedChemistLab.ContactDetails, retrievedChemistLab.ContactDetails);\n    }\n\n    [Fact]\n    public void TestChemistLabDoesNotExist()\n    {\n        // Arrange\n        var chemistLabService = new ChemistLabService();\n        var nonExistentChemistLabId = \"99999\";\n\n        // Act & Assert\n        Assert.Throws<Exception>(() => chemistLabService.GetChemistLab(nonExistentChemistLabId));\n    }\n\n    [Fact]\n    public void TestDeleteChemistLabWithOpenPrescriptions()\n    {\n        // Arrange\n        var chemistLabService = new ChemistLabService();\n        var chemistLabId = \"12345\";\n        var prescriptionService = new PrescriptionService();\n        prescriptionService.AddPrescription(chemistLabId, \"Open Prescription\");\n\n        // Act & Assert\n        Assert.Throws<Exception>(() => chemistLabService.DeleteChemistLab(chemistLabId));\n    }\n\n    [Fact]\n    public void TestDeleteChemistLabWithoutOpenPrescriptions()\n    {\n        // Arrange\n        var chemistLabService = new ChemistLabService();\n        var chemistLabId = \"12345\";\n\n        // Act\n        chemistLabService.DeleteChemistLab(chemistLabId);\n\n        // Assert\n        Assert.Throws<Exception>(() => chemistLabService.GetChemistLab(chemistLabId));\n    }\n}\n\npublic class SymptomTests\n{\n    [Fact]\n    public void TestAddSymptomCode()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptomCode = \"SYM001\";\n        var symptomDescription = \"Symptom Description\";\n\n        // Act\n        symptomService.AddSymptomCode(symptomCode, symptomDescription);\n\n        // Assert\n        var retrievedSymptom = symptomService.GetSymptomCode(symptomCode);\n        Assert.Equal(symptomDescription, retrievedSymptom.Description);\n    }\n\n    [Fact]\n    public void TestEditUpdateSymptomCode()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptomCode = \"SYM001\";\n        var updatedSymptomDescription = \"Updated Symptom Description\";\n\n        // Act\n        symptomService.EditUpdateSymptomCode(symptomCode, updatedSymptomDescription);\n\n        // Assert\n        var retrievedSymptom = symptomService.GetSymptomCode(symptomCode);\n        Assert.Equal(updatedSymptomDescription, retrievedSymptom.Description);\n    }\n\n    [Fact]\n    public void TestSymptomCodeDoesNotExist()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var nonExistentSymptomCode = \"SYM999\";\n\n        // Act & Assert\n        Assert.Throws<Exception>(() => symptomService.GetSymptomCode(nonExistentSymptomCode));\n    }\n}\n\npublic class PatientProfileTests\n{\n    [Fact]\n    public void TestUpdatePatientProfile()\n    {\n        // Arrange\n        var patientProfileService = new PatientProfileService();\n        var patientId = \"P001\";\n        var updatedPatientProfile = new PatientProfile { Id = patientId, Name = \"Updated Patient\", Age = 30, Sex = \"Male\", Address = \"Updated Address\", ContactDetails = \"Updated Contact\" };\n\n        // Act\n        patientProfileService.UpdatePatientProfile(patientId, updatedPatientProfile);\n\n        // Assert\n        var retrievedPatientProfile = patientProfileService.GetPatientProfile(patientId);\n        Assert.Equal(updatedPatientProfile.Name, retrievedPatientProfile.Name);\n        Assert.Equal(updatedPatientProfile.Age, retrievedPatientProfile.Age);\n        Assert.Equal(updatedPatientProfile.Sex, retrievedPatientProfile.Sex);\n        Assert.Equal(updatedPatientProfile.Address, retrievedPatientProfile.Address);\n        Assert.Equal(updatedPatientProfile.ContactDetails, retrievedPatientProfile.ContactDetails);\n    }\n\n    [Fact]\n    public void TestPatientProfileRegistration()\n    {\n        // Arrange\n        var patientProfileService = new PatientProfileService();\n        var newPatientProfile = new PatientProfile { Name = \"New Patient\", Age = 25, Sex = \"Female\", Address = \"New Address\", ContactDetails = \"New Contact\" };\n\n        // Act\n        patientProfileService.RegisterPatientProfile(newPatientProfile);\n\n        // Assert\n        var retrievedPatientProfile = patientProfileService.GetPatientProfile(newPatientProfile.Id);\n        Assert.Equal(newPatientProfile.Name, retrievedPatientProfile.Name);\n        Assert.Equal(newPatientProfile.Age, retrievedPatientProfile.Age);\n        Assert.Equal(newPatientProfile.Sex, retrievedPatientProfile.Sex);\n        Assert.Equal(newPatientProfile.Address, retrievedPatientProfile.Address);\n        Assert.Equal(newPatientProfile.ContactDetails, retrievedPatientProfile.ContactDetails);\n    }\n}",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Edit/Update Chemist/Lab",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "chemistLabId": "12345",
+            "updatedChemistLab": {
+              "Name": "Updated Chemist",
+              "Address": "Updated Address",
+              "ContactDetails": "Updated Contact"
+            }
+          },
+          "steps": [
+            "Edit/Update Chemist/Lab"
+          ],
+          "expected": [
+            "Chemist/Lab details updated successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Chemist/Lab Does Not Exist",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "chemistLabId": "99999"
+          },
+          "steps": [
+            "Get Chemist/Lab"
+          ],
+          "expected": [
+            "Chemist or Lab does not exist"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Chemist/Lab with Open Prescriptions",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "chemistLabId": "12345"
+          },
+          "steps": [
+            "Delete Chemist/Lab"
+          ],
+          "expected": [
+            "Chemist or Lab has open Prescription Requests - cannot delete"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete Chemist/Lab Without Open Prescriptions",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "chemistLabId": "12345"
+          },
+          "steps": [
+            "Delete Chemist/Lab"
+          ],
+          "expected": [
+            "Chemist/Lab deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Add Symptom Code",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptomCode": "SYM001",
+            "symptomDescription": "Symptom Description"
+          },
+          "steps": [
+            "Add Symptom Code"
+          ],
+          "expected": [
+            "Symptom Code added successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Edit/Update Symptom Code",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptomCode": "SYM001",
+            "updatedSymptomDescription": "Updated Symptom Description"
+          },
+          "steps": [
+            "Edit/Update Symptom Code"
+          ],
+          "expected": [
+            "Symptom Code updated successfully"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Symptom Code Does Not Exist",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "symptomCode": "SYM999"
+          },
+          "steps": [
+            "Get Symptom Code"
+          ],
+          "expected": [
+            "Symptom Code does not exist"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Update Patient Profile",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patientId": "P001",
+            "updatedPatientProfile": {
+              "Name": "Updated Patient",
+              "Age": 30,
+              "Sex": "Male",
+              "Address": "Updated Address",
+              "ContactDetails": "Updated Contact"
+            }
+          },
+          "steps": [
+            "Update Patient Profile"
+          ],
+          "expected": [
+            "Patient Profile updated successfully"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Patient Profile Registration",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "newPatientProfile": {
+              "Name": "New Patient",
+              "Age": 25,
+              "Sex": "Female",
+              "Address": "New Address",
+              "ContactDetails": "New Contact"
+            }
+          },
+          "steps": [
+            "Register Patient Profile"
+          ],
+          "expected": [
+            "Patient Profile registered successfully"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "Python syntax error: invalid syntax",
+          "No xUnit-style test definitions found."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Python syntax error: invalid syntax\n- No xUnit-style test definitions found.",
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\n\nclass ChemistLabTest(unittest.TestCase):\n    @patch('module.query_chemist_lab')\n    def test_query_chemist_lab_success(self, mock_query):\n        mock_query.return_value = {'id': '123', 'name': 'John Doe', 'address': '123 Main St', 'contact': '123-456-7890'}\n        response = query_chemist_lab('123')\n        self.assertEqual(response, {'id': '123', 'name': 'John Doe', 'address': '123 Main St', 'contact': '123-456-7890'})\n\n    @patch('module.query_chemist_lab')\n    def test_query_chemist_lab_failure(self, mock_query):\n        mock_query.return_value = None\n        with self.assertRaises(Exception) as context:\n            query_chemist_lab('456')\n        self.assertIn('Chemist or Lab does not exist', str(context.exception))\n\n    @patch('module.delete_chemist_lab')\n    @patch('module.check_open_requests')\n    def test_delete_chemist_lab_success(self, mock_check, mock_delete):\n        mock_check.return_value = False\n        mock_delete.return_value = True\n        response = delete_chemist_lab('123')\n        self.assertTrue(response)\n\n    @patch('module.delete_chemist_lab')\n    @patch('module.check_open_requests')\n    def test_delete_chemist_lab_failure(self, mock_check, mock_delete):\n        mock_check.return_value = True\n        mock_delete.return_value = False\n        with self.assertRaises(Exception) as context:\n            delete_chemist_lab('123')\n        self.assertIn('Chemist or Lab has open Prescription Requests - cannot delete', str(context.exception))\n\nclass SymptomTest(unittest.TestCase):\n    @patch('module.add_symptom')\n    def test_add_symptom_success(self, mock_add):\n        mock_add.return_value = True\n        response = add_symptom('123', 'Symptom Description')\n        self.assertTrue(response)\n\n    @patch('module.update_symptom')\n    def test_update_symptom_success(self, mock_update):\n        mock_update.return_value = True\n        response = update_symptom('123', 'Updated Symptom Description')\n        self.assertTrue(response)\n\n    @patch('module.update_symptom')\n    def test_update_symptom_failure(self, mock_update):\n        mock_update.return_value = False\n        with self.assertRaises(Exception) as context:\n            update_symptom('456', 'Updated Symptom Description')\n        self.assertIn('Symptom does not exist', str(context.exception))\n\nclass PatientProfileTest(unittest.TestCase):\n    @patch('module.register_patient')\n    def test_register_patient_success(self, mock_register):\n        mock_register.return_value = {'id': '123', 'name': 'John Doe', 'age': 30, 'sex': 'Male', 'address': '123 Main St', 'contact': '123-456-7890'}\n        response = register_patient('John Doe', '30', 'Male', '123 Main St', '123-456-7890')\n        self.assertEqual(response, {'id': '123', 'name': 'John Doe', 'age': 30, 'sex': 'Male', 'address': '123 Main St', 'contact': '123-456-7890'})\n\n    @patch('module.register_patient')\n    def test_register_patient_failure(self, mock_register):\n        mock_register.return_value = None\n        with self.assertRaises(Exception) as context:\n            register_patient('John Doe', '30', 'Male', '123 Main St', '123-456-7890')\n        self.assertIn('Invalid username/password', str(context.exception))\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).",
+      "artifact": "using Xunit;\n\npublic class ChemistLabTests\n{\n    [Fact]\n    public void TC_001_EditUpdateChemistLabDetails()\n    {\n        // Arrange\n        var chemistLabService = new ChemistLabService();\n        var chemistLabId = \"12345\";\n        var updatedChemistLab = new ChemistLab { Id = chemistLabId, Name = \"Updated Chemist\", Address = \"Updated Address\", ContactDetails = \"Updated Contact\" };\n\n        // Act\n        chemistLabService.EditChemistLab(chemistLabId, updatedChemistLab);\n\n        // Assert\n        var retrievedChemistLab = chemistLabService.GetChemistLab(chemistLabId);\n        Assert.Equal(updatedChemistLab.Name, retrievedChemistLab.Name);\n        Assert.Equal(updatedChemistLab.Address, retrievedChemistLab.Address);\n        Assert.Equal(updatedChemistLab.ContactDetails, retrievedChemistLab.ContactDetails);\n    }\n\n    [Fact]\n    public void TC_002_ChemistLabDoesNotExist()\n    {\n        // Arrange\n        var chemistLabService = new ChemistLabService();\n        var nonExistentChemistLabId = \"99999\";\n\n        // Act & Assert\n        Assert.Throws<Exception>(() => chemistLabService.GetChemistLab(nonExistentChemistLabId));\n    }\n\n    [Fact]\n    public void TC_003_ChemistLabHasOpenPrescriptionRequests()\n    {\n        // Arrange\n        var chemistLabService = new ChemistLabService();\n        var chemistLabId = \"12345\";\n        var prescription = new Prescription { ChemistLabId = chemistLabId };\n\n        // Act & Assert\n        Assert.Throws<Exception>(() => chemistLabService.DeleteChemistLab(chemistLabId));\n    }\n}\n\npublic class SymptomTests\n{\n    [Fact]\n    public void TC_004_AddSymptomCode()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptomCode = \"SYM001\";\n        var symptomDescription = \"Symptom Description\";\n\n        // Act\n        symptomService.AddSymptomCode(symptomCode, symptomDescription);\n\n        // Assert\n        var retrievedSymptom = symptomService.GetSymptomCode(symptomCode);\n        Assert.Equal(symptomDescription, retrievedSymptom.Description);\n    }\n\n    [Fact]\n    public void TC_005_EditUpdateSymptomCode()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptomCode = \"SYM001\";\n        var updatedSymptomDescription = \"Updated Symptom Description\";\n\n        // Act\n        symptomService.EditSymptomCode(symptomCode, updatedSymptomDescription);\n\n        // Assert\n        var retrievedSymptom = symptomService.GetSymptomCode(symptomCode);\n        Assert.Equal(updatedSymptomDescription, retrievedSymptom.Description);\n    }\n\n    [Fact]\n    public void TC_006_SymptomDoesNotExist()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var nonExistentSymptomCode = \"SYM999\";\n\n        // Act & Assert\n        Assert.Throws<Exception>(() => symptomService.GetSymptomCode(nonExistentSymptomCode));\n    }\n}\n\npublic class PatientProfileTests\n{\n    [Fact]\n    public void TC_007_UpdatePatientProfile()\n    {\n        // Arrange\n        var patientProfileService = new PatientProfileService();\n        var patientId = \"P001\";\n        var updatedPatientProfile = new PatientProfile { Id = patientId, Name = \"Updated Patient\", Age = 30, Sex = \"Male\", Address = \"Updated Address\", ContactDetails = \"Updated Contact\" };\n\n        // Act\n        patientProfileService.UpdatePatientProfile(patientId, updatedPatientProfile);\n\n        // Assert\n        var retrievedPatientProfile = patientProfileService.GetPatientProfile(patientId);\n        Assert.Equal(updatedPatientProfile.Name, retrievedPatientProfile.Name);\n        Assert.Equal(updatedPatientProfile.Age, retrievedPatientProfile.Age);\n        Assert.Equal(updatedPatientProfile.Sex, retrievedPatientProfile.Sex);\n        Assert.Equal(updatedPatientProfile.Address, retrievedPatientProfile.Address);\n        Assert.Equal(updatedPatientProfile.ContactDetails, retrievedPatientProfile.ContactDetails);\n    }\n\n    [Fact]\n    public void TC_008_NewPatientRegistration()\n    {\n        // Arrange\n        var patientProfileService = new PatientProfileService();\n        var newPatientProfile = new PatientProfile { Name = \"New Patient\", Age = 25, Sex = \"Female\", Address = \"New Address\", ContactDetails = \"New Contact\" };\n\n        // Act\n        var patientId = patientProfileService.RegisterNewPatient(newPatientProfile);\n\n        // Assert\n        var retrievedPatientProfile = patientProfileService.GetPatientProfile(patientId);\n        Assert.Equal(newPatientProfile.Name, retrievedPatientProfile.Name);\n        Assert.Equal(newPatientProfile.Age, retrievedPatientProfile.Age);\n        Assert.Equal(newPatientProfile.Sex, retrievedPatientProfile.Sex);\n        Assert.Equal(newPatientProfile.Address, retrievedPatientProfile.Address);\n        Assert.Equal(newPatientProfile.ContactDetails, retrievedPatientProfile.ContactDetails);\n    }\n}",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Edit/Update Chemist/Lab Details",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "chemistLabId": "12345",
+            "updatedChemistLab": {
+              "Id": "12345",
+              "Name": "Updated Chemist",
+              "Address": "Updated Address",
+              "ContactDetails": "Updated Contact"
+            }
+          },
+          "steps": [
+            "Arrange a ChemistLabService instance",
+            "Create an updated ChemistLab object",
+            "Call EditChemistLab method with the updated ChemistLab object",
+            "Retrieve the updated ChemistLab object from the service"
+          ],
+          "expected": [
+            "Updated ChemistLab details should be retrieved correctly"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Chemist/Lab Does Not Exist",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "chemistLabId": "99999"
+          },
+          "steps": [
+            "Arrange a ChemistLabService instance",
+            "Call GetChemistLab method with a non-existent ChemistLab ID"
+          ],
+          "expected": [
+            "An exception should be thrown indicating that the Chemist or Lab does not exist"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Chemist/Lab Has Open Prescription Requests",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "chemistLabId": "12345"
+          },
+          "steps": [
+            "Arrange a ChemistLabService instance",
+            "Create a Prescription object with the ChemistLab ID",
+            "Call DeleteChemistLab method with the ChemistLab ID"
+          ],
+          "expected": [
+            "An exception should be thrown indicating that the Chemist or Lab has open Prescription Requests and cannot be deleted"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add Symptom Code",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptomCode": "SYM001",
+            "symptomDescription": "Symptom Description"
+          },
+          "steps": [
+            "Arrange a SymptomService instance",
+            "Call AddSymptomCode method with the symptom code and description"
+          ],
+          "expected": [
+            "The symptom code should be added successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Edit/Update Symptom Code",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptomCode": "SYM001",
+            "updatedSymptomDescription": "Updated Symptom Description"
+          },
+          "steps": [
+            "Arrange a SymptomService instance",
+            "Call EditSymptomCode method with the updated symptom description"
+          ],
+          "expected": [
+            "The symptom code should be updated successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Symptom Does Not Exist",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "symptomCode": "SYM999"
+          },
+          "steps": [
+            "Arrange a SymptomService instance",
+            "Call GetSymptomCode method with a non-existent symptom code"
+          ],
+          "expected": [
+            "An exception should be thrown indicating that the symptom does not exist"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Update Patient Profile",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patientId": "P001",
+            "updatedPatientProfile": {
+              "Id": "P001",
+              "Name": "Updated Patient",
+              "Age": 30,
+              "Sex": "Male",
+              "Address": "Updated Address",
+              "ContactDetails": "Updated Contact"
+            }
+          },
+          "steps": [
+            "Arrange a PatientProfileService instance",
+            "Create an updated PatientProfile object",
+            "Call UpdatePatientProfile method with the updated PatientProfile object",
+            "Retrieve the updated PatientProfile object from the service"
+          ],
+          "expected": [
+            "Updated PatientProfile details should be retrieved correctly"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "New Patient Registration",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "newPatientProfile": {
+              "Name": "New Patient",
+              "Age": 25,
+              "Sex": "Female",
+              "Address": "New Address",
+              "ContactDetails": "New Contact"
+            }
+          },
+          "steps": [
+            "Arrange a PatientProfileService instance",
+            "Call RegisterNewPatient method with the new PatientProfile object",
+            "Retrieve the new PatientProfile object from the service"
+          ],
+          "expected": [
+            "The new PatientProfile should be registered successfully and details should be retrieved correctly"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "Python syntax error: invalid syntax",
+          "No xUnit-style test definitions found."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Python syntax error: invalid syntax\n- No xUnit-style test definitions found.",
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\n\nclass ChemistLabTest(unittest.TestCase):\n    @patch('module.query_chemist_lab')\n    def test_query_chemist_lab_success(self, mock_query):\n        mock_query.return_value = {'id': '123', 'name': 'John Doe', 'address': '123 Main St', 'contact': '123-456-7890'}\n        response = query_chemist_lab('123')\n        self.assertEqual(response, {'id': '123', 'name': 'John Doe', 'address': '123 Main St', 'contact': '123-456-7890'})\n\n    @patch('module.query_chemist_lab')\n    def test_query_chemist_lab_failure(self, mock_query):\n        mock_query.return_value = None\n        with self.assertRaises(Exception) as context:\n            query_chemist_lab('456')\n        self.assertIn('Chemist or Lab does not exist', str(context.exception))\n\n    @patch('module.delete_chemist_lab')\n    @patch('module.check_open_requests')\n    def test_delete_chemist_lab_success(self, mock_check, mock_delete):\n        mock_check.return_value = False\n        mock_delete.return_value = True\n        response = delete_chemist_lab('123')\n        self.assertTrue(response)\n\n    @patch('module.delete_chemist_lab')\n    @patch('module.check_open_requests')\n    def test_delete_chemist_lab_failure(self, mock_check, mock_delete):\n        mock_check.return_value = True\n        mock_delete.return_value = False\n        with self.assertRaises(Exception) as context:\n            delete_chemist_lab('123')\n        self.assertIn('Chemist or Lab has open Prescription Requests - cannot delete', str(context.exception))\n\nclass SymptomTest(unittest.TestCase):\n    @patch('module.add_symptom')\n    def test_add_symptom_success(self, mock_add):\n        mock_add.return_value = True\n        response = add_symptom('123', 'Symptom Description')\n        self.assertTrue(response)\n\n    @patch('module.update_symptom')\n    def test_update_symptom_success(self, mock_update):\n        mock_update.return_value = True\n        response = update_symptom('123', 'Updated Symptom Description')\n        self.assertTrue(response)\n\n    @patch('module.update_symptom')\n    def test_update_symptom_failure(self, mock_update):\n        mock_update.return_value = False\n        with self.assertRaises(Exception) as context:\n            update_symptom('456', 'Updated Symptom Description')\n        self.assertIn('Symptom does not exist', str(context.exception))\n\nclass PatientProfileTest(unittest.TestCase):\n    @patch('module.register_patient')\n    def test_register_patient_success(self, mock_register):\n        mock_register.return_value = {'id': '123', 'name': 'John Doe', 'age': 30, 'sex': 'Male', 'address': '123 Main St', 'contact': '123-456-7890'}\n        response = register_patient('John Doe', '30', 'Male', '123 Main St', '123-456-7890')\n        self.assertEqual(response, {'id': '123', 'name': 'John Doe', 'age': 30, 'sex': 'Male', 'address': '123 Main St', 'contact': '123-456-7890'})\n\n    @patch('module.register_patient')\n    def test_register_patient_failure(self, mock_register):\n        mock_register.return_value = None\n        with self.assertRaises(Exception) as context:\n            register_patient('John Doe', '30', 'Male', '123 Main St', '123-456-7890')\n        self.assertIn('Invalid username/password', str(context.exception))\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    }
+  ]
+}

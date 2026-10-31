@@ -1,0 +1,1635 @@
+{
+  "unit_id": "U28_misc",
+  "representation": "Decision Tables",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 1.0,
+    "representation_score": 0.6667,
+    "sfv_score": 0.8333,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": [
+      "Table syntax is inconsistent."
+    ]
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.875,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.5,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.4118,
+    "hallucinated": [
+      {
+        "value": "EXISTING_ID",
+        "context": "placeholder Chemist/Lab Id",
+        "grounded": false
+      },
+      {
+        "value": "NON_EXISTENT_ID",
+        "context": "placeholder Chemist/Lab Id",
+        "grounded": false
+      },
+      {
+        "value": "NEW_CODE",
+        "context": "placeholder Symptom Code",
+        "grounded": false
+      },
+      {
+        "value": "NEW_DESCRIPTION",
+        "context": "placeholder Symptom Description",
+        "grounded": false
+      },
+      {
+        "value": "EXISTING_CODE",
+        "context": "placeholder Symptom Code",
+        "grounded": false
+      },
+      {
+        "value": "VALID_USER",
+        "context": "placeholder Username",
+        "grounded": false
+      },
+      {
+        "value": "VALID_PASS",
+        "context": "placeholder Password",
+        "grounded": false
+      },
+      {
+        "value": "INVALID_USER",
+        "context": "placeholder Username",
+        "grounded": false
+      },
+      {
+        "value": "INVALID_PASS",
+        "context": "placeholder Password",
+        "grounded": false
+      },
+      {
+        "value": "Add",
+        "context": "menu operation",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 17,
+    "uncovered_clauses": [
+      "VCDPA02"
+    ],
+    "weaknesses": [
+      "Missing tests for patient registration (VCDPA02).",
+      "Many expected results are vague; add concrete assertions (e.g., specific field values).",
+      "No boundary or edge case testing for numeric fields such as Age.",
+      "No verification that edit/delete actions actually modify or remove data.",
+      "No tests confirm that added symptom codes are persisted in the system."
+    ],
+    "traceability": 0.875,
+    "untraced_reqs": [
+      "VCDPA02"
+    ],
+    "fsa_score": 0.7868,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Decision Table 1: Edit/Update Chemist/Labs Screen\n| Condition 1: Chemist/Lab Id Exists | Condition 2: Chemist/Lab Name | Condition 3: Address | Condition 4: Contact Details | Action |\n|------------------------------------|------------------------------|----------------------|-----------------------------|--------|\n| Yes                                | -                            | -                    | -                           | Display and modify details |\n| No                                 | -                            | -                    | -                           | Display error: \"Chemist or Lab does not exist\" |\n\nDecision Table 2: Delete Chemist/Lab Details\n| Condition 1: Open Prescription Requests | Action |\n|----------------------------------------|--------|\n| Yes                                    | Display error: \"Chemist or Lab has open Prescription Requests - cannot delete\" |\n| No                                     | Delete Chemist/Lab details |\n\nDecision Table 3: Add Symptom Code Screen\n| Condition 1: Symptom Code | Condition 2: Symptom Description | Action |\n|---------------------------|----------------------------------|--------|\n| Unique                    | -                                | Add Symptom Code |\n| Duplicate                 | -                                | Display error: \"Symptom Code already exists\" |\n\nDecision Table 4: Edit/Update Symptom Screen\n| Condition 1: Symptom Code Exists | Condition 2: Symptom Description | Action |\n|----------------------------------|----------------------------------|--------|\n| Yes                              | -                                | Display and modify details |\n| No                               | -                                | Display error: \"Symptom does not exist\" |\n\nDecision Table 5: Update Patient Profile\n| Condition 1: Valid Username/Password | Action |\n|--------------------------------------|--------|\n| Yes                                  | Capture and update Patient Id, Name, Age, Sex, Address, Contact details |\n| No                                   | Display error: \"Invalid username or password\" |\n\nDecision Table 6: Raise Consultation/Appointment Request\n| Condition 1: Patient Profile Exists | Action |\n|-------------------------------------|--------|\n| Yes                                 | Raise Consultation/Appointment Request |\n| No                                  | Display error: \"Patient profile does not exist\" |\n\nDecision Table 7: Generate Prescription Reports/Print Invoice\n| Condition 1: Prescription Exists | Action |\n|----------------------------------|--------|\n| Yes                              | Generate Prescription Report and Print Invoice |\n| No                               | Display error: \"No prescription available for reporting\" |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Edit/Update Chemist/Labs Screen - Positive Path",
+      "req_ids": [
+        "VCMCL03-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist/Lab Id exists"
+      ],
+      "inputs": {
+        "Chemist_Lab_Id": "EXISTING_ID"
+      },
+      "steps": [
+        "Navigate to Edit/Update Chemist/Labs Screen",
+        "Query on Chemist/Lab Id",
+        "Verify details are displayed"
+      ],
+      "expected": [
+        "Details are displayed and can be modified"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Edit/Update Chemist/Labs Screen - Chemist/Lab Does Not Exist",
+      "req_ids": [
+        "VCMCL03-2"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "Chemist_Lab_Id": "NON_EXISTENT_ID"
+      },
+      "steps": [
+        "Navigate to Edit/Update Chemist/Labs Screen",
+        "Query on Chemist/Lab Id"
+      ],
+      "expected": [
+        "Error message: 'Chemist or Lab does not exist' displayed"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Delete Chemist/Lab Details - Open Prescription Requests",
+      "req_ids": [
+        "VCMCL03-3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Open Prescription Requests exist"
+      ],
+      "inputs": {
+        "Chemist_Lab_Id": "EXISTING_ID"
+      },
+      "steps": [
+        "Navigate to Delete Chemist/Lab Details",
+        "Attempt deletion"
+      ],
+      "expected": [
+        "Error message: 'Chemist or Lab has open Prescription Requests - cannot delete' displayed"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Delete Chemist/Lab Details - No Open Prescription Requests",
+      "req_ids": [
+        "VCMCL03-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "No Open Prescription Requests"
+      ],
+      "inputs": {
+        "Chemist_Lab_Id": "EXISTING_ID"
+      },
+      "steps": [
+        "Navigate to Delete Chemist/Lab Details",
+        "Attempt deletion"
+      ],
+      "expected": [
+        "Chemist/Lab details are deleted"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Add Symptom Code - Unique Symptom Code",
+      "req_ids": [
+        "VCMSYM02"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "Symptom_Code": "NEW_CODE",
+        "Symptom_Description": "NEW_DESCRIPTION"
+      },
+      "steps": [
+        "Navigate to Add Symptom Code Screen",
+        "Enter Symptom Code and Description",
+        "Submit"
+      ],
+      "expected": [
+        "Symptom Code is added"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Add Symptom Code - Duplicate Symptom Code",
+      "req_ids": [
+        "VCMSYM02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Symptom Code already exists"
+      ],
+      "inputs": {
+        "Symptom_Code": "EXISTING_CODE",
+        "Symptom_Description": "NEW_DESCRIPTION"
+      },
+      "steps": [
+        "Navigate to Add Symptom Code Screen",
+        "Enter Symptom Code and Description",
+        "Submit"
+      ],
+      "expected": [
+        "Error message: 'Symptom Code already exists' displayed"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Edit/Update Symptom Screen - Symptom Exists",
+      "req_ids": [
+        "VCMSYM03"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Symptom Code exists"
+      ],
+      "inputs": {
+        "Symptom_Code": "EXISTING_CODE"
+      },
+      "steps": [
+        "Navigate to Edit/Update Symptom Screen",
+        "Query on Symptom Code",
+        "Verify details are displayed"
+      ],
+      "expected": [
+        "Details are displayed and can be modified"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Edit/Update Symptom Screen - Symptom Does Not Exist",
+      "req_ids": [
+        "VCMSYM03"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "Symptom_Code": "NON_EXISTENT_CODE"
+      },
+      "steps": [
+        "Navigate to Edit/Update Symptom Screen",
+        "Query on Symptom Code"
+      ],
+      "expected": [
+        "Error message: 'Symptom does not exist' displayed"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Update Patient Profile - Valid Username/Password",
+      "req_ids": [
+        "VCMPA01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Valid username and password"
+      ],
+      "inputs": {
+        "Username": "VALID_USER",
+        "Password": "VALID_PASS"
+      },
+      "steps": [
+        "Navigate to Update Patient Profile Screen",
+        "Enter username and password",
+        "Verify patient details are captured"
+      ],
+      "expected": [
+        "Patient Id, Name, Age, Sex, Address, Contact details are captured and updated"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Update Patient Profile - Invalid Username/Password",
+      "req_ids": [
+        "VCMPA01"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "Username": "INVALID_USER",
+        "Password": "INVALID_PASS"
+      },
+      "steps": [
+        "Navigate to Update Patient Profile Screen",
+        "Enter username and password",
+        "Attempt to capture details"
+      ],
+      "expected": [
+        "Error message: 'Invalid username or password' displayed"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Raise Consultation/Appointment Request - Patient Profile Exists",
+      "req_ids": [
+        "VCMPA01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient profile exists"
+      ],
+      "inputs": {
+        "Patient_Id": "EXISTING_ID"
+      },
+      "steps": [
+        "Navigate to Raise Consultation/Appointment Request Screen",
+        "Query on Patient Id",
+        "Submit request"
+      ],
+      "expected": [
+        "Consultation/Appointment Request is raised"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Raise Consultation/Appointment Request - Patient Profile Does Not Exist",
+      "req_ids": [
+        "VCMPA01"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "Patient_Id": "NON_EXISTENT_ID"
+      },
+      "steps": [
+        "Navigate to Raise Consultation/Appointment Request Screen",
+        "Query on Patient Id",
+        "Attempt to raise request"
+      ],
+      "expected": [
+        "Error message: 'Patient profile does not exist' displayed"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Generate Prescription Reports/Print Invoice - Prescription Exists",
+      "req_ids": [
+        "VCMPA01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Prescription exists"
+      ],
+      "inputs": {
+        "Prescription_Id": "EXISTING_ID"
+      },
+      "steps": [
+        "Navigate to Generate Prescription Reports/Print Invoice Screen",
+        "Query on Prescription Id",
+        "Generate report and print invoice"
+      ],
+      "expected": [
+        "Prescription Report is generated and Invoice is printed"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Generate Prescription Reports/Print Invoice - No Prescription Available",
+      "req_ids": [
+        "VCMPA01"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "Prescription_Id": "NON_EXISTENT_ID"
+      },
+      "steps": [
+        "Navigate to Generate Prescription Reports/Print Invoice Screen",
+        "Query on Prescription Id",
+        "Attempt to generate report and print invoice"
+      ],
+      "expected": [
+        "Error message: 'No prescription available for reporting' displayed"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "Add Symptom Code - Menu Operation",
+      "req_ids": [
+        "VCMSYM01"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "Operation": "Add"
+      },
+      "steps": [
+        "Navigate to Administrators Menu Screen",
+        "Select Maintain Symptoms",
+        "Choose Add Symptom Code",
+        "Enter Symptom Code and Description",
+        "Submit"
+      ],
+      "expected": [
+        "Symptom Code is added"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "Edit Symptom Code - Menu Operation",
+      "req_ids": [
+        "VCMSYM01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Symptom Code exists"
+      ],
+      "inputs": {
+        "Symptom_Code": "EXISTING_CODE"
+      },
+      "steps": [
+        "Navigate to Administrators Menu Screen",
+        "Select Maintain Symptoms",
+        "Choose Edit Symptom Code",
+        "Query on Symptom Code",
+        "Modify and submit"
+      ],
+      "expected": [
+        "Symptom Code is updated"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "Invalid Inputs for VCMSYM02 - Non-Existent Symptom Code",
+      "req_ids": [
+        "VCMSYM02"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "Symptom_Code": "NON_EXISTENT_CODE",
+        "Symptom_Description": "INVALID_DESC"
+      },
+      "steps": [
+        "Navigate to Add Symptom Code Screen",
+        "Enter Symptom Code and Description",
+        "Submit"
+      ],
+      "expected": [
+        "Error message: 'Symptom does not exist' displayed"
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "Invalid Inputs for VCMSYM03 - Non-Existent Symptom Code",
+      "req_ids": [
+        "VCMSYM03"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "Symptom_Code": "NON_EXISTENT_CODE"
+      },
+      "steps": [
+        "Navigate to Edit/Update Symptom Screen",
+        "Query on Symptom Code"
+      ],
+      "expected": [
+        "Error message: 'Symptom does not exist' displayed"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Decision Table for Requirement VCMCL03-1: Edit/Update Chemist/Labs Screen\nConditions:\n- Query Type: (Chemist/Lab Id, Chemist/Lab Name, Address, Contact Details)\n- Existence Check: (Chemist/Lab Id exists?)\nActions:\n- Display Details: (Yes → Display; No → Exception)\n- Modify Details: (Yes → Allow; No → Exception)\n- Delete Details: (Yes → Allow; No → Exception)\n\nDecision Table for Requirement VCMCL03-2: Exception for Non-Existent Chemist/Lab\nConditions:\n- Existence Check: (Chemist/Lab Id exists?)\nActions:\n- Display Message: (No → \"Chemist or Lab does not exist\"; Yes → None)\n\nDecision Table for Requirement VCMCL03-3: Delete Chemist/Lab with Open Prescription Requests\nConditions:\n- Open Requests Check: (Open Prescription Requests exist?)\nActions:\n- Delete Chemist/Lab: (Yes → Exception \"Chemist or Lab has open Prescription Requests - cannot delete\"; No → Delete)\n\nDecision Table for Requirement VCMSYM01: Administrators Menu to Maintain Symptoms\nConditions:\n- Operation Type: (Add Symptom Code, Edit/Update Symptom Codes)\nActions:\n- Add Symptom: (Add → Prompt for Symptom Code, Description; Edit → Display Symptom Code, Description)\n- Update Symptom: (Yes → Allow; No → Exception)\n\nDecision Table for Requirement VCMSYM02: Add Symptom Code Screen\nConditions:\n- Input Validation: (Symptom Code unique?)\nActions:\n- Add Symptom: (Yes → Store Symptom Code, Description; No → Exception)\n\nDecision Table for Requirement VCMSYM03: Edit/Update Symptom Screen\nConditions:\n- Existence Check: (Symptom Code exists?)\nActions:\n- Display Details: (Yes → Display; No → Exception)\n- Modify Details: (Yes → Allow; No → Exception)\n- Delete Details: (Yes → Allow; No → Exception)\n\nDecision Table for Requirement VCMPA01: Update Patient Profile and Raise Consultation/Appointment Request\nConditions:\n- Profile Update: (Patient Id exists?)\nActions:\n- Update Profile: (Yes → Update; No → Exception)\n- Raise Request: (Yes → Allow; No → Exception)\n\nDecision Table for Requirement VCDPA02: Patient Registration Screen\nConditions:\n- New Registration: (Username/Password valid?)\nActions:\n- Capture Details: (Yes → Capture Patient Id, Name, Age, Sex, Address, Contact; No → Exception)",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Edit/Update Chemist/Labs Screen with existing Chemist/Lab Id",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist/Lab Id exists"
+          ],
+          "inputs": {
+            "query_type": "Chemist/Lab Id",
+            "existence_check": "Yes"
+          },
+          "steps": [
+            "Navigate to Edit/Update Chemist/Labs Screen",
+            "Query by Chemist/Lab Id"
+          ],
+          "expected": [
+            "Details displayed",
+            "Modification allowed",
+            "Deletion allowed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test exception for non-existent Chemist/Lab Id",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist/Lab Id does not exist"
+          ],
+          "inputs": {
+            "query_type": "Chemist/Lab Id",
+            "existence_check": "No"
+          },
+          "steps": [
+            "Navigate to Edit/Update Chemist/Labs Screen",
+            "Query by non-existent Chemist/Lab Id"
+          ],
+          "expected": [
+            "Exception message displayed: 'Chemist or Lab does not exist'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test deletion of Chemist/Lab with open Prescription Requests",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Open Prescription Requests exist for Chemist/Lab"
+          ],
+          "inputs": {
+            "open_requests_check": "Yes"
+          },
+          "steps": [
+            "Navigate to Delete Chemist/Lab Screen",
+            "Attempt deletion"
+          ],
+          "expected": [
+            "Exception message displayed: 'Chemist or Lab has open Prescription Requests - cannot delete'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Add Symptom Code with unique Symptom Code",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom Code is unique"
+          ],
+          "inputs": {
+            "symptom_code": "SYM001",
+            "description": "Fever"
+          },
+          "steps": [
+            "Navigate to Add Symptom Code Screen",
+            "Enter Symptom Code and Description"
+          ],
+          "expected": [
+            "Symptom added successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Edit/Update Symptom Code with existing Symptom Code",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom Code exists"
+          ],
+          "inputs": {
+            "symptom_code": "SYM001",
+            "description": "High Fever"
+          },
+          "steps": [
+            "Navigate to Edit/Update Symptom Screen",
+            "Query by Symptom Code"
+          ],
+          "expected": [
+            "Details displayed",
+            "Modification allowed",
+            "Deletion allowed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test exception for non-existent Symptom Code during Edit/Update",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom Code does not exist"
+          ],
+          "inputs": {
+            "symptom_code": "SYM999",
+            "description": "Unknown"
+          },
+          "steps": [
+            "Navigate to Edit/Update Symptom Screen",
+            "Query by non-existent Symptom Code"
+          ],
+          "expected": [
+            "Exception message displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Update Patient Profile and Raise Consultation/Appointment Request",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Id exists"
+          ],
+          "inputs": {
+            "patient_id": "PAT001"
+          },
+          "steps": [
+            "Navigate to Update Patient Profile Screen",
+            "Update details",
+            "Raise Consultation/Appointment Request"
+          ],
+          "expected": [
+            "Profile updated",
+            "Request raised successfully"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Patient Registration with valid username/password",
+          "req_ids": [
+            "VCDPA02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Username/Password is valid"
+          ],
+          "inputs": {
+            "username": "user1",
+            "password": "pass123"
+          },
+          "steps": [
+            "Navigate to Patient Registration Screen",
+            "Enter valid username and password",
+            "Capture details"
+          ],
+          "expected": [
+            "Patient Id, Name, Age, Sex, Address, Contact captured successfully"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No table structure detected."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No table structure detected.",
+      "artifact": "Decision Table for Requirement VCMCL03-1: Edit/Update Chemist/Labs Screen\nConditions:\n- Chemist/Lab Id: {exists, not_exists}\n- Chemist/Lab Name: {input, -}\n- Address: {input, -}\n- Contact Details: {input, -}\nActions:\n- Display Query: {yes, no}\n- Can Modify: {yes, no}\n- Can Delete: {yes, no}\n\n| Chemist/Lab Id | Chemist/Lab Name | Address | Contact Details | Display Query | Can Modify | Can Delete |\n|----------------|------------------|---------|-----------------|---------------|------------|------------|\n| exists         | -                | -       | -               | yes           | yes        | yes        |\n| not_exists     | -                | -       | -               | no            | no         | no         |\n\nDecision Table for Requirement VCMCL03-2: Exception for Non-Existent Chemist/Lab Id\nConditions:\n- Chemist/Lab Id: {exists, not_exists}\nActions:\n- Display Error Message: {yes, no}\n\n| Chemist/Lab Id | Display Error Message |\n|----------------|-----------------------|\n| not_exists     | yes                   |\n| exists         | no                    |\n\nDecision Table for Requirement VCMCL03-3: Delete Chemist/Lab with Open Prescription Requests\nConditions:\n- Open Prescription Requests: {yes, no}\n- Chemist/Lab Id: {exists, -}\nActions:\n- Allow Delete: {yes, no}\n- Display Error Message: {yes, no}\n\n| Open Prescription Requests | Chemist/Lab Id | Allow Delete | Display Error Message |\n|---------------------------|----------------|--------------|-----------------------|\n| yes                       | exists         | no           | yes                   |\n| no                        | exists         | yes          | no                    |\n| yes                       | -              | no           | yes                   |\n| no                        | -              | no           | no                    |\n\nDecision Table for Requirement VCMSYM01: Administrators Menu to Maintain Symptoms\nConditions:\n- Operation: {Add, Edit}\n- Symptom Code: {exists, not_exists}\nActions:\n- Display Screen: {yes, no}\n- Allow Modification: {yes, no}\n\n| Operation | Symptom Code | Display Screen | Allow Modification |\n|-----------|--------------|----------------|--------------------|\n| Add       | -            | yes            | yes                |\n| Edit      | exists       | yes            | yes                |\n| Edit      | not_exists   | no             | no                 |\n\nDecision Table for Requirement VCMSYM02: Add Symptom Code Screen\nConditions:\n- Symptom Code: {input, -}\n- Symptom Description: {input, -}\nActions:\n- Validate Input: {valid, invalid}\n\n| Symptom Code | Symptom Description | Validate Input |\n|--------------|---------------------|----------------|\n| input        | input               | valid          |\n| -            | -                   | invalid        |\n\nDecision Table for Requirement VCMSYM03: Edit/Update Symptom Screen\nConditions:\n- Symptom Code: {exists, not_exists}\n- Symptom Description: {input, -}\nActions:\n- Display Query: {yes, no}\n- Can Modify: {yes, no}\n- Can Delete: {yes, no}\n\n| Symptom Code | Symptom Description | Display Query | Can Modify | Can Delete |\n|--------------|---------------------|---------------|------------|------------|\n| exists       | -                   | yes           | yes        | yes        |\n| not_exists   | -                   | no            | no         | no         |\n\nDecision Table for Requirement VCMPA01: Update Patient Profile and Raise Consultation/Appointment Request\nConditions:\n- Patient Id: {exists, not_exists}\n- Open Requests: {yes, no}\nActions:\n- Allow Update: {yes, no}\n- Allow Raise Request: {yes, no}\n\n| Patient Id | Open Requests | Allow Update | Allow Raise Request |\n|------------|---------------|--------------|---------------------|\n| exists     | yes           | no           | no                  |\n| exists     | no            | yes          | yes                 |\n| not_exists | -             | no           | no                  |\n\nDecision Table for Requirement VCDPA02: Patient Registration Screen\nConditions:\n- Username/Password: {valid, invalid}\nActions:\n- Display Registration Screen: {yes, no}\n- Capture Details: {yes, no}\n\n| Username/Password | Display Registration Screen | Capture Details |\n|-------------------|-----------------------------|-----------------|\n| valid             | yes                         | yes             |\n| invalid           | no                          | no              |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Edit/Update Chemist/Labs Screen with existing Chemist/Lab Id",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist/Lab Id exists"
+          ],
+          "inputs": {
+            "Chemist/Lab Id": "EXISTING_ID"
+          },
+          "steps": [
+            "Navigate to Edit/Update Chemist/Labs Screen",
+            "Query with existing Chemist/Lab Id"
+          ],
+          "expected": [
+            "Query results displayed",
+            "Modification and deletion options available"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Exception for Non-Existent Chemist/Lab Id",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist/Lab Id does not exist"
+          ],
+          "inputs": {
+            "Chemist/Lab Id": "NON_EXISTENT_ID"
+          },
+          "steps": [
+            "Navigate to Edit/Update Chemist/Labs Screen",
+            "Query with non-existent Chemist/Lab Id"
+          ],
+          "expected": [
+            "Error message displayed: 'Chemist or Lab does not exist'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Delete Chemist/Lab with Open Prescription Requests",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Open Prescription Requests exist for Chemist/Lab Id"
+          ],
+          "inputs": {
+            "Chemist/Lab Id": "EXISTING_ID_WITH_OPEN_REQUESTS"
+          },
+          "steps": [
+            "Attempt to delete Chemist/Lab with open requests"
+          ],
+          "expected": [
+            "Error message displayed: 'Chemist or Lab has open Prescription Requests - cannot delete'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Add Symptom Code Screen with valid inputs",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Valid Symptom Code and Description provided"
+          ],
+          "inputs": {
+            "Symptom Code": "NEW_SYMPTOM",
+            "Symptom Description": "New Symptom Description"
+          },
+          "steps": [
+            "Navigate to Add Symptom Code Screen",
+            "Enter valid Symptom Code and Description"
+          ],
+          "expected": [
+            "Input validated as valid",
+            "Screen confirms successful addition"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Edit/Update Symptom Screen with existing Symptom Code",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom Code exists"
+          ],
+          "inputs": {
+            "Symptom Code": "EXISTING_SYMPTOM"
+          },
+          "steps": [
+            "Navigate to Edit/Update Symptom Screen",
+            "Query with existing Symptom Code"
+          ],
+          "expected": [
+            "Query results displayed",
+            "Modification and deletion options available"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Patient Registration with valid username/password",
+          "req_ids": [
+            "VCDPA02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Valid username and password provided"
+          ],
+          "inputs": {
+            "Username": "VALID_USER",
+            "Password": "VALID_PASS"
+          },
+          "steps": [
+            "Initiate patient registration",
+            "Enter valid username and password"
+          ],
+          "expected": [
+            "Registration screen displayed",
+            "Patient details captured successfully"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.6667,
+        "sfv_score": 0.8333,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": [
+          "Table syntax is inconsistent."
+        ]
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.61,
+        "negative_coverage": 0.4,
+        "oracle_assertiveness": 0.33,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 2,
+        "uncovered_clauses": [
+          "VCMSYM01 Add Symptom Code (menu)",
+          "VCMSYM01 Edit Symptom Code (menu)",
+          "VCMSYM02 Symptom Code input field presence",
+          "VCMSYM03 Symptom does not exist error",
+          "VCMPA01 Update Patient Profile",
+          "VCMPA01 Raise Consultation/Appointment Request",
+          "VCMPA01 View/Generate Prescription Reports",
+          "VCMPA01 Print Invoice",
+          "VCDPA02 Invalid username/password",
+          "VCMCL03-2 Positive path (exists)",
+          "VCMCL03-3 Positive path (no open requests)",
+          "VCMSYM02 Invalid input"
+        ],
+        "weaknesses": [
+          "Add tests for positive paths of VCMCL03-2 and VCMCL03-3.",
+          "Include tests for VCMSYM01 menu operations (add/edit symptom codes).",
+          "Test invalid inputs for VCMSYM02 and VCMSYM03 (non-existent symptom code).",
+          "Cover VCMPA01 functionalities (profile update, request raising, reports, invoice printing).",
+          "Make oracle assertions more precise by specifying exact messages and state changes."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VCMPA01",
+          "VCMSYM01"
+        ],
+        "fsa_score": 0.6535,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.6535; sub-scores {'clause_coverage': 0.61, 'negative_coverage': 0.4, 'oracle_assertiveness': 0.33, 'boundary_coverage': 1.0, 'groundedness_mg': 1.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCMPA01', 'VCMSYM01'] (add at least one each)\n- uncovered clause: VCMSYM01 Add Symptom Code (menu)\n- uncovered clause: VCMSYM01 Edit Symptom Code (menu)\n- uncovered clause: VCMSYM02 Symptom Code input field presence\n- uncovered clause: VCMSYM03 Symptom does not exist error\n- uncovered clause: VCMPA01 Update Patient Profile\n- uncovered clause: VCMPA01 Raise Consultation/Appointment Request\n- Add tests for positive paths of VCMCL03-2 and VCMCL03-3.\n- Include tests for VCMSYM01 menu operations (add/edit symptom codes).\n- Test invalid inputs for VCMSYM02 and VCMSYM03 (non-existent symptom code).\n- Cover VCMPA01 functionalities (profile update, request raising, reports, invoice printing).\n- Make oracle assertions more precise by specifying exact messages and state changes.",
+      "artifact": "Decision Table 1: Edit/Update Chemist/Labs Screen\n| Condition 1: Chemist/Lab Id Exists | Condition 2: Chemist/Lab Name | Condition 3: Address | Condition 4: Contact Details | Action |\n|------------------------------------|------------------------------|----------------------|-----------------------------|--------|\n| Yes                                | -                            | -                    | -                           | Display and modify details |\n| No                                 | -                            | -                    | -                           | Display error: \"Chemist or Lab does not exist\" |\n\nDecision Table 2: Delete Chemist/Lab Details\n| Condition 1: Open Prescription Requests | Action |\n|----------------------------------------|--------|\n| Yes                                    | Display error: \"Chemist or Lab has open Prescription Requests - cannot delete\" |\n| No                                     | Delete Chemist/Lab details |\n\nDecision Table 3: Add Symptom Code Screen\n| Condition 1: Symptom Code | Condition 2: Symptom Description | Action |\n|---------------------------|----------------------------------|--------|\n| Unique                    | -                                | Add Symptom Code |\n| Duplicate                 | -                                | Display error: \"Symptom Code already exists\" |\n\nDecision Table 4: Edit/Update Symptom Screen\n| Condition 1: Symptom Code Exists | Condition 2: Symptom Description | Action |\n|----------------------------------|----------------------------------|--------|\n| Yes                              | -                                | Display and modify details |\n| No                               | -                                | Display error: \"Symptom does not exist\" |\n\nDecision Table 5: Update Patient Profile\n| Condition 1: Valid Username/Password | Action |\n|--------------------------------------|--------|\n| Yes                                  | Capture and update Patient Id, Name, Age, Sex, Address, Contact details |\n| No                                   | Display error: \"Invalid username or password\" |\n\nDecision Table 6: Raise Consultation/Appointment Request\n| Condition 1: Patient Profile Exists | Action |\n|-------------------------------------|--------|\n| Yes                                 | Raise Consultation/Appointment Request |\n| No                                  | Display error: \"Patient profile does not exist\" |\n\nDecision Table 7: Generate Prescription Reports/Print Invoice\n| Condition 1: Prescription Exists | Action |\n|----------------------------------|--------|\n| Yes                              | Generate Prescription Report and Print Invoice |\n| No                               | Display error: \"No prescription available for reporting\" |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Edit/Update Chemist/Labs Screen - Positive Path",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist/Lab Id exists"
+          ],
+          "inputs": {
+            "Chemist_Lab_Id": "EXISTING_ID"
+          },
+          "steps": [
+            "Navigate to Edit/Update Chemist/Labs Screen",
+            "Query on Chemist/Lab Id",
+            "Verify details are displayed"
+          ],
+          "expected": [
+            "Details are displayed and can be modified"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Edit/Update Chemist/Labs Screen - Chemist/Lab Does Not Exist",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Chemist_Lab_Id": "NON_EXISTENT_ID"
+          },
+          "steps": [
+            "Navigate to Edit/Update Chemist/Labs Screen",
+            "Query on Chemist/Lab Id"
+          ],
+          "expected": [
+            "Error message: 'Chemist or Lab does not exist' displayed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Chemist/Lab Details - Open Prescription Requests",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Open Prescription Requests exist"
+          ],
+          "inputs": {
+            "Chemist_Lab_Id": "EXISTING_ID"
+          },
+          "steps": [
+            "Navigate to Delete Chemist/Lab Details",
+            "Attempt deletion"
+          ],
+          "expected": [
+            "Error message: 'Chemist or Lab has open Prescription Requests - cannot delete' displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete Chemist/Lab Details - No Open Prescription Requests",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No Open Prescription Requests"
+          ],
+          "inputs": {
+            "Chemist_Lab_Id": "EXISTING_ID"
+          },
+          "steps": [
+            "Navigate to Delete Chemist/Lab Details",
+            "Attempt deletion"
+          ],
+          "expected": [
+            "Chemist/Lab details are deleted"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Add Symptom Code - Unique Symptom Code",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Symptom_Code": "NEW_CODE",
+            "Symptom_Description": "NEW_DESCRIPTION"
+          },
+          "steps": [
+            "Navigate to Add Symptom Code Screen",
+            "Enter Symptom Code and Description",
+            "Submit"
+          ],
+          "expected": [
+            "Symptom Code is added"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Add Symptom Code - Duplicate Symptom Code",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom Code already exists"
+          ],
+          "inputs": {
+            "Symptom_Code": "EXISTING_CODE",
+            "Symptom_Description": "NEW_DESCRIPTION"
+          },
+          "steps": [
+            "Navigate to Add Symptom Code Screen",
+            "Enter Symptom Code and Description",
+            "Submit"
+          ],
+          "expected": [
+            "Error message: 'Symptom Code already exists' displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Edit/Update Symptom Screen - Symptom Exists",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom Code exists"
+          ],
+          "inputs": {
+            "Symptom_Code": "EXISTING_CODE"
+          },
+          "steps": [
+            "Navigate to Edit/Update Symptom Screen",
+            "Query on Symptom Code",
+            "Verify details are displayed"
+          ],
+          "expected": [
+            "Details are displayed and can be modified"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Edit/Update Symptom Screen - Symptom Does Not Exist",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Symptom_Code": "NON_EXISTENT_CODE"
+          },
+          "steps": [
+            "Navigate to Edit/Update Symptom Screen",
+            "Query on Symptom Code"
+          ],
+          "expected": [
+            "Error message: 'Symptom does not exist' displayed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Update Patient Profile - Valid Username/Password",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Valid username and password"
+          ],
+          "inputs": {
+            "Username": "VALID_USER",
+            "Password": "VALID_PASS"
+          },
+          "steps": [
+            "Navigate to Update Patient Profile Screen",
+            "Enter username and password",
+            "Verify patient details are captured"
+          ],
+          "expected": [
+            "Patient Id, Name, Age, Sex, Address, Contact details are captured and updated"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Update Patient Profile - Invalid Username/Password",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Username": "INVALID_USER",
+            "Password": "INVALID_PASS"
+          },
+          "steps": [
+            "Navigate to Update Patient Profile Screen",
+            "Enter username and password",
+            "Attempt to capture details"
+          ],
+          "expected": [
+            "Error message: 'Invalid username or password' displayed"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Raise Consultation/Appointment Request - Patient Profile Exists",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient profile exists"
+          ],
+          "inputs": {
+            "Patient_Id": "EXISTING_ID"
+          },
+          "steps": [
+            "Navigate to Raise Consultation/Appointment Request Screen",
+            "Query on Patient Id",
+            "Submit request"
+          ],
+          "expected": [
+            "Consultation/Appointment Request is raised"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Raise Consultation/Appointment Request - Patient Profile Does Not Exist",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Patient_Id": "NON_EXISTENT_ID"
+          },
+          "steps": [
+            "Navigate to Raise Consultation/Appointment Request Screen",
+            "Query on Patient Id",
+            "Attempt to raise request"
+          ],
+          "expected": [
+            "Error message: 'Patient profile does not exist' displayed"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Generate Prescription Reports/Print Invoice - Prescription Exists",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription exists"
+          ],
+          "inputs": {
+            "Prescription_Id": "EXISTING_ID"
+          },
+          "steps": [
+            "Navigate to Generate Prescription Reports/Print Invoice Screen",
+            "Query on Prescription Id",
+            "Generate report and print invoice"
+          ],
+          "expected": [
+            "Prescription Report is generated and Invoice is printed"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Generate Prescription Reports/Print Invoice - No Prescription Available",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Prescription_Id": "NON_EXISTENT_ID"
+          },
+          "steps": [
+            "Navigate to Generate Prescription Reports/Print Invoice Screen",
+            "Query on Prescription Id",
+            "Attempt to generate report and print invoice"
+          ],
+          "expected": [
+            "Error message: 'No prescription available for reporting' displayed"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Add Symptom Code - Menu Operation",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Operation": "Add"
+          },
+          "steps": [
+            "Navigate to Administrators Menu Screen",
+            "Select Maintain Symptoms",
+            "Choose Add Symptom Code",
+            "Enter Symptom Code and Description",
+            "Submit"
+          ],
+          "expected": [
+            "Symptom Code is added"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Edit Symptom Code - Menu Operation",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom Code exists"
+          ],
+          "inputs": {
+            "Symptom_Code": "EXISTING_CODE"
+          },
+          "steps": [
+            "Navigate to Administrators Menu Screen",
+            "Select Maintain Symptoms",
+            "Choose Edit Symptom Code",
+            "Query on Symptom Code",
+            "Modify and submit"
+          ],
+          "expected": [
+            "Symptom Code is updated"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Invalid Inputs for VCMSYM02 - Non-Existent Symptom Code",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Symptom_Code": "NON_EXISTENT_CODE",
+            "Symptom_Description": "INVALID_DESC"
+          },
+          "steps": [
+            "Navigate to Add Symptom Code Screen",
+            "Enter Symptom Code and Description",
+            "Submit"
+          ],
+          "expected": [
+            "Error message: 'Symptom does not exist' displayed"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Invalid Inputs for VCMSYM03 - Non-Existent Symptom Code",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Symptom_Code": "NON_EXISTENT_CODE"
+          },
+          "steps": [
+            "Navigate to Edit/Update Symptom Screen",
+            "Query on Symptom Code"
+          ],
+          "expected": [
+            "Error message: 'Symptom does not exist' displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.6667,
+        "sfv_score": 0.8333,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": [
+          "Table syntax is inconsistent."
+        ]
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.5,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.4118,
+        "hallucinated": [
+          {
+            "value": "EXISTING_ID",
+            "context": "placeholder Chemist/Lab Id",
+            "grounded": false
+          },
+          {
+            "value": "NON_EXISTENT_ID",
+            "context": "placeholder Chemist/Lab Id",
+            "grounded": false
+          },
+          {
+            "value": "NEW_CODE",
+            "context": "placeholder Symptom Code",
+            "grounded": false
+          },
+          {
+            "value": "NEW_DESCRIPTION",
+            "context": "placeholder Symptom Description",
+            "grounded": false
+          },
+          {
+            "value": "EXISTING_CODE",
+            "context": "placeholder Symptom Code",
+            "grounded": false
+          },
+          {
+            "value": "VALID_USER",
+            "context": "placeholder Username",
+            "grounded": false
+          },
+          {
+            "value": "VALID_PASS",
+            "context": "placeholder Password",
+            "grounded": false
+          },
+          {
+            "value": "INVALID_USER",
+            "context": "placeholder Username",
+            "grounded": false
+          },
+          {
+            "value": "INVALID_PASS",
+            "context": "placeholder Password",
+            "grounded": false
+          },
+          {
+            "value": "Add",
+            "context": "menu operation",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [
+          "VCDPA02"
+        ],
+        "weaknesses": [
+          "Missing tests for patient registration (VCDPA02).",
+          "Many expected results are vague; add concrete assertions (e.g., specific field values).",
+          "No boundary or edge case testing for numeric fields such as Age.",
+          "No verification that edit/delete actions actually modify or remove data.",
+          "No tests confirm that added symptom codes are persisted in the system."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "VCDPA02"
+        ],
+        "fsa_score": 0.7868,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.7868; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.5, 'boundary_coverage': 1.0, 'groundedness_mg': 0.4118}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCDPA02'] (add at least one each)\n- uncovered clause: VCDPA02\n- ungrounded value 'EXISTING_ID' (placeholder Chemist/Lab Id): remove or use the SRS value\n- ungrounded value 'NON_EXISTENT_ID' (placeholder Chemist/Lab Id): remove or use the SRS value\n- ungrounded value 'NEW_CODE' (placeholder Symptom Code): remove or use the SRS value\n- ungrounded value 'NEW_DESCRIPTION' (placeholder Symptom Description): remove or use the SRS value\n- ungrounded value 'EXISTING_CODE' (placeholder Symptom Code): remove or use the SRS value\n- ungrounded value 'VALID_USER' (placeholder Username): remove or use the SRS value\n- Missing tests for patient registration (VCDPA02).\n- Many expected results are vague; add concrete assertions (e.g., specific field values).\n- No boundary or edge case testing for numeric fields such as Age.\n- No verification that edit/delete actions actually modify or remove data.\n- No tests confirm that added symptom codes are persisted in the system.",
+      "artifact": "Decision Table 1: Edit/Update Chemist/Lab Screen\nConditions:\n- Chemist/Lab Id: Existing_ID, Non_Existing_ID\n- Action: Query, Modify, Delete\nActions:\n- Existing_ID, Query: Display details\n- Existing_ID, Modify: Update details\n- Existing_ID, Delete: Check prescriptions, if none → Delete, else → Error \"Chemist or Lab has open Prescription Requests - cannot delete\"\n- Non_Existing_ID, Query: Error \"Chemist or Lab does not exist\"\n\nDecision Table 2: Add Symptom Code Screen\nConditions:\n- Symptom Code: New_Code\n- Action: Add\nActions:\n- New_Code: Store Symptom Code and Description\n\nDecision Table 3: Edit/Update Symptom Screen\nConditions:\n- Symptom Code: Existing_Code, Non_Existing_Code\n- Action: Query, Modify, Delete\nActions:\n- Existing_Code, Query: Display details\n- Existing_Code, Modify: Update Description\n- Existing_Code, Delete: Remove Symptom\n- Non_Existing_Code, Query: Error \"Symptom does not exist\"\n\nDecision Table 4: Patient Registration Screen\nConditions:\n- Username: Valid_User\n- Action: Register\nActions:\n- Valid_User: Capture Patient Id, Name, Age, Sex, Address, Contact details",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Edit/Update Chemist/Lab Screen with Existing ID",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist/Lab Id = Existing_ID exists"
+          ],
+          "inputs": {
+            "Chemist_Lab_Id": "EXISTING_ID",
+            "Action": "Query"
+          },
+          "steps": [
+            "Navigate to Edit/Update Chemist/Lab Screen",
+            "Enter Existing_ID",
+            "Submit"
+          ],
+          "expected": [
+            "Display Chemist/Lab details"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Edit/Update Chemist/Lab Screen with Non-Existing ID",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist/Lab Id = NON_EXISTENT_ID does not exist"
+          ],
+          "inputs": {
+            "Chemist_Lab_Id": "NON_EXISTENT_ID",
+            "Action": "Query"
+          },
+          "steps": [
+            "Navigate to Edit/Update Chemist/Lab Screen",
+            "Enter NON_EXISTENT_ID",
+            "Submit"
+          ],
+          "expected": [
+            "Display error message: 'Chemist or Lab does not exist'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Chemist/Lab with Open Prescription Requests",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist/Lab Id = EXISTING_ID has open prescription requests"
+          ],
+          "inputs": {
+            "Chemist_Lab_Id": "EXISTING_ID",
+            "Action": "Delete"
+          },
+          "steps": [
+            "Navigate to Edit/Update Chemist/Lab Screen",
+            "Enter EXISTING_ID",
+            "Submit Delete"
+          ],
+          "expected": [
+            "Display error message: 'Chemist or Lab has open Prescription Requests - cannot delete'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete Chemist/Lab with No Open Prescription Requests",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist/Lab Id = EXISTING_ID has no open prescription requests"
+          ],
+          "inputs": {
+            "Chemist_Lab_Id": "EXISTING_ID",
+            "Action": "Delete"
+          },
+          "steps": [
+            "Navigate to Edit/Update Chemist/Lab Screen",
+            "Enter EXISTING_ID",
+            "Submit Delete"
+          ],
+          "expected": [
+            "Chemist/Lab details are removed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Add Symptom Code",
+          "req_ids": [
+            "VCMSYM02"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Symptom_Code": "NEW_CODE",
+            "Symptom_Description": "NEW_DESCRIPTION"
+          },
+          "steps": [
+            "Navigate to Add Symptom Code Screen",
+            "Enter NEW_CODE and NEW_DESCRIPTION",
+            "Submit"
+          ],
+          "expected": [
+            "Symptom Code and Description are stored"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Edit/Update Symptom Code",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom Code = EXISTING_CODE exists"
+          ],
+          "inputs": {
+            "Symptom_Code": "EXISTING_CODE",
+            "New_Description": "UPDATED_DESCRIPTION"
+          },
+          "steps": [
+            "Navigate to Edit/Update Symptom Screen",
+            "Enter EXISTING_CODE",
+            "Update Description to UPDATED_DESCRIPTION",
+            "Submit"
+          ],
+          "expected": [
+            "Symptom Description is updated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Query Non-Existing Symptom Code",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom Code = NON_EXISTING_CODE does not exist"
+          ],
+          "inputs": {
+            "Symptom_Code": "NON_EXISTING_CODE"
+          },
+          "steps": [
+            "Navigate to Edit/Update Symptom Screen",
+            "Enter NON_EXISTING_CODE",
+            "Submit Query"
+          ],
+          "expected": [
+            "Display error message: 'Symptom does not exist'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient Registration with Valid Username",
+          "req_ids": [
+            "VCDPA02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Username = VALID_USER is valid"
+          ],
+          "inputs": {
+            "Username": "VALID_USER",
+            "Name": "John Doe",
+            "Age": 30,
+            "Sex": "Male",
+            "Address": "123 Main St",
+            "Contact": "555-1234"
+          },
+          "steps": [
+            "Navigate to Patient Registration Screen",
+            "Enter Username, Name, Age, Sex, Address, Contact",
+            "Submit"
+          ],
+          "expected": [
+            "Capture Patient Id, Name, Age, Sex, Address, Contact details"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Patient Registration with Invalid Username",
+          "req_ids": [
+            "VCDPA02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Username = INVALID_USER is invalid"
+          ],
+          "inputs": {
+            "Username": "INVALID_USER",
+            "Name": "Jane Doe",
+            "Age": 25,
+            "Sex": "Female",
+            "Address": "456 Elm St",
+            "Contact": "555-5678"
+          },
+          "steps": [
+            "Navigate to Patient Registration Screen",
+            "Enter INVALID_USER, Name, Age, Sex, Address, Contact",
+            "Submit"
+          ],
+          "expected": [
+            "Display error message: 'Invalid username'"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Boundary Test for Age Field",
+          "req_ids": [
+            "VCDPA02"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "Age": 120
+          },
+          "steps": [
+            "Navigate to Patient Registration Screen",
+            "Enter Age = 0",
+            "Submit",
+            "Enter Age = 120",
+            "Submit"
+          ],
+          "expected": [
+            "Validate Age within acceptable range (e.g., 1-120)"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No table structure detected."
+        ]
+      }
+    }
+  ]
+}

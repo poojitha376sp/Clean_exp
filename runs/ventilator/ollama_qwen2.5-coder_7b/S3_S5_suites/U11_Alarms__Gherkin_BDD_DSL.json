@@ -1,0 +1,783 @@
+{
+  "unit_id": "U11_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.875,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.8333333333333334,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.4118,
+    "hallucinated": [
+      {
+        "value": "30 minutes",
+        "context": "battery ETA",
+        "grounded": false
+      },
+      {
+        "value": "[100,90,80]",
+        "context": "battery history list",
+        "grounded": false
+      },
+      {
+        "value": "[100,50,20]",
+        "context": "battery history list",
+        "grounded": false
+      },
+      {
+        "value": "[100,10,0]",
+        "context": "battery history list",
+        "grounded": false
+      },
+      {
+        "value": "[100,50,10]",
+        "context": "battery history list",
+        "grounded": false
+      },
+      {
+        "value": "[100,50,5]",
+        "context": "battery history list",
+        "grounded": false
+      },
+      {
+        "value": "[100,50,100]",
+        "context": "battery history list",
+        "grounded": false
+      },
+      {
+        "value": "9",
+        "context": "battery ETA",
+        "grounded": false
+      },
+      {
+        "value": "8",
+        "context": "battery ETA",
+        "grounded": false
+      },
+      {
+        "value": "0",
+        "context": "battery ETA",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 17,
+    "uncovered_clauses": [
+      "RW-SW-128"
+    ],
+    "weaknesses": [
+      "No tests for RW-SW-128 (battery presence/chargeability sensors).",
+      "No negative tests for sensor disconnection or battery unavailable/unchargeable states.",
+      "Concrete ETA values are not grounded in the SRS.",
+      "Vague assertion 'within expected range' should be replaced with concrete thresholds.",
+      "Boundary tests do not cover exact threshold values (30 and 10 minutes)."
+    ],
+    "traceability": 0.625,
+    "untraced_reqs": [
+      "RW-SW-123",
+      "RW-SW-125",
+      "RW-SW-128"
+    ],
+    "fsa_score": 0.6118,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Battery Management System\n\n  Scenario: GUI can compute battery ETA from a history of remaining battery amounts\n    Given a battery history list of [100, 90, 80]\n    When the GUI computes the battery ETA\n    Then the battery ETA should be 30 minutes\n\n  Scenario: GUI is connected to a battery amount sensor\n    Given the battery sensor is connected\n    When the GUI reads the battery amount\n    Then the battery amount should be within the expected range\n\n  Scenario: GUI can compute a \"low battery\" alarm when battery ETA is <30min\n    Given a battery history list of [100, 50, 20]\n    When the GUI computes the battery ETA\n    Then a \"low battery\" alarm should be triggered\n    And the alarm priority should be low\n\n  Scenario: GUI can compute a \"critically low battery\" alarm when battery ETA is <10min\n    Given a battery history list of [100, 10, 0]\n    When the GUI computes the battery ETA\n    Then a \"critically low battery\" alarm should be triggered\n    And the alarm priority should be high\n\n  Scenario: GUI needs to have a \"battery failure\" alarm that is activated when the battery is absent, unavailable, or unchargeable\n    Given the battery is absent\n    When the GUI checks the battery status\n    Then a \"battery failure\" alarm should be triggered\n\n  Scenario Outline: Boundary value tests for ETA thresholds\n    Given a battery history list of <battery_history>\n    When the GUI computes the battery ETA\n    Then the battery ETA should be <expected_eta>\n\n    Examples:\n      | battery_history | expected_eta |\n      | [100, 50, 10]   | 9            |\n      | [100, 50, 5]    | 8            |\n      | [100, 50, 100] | 0            |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "GUI can compute battery ETA from a history of remaining battery amounts",
+      "req_ids": [
+        "RW-SW-120"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "battery_history": "[100, 90, 80]"
+      },
+      "steps": [
+        "Given a battery history list of [100, 90, 80]",
+        "When the GUI computes the battery ETA",
+        "Then the battery ETA should be 30 minutes"
+      ],
+      "expected": [
+        "The battery ETA should be 30 minutes"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "GUI is connected to a battery amount sensor",
+      "req_ids": [
+        "RW-SW-121"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "battery_sensor": "connected"
+      },
+      "steps": [
+        "Given the battery sensor is connected",
+        "When the GUI reads the battery amount",
+        "Then the battery amount should be within the expected range"
+      ],
+      "expected": [
+        "The battery amount should be within the expected range"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "GUI can compute a \"low battery\" alarm when battery ETA is <30min",
+      "req_ids": [
+        "RW-SW-122"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "battery_history": "[100, 50, 20]"
+      },
+      "steps": [
+        "Given a battery history list of [100, 50, 20]",
+        "When the GUI computes the battery ETA",
+        "Then a \"low battery\" alarm should be triggered",
+        "And the alarm priority should be low"
+      ],
+      "expected": [
+        "A \"low battery\" alarm should be triggered",
+        "The alarm priority should be low"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "GUI can compute a \"critically low battery\" alarm when battery ETA is <10min",
+      "req_ids": [
+        "RW-SW-124"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "battery_history": "[100, 10, 0]"
+      },
+      "steps": [
+        "Given a battery history list of [100, 10, 0]",
+        "When the GUI computes the battery ETA",
+        "Then a \"critically low battery\" alarm should be triggered",
+        "And the alarm priority should be high"
+      ],
+      "expected": [
+        "A \"critically low battery\" alarm should be triggered",
+        "The alarm priority should be high"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "GUI needs to have a \"battery failure\" alarm that is activated when the battery is absent, unavailable, or unchargeable",
+      "req_ids": [
+        "RW-SW-129"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "battery_status": "absent"
+      },
+      "steps": [
+        "Given the battery is absent",
+        "When the GUI checks the battery status",
+        "Then a \"battery failure\" alarm should be triggered"
+      ],
+      "expected": [
+        "A \"battery failure\" alarm should be triggered"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Boundary value tests for ETA thresholds",
+      "req_ids": [
+        "RW-SW-122",
+        "RW-SW-124"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "battery_history": "<battery_history>"
+      },
+      "steps": [
+        "Given a battery history list of <battery_history>",
+        "When the GUI computes the battery ETA",
+        "Then the battery ETA should be <expected_eta>"
+      ],
+      "expected": [
+        "The battery ETA should be <expected_eta>"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Battery Management System\n\n  Scenario Outline: GUI can compute battery ETA from a history of remaining battery amounts\n    Given the GUI is connected to a battery amount sensor\n    When the GUI receives a history of remaining battery amounts: <battery_history>\n    Then the GUI should compute the battery ETA as <battery_eta>\n\n    Examples:\n      | battery_history | battery_eta |\n      | [100, 90, 80]   | 30          |\n      | [100, 50, 20]   | 60          |\n      | [100, 10, 0]    | 120         |\n\n  Scenario Outline: GUI can compute a \"low battery\" alarm when battery ETA is <30min\n    Given the GUI is connected to a battery amount sensor\n    When the GUI receives a history of remaining battery amounts: <battery_history>\n    Then the GUI should compute the battery ETA as <battery_eta>\n    And the GUI should display a \"low battery\" alarm if <battery_eta> < 30\n\n    Examples:\n      | battery_history | battery_eta | battery_alarm |\n      | [100, 90, 80]   | 30          | no            |\n      | [100, 50, 20]   | 60          | no            |\n      | [100, 10, 0]    | 120         | no            |\n      | [100, 50, 10]   | 20          | yes           |\n\n  Scenario Outline: GUI can compute a \"critically low battery\" alarm when battery ETA is <10min\n    Given the GUI is connected to a battery amount sensor\n    When the GUI receives a history of remaining battery amounts: <battery_history>\n    Then the GUI should compute the battery ETA as <battery_eta>\n    And the GUI should display a \"critically low battery\" alarm if <battery_eta> < 10\n\n    Examples:\n      | battery_history | battery_eta | battery_alarm |\n      | [100, 90, 80]   | 30          | no            |\n      | [100, 50, 20]   | 60          | no            |\n      | [100, 10, 0]    | 120         | no            |\n      | [100, 50, 10]   | 20          | no            |\n      | [100, 50, 5]    | 10          | yes           |\n\n  Scenario Outline: GUI needs to be able to read hardware battery presence and chargeability sensors\n    Given the GUI is connected to a battery amount sensor\n    When the GUI reads the battery presence and chargeability sensors\n    Then the GUI should display the battery status as <battery_status>\n\n    Examples:\n      | battery_presence | battery_chargeability | battery_status |\n      | true             | true                  | charging       |\n      | true             | false                 | discharging    |\n      | false            | true                  | absent         |\n      | false            | false                 | unavailable    |\n\n  Scenario Outline: GUI needs to have a \"battery failure\" alarm that is activated when the battery is absent, unavailable, or unchargeable\n    Given the GUI is connected to a battery amount sensor\n    When the GUI reads the battery presence and chargeability sensors\n    Then the GUI should display a \"battery failure\" alarm if <battery_status> is \"absent\" or \"unavailable\" or \"discharging\"\n\n    Examples:\n      | battery_presence | battery_chargeability | battery_status | battery_alarm |\n      | true             | true                  | charging       | no            |\n      | true             | false                 | discharging    | yes           |\n      | false            | true                  | absent         | yes           |\n      | false            | false                 | unavailable    | yes           |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI can compute battery ETA from a history of remaining battery amounts",
+          "req_ids": [
+            "RW-SW-120"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is connected to a battery amount sensor"
+          ],
+          "inputs": {
+            "battery_history": "[100, 90, 80]"
+          },
+          "steps": [
+            "the GUI receives a history of remaining battery amounts: [100, 90, 80]",
+            "the GUI should compute the battery ETA as 30"
+          ],
+          "expected": [
+            "the GUI should compute the battery ETA as 30"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI can compute a \"low battery\" alarm when battery ETA is <30min",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is connected to a battery amount sensor"
+          ],
+          "inputs": {
+            "battery_history": "[100, 50, 20]"
+          },
+          "steps": [
+            "the GUI receives a history of remaining battery amounts: [100, 50, 20]",
+            "the GUI should compute the battery ETA as 60",
+            "the GUI should display a \"low battery\" alarm if 60 < 30"
+          ],
+          "expected": [
+            "the GUI should display a \"low battery\" alarm if 60 < 30"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI can compute a \"critically low battery\" alarm when battery ETA is <10min",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is connected to a battery amount sensor"
+          ],
+          "inputs": {
+            "battery_history": "[100, 50, 10]"
+          },
+          "steps": [
+            "the GUI receives a history of remaining battery amounts: [100, 50, 10]",
+            "the GUI should compute the battery ETA as 20",
+            "the GUI should display a \"critically low battery\" alarm if 20 < 10"
+          ],
+          "expected": [
+            "the GUI should display a \"critically low battery\" alarm if 20 < 10"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI needs to be able to read hardware battery presence and chargeability sensors",
+          "req_ids": [
+            "RW-SW-128"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is connected to a battery amount sensor"
+          ],
+          "inputs": {
+            "battery_presence": "true",
+            "battery_chargeability": "true"
+          },
+          "steps": [
+            "the GUI reads the battery presence and chargeability sensors",
+            "the GUI should display the battery status as charging"
+          ],
+          "expected": [
+            "the GUI should display the battery status as charging"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI needs to have a \"battery failure\" alarm that is activated when the battery is absent, unavailable, or unchargeable",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is connected to a battery amount sensor"
+          ],
+          "inputs": {
+            "battery_presence": "false",
+            "battery_chargeability": "false"
+          },
+          "steps": [
+            "the GUI reads the battery presence and chargeability sensors",
+            "the GUI should display a \"battery failure\" alarm if absent or unavailable or discharging"
+          ],
+          "expected": [
+            "the GUI should display a \"battery failure\" alarm if absent or unavailable or discharging"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.625,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "[100, 90, 80]",
+            "context": "battery history list",
+            "grounded": false
+          },
+          {
+            "value": "[100, 50, 20]",
+            "context": "battery history list",
+            "grounded": false
+          },
+          {
+            "value": "[100, 10, 0]",
+            "context": "battery history list",
+            "grounded": false
+          },
+          {
+            "value": "[100, 50, 10]",
+            "context": "battery history list",
+            "grounded": false
+          },
+          {
+            "value": "[100, 50, 5]",
+            "context": "battery history list",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "battery ETA value",
+            "grounded": false
+          },
+          {
+            "value": "60",
+            "context": "battery ETA value",
+            "grounded": false
+          },
+          {
+            "value": "120",
+            "context": "battery ETA value",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "battery ETA value",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "battery ETA value",
+            "grounded": false
+          },
+          {
+            "value": "yes",
+            "context": "low battery alarm status",
+            "grounded": false
+          },
+          {
+            "value": "no",
+            "context": "low battery alarm status",
+            "grounded": false
+          },
+          {
+            "value": "true",
+            "context": "battery presence flag",
+            "grounded": false
+          },
+          {
+            "value": "false",
+            "context": "battery presence flag",
+            "grounded": false
+          },
+          {
+            "value": "true",
+            "context": "battery chargeability flag",
+            "grounded": false
+          },
+          {
+            "value": "false",
+            "context": "battery chargeability flag",
+            "grounded": false
+          },
+          {
+            "value": "charging",
+            "context": "battery status string",
+            "grounded": false
+          },
+          {
+            "value": "discharging",
+            "context": "battery status string",
+            "grounded": false
+          },
+          {
+            "value": "absent",
+            "context": "battery status string",
+            "grounded": false
+          },
+          {
+            "value": "unavailable",
+            "context": "battery status string",
+            "grounded": false
+          },
+          {
+            "value": "yes",
+            "context": "battery failure alarm status",
+            "grounded": false
+          },
+          {
+            "value": "no",
+            "context": "battery failure alarm status",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 22,
+        "uncovered_clauses": [
+          "RW-SW-121",
+          "RW-SW-123",
+          "RW-SW-125"
+        ],
+        "weaknesses": [
+          "Add tests for GUI connectivity to battery sensor (RW-SW-121).",
+          "Verify alarm priority levels (RW-SW-123, RW-SW-125).",
+          "Include boundary value tests for ETA thresholds (<30, <10) with values just below thresholds.",
+          "Correct critical low battery test to use ETA <10 (e.g., 9) instead of 10.",
+          "Assert concrete alarm priority states rather than generic yes/no."
+        ],
+        "traceability": 0.625,
+        "untraced_reqs": [
+          "RW-SW-121",
+          "RW-SW-123",
+          "RW-SW-125"
+        ],
+        "fsa_score": 0.37,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.37; sub-scores {'clause_coverage': 0.625, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.8, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-121', 'RW-SW-123', 'RW-SW-125'] (add at least one each)\n- uncovered clause: RW-SW-121\n- uncovered clause: RW-SW-123\n- uncovered clause: RW-SW-125\n- ungrounded value '[100, 90, 80]' (battery history list): remove or use the SRS value\n- ungrounded value '[100, 50, 20]' (battery history list): remove or use the SRS value\n- ungrounded value '[100, 10, 0]' (battery history list): remove or use the SRS value\n- ungrounded value '[100, 50, 10]' (battery history list): remove or use the SRS value\n- ungrounded value '[100, 50, 5]' (battery history list): remove or use the SRS value\n- ungrounded value '30' (battery ETA value): remove or use the SRS value\n- Add tests for GUI connectivity to battery sensor (RW-SW-121).\n- Verify alarm priority levels (RW-SW-123, RW-SW-125).\n- Include boundary value tests for ETA thresholds (<30, <10) with values just below thresholds.\n- Correct critical low battery test to use ETA <10 (e.g., 9) instead of 10.\n- Assert concrete alarm priority states rather than generic yes/no.",
+      "artifact": "Feature: Battery Management System\n\n  Scenario: GUI can compute battery ETA from a history of remaining battery amounts\n    Given a battery history list of [100, 90, 80]\n    When the GUI computes the battery ETA\n    Then the battery ETA should be 30 minutes\n\n  Scenario: GUI is connected to a battery amount sensor\n    Given the battery sensor is connected\n    When the GUI reads the battery amount\n    Then the battery amount should be within the expected range\n\n  Scenario: GUI can compute a \"low battery\" alarm when battery ETA is <30min\n    Given a battery history list of [100, 50, 20]\n    When the GUI computes the battery ETA\n    Then a \"low battery\" alarm should be triggered\n    And the alarm priority should be low\n\n  Scenario: GUI can compute a \"critically low battery\" alarm when battery ETA is <10min\n    Given a battery history list of [100, 10, 0]\n    When the GUI computes the battery ETA\n    Then a \"critically low battery\" alarm should be triggered\n    And the alarm priority should be high\n\n  Scenario: GUI needs to have a \"battery failure\" alarm that is activated when the battery is absent, unavailable, or unchargeable\n    Given the battery is absent\n    When the GUI checks the battery status\n    Then a \"battery failure\" alarm should be triggered\n\n  Scenario Outline: Boundary value tests for ETA thresholds\n    Given a battery history list of <battery_history>\n    When the GUI computes the battery ETA\n    Then the battery ETA should be <expected_eta>\n\n    Examples:\n      | battery_history | expected_eta |\n      | [100, 50, 10]   | 9            |\n      | [100, 50, 5]    | 8            |\n      | [100, 50, 100] | 0            |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI can compute battery ETA from a history of remaining battery amounts",
+          "req_ids": [
+            "RW-SW-120"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "battery_history": "[100, 90, 80]"
+          },
+          "steps": [
+            "Given a battery history list of [100, 90, 80]",
+            "When the GUI computes the battery ETA",
+            "Then the battery ETA should be 30 minutes"
+          ],
+          "expected": [
+            "The battery ETA should be 30 minutes"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI is connected to a battery amount sensor",
+          "req_ids": [
+            "RW-SW-121"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "battery_sensor": "connected"
+          },
+          "steps": [
+            "Given the battery sensor is connected",
+            "When the GUI reads the battery amount",
+            "Then the battery amount should be within the expected range"
+          ],
+          "expected": [
+            "The battery amount should be within the expected range"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI can compute a \"low battery\" alarm when battery ETA is <30min",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "battery_history": "[100, 50, 20]"
+          },
+          "steps": [
+            "Given a battery history list of [100, 50, 20]",
+            "When the GUI computes the battery ETA",
+            "Then a \"low battery\" alarm should be triggered",
+            "And the alarm priority should be low"
+          ],
+          "expected": [
+            "A \"low battery\" alarm should be triggered",
+            "The alarm priority should be low"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI can compute a \"critically low battery\" alarm when battery ETA is <10min",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "battery_history": "[100, 10, 0]"
+          },
+          "steps": [
+            "Given a battery history list of [100, 10, 0]",
+            "When the GUI computes the battery ETA",
+            "Then a \"critically low battery\" alarm should be triggered",
+            "And the alarm priority should be high"
+          ],
+          "expected": [
+            "A \"critically low battery\" alarm should be triggered",
+            "The alarm priority should be high"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI needs to have a \"battery failure\" alarm that is activated when the battery is absent, unavailable, or unchargeable",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "battery_status": "absent"
+          },
+          "steps": [
+            "Given the battery is absent",
+            "When the GUI checks the battery status",
+            "Then a \"battery failure\" alarm should be triggered"
+          ],
+          "expected": [
+            "A \"battery failure\" alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Boundary value tests for ETA thresholds",
+          "req_ids": [
+            "RW-SW-122",
+            "RW-SW-124"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "battery_history": "<battery_history>"
+          },
+          "steps": [
+            "Given a battery history list of <battery_history>",
+            "When the GUI computes the battery ETA",
+            "Then the battery ETA should be <expected_eta>"
+          ],
+          "expected": [
+            "The battery ETA should be <expected_eta>"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.8333333333333334,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.4118,
+        "hallucinated": [
+          {
+            "value": "30 minutes",
+            "context": "battery ETA",
+            "grounded": false
+          },
+          {
+            "value": "[100,90,80]",
+            "context": "battery history list",
+            "grounded": false
+          },
+          {
+            "value": "[100,50,20]",
+            "context": "battery history list",
+            "grounded": false
+          },
+          {
+            "value": "[100,10,0]",
+            "context": "battery history list",
+            "grounded": false
+          },
+          {
+            "value": "[100,50,10]",
+            "context": "battery history list",
+            "grounded": false
+          },
+          {
+            "value": "[100,50,5]",
+            "context": "battery history list",
+            "grounded": false
+          },
+          {
+            "value": "[100,50,100]",
+            "context": "battery history list",
+            "grounded": false
+          },
+          {
+            "value": "9",
+            "context": "battery ETA",
+            "grounded": false
+          },
+          {
+            "value": "8",
+            "context": "battery ETA",
+            "grounded": false
+          },
+          {
+            "value": "0",
+            "context": "battery ETA",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [
+          "RW-SW-128"
+        ],
+        "weaknesses": [
+          "No tests for RW-SW-128 (battery presence/chargeability sensors).",
+          "No negative tests for sensor disconnection or battery unavailable/unchargeable states.",
+          "Concrete ETA values are not grounded in the SRS.",
+          "Vague assertion 'within expected range' should be replaced with concrete thresholds.",
+          "Boundary tests do not cover exact threshold values (30 and 10 minutes)."
+        ],
+        "traceability": 0.625,
+        "untraced_reqs": [
+          "RW-SW-123",
+          "RW-SW-125",
+          "RW-SW-128"
+        ],
+        "fsa_score": 0.6118,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.6118; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.8333333333333334, 'boundary_coverage': 0.5, 'groundedness_mg': 0.4118}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-123', 'RW-SW-125', 'RW-SW-128'] (add at least one each)\n- uncovered clause: RW-SW-128\n- ungrounded value '30 minutes' (battery ETA): remove or use the SRS value\n- ungrounded value '[100,90,80]' (battery history list): remove or use the SRS value\n- ungrounded value '[100,50,20]' (battery history list): remove or use the SRS value\n- ungrounded value '[100,10,0]' (battery history list): remove or use the SRS value\n- ungrounded value '[100,50,10]' (battery history list): remove or use the SRS value\n- ungrounded value '[100,50,5]' (battery history list): remove or use the SRS value\n- No tests for RW-SW-128 (battery presence/chargeability sensors).\n- No negative tests for sensor disconnection or battery unavailable/unchargeable states.\n- Concrete ETA values are not grounded in the SRS.\n- Vague assertion 'within expected range' should be replaced with concrete thresholds.\n- Boundary tests do not cover exact threshold values (30 and 10 minutes).",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "```artifact\nFeature: Battery Management System\n\n  Scenario: GUI can compute battery ETA from a history of remaining battery amounts\n    Given a history of battery amounts [100, 90, 80]\n    When the GUI computes the battery ETA\n    Then the battery ETA should be 30 minutes\n\n  Scenario: GUI is connected to a battery amount sensor\n    Given the battery amount sensor is connected\n    When the GUI reads the battery amount\n    Then the battery amount should be within expected range\n\n  Scenario: GUI can compute a \"low battery\" alarm when battery ETA is <30min\n    Given a history of battery amounts [100, 50, 20]\n    When the GUI computes the battery ETA\n    Then a \"low battery\" alarm should be triggered\n    And the alarm priority should be low\n\n  Scenario: GUI can compute a \"critically low battery\" alarm when battery ETA is <10min\n    Given a history of battery amounts [100, 10, 0]\n    When the GUI computes the battery ETA\n    Then a \"critically low battery\" alarm should be triggered\n    And the alarm priority should be high\n\n  Scenario: GUI needs to have a \"battery failure\" alarm that is activated when the battery is absent, unavailable, or unchargeable\n    Given the battery is absent\n    When the GUI checks the battery status\n    Then a \"battery failure\" alarm should be triggered\n\n  Scenario Outline: GUI can compute battery ETA from different battery history lists\n    Given a history of battery amounts <battery_history>\n    When the GUI computes the battery ETA\n    Then the battery ETA should be <expected_eta>\n\n    Examples:\n      | battery_history | expected_eta |\n      | [100, 50, 10]   | 30 minutes   |\n      | [100, 50, 5]   | 30 minutes   |\n      | [100, 50, 100] | 0 minutes    |\n      | [100, 50, 0]   | 0 minutes    |\n      | [100, 50, 20]  | 30 minutes   |\n      | [100, 50, 80]  | 30 minutes   |\n      | [100, 50, 90]  | 30 minutes   |\n      | [100, 50, 100] | 0 minutes    |\n      | [100, 50, 0]   | 0 minutes    |\n      | [100, 50, 20]  | 30 minutes   |\n      | [100, 50, 80]  | 30 minutes   |\n      | [100, 50, 90]  | 30 minutes   |\n      | [100, 50, 100] | 0 minutes    |\n      | [100, 50, 0]   | 0 minutes    |\n      | [100, 50, 20]  | 30 minutes   |\n      | [100, 50, 80]  | 30 minutes   |\n      | [100, 50, 90]  | 30 minutes   |\n      | [100, 50, 100] | 0 minutes    |\n      | [100, 50, 0]   | 0 minutes    |\n      | [100, 50, 20]  | 30 minutes   |\n      | [100, 50, 80]  | 30 minutes   |\n      | [100, 50, 90]  | 30 minutes   |\n      | [100, 50, 100] | 0 minutes    |\n      | [100, 50, 0]   | 0 minutes    |\n      | [100, 50, 20]  | 30 minutes   |\n      | [100, 50, 80]  | 30 minutes   |\n      | [100, 50, 90]  | 30 minutes   |\n      | [100, 50, 100] | 0 minutes    |\n      | [100, 50, 0]   | 0 minutes    |\n      | [100, 50, 20]  | 30 minutes   |\n      | [100, 50, 80]  | 30 minutes   |\n      | [100, 50, 90]  | 30 minutes   |\n      | [100, 50, 100] | 0 minutes    |\n      | [100, 50, 0]   | 0 minutes    |\n      | [100, 50, 20]  | 30 minutes   |\n      | [100,",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": "Feature: Battery Management System\n\n  Scenario Outline: GUI can compute battery ETA from a history of remaining battery amounts\n    Given the GUI is connected to a battery amount sensor\n    And the sensor provides a history of remaining battery amounts: <battery_history>\n    When the GUI computes the battery ETA\n    Then the GUI should display the battery ETA as <battery_eta>\n\n    Examples:\n      | battery_history | battery_eta |\n      | [100, 90, 80, 70, 60, 50, 40, 30, 20, 10] | 10 minutes |\n      | [100, 95, 90, 85, 80, 75, 70, 65, 60, 55] | 5 minutes |\n      | [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5] | 1 minute |\n      | [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0] | 0 minutes |\n\n  Scenario Outline: GUI can compute a \"low battery\" alarm when battery ETA is <30min\n    Given the GUI is connected to a battery amount sensor\n    And the sensor provides a history of remaining battery amounts: <battery_history>\n    When the GUI computes the battery ETA\n    Then the GUI should display a \"low battery\" alarm if the battery ETA is <30 minutes\n\n    Examples:\n      | battery_history | battery_eta |\n      | [100, 90, 80, 70, 60, 50, 40, 30, 20, 10] | 10 minutes |\n      | [100, 95, 90, 85, 80, 75, 70, 65, 60, 55] | 5 minutes |\n      | [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5] | 1 minute |\n      | [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0] | 0 minutes |\n\n  Scenario Outline: GUI can compute a \"critically low battery\" alarm when battery ETA is <10min\n    Given the GUI is connected to a battery amount sensor\n    And the sensor provides a history of remaining battery amounts: <battery_history>\n    When the GUI computes the battery ETA\n    Then the GUI should display a \"critically low battery\" alarm if the battery ETA is <10 minutes\n\n    Examples:\n      | battery_history | battery_eta |\n      | [100, 90, 80, 70, 60, 50, 40, 30, 20, 10] | 10 minutes |\n      | [100, 95, 90, 85, 80, 75, 70, 65, 60, 55] | 5 minutes |\n      | [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5] | 1 minute |\n      | [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0] | 0 minutes |\n\n  Scenario Outline: GUI needs to be able to read hardware battery presence and chargeability sensors\n    Given the GUI is connected to a battery amount sensor\n    And the sensor provides battery presence and chargeability data\n    When the GUI reads the battery presence and chargeability data\n    Then the GUI should display the battery presence and chargeability status\n\n    Examples:\n      | battery_presence | battery_chargeability |\n      | present          | chargeable          |\n      | present          | not chargeable      |\n      | absent           | not applicable      |\n      | unavailable      | not applicable      |\n      | unchargeable     | not applicable      |\n\n  Scenario Outline: GUI needs to have a \"battery failure\" alarm that is activated when the battery is absent, unavailable, or unchargeable\n    Given the GUI is connected to a battery amount sensor\n    And the sensor provides battery presence and chargeability data\n    When the GUI reads the battery presence and chargeability data\n    Then the GUI should display a \"battery failure\" alarm if the battery is absent, unavailable, or unchargeable\n\n    Examples:\n      | battery_presence | battery_chargeability |\n      | absent           | not applicable      |\n      | unavailable      | not applicable      |\n      | unchargeable     | not applicable      |",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    }
+  ]
+}

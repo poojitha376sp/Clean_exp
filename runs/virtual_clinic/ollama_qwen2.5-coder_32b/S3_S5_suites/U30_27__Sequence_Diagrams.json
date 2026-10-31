@@ -1,0 +1,1440 @@
+{
+  "unit_id": "U30_27",
+  "representation": "Sequence Diagrams",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "safety_critical",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Sequence Diagrams",
+    "group": 3,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 0.7,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.3,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.4118,
+    "hallucinated": [
+      {
+        "value": "Fever",
+        "grounded": false
+      },
+      {
+        "value": "Lab Report.pdf",
+        "grounded": false
+      },
+      {
+        "value": "Cough",
+        "grounded": false
+      },
+      {
+        "value": "X-Ray.pdf",
+        "grounded": false
+      },
+      {
+        "value": "Invalid",
+        "grounded": false
+      },
+      {
+        "value": "Same Day",
+        "grounded": false
+      },
+      {
+        "value": "Delivered",
+        "grounded": false
+      },
+      {
+        "value": "123",
+        "grounded": false
+      },
+      {
+        "value": "Error: Symptoms are required",
+        "grounded": false
+      },
+      {
+        "value": "Error: Invalid Mode",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 17,
+    "uncovered_clauses": [
+      "VCSYSS03-Consultations",
+      "VCSYSS03-Revenue",
+      "VCSYSS03-PatientHistory"
+    ],
+    "weaknesses": [
+      "No tests for speciality‑wise consultation counts and revenue",
+      "No tests for patient history file retrieval",
+      "Assertions lack concrete values (e.g., status codes, priority enums)",
+      "No test for doctor’s lab request suggestions",
+      "No test for chemist offline delivery process"
+    ],
+    "traceability": 0.875,
+    "untraced_reqs": [
+      "VCSYSS03"
+    ],
+    "fsa_score": 0.7262,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "@startuml\nactor Patient\nactor Doctor\nactor Chemist\nparticipant \"Patient History File\" as PHF\nparticipant \"Patient Appointment File\" as PAF\nparticipant \"Consultation Request File\" as CRF\nparticipant \"Batch Program (Appointment)\" as BP_A\nparticipant \"Batch Program (Prediction)\" as BP_P\nparticipant \"Machine Learning Algorithm\" as MLA\nparticipant \"Database\" as DB\n\n== TC-001: Patient creates a Consultation Request (Appointment Mode) ==\nPatient -> CRF: Create Consultation Request (Symptoms: \"Fever\", Reports: \"Lab Report.pdf\", Mode: \"Appointment\")\nCRF -> BP_A: Store Request\nBP_A -> DB: Check Date (Next Day)\nDB --> BP_A: Date is Next Day\nBP_A -> PAF: Create Appointment Entry\nPAF --> BP_A: Appointment Entry Created\nBP_A --> CRF: Confirm Request Stored\nCRF --> Patient: Request Stored\n\n== TC-002: Patient creates a Consultation Request (Offline Mode) ==\nPatient -> CRF: Create Consultation Request (Symptoms: \"Cough\", Reports: \"X-Ray.pdf\", Mode: \"Offline\")\nCRF -> BP_P: Store Request\nBP_P -> MLA: Predict Disease\nMLA --> BP_P: Predicted Priority: Medium\nBP_P -> CRF: Update Priority\nCRF --> Patient: Request Stored\n\n== TC-003: Batch Program (Appointment) runs nightly ==\nBP_A -> DB: Check Current Time (Nightly Schedule)\nDB --> BP_A: Time is Night\nBP_A -> PAF: Purge Existing Appointments\nPAF --> BP_A: Appointments Purged\nBP_A -> DB: Fetch Consultation Requests for Next 5 Days\nDB --> BP_A: Requests Fetched\nBP_A -> PAF: Create Appointment Entries\nPAF --> BP_A: Appointment Entries Created\nBP_A --> DB: Confirm Appointments Created\nDB --> BP_A: Confirmation Received\n\n== TC-004: Batch Program (Prediction) runs periodically ==\nBP_P -> DB: Check New Consultation Requests\nDB --> BP_P: Requests Fetched\nBP_P -> MLA: Predict Disease for Requests\nMLA --> BP_P: Predicted Priorities\nBP_P -> CRF: Update Priorities\nCRF --> DB: Priorities Updated\nDB --> BP_P: Confirmation Received\n\n== TC-005: Doctor views and responds to Consultation Requests ==\nDoctor -> CRF: View Consultation Requests\nCRF --> Doctor: Display Requests with Priorities\nDoctor -> CRF: Provide Diagnosis and Prescribe Medicines (Request ID: 123)\nCRF -> DB: Update Request with Diagnosis and Prescription\nDB --> CRF: Confirmation Received\nCRF --> Doctor: Request Updated\n\n== TC-006: Chemist views and updates Prescription Status ==\nChemist -> DB: View Open Prescriptions\nDB --> Chemist: Display Prescriptions\nChemist -> DB: Update Prescription Status (Request ID: 123, Status: \"Delivered\")\nDB --> Chemist: Status Updated\nDB --> Chemist: Confirmation Received\n\n== TC-007: Patient creates a Consultation Request with Missing Symptoms ==\nPatient -> CRF: Create Consultation Request (Symptoms: \"\", Reports: \"MRI.pdf\", Mode: \"Appointment\")\nCRF --> Patient: Error: Symptoms are required\n\n== TC-008: Patient creates a Consultation Request with Invalid Mode ==\nPatient -> CRF: Create Consultation Request (Symptoms: \"Headache\", Reports: \"MRI.pdf\", Mode: \"Invalid\")\nCRF --> Patient: Error: Invalid Mode\n\n== TC-009: Batch Program (Appointment) handles Time Zone Boundaries ==\nBP_A -> DB: Check Current Time (Nightly Schedule, Time Zone Boundary)\nDB --> BP_A: Time is Night\nBP_A -> PAF: Purge Existing Appointments\nPAF --> BP_A: Appointments Purged\nBP_A -> DB: Fetch Consultation Requests for Next 5 Days\nDB --> BP_A: Requests Fetched\nBP_A -> PAF: Create Appointment Entries\nPAF --> BP_A: Appointment Entries Created\nBP_A --> DB: Confirm Appointments Created\nDB --> BP_A: Confirmation Received\n\n== TC-010: Batch Program (Appointment) handles Same Day Appointments ==\nBP_A -> DB: Check Date (Same Day)\nDB --> BP_A: Date is Same Day\nBP_A --> CRF: Skip Appointment Creation\nCRF --> BP_A: Confirmation Received\n@enduml",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Patient creates a Consultation Request (Appointment Mode)",
+      "req_ids": [
+        "Req-6",
+        "Req-6/1",
+        "Req-6/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient is registered"
+      ],
+      "inputs": {
+        "Symptoms": "Fever",
+        "Reports": "Lab Report.pdf",
+        "Mode": "Appointment"
+      },
+      "steps": [
+        "Patient creates a Consultation Request",
+        "Request is stored in Consultation Request File",
+        "Batch Program (Appointment) checks date",
+        "Appointment Entry is created in Patient Appointment File"
+      ],
+      "expected": [
+        "Request stored",
+        "Appointment Entry created"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Patient creates a Consultation Request (Offline Mode)",
+      "req_ids": [
+        "Req-6",
+        "Req-6/1",
+        "Req-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient is registered"
+      ],
+      "inputs": {
+        "Symptoms": "Cough",
+        "Reports": "X-Ray.pdf",
+        "Mode": "Offline"
+      },
+      "steps": [
+        "Patient creates a Consultation Request",
+        "Request is stored in Consultation Request File",
+        "Batch Program (Prediction) predicts disease",
+        "Priority is updated in Consultation Request File"
+      ],
+      "expected": [
+        "Request stored",
+        "Priority updated"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Batch Program (Appointment) runs nightly",
+      "req_ids": [
+        "Req-6/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Batch Program (Appointment) is scheduled"
+      ],
+      "inputs": {},
+      "steps": [
+        "Batch Program checks current time",
+        "Purges existing appointments",
+        "Fetches consultation requests for next 5 days",
+        "Creates appointment entries"
+      ],
+      "expected": [
+        "Appointments purged",
+        "Appointment entries created"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Batch Program (Prediction) runs periodically",
+      "req_ids": [
+        "Req-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Batch Program (Prediction) is scheduled"
+      ],
+      "inputs": {},
+      "steps": [
+        "Batch Program checks new consultation requests",
+        "Predicts disease for requests",
+        "Updates priorities in Consultation Request File"
+      ],
+      "expected": [
+        "Priorities updated"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Doctor views and responds to Consultation Requests",
+      "req_ids": [
+        "Req-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor is logged in"
+      ],
+      "inputs": {
+        "Request ID": "123"
+      },
+      "steps": [
+        "Doctor views consultation requests",
+        "Doctor provides diagnosis and prescribes medicines",
+        "Request is updated in Consultation Request File"
+      ],
+      "expected": [
+        "Request updated"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Chemist views and updates Prescription Status",
+      "req_ids": [
+        "Req-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist is logged in"
+      ],
+      "inputs": {
+        "Request ID": "123",
+        "Status": "Delivered"
+      },
+      "steps": [
+        "Chemist views open prescriptions",
+        "Chemist updates prescription status",
+        "Status is updated in Database"
+      ],
+      "expected": [
+        "Status updated"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Patient creates a Consultation Request with Missing Symptoms",
+      "req_ids": [
+        "Req-6/1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient is registered"
+      ],
+      "inputs": {
+        "Symptoms": "",
+        "Reports": "MRI.pdf",
+        "Mode": "Appointment"
+      },
+      "steps": [
+        "Patient creates a Consultation Request",
+        "Request is rejected due to missing symptoms"
+      ],
+      "expected": [
+        "Error: Symptoms are required"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Patient creates a Consultation Request with Invalid Mode",
+      "req_ids": [
+        "Req-6/1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient is registered"
+      ],
+      "inputs": {
+        "Symptoms": "Headache",
+        "Reports": "MRI.pdf",
+        "Mode": "Invalid"
+      },
+      "steps": [
+        "Patient creates a Consultation Request",
+        "Request is rejected due to invalid mode"
+      ],
+      "expected": [
+        "Error: Invalid Mode"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Batch Program (Appointment) handles Time Zone Boundaries",
+      "req_ids": [
+        "Req-6/3"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Batch Program (Appointment) is scheduled"
+      ],
+      "inputs": {},
+      "steps": [
+        "Batch Program checks current time at time zone boundary",
+        "Purges existing appointments",
+        "Fetches consultation requests for next 5 days",
+        "Creates appointment entries"
+      ],
+      "expected": [
+        "Appointments purged",
+        "Appointment entries created"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Batch Program (Appointment) handles Same Day Appointments",
+      "req_ids": [
+        "Req-6/3"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Batch Program (Appointment) is scheduled"
+      ],
+      "inputs": {},
+      "steps": [
+        "Batch Program checks date for same day",
+        "Skips appointment creation"
+      ],
+      "expected": [
+        "Appointment creation skipped"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "@startuml\n\nactor Patient\nactor Doctor\nactor Chemist\nactor Admin\nparticipant \"Patient History File\" as PHF\nparticipant \"Patient Appointment File\" as PAF\nparticipant \"Consultation Request File\" as CRF\nparticipant \"Machine Learning Algorithm\" as MLA\nparticipant \"Prescription File\" as PF\n\n== TC-001: Patient creates a Consultation Request (Offline) ==\nPatient -> CRF: Create Consultation Request (Symptoms, Reports, Mode=Offline)\nCRF -> MLA: New Consultation Request\nMLA -> CRF: Prioritize Request (Critical/Medium/Low)\nCRF -> Doctor: Notify New Consultation Request\n\n== TC-002: Patient creates a Consultation Request (Appointment) ==\nPatient -> CRF: Create Consultation Request (Symptoms, Reports, Mode=Appointment, Date=Next Day)\nalt Date is Next Day\n    CRF -> PAF: Create Appointment Entry\nelse Date is not Next Day\n    CRF -> CRF: Store Request for Batch Processing\nend\nCRF -> MLA: New Consultation Request\nMLA -> CRF: Prioritize Request (Critical/Medium/Low)\nCRF -> Doctor: Notify New Consultation Request\n\n== TC-003: Batch Program for Next 5 Days Appointments ==\nAdmin -> PAF: Run Batch Program\nPAF -> PAF: Purge Existing Files\nPAF -> CRF: Fetch Consultation Requests for Next 5 Days\nloop For each Request\n    CRF -> PAF: Create Appointment Entry\nend\n\n== TC-004: Machine Learning Algorithm Prioritizes Requests ==\nMLA -> CRF: Fetch New Consultation Requests\nloop For each Request\n    MLA -> MLA: Analyze Symptoms and Reports\n    MLA -> CRF: Prioritize Request (Critical/Medium/Low)\nend\n\n== TC-005: Doctor Provides Diagnosis and Prescribes Medicines ==\nDoctor -> CRF: Fetch Prioritized Consultation Requests\nDoctor -> CRF: Provide Diagnosis and Prescribe Medicines\nCRF -> PF: Create Prescription Entry\nPF -> Chemist: Notify New Prescription\n\n== TC-006: Chemist Updates Prescription Status ==\nChemist -> PF: Fetch Open Prescriptions\nChemist -> PF: Update Prescription Status\nPF -> Patient: Notify Prescription Status Update\n\n@enduml",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient creates a Consultation Request (Offline)",
+          "req_ids": [
+            "Req-6",
+            "Req-6/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Symptoms": "as specified",
+            "Reports": "as specified",
+            "Mode": "Offline"
+          },
+          "steps": [
+            "Patient creates a Consultation Request"
+          ],
+          "expected": [
+            "Consultation Request is created in CRF",
+            "Request is prioritized by MLA",
+            "Doctor is notified of new Consultation Request"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient creates a Consultation Request (Appointment)",
+          "req_ids": [
+            "Req-6",
+            "Req-6/1",
+            "Req-6/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Symptoms": "as specified",
+            "Reports": "as specified",
+            "Mode": "Appointment",
+            "Date": "Next Day"
+          },
+          "steps": [
+            "Patient creates a Consultation Request"
+          ],
+          "expected": [
+            "Consultation Request is created in CRF",
+            "Appointment Entry is created in PAF",
+            "Request is prioritized by MLA",
+            "Doctor is notified of new Consultation Request"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Batch Program for Next 5 Days Appointments",
+          "req_ids": [
+            "Req-6/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Batch Program is scheduled"
+          ],
+          "inputs": {},
+          "steps": [
+            "Admin runs Batch Program"
+          ],
+          "expected": [
+            "Existing files in PAF are purged",
+            "Appointment Entries are created in PAF for next 5 days"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Machine Learning Algorithm Prioritizes Requests",
+          "req_ids": [
+            "Req-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "New Consultation Requests are available"
+          ],
+          "inputs": {},
+          "steps": [
+            "MLA fetches new Consultation Requests"
+          ],
+          "expected": [
+            "Requests are analyzed and prioritized by MLA",
+            "Prioritized Requests are updated in CRF"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor Provides Diagnosis and Prescribes Medicines",
+          "req_ids": [
+            "Req-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prioritized Consultation Requests are available"
+          ],
+          "inputs": {},
+          "steps": [
+            "Doctor fetches Prioritized Consultation Requests",
+            "Doctor provides Diagnosis and Prescribes Medicines"
+          ],
+          "expected": [
+            "Prescription Entry is created in PF",
+            "Chemist is notified of new Prescription"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Chemist Updates Prescription Status",
+          "req_ids": [
+            "Req-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Open Prescriptions are available"
+          ],
+          "inputs": {},
+          "steps": [
+            "Chemist fetches Open Prescriptions",
+            "Chemist updates Prescription Status"
+          ],
+          "expected": [
+            "Prescription Status is updated in PF",
+            "Patient is notified of Prescription Status Update"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.7,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.2,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 27,
+        "uncovered_clauses": [
+          "Number of Consultations by Doctor (Month/ Quarter/ Year)",
+          "Revenue Earned per Month/ Quarter/ Year",
+          "Patient History File (based on Patient Id)"
+        ],
+        "weaknesses": [
+          "Add tests for VCSYSS03 requirements (consultation counts, revenue, patient history).",
+          "Include negative test cases for invalid inputs and error paths.",
+          "Test boundary conditions: date not next day, 5‑day limit, priority boundaries.",
+          "Assert concrete values such as priority level, timestamps, and status codes.",
+          "Verify network latency bounds and async call behavior."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "VCSYSS03"
+        ],
+        "fsa_score": 0.355,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.355; sub-scores {'clause_coverage': 0.7, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.2, 'groundedness_mg': 1.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCSYSS03'] (add at least one each)\n- uncovered clause: Number of Consultations by Doctor (Month/ Quarter/ Year)\n- uncovered clause: Revenue Earned per Month/ Quarter/ Year\n- uncovered clause: Patient History File (based on Patient Id)\n- Add tests for VCSYSS03 requirements (consultation counts, revenue, patient history).\n- Include negative test cases for invalid inputs and error paths.\n- Test boundary conditions: date not next day, 5‑day limit, priority boundaries.\n- Assert concrete values such as priority level, timestamps, and status codes.\n- Verify network latency bounds and async call behavior.",
+      "artifact": "@startuml\nactor Patient\nactor Doctor\nactor Chemist\nactor Admin\nparticipant \"Patient History File\" as PHF\nparticipant \"Consultation Request File\" as CRF\nparticipant \"Appointment File\" as AF\nparticipant \"Machine Learning Model\" as ML\nparticipant \"Prescription File\" as PF\n\n== TC-001: Patient creates a Consultation Request (Appointment Mode) ==\nPatient -> CRF: Create Consultation Request (Symptoms, Reports, Mode=Appointment, Date=Next Day)\nCRF -> AF: Create Appointment Entry\nAF -> CRF: Appointment Entry Created\nCRF -> Patient: Consultation Request Created\n\n== TC-002: Patient creates a Consultation Request (Offline Mode) ==\nPatient -> CRF: Create Consultation Request (Symptoms, Reports, Mode=Offline)\nCRF -> Patient: Consultation Request Created\n\n== TC-003: Batch Program creates Appointment File for next 5 days ==\nAdmin -> AF: Run Batch Program\nAF -> AF: Purge Existing Files\nAF -> AF: Create Appointment Entries for Next 5 Days\nAF -> Admin: Batch Program Completed\n\n== TC-004: Machine Learning Model prioritizes Consultation Requests ==\nML -> CRF: Run Periodically\nCRF -> ML: Fetch New Consultation Requests\nML -> ML: Predict Diseases and Prioritize Requests\nML -> CRF: Update Priorities\nCRF -> ML: Priorities Updated\n\n== TC-005: Doctor views and responds to prioritized Consultation Requests ==\nDoctor -> CRF: View Prioritized Requests\nCRF -> Doctor: Display Requests\nDoctor -> CRF: Provide Diagnosis, Prescribe Medicines, Suggest Lab Requests\nCRF -> Doctor: Request Updated\n\n== TC-006: Chemist views and updates open prescriptions ==\nChemist -> PF: View Open Prescriptions\nPF -> Chemist: Display Prescriptions\nChemist -> PF: Update Prescription Status\nPF -> Chemist: Status Updated\n\n== TC-007: Patient creates a Consultation Request with invalid date ==\nPatient -> CRF: Create Consultation Request (Symptoms, Reports, Mode=Appointment, Date=Not Next Day)\nCRF -> Patient: Error: Date must be next day\n\n== TC-008: Machine Learning Model handles boundary priority levels ==\nML -> CRF: Run Periodically\nCRF -> ML: Fetch New Consultation Requests\nML -> ML: Predict Diseases and Prioritize Requests (Critical, Medium, Low)\nML -> CRF: Update Priorities\nCRF -> ML: Priorities Updated\n\n== TC-009: Verify Number of Consultations by Doctor (Month) ==\nDoctor -> PHF: Request Consultation Count (Month)\nPHF -> Doctor: Return Consultation Count (Month)\n\n== TC-010: Verify Revenue Earned by Doctor (Month) ==\nDoctor -> PHF: Request Revenue Earned (Month)\nPHF -> Doctor: Return Revenue Earned (Month)\n\n== TC-011: Verify Patient History File based on Patient Id ==\nPatient -> PHF: Request Patient History (Patient Id)\nPHF -> Patient: Return Patient History\n\n@enduml",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient creates a Consultation Request (Appointment Mode)",
+          "req_ids": [
+            "Req-6/1",
+            "Req-6/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Symptoms": "Fever",
+            "Reports": "Lab Report.pdf",
+            "Mode": "Appointment",
+            "Date": "Next Day"
+          },
+          "steps": [
+            "Patient creates a Consultation Request",
+            "Consultation Request File creates an Appointment Entry"
+          ],
+          "expected": [
+            "Consultation Request Created",
+            "Appointment Entry Created"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient creates a Consultation Request (Offline Mode)",
+          "req_ids": [
+            "Req-6/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Symptoms": "Cough",
+            "Reports": "X-Ray.pdf",
+            "Mode": "Offline"
+          },
+          "steps": [
+            "Patient creates a Consultation Request"
+          ],
+          "expected": [
+            "Consultation Request Created"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Batch Program creates Appointment File for next 5 days",
+          "req_ids": [
+            "Req-6/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Batch Program is scheduled"
+          ],
+          "inputs": {},
+          "steps": [
+            "Admin runs Batch Program",
+            "Appointment File purges existing files",
+            "Appointment File creates entries for next 5 days"
+          ],
+          "expected": [
+            "Batch Program Completed",
+            "Appointment Entries Created"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Machine Learning Model prioritizes Consultation Requests",
+          "req_ids": [
+            "Req-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Machine Learning Model is running"
+          ],
+          "inputs": {},
+          "steps": [
+            "Machine Learning Model fetches new Consultation Requests",
+            "Machine Learning Model predicts diseases and prioritizes requests",
+            "Machine Learning Model updates priorities"
+          ],
+          "expected": [
+            "Priorities Updated"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor views and responds to prioritized Consultation Requests",
+          "req_ids": [
+            "Req-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged in"
+          ],
+          "inputs": {},
+          "steps": [
+            "Doctor views prioritized requests",
+            "Doctor provides diagnosis, prescribes medicines, suggests lab requests"
+          ],
+          "expected": [
+            "Request Updated"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Chemist views and updates open prescriptions",
+          "req_ids": [
+            "Req-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist is logged in"
+          ],
+          "inputs": {},
+          "steps": [
+            "Chemist views open prescriptions",
+            "Chemist updates prescription status"
+          ],
+          "expected": [
+            "Status Updated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient creates a Consultation Request with invalid date",
+          "req_ids": [
+            "Req-6/1",
+            "Req-6/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Symptoms": "Headache",
+            "Reports": "MRI.pdf",
+            "Mode": "Appointment",
+            "Date": "Not Next Day"
+          },
+          "steps": [
+            "Patient creates a Consultation Request"
+          ],
+          "expected": [
+            "Error: Date must be next day"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Machine Learning Model handles boundary priority levels",
+          "req_ids": [
+            "Req-7"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Machine Learning Model is running"
+          ],
+          "inputs": {},
+          "steps": [
+            "Machine Learning Model fetches new Consultation Requests",
+            "Machine Learning Model predicts diseases and prioritizes requests (Critical, Medium, Low)",
+            "Machine Learning Model updates priorities"
+          ],
+          "expected": [
+            "Priorities Updated"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Verify Number of Consultations by Doctor (Month)",
+          "req_ids": [
+            "VCSYSS03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged in"
+          ],
+          "inputs": {},
+          "steps": [
+            "Doctor requests consultation count (Month)",
+            "Patient History File returns consultation count (Month)"
+          ],
+          "expected": [
+            "Consultation Count Returned"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Verify Revenue Earned by Doctor (Month)",
+          "req_ids": [
+            "VCSYSS03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged in"
+          ],
+          "inputs": {},
+          "steps": [
+            "Doctor requests revenue earned (Month)",
+            "Patient History File returns revenue earned (Month)"
+          ],
+          "expected": [
+            "Revenue Earned Returned"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Verify Patient History File based on Patient Id",
+          "req_ids": [
+            "VCSYSS03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Patient Id": "12345"
+          },
+          "steps": [
+            "Patient requests patient history (Patient Id)",
+            "Patient History File returns patient history"
+          ],
+          "expected": [
+            "Patient History Returned"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.24,
+        "hallucinated": [
+          {
+            "value": "Fever",
+            "context": "Symptoms in TC-001",
+            "grounded": false
+          },
+          {
+            "value": "Lab Report.pdf",
+            "context": "Reports in TC-001",
+            "grounded": false
+          },
+          {
+            "value": "Cough",
+            "context": "Symptoms in TC-002",
+            "grounded": false
+          },
+          {
+            "value": "X-Ray.pdf",
+            "context": "Reports in TC-002",
+            "grounded": false
+          },
+          {
+            "value": "Headache",
+            "context": "Symptoms in TC-007",
+            "grounded": false
+          },
+          {
+            "value": "MRI.pdf",
+            "context": "Reports in TC-007",
+            "grounded": false
+          },
+          {
+            "value": "Not Next Day",
+            "context": "Date in TC-007",
+            "grounded": false
+          },
+          {
+            "value": "12345",
+            "context": "Patient Id in TC-011",
+            "grounded": false
+          },
+          {
+            "value": "Consultation Request Created",
+            "context": "Expected output in TC-001, TC-002",
+            "grounded": false
+          },
+          {
+            "value": "Appointment Entry Created",
+            "context": "Expected output in TC-001",
+            "grounded": false
+          },
+          {
+            "value": "Batch Program Completed",
+            "context": "Expected output in TC-003",
+            "grounded": false
+          },
+          {
+            "value": "Appointment Entries Created",
+            "context": "Expected output in TC-003",
+            "grounded": false
+          },
+          {
+            "value": "Priorities Updated",
+            "context": "Expected output in TC-004, TC-008",
+            "grounded": false
+          },
+          {
+            "value": "Request Updated",
+            "context": "Expected output in TC-005",
+            "grounded": false
+          },
+          {
+            "value": "Status Updated",
+            "context": "Expected output in TC-006",
+            "grounded": false
+          },
+          {
+            "value": "Error: Date must be next day",
+            "context": "Expected output in TC-007",
+            "grounded": false
+          },
+          {
+            "value": "Consultation Count Returned",
+            "context": "Expected output in TC-009",
+            "grounded": false
+          },
+          {
+            "value": "Revenue Earned Returned",
+            "context": "Expected output in TC-010",
+            "grounded": false
+          },
+          {
+            "value": "Patient History Returned",
+            "context": "Expected output in TC-011",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 25,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add numeric assertions for consultation counts, revenue, and patient history details to increase oracle assertiveness.",
+          "Include boundary tests for next-day appointment creation (exact next day vs. same day).",
+          "Test invalid modes or missing symptoms to cover additional negative paths.",
+          "Assert concrete status codes or database state changes rather than generic messages.",
+          "Verify that batch program runs at correct nightly schedule and handles time zone boundaries."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "Req-6"
+        ],
+        "fsa_score": 0.664,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.664; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.5, 'groundedness_mg': 0.24}). Output the full improved suite addressing:\n- requirements with NO test case: ['Req-6'] (add at least one each)\n- ungrounded value 'Fever' (Symptoms in TC-001): remove or use the SRS value\n- ungrounded value 'Lab Report.pdf' (Reports in TC-001): remove or use the SRS value\n- ungrounded value 'Cough' (Symptoms in TC-002): remove or use the SRS value\n- ungrounded value 'X-Ray.pdf' (Reports in TC-002): remove or use the SRS value\n- ungrounded value 'Headache' (Symptoms in TC-007): remove or use the SRS value\n- ungrounded value 'MRI.pdf' (Reports in TC-007): remove or use the SRS value\n- Add numeric assertions for consultation counts, revenue, and patient history details to increase oracle assertiveness.\n- Include boundary tests for next-day appointment creation (exact next day vs. same day).\n- Test invalid modes or missing symptoms to cover additional negative paths.\n- Assert concrete status codes or database state changes rather than generic messages.\n- Verify that batch program runs at correct nightly schedule and handles time zone boundaries.",
+      "artifact": "@startuml\nactor Patient\nactor Doctor\nactor Chemist\nparticipant \"Patient History File\" as PHF\nparticipant \"Patient Appointment File\" as PAF\nparticipant \"Consultation Request File\" as CRF\nparticipant \"Batch Program (Appointment)\" as BP_A\nparticipant \"Batch Program (Prediction)\" as BP_P\nparticipant \"Machine Learning Algorithm\" as MLA\nparticipant \"Database\" as DB\n\n== TC-001: Patient creates a Consultation Request (Appointment Mode) ==\nPatient -> CRF: Create Consultation Request (Symptoms: \"Fever\", Reports: \"Lab Report.pdf\", Mode: \"Appointment\")\nCRF -> BP_A: Store Request\nBP_A -> DB: Check Date (Next Day)\nDB --> BP_A: Date is Next Day\nBP_A -> PAF: Create Appointment Entry\nPAF --> BP_A: Appointment Entry Created\nBP_A --> CRF: Confirm Request Stored\nCRF --> Patient: Request Stored\n\n== TC-002: Patient creates a Consultation Request (Offline Mode) ==\nPatient -> CRF: Create Consultation Request (Symptoms: \"Cough\", Reports: \"X-Ray.pdf\", Mode: \"Offline\")\nCRF -> BP_P: Store Request\nBP_P -> MLA: Predict Disease\nMLA --> BP_P: Predicted Priority: Medium\nBP_P -> CRF: Update Priority\nCRF --> Patient: Request Stored\n\n== TC-003: Batch Program (Appointment) runs nightly ==\nBP_A -> DB: Check Current Time (Nightly Schedule)\nDB --> BP_A: Time is Night\nBP_A -> PAF: Purge Existing Appointments\nPAF --> BP_A: Appointments Purged\nBP_A -> DB: Fetch Consultation Requests for Next 5 Days\nDB --> BP_A: Requests Fetched\nBP_A -> PAF: Create Appointment Entries\nPAF --> BP_A: Appointment Entries Created\nBP_A --> DB: Confirm Appointments Created\nDB --> BP_A: Confirmation Received\n\n== TC-004: Batch Program (Prediction) runs periodically ==\nBP_P -> DB: Check New Consultation Requests\nDB --> BP_P: Requests Fetched\nBP_P -> MLA: Predict Disease for Requests\nMLA --> BP_P: Predicted Priorities\nBP_P -> CRF: Update Priorities\nCRF --> DB: Priorities Updated\nDB --> BP_P: Confirmation Received\n\n== TC-005: Doctor views and responds to Consultation Requests ==\nDoctor -> CRF: View Consultation Requests\nCRF --> Doctor: Display Requests with Priorities\nDoctor -> CRF: Provide Diagnosis and Prescribe Medicines (Request ID: 123)\nCRF -> DB: Update Request with Diagnosis and Prescription\nDB --> CRF: Confirmation Received\nCRF --> Doctor: Request Updated\n\n== TC-006: Chemist views and updates Prescription Status ==\nChemist -> DB: View Open Prescriptions\nDB --> Chemist: Display Prescriptions\nChemist -> DB: Update Prescription Status (Request ID: 123, Status: \"Delivered\")\nDB --> Chemist: Status Updated\nDB --> Chemist: Confirmation Received\n\n== TC-007: Patient creates a Consultation Request with Missing Symptoms ==\nPatient -> CRF: Create Consultation Request (Symptoms: \"\", Reports: \"MRI.pdf\", Mode: \"Appointment\")\nCRF --> Patient: Error: Symptoms are required\n\n== TC-008: Patient creates a Consultation Request with Invalid Mode ==\nPatient -> CRF: Create Consultation Request (Symptoms: \"Headache\", Reports: \"MRI.pdf\", Mode: \"Invalid\")\nCRF --> Patient: Error: Invalid Mode\n\n== TC-009: Batch Program (Appointment) handles Time Zone Boundaries ==\nBP_A -> DB: Check Current Time (Nightly Schedule, Time Zone Boundary)\nDB --> BP_A: Time is Night\nBP_A -> PAF: Purge Existing Appointments\nPAF --> BP_A: Appointments Purged\nBP_A -> DB: Fetch Consultation Requests for Next 5 Days\nDB --> BP_A: Requests Fetched\nBP_A -> PAF: Create Appointment Entries\nPAF --> BP_A: Appointment Entries Created\nBP_A --> DB: Confirm Appointments Created\nDB --> BP_A: Confirmation Received\n\n== TC-010: Batch Program (Appointment) handles Same Day Appointments ==\nBP_A -> DB: Check Date (Same Day)\nDB --> BP_A: Date is Same Day\nBP_A --> CRF: Skip Appointment Creation\nCRF --> BP_A: Confirmation Received\n@enduml",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient creates a Consultation Request (Appointment Mode)",
+          "req_ids": [
+            "Req-6",
+            "Req-6/1",
+            "Req-6/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Symptoms": "Fever",
+            "Reports": "Lab Report.pdf",
+            "Mode": "Appointment"
+          },
+          "steps": [
+            "Patient creates a Consultation Request",
+            "Request is stored in Consultation Request File",
+            "Batch Program (Appointment) checks date",
+            "Appointment Entry is created in Patient Appointment File"
+          ],
+          "expected": [
+            "Request stored",
+            "Appointment Entry created"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient creates a Consultation Request (Offline Mode)",
+          "req_ids": [
+            "Req-6",
+            "Req-6/1",
+            "Req-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Symptoms": "Cough",
+            "Reports": "X-Ray.pdf",
+            "Mode": "Offline"
+          },
+          "steps": [
+            "Patient creates a Consultation Request",
+            "Request is stored in Consultation Request File",
+            "Batch Program (Prediction) predicts disease",
+            "Priority is updated in Consultation Request File"
+          ],
+          "expected": [
+            "Request stored",
+            "Priority updated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Batch Program (Appointment) runs nightly",
+          "req_ids": [
+            "Req-6/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Batch Program (Appointment) is scheduled"
+          ],
+          "inputs": {},
+          "steps": [
+            "Batch Program checks current time",
+            "Purges existing appointments",
+            "Fetches consultation requests for next 5 days",
+            "Creates appointment entries"
+          ],
+          "expected": [
+            "Appointments purged",
+            "Appointment entries created"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Batch Program (Prediction) runs periodically",
+          "req_ids": [
+            "Req-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Batch Program (Prediction) is scheduled"
+          ],
+          "inputs": {},
+          "steps": [
+            "Batch Program checks new consultation requests",
+            "Predicts disease for requests",
+            "Updates priorities in Consultation Request File"
+          ],
+          "expected": [
+            "Priorities updated"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor views and responds to Consultation Requests",
+          "req_ids": [
+            "Req-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged in"
+          ],
+          "inputs": {
+            "Request ID": "123"
+          },
+          "steps": [
+            "Doctor views consultation requests",
+            "Doctor provides diagnosis and prescribes medicines",
+            "Request is updated in Consultation Request File"
+          ],
+          "expected": [
+            "Request updated"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Chemist views and updates Prescription Status",
+          "req_ids": [
+            "Req-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist is logged in"
+          ],
+          "inputs": {
+            "Request ID": "123",
+            "Status": "Delivered"
+          },
+          "steps": [
+            "Chemist views open prescriptions",
+            "Chemist updates prescription status",
+            "Status is updated in Database"
+          ],
+          "expected": [
+            "Status updated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient creates a Consultation Request with Missing Symptoms",
+          "req_ids": [
+            "Req-6/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Symptoms": "",
+            "Reports": "MRI.pdf",
+            "Mode": "Appointment"
+          },
+          "steps": [
+            "Patient creates a Consultation Request",
+            "Request is rejected due to missing symptoms"
+          ],
+          "expected": [
+            "Error: Symptoms are required"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient creates a Consultation Request with Invalid Mode",
+          "req_ids": [
+            "Req-6/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Symptoms": "Headache",
+            "Reports": "MRI.pdf",
+            "Mode": "Invalid"
+          },
+          "steps": [
+            "Patient creates a Consultation Request",
+            "Request is rejected due to invalid mode"
+          ],
+          "expected": [
+            "Error: Invalid Mode"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Batch Program (Appointment) handles Time Zone Boundaries",
+          "req_ids": [
+            "Req-6/3"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Batch Program (Appointment) is scheduled"
+          ],
+          "inputs": {},
+          "steps": [
+            "Batch Program checks current time at time zone boundary",
+            "Purges existing appointments",
+            "Fetches consultation requests for next 5 days",
+            "Creates appointment entries"
+          ],
+          "expected": [
+            "Appointments purged",
+            "Appointment entries created"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Batch Program (Appointment) handles Same Day Appointments",
+          "req_ids": [
+            "Req-6/3"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Batch Program (Appointment) is scheduled"
+          ],
+          "inputs": {},
+          "steps": [
+            "Batch Program checks date for same day",
+            "Skips appointment creation"
+          ],
+          "expected": [
+            "Appointment creation skipped"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.7,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.4118,
+        "hallucinated": [
+          {
+            "value": "Fever",
+            "grounded": false
+          },
+          {
+            "value": "Lab Report.pdf",
+            "grounded": false
+          },
+          {
+            "value": "Cough",
+            "grounded": false
+          },
+          {
+            "value": "X-Ray.pdf",
+            "grounded": false
+          },
+          {
+            "value": "Invalid",
+            "grounded": false
+          },
+          {
+            "value": "Same Day",
+            "grounded": false
+          },
+          {
+            "value": "Delivered",
+            "grounded": false
+          },
+          {
+            "value": "123",
+            "grounded": false
+          },
+          {
+            "value": "Error: Symptoms are required",
+            "grounded": false
+          },
+          {
+            "value": "Error: Invalid Mode",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [
+          "VCSYSS03-Consultations",
+          "VCSYSS03-Revenue",
+          "VCSYSS03-PatientHistory"
+        ],
+        "weaknesses": [
+          "No tests for speciality‑wise consultation counts and revenue",
+          "No tests for patient history file retrieval",
+          "Assertions lack concrete values (e.g., status codes, priority enums)",
+          "No test for doctor’s lab request suggestions",
+          "No test for chemist offline delivery process"
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "VCSYSS03"
+        ],
+        "fsa_score": 0.7262,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.7262; sub-scores {'clause_coverage': 0.7, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.3, 'boundary_coverage': 1.0, 'groundedness_mg': 0.4118}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCSYSS03'] (add at least one each)\n- uncovered clause: VCSYSS03-Consultations\n- uncovered clause: VCSYSS03-Revenue\n- uncovered clause: VCSYSS03-PatientHistory\n- ungrounded value 'Fever' (None): remove or use the SRS value\n- ungrounded value 'Lab Report.pdf' (None): remove or use the SRS value\n- ungrounded value 'Cough' (None): remove or use the SRS value\n- ungrounded value 'X-Ray.pdf' (None): remove or use the SRS value\n- ungrounded value 'Invalid' (None): remove or use the SRS value\n- ungrounded value 'Same Day' (None): remove or use the SRS value\n- No tests for speciality‑wise consultation counts and revenue\n- No tests for patient history file retrieval\n- Assertions lack concrete values (e.g., status codes, priority enums)\n- No test for doctor’s lab request suggestions\n- No test for chemist offline delivery process",
+      "artifact": "@startuml\nactor Patient\nactor Doctor\nactor Chemist\nparticipant \"Patient Management System\" as PMS\nparticipant \"Consultation Request System\" as CRS\nparticipant \"Appointment Scheduler\" as AS\nparticipant \"Machine Learning Model\" as ML\nparticipant \"Doctor Interface\" as DI\nparticipant \"Chemist Interface\" as CI\nparticipant \"Patient History File\" as PHF\nparticipant \"Appointment File\" as AF\nparticipant \"Prescription File\" as PF\nparticipant \"Lab Request File\" as LRF\n\n== Test Case TC-001: Patient creates a Consultation Request (Offline) ==\nPatient -> CRS: Create Consultation Request (Symptoms: Fever, Mode: Offline)\nCRS -> PHF: Store Consultation Request\nPHF -> CRS: Confirmation\nCRS -> ML: Send Consultation Request for Prioritization\nML -> CRS: Return Priority (Critical)\nCRS -> DI: Notify Doctor of New Consultation Request (Priority: Critical)\n\n== Test Case TC-002: Patient creates a Consultation Request (Appointment) ==\nPatient -> CRS: Create Consultation Request (Symptoms: Cough, Mode: Appointment, Date: Same Day)\nCRS -> AS: Check Availability for Same Day\nAS -> CRS: Availability (False)\nCRS -> Patient: Notify Unavailability for Same Day\nPatient -> CRS: Create Consultation Request (Symptoms: Cough, Mode: Appointment, Date: Next Day)\nCRS -> AS: Check Availability for Next Day\nAS -> CRS: Availability (True)\nCRS -> AF: Create Appointment Entry\nAF -> CRS: Confirmation\nCRS -> PHF: Store Consultation Request\nPHF -> CRS: Confirmation\nCRS -> ML: Send Consultation Request for Prioritization\nML -> CRS: Return Priority (Medium)\nCRS -> DI: Notify Doctor of New Consultation Request (Priority: Medium)\n\n== Test Case TC-003: Batch Program for Appointment File Creation ==\nAS -> AF: Purge Existing Appointment File\nAF -> AS: Confirmation\nAS -> CRS: Fetch Consultation Requests for Next 5 Days\nCRS -> AS: Return Consultation Requests\nAS -> AF: Create Appointment Entries for Next 5 Days\nAF -> AS: Confirmation\n\n== Test Case TC-004: Machine Learning Model Prioritizes Consultation Requests ==\nML -> CRS: Receive Consultation Requests\nCRS -> ML: Send Consultation Requests\nML -> CRS: Return Prioritized Requests (Critical, Medium, Low)\nCRS -> DI: Notify Doctor of New Consultation Requests (Priorities: Critical, Medium, Low)\n\n== Test Case TC-005: Doctor Provides Diagnosis and Prescribes Medicines ==\nDoctor -> DI: View Consultation Requests\nDI -> Doctor: Display Consultation Requests (Priorities: Critical, Medium, Low)\nDoctor -> DI: Provide Diagnosis and Prescribe Medicines\nDI -> PF: Create Prescription Entry\nPF -> DI: Confirmation\nDI -> LRF: Create Lab Request Entry (if any)\nLRF -> DI: Confirmation\n\n== Test Case TC-006: Chemist Views and Updates Prescription Status ==\nChemist -> CI: View Open Prescriptions\nCI -> PF: Fetch Open Prescriptions\nPF -> CI: Return Open Prescriptions\nChemist -> CI: Update Prescription Status (Delivered)\nCI -> PF: Update Prescription Status (Delivered)\nPF -> CI: Confirmation\n\n== Test Case TC-007: Retrieve Patient History File ==\nPatient -> PMS: Request Patient History (Patient ID)\nPMS -> PHF: Fetch Patient History (Patient ID)\nPHF -> PMS: Return Patient History\nPMS -> Patient: Display Patient History\n\n== Test Case TC-008: Speciality-wise Consultations and Revenue ==\nPMS -> PHF: Fetch Consultation Data (Speciality, Month/Quarter/Year)\nPHF -> PMS: Return Consultation Data (Speciality, Month/Quarter/Year)\nPMS -> PMS: Calculate Consultation Counts (Speciality, Month/Quarter/Year)\nPMS -> PMS: Calculate Revenue Earned (Speciality, Month/Quarter/Year)\nPMS -> Patient: Display Consultation Counts and Revenue (Speciality, Month/Quarter/Year)\n@enduml",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient creates a Consultation Request (Offline)",
+          "req_ids": [
+            "Req-6",
+            "Req-6/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Symptoms": "Fever",
+            "Mode": "Offline"
+          },
+          "steps": [
+            "Patient creates a Consultation Request",
+            "CRS stores Consultation Request",
+            "ML prioritizes Consultation Request",
+            "Doctor is notified of new Consultation Request"
+          ],
+          "expected": [
+            "Consultation Request stored",
+            "Priority assigned as Critical",
+            "Doctor notified"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient creates a Consultation Request (Appointment)",
+          "req_ids": [
+            "Req-6",
+            "Req-6/1",
+            "Req-6/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Symptoms": "Cough",
+            "Mode": "Appointment",
+            "Date": "Next Day"
+          },
+          "steps": [
+            "Patient creates a Consultation Request",
+            "AS checks availability for Same Day",
+            "Patient notified of unavailability",
+            "Patient creates Consultation Request for Next Day",
+            "AS checks availability for Next Day",
+            "AF creates Appointment Entry",
+            "CRS stores Consultation Request",
+            "ML prioritizes Consultation Request",
+            "Doctor is notified of new Consultation Request"
+          ],
+          "expected": [
+            "Appointment Entry created",
+            "Consultation Request stored",
+            "Priority assigned as Medium",
+            "Doctor notified"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Batch Program for Appointment File Creation",
+          "req_ids": [
+            "Req-6/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Batch program is scheduled"
+          ],
+          "inputs": {},
+          "steps": [
+            "AS purges existing Appointment File",
+            "AS fetches Consultation Requests for Next 5 Days",
+            "AF creates Appointment Entries for Next 5 Days"
+          ],
+          "expected": [
+            "Existing Appointment File purged",
+            "Appointment Entries created for Next 5 Days"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Machine Learning Model Prioritizes Consultation Requests",
+          "req_ids": [
+            "Req-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation Requests are available"
+          ],
+          "inputs": {},
+          "steps": [
+            "ML receives Consultation Requests",
+            "ML returns Prioritized Requests",
+            "Doctor is notified of new Consultation Requests"
+          ],
+          "expected": [
+            "Prioritized Requests returned",
+            "Doctor notified"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor Provides Diagnosis and Prescribes Medicines",
+          "req_ids": [
+            "Req-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged in",
+            "Consultation Requests are available"
+          ],
+          "inputs": {},
+          "steps": [
+            "Doctor views Consultation Requests",
+            "Doctor provides Diagnosis and Prescribes Medicines",
+            "PF creates Prescription Entry",
+            "LRF creates Lab Request Entry (if any)"
+          ],
+          "expected": [
+            "Prescription Entry created",
+            "Lab Request Entry created (if any)"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Chemist Views and Updates Prescription Status",
+          "req_ids": [
+            "Req-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist is logged in",
+            "Prescriptions are available"
+          ],
+          "inputs": {},
+          "steps": [
+            "Chemist views Open Prescriptions",
+            "CI fetches Open Prescriptions",
+            "Chemist updates Prescription Status",
+            "PF updates Prescription Status"
+          ],
+          "expected": [
+            "Open Prescriptions fetched",
+            "Prescription Status updated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Retrieve Patient History File",
+          "req_ids": [
+            "VCSYSS03-PatientHistory"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "Patient ID": "as specified"
+          },
+          "steps": [
+            "Patient requests Patient History",
+            "PMS fetches Patient History",
+            "PMS displays Patient History"
+          ],
+          "expected": [
+            "Patient History fetched",
+            "Patient History displayed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Speciality-wise Consultations and Revenue",
+          "req_ids": [
+            "VCSYSS03-Consultations",
+            "VCSYSS03-Revenue"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation data is available"
+          ],
+          "inputs": {
+            "Speciality": "as specified",
+            "Period": "Month/Quarter/Year"
+          },
+          "steps": [
+            "PMS fetches Consultation Data",
+            "PMS calculates Consultation Counts",
+            "PMS calculates Revenue Earned",
+            "PMS displays Consultation Counts and Revenue"
+          ],
+          "expected": [
+            "Consultation Counts calculated",
+            "Revenue Earned calculated",
+            "Consultation Counts and Revenue displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 0.75,
+        "representation_score": 1.0,
+        "sfv_score": 0.875,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #7 (TC-007): traces to unknown requirement ids ['VCSYSS03-PatientHistory']",
+          "test case #8 (TC-008): traces to unknown requirement ids ['VCSYSS03-Consultations', 'VCSYSS03-Revenue']"
+        ]
+      }
+    }
+  ]
+}

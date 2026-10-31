@@ -1,0 +1,1242 @@
+{
+  "unit_id": "U17_GUI",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "data_pipeline",
+  "n_attempts": 3,
+  "repairs_used": 2,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "data_pipeline",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.25,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.8696,
+    "hallucinated": [
+      {
+        "value": "1001 mL",
+        "context": "inspiratory tidal volume",
+        "grounded": false
+      },
+      {
+        "value": "5:1",
+        "context": "ratio of inspiration to expiration",
+        "grounded": false
+      },
+      {
+        "value": "1:201",
+        "context": "ratio of inspiration to expiration",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 23,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Oracle assertions are vague and do not check concrete numeric values",
+      "Negative coverage is minimal; no tests for error handling or out‑of‑range behavior defined in the SRS",
+      "Some test values (e.g., 5:1 ratio, 1001 mL) are outside the specified ranges and may mislead",
+      "The scenario outline duplicates many individual scenarios, reducing clarity",
+      "Combined behavior of refresh rate and duration is not explicitly verified together"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.667,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: GUI Display Requirements\n\n  Scenario: Display Patient Pressure\n    Given the controller provides patient pressure data\n    When the GUI displays the patient pressure\n    Then the GUI displays the patient pressure measured at the gas outlet port\n\n  Scenario: GUI Graph Refresh Rate\n    Given the GUI graph refresh rate is set to 20 Hz\n    When the GUI graph is updated\n    Then the GUI graph is updated at a rate of at least 20 Hz\n\n  Scenario: GUI Graph Duration\n    Given the GUI graph duration is set to 30 seconds\n    When the GUI graph is updated\n    Then the GUI graph is displayed for 30 seconds\n\n  Scenario: Display Inspiratory Tidal Volume\n    Given the inspiratory tidal volume is set to 500 mL\n    When the GUI displays the inspiratory tidal volume\n    Then the GUI displays the inspiratory tidal volume with a resolution of 1 mL\n\n  Scenario: Display Ratio of Inspiration Time to Expiration Time\n    Given the ratio of inspiration time to expiration time is set to 5:1\n    When the GUI displays the ratio of inspiration time to expiration time\n    Then the GUI displays the ratio with a resolution of 0.1 for values under 10 and 1 for values over 10\n\n  Scenario: Display PEEP\n    Given the PEEP is set to 5 cmH2O\n    When the GUI displays the PEEP\n    Then the GUI displays the PEEP in increments of 1 cmH2O\n\n  Scenario: Display Graph of Volume Provided to Patient\n    Given the GUI graph displays the volume provided to the patient\n    When the GUI graph is updated\n    Then the GUI graph displays the volume provided to the patient\n\n  Scenario: Display Flow Rate Provided to Patient\n    Given the flow rate provided to the patient is set to 10 L/min\n    When the GUI displays the flow rate provided to the patient\n    Then the GUI displays the flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute\n\n  Scenario Outline: GUI Display Requirements with Examples\n    Given the controller provides patient pressure data\n    And the GUI graph refresh rate is set to 20 Hz\n    And the GUI graph duration is set to 30 seconds\n    And the inspiratory tidal volume is set to <inspiratory tidal volume>\n    And the ratio of inspiration time to expiration time is set to <ratio of inspiration time to expiration time>\n    And the PEEP is set to <PEEP>\n    And the flow rate provided to the patient is set to <flow rate provided to the patient>\n    When the GUI displays the patient pressure, inspiratory tidal volume, ratio of inspiration time to expiration time, PEEP, and flow rate provided to the patient\n    Then the GUI displays the patient pressure measured at the gas outlet port, inspiratory tidal volume with a resolution of 1 mL, ratio with a resolution of 0.1 for values under 10 and 1 for values over 10, PEEP in increments of 1 cmH2O, and flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute\n\n    Examples:\n      | inspiratory tidal volume | ratio of inspiration time to expiration time | PEEP | flow rate provided to the patient |\n      | 0 mL                      | 10:1                                    | 0 cmH2O | 0 L/min                         |\n      | 1000 mL                   | 1:200                                  | 10 cmH2O | 20 L/min                        |\n      | 500 mL                    | 5:1                                    | 5 cmH2O | 10 L/min                        |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Display Patient Pressure",
+      "req_ids": [
+        "RW-SW-46"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "controller provides patient pressure data"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI displays patient pressure"
+      ],
+      "expected": [
+        "GUI displays patient pressure measured at gas outlet port"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "GUI Graph Refresh Rate",
+      "req_ids": [
+        "RW-SW-47"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI graph refresh rate is set to 20 Hz"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI graph is updated"
+      ],
+      "expected": [
+        "GUI graph is updated at a rate of at least 20 Hz"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "GUI Graph Duration",
+      "req_ids": [
+        "RW-SW-48"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI graph duration is set to 30 seconds"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI graph is updated"
+      ],
+      "expected": [
+        "GUI graph is displayed for 30 seconds"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Display Inspiratory Tidal Volume",
+      "req_ids": [
+        "RW-SW-49"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "inspiratory tidal volume is set to 500 mL"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI displays inspiratory tidal volume"
+      ],
+      "expected": [
+        "GUI displays inspiratory tidal volume with a resolution of 1 mL"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Display Ratio of Inspiration Time to Expiration Time",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "ratio of inspiration time to expiration time is set to 5:1"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI displays ratio of inspiration time to expiration time"
+      ],
+      "expected": [
+        "GUI displays ratio with a resolution of 0.1 for values under 10 and 1 for values over 10"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Display PEEP",
+      "req_ids": [
+        "RW-SW-53"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "PEEP is set to 5 cmH2O"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI displays PEEP"
+      ],
+      "expected": [
+        "GUI displays PEEP in increments of 1 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Display Graph of Volume Provided to Patient",
+      "req_ids": [
+        "RW-SW-54"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI graph displays volume provided to patient"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI graph is updated"
+      ],
+      "expected": [
+        "GUI graph displays volume provided to patient"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Display Flow Rate Provided to Patient",
+      "req_ids": [
+        "RW-SW-92"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "flow rate provided to patient is set to 10 L/min"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI displays flow rate provided to patient"
+      ],
+      "expected": [
+        "GUI displays flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "GUI Display Requirements with Examples",
+      "req_ids": [
+        "RW-SW-46",
+        "RW-SW-47",
+        "RW-SW-48",
+        "RW-SW-49",
+        "RW-SW-50",
+        "RW-SW-53",
+        "RW-SW-92"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "controller provides patient pressure data",
+        "GUI graph refresh rate is set to 20 Hz",
+        "GUI graph duration is set to 30 seconds",
+        "inspiratory tidal volume is set to <inspiratory tidal volume>",
+        "ratio of inspiration time to expiration time is set to <ratio of inspiration time to expiration time>",
+        "PEEP is set to <PEEP>",
+        "flow rate provided to patient is set to <flow rate provided to patient>"
+      ],
+      "inputs": {
+        "inspiratory tidal volume": "value",
+        "ratio of inspiration time to expiration time": "value",
+        "PEEP": "value",
+        "flow rate provided to patient": "value"
+      },
+      "steps": [
+        "GUI displays patient pressure, inspiratory tidal volume, ratio of inspiration time to expiration time, PEEP, and flow rate provided to patient"
+      ],
+      "expected": [
+        "GUI displays patient pressure measured at gas outlet port, inspiratory tidal volume with a resolution of 1 mL, ratio with a resolution of 0.1 for values under 10 and 1 for values over 10, PEEP in increments of 1 cmH2O, and flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "GUI Display Requirements with Examples - Edge Case",
+      "req_ids": [
+        "RW-SW-46",
+        "RW-SW-47",
+        "RW-SW-48",
+        "RW-SW-49",
+        "RW-SW-50",
+        "RW-SW-53",
+        "RW-SW-92"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "controller provides patient pressure data",
+        "GUI graph refresh rate is set to 20 Hz",
+        "GUI graph duration is set to 30 seconds",
+        "inspiratory tidal volume is set to 0 mL",
+        "ratio of inspiration time to expiration time is set to 10:1",
+        "PEEP is set to 0 cmH2O",
+        "flow rate provided to patient is set to 0 L/min"
+      ],
+      "inputs": {
+        "inspiratory tidal volume": "0 mL",
+        "ratio of inspiration time to expiration time": "10:1",
+        "PEEP": "0 cmH2O",
+        "flow rate provided to patient": "0 L/min"
+      },
+      "steps": [
+        "GUI displays patient pressure, inspiratory tidal volume, ratio of inspiration time to expiration time, PEEP, and flow rate provided to patient"
+      ],
+      "expected": [
+        "GUI displays patient pressure measured at gas outlet port, inspiratory tidal volume with a resolution of 1 mL, ratio with a resolution of 0.1 for values under 10 and 1 for values over 10, PEEP in increments of 1 cmH2O, and flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "GUI Display Requirements with Examples - Invalid Case",
+      "req_ids": [
+        "RW-SW-46",
+        "RW-SW-47",
+        "RW-SW-48",
+        "RW-SW-49",
+        "RW-SW-50",
+        "RW-SW-53",
+        "RW-SW-92"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "controller provides patient pressure data",
+        "GUI graph refresh rate is set to 20 Hz",
+        "GUI graph duration is set to 30 seconds",
+        "inspiratory tidal volume is set to 1001 mL",
+        "ratio of inspiration time to expiration time is set to 1:201",
+        "PEEP is set to 11 cmH2O",
+        "flow rate provided to patient is set to 21 L/min"
+      ],
+      "inputs": {
+        "inspiratory tidal volume": "1001 mL",
+        "ratio of inspiration time to expiration time": "1:201",
+        "PEEP": "11 cmH2O",
+        "flow rate provided to patient": "21 L/min"
+      },
+      "steps": [
+        "GUI displays patient pressure, inspiratory tidal volume, ratio of inspiration time to expiration time, PEEP, and flow rate provided to patient"
+      ],
+      "expected": [
+        "GUI does not display patient pressure measured at gas outlet port, inspiratory tidal volume with a resolution of 1 mL, ratio with a resolution of 0.1 for values under 10 and 1 for values over 10, PEEP in increments of 1 cmH2O, and flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Display Patient Pressure",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is sending data to the GUI"
+          ],
+          "inputs": {
+            "name": "patient pressure"
+          },
+          "steps": [
+            "GUI displays patient pressure"
+          ],
+          "expected": [
+            "patient pressure is displayed as 20 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI Graph Refresh Rate",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI graph refresh rate is set to 20 Hz"
+          ],
+          "inputs": {
+            "name": "GUI graph refresh rate"
+          },
+          "steps": [
+            "GUI graph is updated"
+          ],
+          "expected": [
+            "GUI graph is updated at a rate of at least 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI Graph Duration",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI graph duration is set to 30 seconds"
+          ],
+          "inputs": {
+            "name": "GUI graph duration"
+          },
+          "steps": [
+            "GUI graph is updated"
+          ],
+          "expected": [
+            "GUI graph is updated for 30 seconds"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Display Inspiratory Tidal Volume",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "inspiratory tidal volume is 500 mL"
+          ],
+          "inputs": {
+            "name": "inspiratory tidal volume"
+          },
+          "steps": [
+            "GUI displays inspiratory tidal volume"
+          ],
+          "expected": [
+            "inspiratory tidal volume is displayed as 500 mL with a resolution of 1 mL"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Display Ratio of Inspiration Time to Expiration Time",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ratio of inspiration time to expiration time is 15:1"
+          ],
+          "inputs": {
+            "name": "ratio of inspiration time to expiration time"
+          },
+          "steps": [
+            "GUI displays ratio"
+          ],
+          "expected": [
+            "ratio is displayed as 15:1 with a display resolution of 0.1"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Display PEEP",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PEEP is 5 cmH2O"
+          ],
+          "inputs": {
+            "name": "PEEP"
+          },
+          "steps": [
+            "GUI displays PEEP"
+          ],
+          "expected": [
+            "PEEP is displayed as 5 cmH2O in increments of 1 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Display Graph of Volume Provided to Patient",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "volume provided to the patient is 1000 mL"
+          ],
+          "inputs": {
+            "name": "volume provided to the patient"
+          },
+          "steps": [
+            "GUI displays graph of volume provided"
+          ],
+          "expected": [
+            "graph of volume provided to the patient is displayed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Display Flow Rate",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "flow rate is 10 L/min"
+          ],
+          "inputs": {
+            "name": "flow rate"
+          },
+          "steps": [
+            "GUI displays flow rate"
+          ],
+          "expected": [
+            "flow rate is displayed as 10 L/min with a duration of 30 seconds updated at a rate of at least 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Display Patient Pressure with Various Values",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is sending data to the GUI"
+          ],
+          "inputs": {
+            "name": "patient pressure"
+          },
+          "steps": [
+            "GUI displays patient pressure"
+          ],
+          "expected": [
+            "patient pressure is displayed as <pressure>"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Display Inspiratory Tidal Volume with Various Values",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "inspiratory tidal volume is <volume>"
+          ],
+          "inputs": {
+            "name": "inspiratory tidal volume"
+          },
+          "steps": [
+            "GUI displays inspiratory tidal volume"
+          ],
+          "expected": [
+            "inspiratory tidal volume is displayed as <volume> with a resolution of 1 mL"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Display Ratio of Inspiration Time to Expiration Time with Various Values",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ratio of inspiration time to expiration time is <ratio>"
+          ],
+          "inputs": {
+            "name": "ratio of inspiration time to expiration time"
+          },
+          "steps": [
+            "GUI displays ratio"
+          ],
+          "expected": [
+            "ratio is displayed as <ratio> with a display resolution of 0.1"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Display PEEP with Various Values",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PEEP is <peep>"
+          ],
+          "inputs": {
+            "name": "PEEP"
+          },
+          "steps": [
+            "GUI displays PEEP"
+          ],
+          "expected": [
+            "PEEP is displayed as <peep> in increments of 1 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Display Flow Rate with Various Values",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "flow rate is <flow>"
+          ],
+          "inputs": {
+            "name": "flow rate"
+          },
+          "steps": [
+            "GUI displays flow rate"
+          ],
+          "expected": [
+            "flow rate is displayed as <flow> with a duration of 30 seconds updated at a rate of at least 20 Hz"
+          ]
+        }
+      ],
+      "raw_if_unparsed": "```gherkin\nFeature: GUI Display Requirements\n\n  Scenario: Display Patient Pressure\n    Given the controller is sending data to the GUI\n    And the patient pressure is 20 cmH2O\n    When the GUI displays the patient pressure\n    Then the GUI displays the patient pressure as 20 cmH2O\n\n  Scenario: GUI Graph Refresh Rate\n    Given the GUI graph refresh rate is set to 20 Hz\n    When the GUI graph is updated\n    Then the GUI graph is updated at a rate of at least 20 Hz\n\n  Scenario: GUI Graph Duration\n    Given the GUI graph duration is set to 30 seconds\n    When the GUI graph is updated\n    Then the GUI graph is updated for 30 seconds\n\n  Scenario: Display Inspiratory Tidal Volume\n    Given the inspiratory tidal volume is 500 mL\n    When the GUI displays the inspiratory tidal volume\n    Then the GUI displays the inspiratory tidal volume as 500 mL with a resolution of 1 mL\n\n  Scenario: Display Ratio of Inspiration Time to Expiration Time\n    Given the ratio of inspiration time to expiration time is 15:1\n    When the GUI displays the ratio\n    Then the GUI displays the ratio as 15:1 with a display resolution of 0.1\n\n  Scenario: Display PEEP\n    Given the PEEP is 5 cmH2O\n    When the GUI displays the PEEP\n    Then the GUI displays the PEEP as 5 cmH2O in increments of 1 cmH2O\n\n  Scenario: Display Graph of Volume Provided to Patient\n    Given the volume provided to the patient is 1000 mL\n    When the GUI displays the graph of volume provided\n    Then the GUI displays the graph of volume provided to the patient\n\n  Scenario: Display Flow Rate\n    Given the flow rate is 10 L/min\n    When the GUI displays the flow rate\n    Then the GUI displays the flow rate as 10 L/min with a duration of 30 seconds updated at a rate of at least 20 Hz\n\n  Scenario Outline: Display Patient Pressure with Various Values\n    Given the controller is sending data to the GUI\n    And the patient pressure is <pressure>\n    When the GUI displays the patient pressure\n    Then the GUI displays the patient pressure as <pressure>\n\n    Examples:\n      | pressure |\n      | 10 cmH2O |\n      | 20 cmH2O |\n      | 30 cmH2O |\n      | 40 cmH2O |\n      | 50 cmH2O |\n\n  Scenario Outline: Display Inspiratory Tidal Volume with Various Values\n    Given the inspiratory tidal volume is <volume>\n    When the GUI displays the inspiratory tidal volume\n    Then the GUI displays the inspiratory tidal volume as <volume> with a resolution of 1 mL\n\n    Examples:\n      | volume |\n      | 0 mL   |\n      | 100 mL |\n      | 500 mL |\n      | 1000 mL|\n\n  Scenario Outline: Display Ratio of Inspiration Time to Expiration Time with Various Values\n    Given the ratio of inspiration time to expiration time is <ratio>\n    When the GUI displays the ratio\n    Then the GUI displays the ratio as <ratio> with a display resolution of 0.1\n\n    Examples:\n      | ratio  |\n      | 10:1   |\n      | 15:1   |\n      | 20:1   |\n      | 25:1   |\n      | 1:200  |\n\n  Scenario Outline: Display PEEP with Various Values\n    Given the PEEP is <peep>\n ",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Representation artifact is empty.",
+      "artifact": "Feature: GUI Display Requirements\n\n  Scenario: Display Patient Pressure\n    Given the controller provides patient pressure data\n    When the GUI displays the patient pressure\n    Then the GUI displays the patient pressure measured at the gas outlet port\n\n  Scenario: GUI Graph Refresh Rate\n    Given the GUI graph refresh rate is set to 20 Hz\n    When the GUI graph is updated\n    Then the GUI graph is updated at a rate of at least 20 Hz\n\n  Scenario: GUI Graph Duration\n    Given the GUI graph duration is set to 30 seconds\n    When the GUI graph is updated\n    Then the GUI graph is updated for 30 seconds\n\n  Scenario: Display Inspiratory Tidal Volume\n    Given the inspiratory tidal volume is set to 500 mL\n    When the GUI displays the inspiratory tidal volume\n    Then the GUI displays the inspiratory tidal volume with a resolution of 1 mL\n\n  Scenario: Display Ratio of Inspiration Time to Expiration Time\n    Given the ratio of inspiration time to expiration time is set to 5:1\n    When the GUI displays the ratio of inspiration time to expiration time\n    Then the GUI displays the ratio with a resolution of 0.1 for values under 10 and 1 for values over 10\n\n  Scenario: Display PEEP\n    Given the PEEP is set to 5 cmH2O\n    When the GUI displays the PEEP\n    Then the GUI displays the PEEP in increments of 1 cmH2O\n\n  Scenario: Display Graph of Volume Provided to Patient\n    Given the GUI graph displays the volume provided to the patient\n    When the GUI graph is updated\n    Then the GUI graph displays the volume provided to the patient\n\n  Scenario: Display Flow Rate Provided to Patient\n    Given the flow rate provided to the patient is set to 10 L/min\n    When the GUI displays the flow rate provided to the patient\n    Then the GUI displays the flow rate with units of liters/minute and updates at a rate of at least 20 Hz\n\n  Scenario Outline: Display Patient Pressure with Edge Cases\n    Given the controller provides patient pressure data\n    When the GUI displays the patient pressure\n    Then the GUI displays the patient pressure measured at the gas outlet port\n    Examples:\n      | patient pressure | expected display |\n      | 0 | 0 |\n      | 100 | 100 |\n      | -1 | error |\n      | 101 | error |\n\n  Scenario Outline: Display Inspiratory Tidal Volume with Edge Cases\n    Given the inspiratory tidal volume is set to <value>\n    When the GUI displays the inspiratory tidal volume\n    Then the GUI displays the inspiratory tidal volume with a resolution of 1 mL\n    Examples:\n      | value | expected display |\n      | 0 | 0 |\n      | 1000 | 1000 |\n      | -1 | error |\n      | 1001 | error |\n\n  Scenario Outline: Display Ratio of Inspiration Time to Expiration Time with Edge Cases\n    Given the ratio of inspiration time to expiration time is set to <value>\n    When the GUI displays the ratio of inspiration time to expiration time\n    Then the GUI displays the ratio with a resolution of 0.1 for values under 10 and 1 for values over 10\n    Examples:\n      | value | expected display |\n      | 10:1 | 10:1 |\n      | 1:200 | 1:200 |\n      | 10:2 | 10:2 |\n      | 1:201 | 1:201 |\n      | -1:1 | error |\n      | 1:-1 | error |\n\n  Scenario Outline: Display PEEP with Edge Cases\n    Given the PEEP is set to <value>\n    When the GUI displays the PEEP\n    Then the GUI displays the PEEP in increments of 1 cmH2O\n    Examples:\n      | value | expected display |\n      | 0 | 0 |\n      | 10 | 10 |\n      | -1 | error |\n      | 11 | error |\n\n  Scenario Outline: Display Flow Rate Provided to Patient with Edge Cases\n    Given the flow rate provided to the patient is set to <value>\n    When the GUI displays the flow rate provided to the patient\n    Then the GUI displays the flow rate with units of liters/minute and updates at a rate of at least 20 Hz\n    Examples:\n      | value | expected display |\n      | 0 | 0 |\n      | 10 | 10 L/min |\n      | -1 | error |\n      | 11 | error |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Display Patient Pressure",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller provides patient pressure data"
+          ],
+          "inputs": {
+            "name": "patient pressure"
+          },
+          "steps": [
+            "GUI displays patient pressure",
+            "GUI displays patient pressure measured at gas outlet port"
+          ],
+          "expected": [
+            "patient pressure measured at gas outlet port"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI Graph Refresh Rate",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI graph refresh rate is set to 20 Hz"
+          ],
+          "inputs": {
+            "name": "GUI graph refresh rate"
+          },
+          "steps": [
+            "GUI graph is updated",
+            "GUI graph is updated at a rate of at least 20 Hz"
+          ],
+          "expected": [
+            "GUI graph is updated at a rate of at least 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI Graph Duration",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI graph duration is set to 30 seconds"
+          ],
+          "inputs": {
+            "name": "GUI graph duration"
+          },
+          "steps": [
+            "GUI graph is updated",
+            "GUI graph is updated for 30 seconds"
+          ],
+          "expected": [
+            "GUI graph is updated for 30 seconds"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Display Inspiratory Tidal Volume",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "inspiratory tidal volume is set to 500 mL"
+          ],
+          "inputs": {
+            "name": "inspiratory tidal volume"
+          },
+          "steps": [
+            "GUI displays inspiratory tidal volume",
+            "GUI displays inspiratory tidal volume with a resolution of 1 mL"
+          ],
+          "expected": [
+            "inspiratory tidal volume with a resolution of 1 mL"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Display Ratio of Inspiration Time to Expiration Time",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ratio of inspiration time to expiration time is set to 5:1"
+          ],
+          "inputs": {
+            "name": "ratio of inspiration time to expiration time"
+          },
+          "steps": [
+            "GUI displays ratio of inspiration time to expiration time",
+            "GUI displays ratio with a resolution of 0.1 for values under 10 and 1 for values over 10"
+          ],
+          "expected": [
+            "ratio with a resolution of 0.1 for values under 10 and 1 for values over 10"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Display PEEP",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PEEP is set to 5 cmH2O"
+          ],
+          "inputs": {
+            "name": "PEEP"
+          },
+          "steps": [
+            "GUI displays PEEP",
+            "GUI displays PEEP in increments of 1 cmH2O"
+          ],
+          "expected": [
+            "PEEP in increments of 1 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Display Graph of Volume Provided to Patient",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI graph displays volume provided to patient"
+          ],
+          "inputs": {
+            "name": "volume provided to patient"
+          },
+          "steps": [
+            "GUI graph is updated",
+            "GUI graph displays volume provided to patient"
+          ],
+          "expected": [
+            "GUI graph displays volume provided to patient"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Display Flow Rate Provided to Patient",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "flow rate provided to patient is set to 10 L/min"
+          ],
+          "inputs": {
+            "name": "flow rate provided to patient"
+          },
+          "steps": [
+            "GUI displays flow rate provided to patient",
+            "GUI displays flow rate with units of liters/minute and updates at a rate of at least 20 Hz"
+          ],
+          "expected": [
+            "flow rate with units of liters/minute and updates at a rate of at least 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Display Patient Pressure with Edge Cases",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "controller provides patient pressure data"
+          ],
+          "inputs": {
+            "name": "patient pressure"
+          },
+          "steps": [
+            "GUI displays patient pressure",
+            "GUI displays patient pressure measured at gas outlet port"
+          ],
+          "expected": [
+            "error"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Display Inspiratory Tidal Volume with Edge Cases",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "inspiratory tidal volume is set to <value>"
+          ],
+          "inputs": {
+            "name": "inspiratory tidal volume"
+          },
+          "steps": [
+            "GUI displays inspiratory tidal volume",
+            "GUI displays inspiratory tidal volume with a resolution of 1 mL"
+          ],
+          "expected": [
+            "error"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Display Ratio of Inspiration Time to Expiration Time with Edge Cases",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "ratio of inspiration time to expiration time is set to <value>"
+          ],
+          "inputs": {
+            "name": "ratio of inspiration time to expiration time"
+          },
+          "steps": [
+            "GUI displays ratio of inspiration time to expiration time",
+            "GUI displays ratio with a resolution of 0.1 for values under 10 and 1 for values over 10"
+          ],
+          "expected": [
+            "error"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Display PEEP with Edge Cases",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "PEEP is set to <value>"
+          ],
+          "inputs": {
+            "name": "PEEP"
+          },
+          "steps": [
+            "GUI displays PEEP",
+            "GUI displays PEEP in increments of 1 cmH2O"
+          ],
+          "expected": [
+            "error"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Display Flow Rate Provided to Patient with Edge Cases",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "flow rate provided to patient is set to <value>"
+          ],
+          "inputs": {
+            "name": "flow rate provided to patient"
+          },
+          "steps": [
+            "GUI displays flow rate provided to patient",
+            "GUI displays flow rate with units of liters/minute and updates at a rate of at least 20 Hz"
+          ],
+          "expected": [
+            "error"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "error": "ollama:gpt-oss:20b returned an empty response",
+        "fsa_pass": false,
+        "fsa_score": 0.0
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.0; sub-scores {'clause_coverage': None, 'negative_coverage': None, 'oracle_assertiveness': None, 'boundary_coverage': None, 'groundedness_mg': None}). Output the full improved suite addressing:",
+      "artifact": "Feature: GUI Display Requirements\n\n  Scenario: Display Patient Pressure\n    Given the controller provides patient pressure data\n    When the GUI displays the patient pressure\n    Then the GUI displays the patient pressure measured at the gas outlet port\n\n  Scenario: GUI Graph Refresh Rate\n    Given the GUI graph refresh rate is set to 20 Hz\n    When the GUI graph is updated\n    Then the GUI graph is updated at a rate of at least 20 Hz\n\n  Scenario: GUI Graph Duration\n    Given the GUI graph duration is set to 30 seconds\n    When the GUI graph is updated\n    Then the GUI graph is displayed for 30 seconds\n\n  Scenario: Display Inspiratory Tidal Volume\n    Given the inspiratory tidal volume is set to 500 mL\n    When the GUI displays the inspiratory tidal volume\n    Then the GUI displays the inspiratory tidal volume with a resolution of 1 mL\n\n  Scenario: Display Ratio of Inspiration Time to Expiration Time\n    Given the ratio of inspiration time to expiration time is set to 5:1\n    When the GUI displays the ratio of inspiration time to expiration time\n    Then the GUI displays the ratio with a resolution of 0.1 for values under 10 and 1 for values over 10\n\n  Scenario: Display PEEP\n    Given the PEEP is set to 5 cmH2O\n    When the GUI displays the PEEP\n    Then the GUI displays the PEEP in increments of 1 cmH2O\n\n  Scenario: Display Graph of Volume Provided to Patient\n    Given the GUI graph displays the volume provided to the patient\n    When the GUI graph is updated\n    Then the GUI graph displays the volume provided to the patient\n\n  Scenario: Display Flow Rate Provided to Patient\n    Given the flow rate provided to the patient is set to 10 L/min\n    When the GUI displays the flow rate provided to the patient\n    Then the GUI displays the flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute\n\n  Scenario Outline: GUI Display Requirements with Examples\n    Given the controller provides patient pressure data\n    And the GUI graph refresh rate is set to 20 Hz\n    And the GUI graph duration is set to 30 seconds\n    And the inspiratory tidal volume is set to <inspiratory tidal volume>\n    And the ratio of inspiration time to expiration time is set to <ratio of inspiration time to expiration time>\n    And the PEEP is set to <PEEP>\n    And the flow rate provided to the patient is set to <flow rate provided to the patient>\n    When the GUI displays the patient pressure, inspiratory tidal volume, ratio of inspiration time to expiration time, PEEP, and flow rate provided to the patient\n    Then the GUI displays the patient pressure measured at the gas outlet port, inspiratory tidal volume with a resolution of 1 mL, ratio with a resolution of 0.1 for values under 10 and 1 for values over 10, PEEP in increments of 1 cmH2O, and flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute\n\n    Examples:\n      | inspiratory tidal volume | ratio of inspiration time to expiration time | PEEP | flow rate provided to the patient |\n      | 0 mL                      | 10:1                                    | 0 cmH2O | 0 L/min                         |\n      | 1000 mL                   | 1:200                                  | 10 cmH2O | 20 L/min                        |\n      | 500 mL                    | 5:1                                    | 5 cmH2O | 10 L/min                        |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Display Patient Pressure",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller provides patient pressure data"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI displays patient pressure"
+          ],
+          "expected": [
+            "GUI displays patient pressure measured at gas outlet port"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI Graph Refresh Rate",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI graph refresh rate is set to 20 Hz"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI graph is updated"
+          ],
+          "expected": [
+            "GUI graph is updated at a rate of at least 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI Graph Duration",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI graph duration is set to 30 seconds"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI graph is updated"
+          ],
+          "expected": [
+            "GUI graph is displayed for 30 seconds"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Display Inspiratory Tidal Volume",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "inspiratory tidal volume is set to 500 mL"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI displays inspiratory tidal volume"
+          ],
+          "expected": [
+            "GUI displays inspiratory tidal volume with a resolution of 1 mL"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Display Ratio of Inspiration Time to Expiration Time",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "ratio of inspiration time to expiration time is set to 5:1"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI displays ratio of inspiration time to expiration time"
+          ],
+          "expected": [
+            "GUI displays ratio with a resolution of 0.1 for values under 10 and 1 for values over 10"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Display PEEP",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PEEP is set to 5 cmH2O"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI displays PEEP"
+          ],
+          "expected": [
+            "GUI displays PEEP in increments of 1 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Display Graph of Volume Provided to Patient",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI graph displays volume provided to patient"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI graph is updated"
+          ],
+          "expected": [
+            "GUI graph displays volume provided to patient"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Display Flow Rate Provided to Patient",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "flow rate provided to patient is set to 10 L/min"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI displays flow rate provided to patient"
+          ],
+          "expected": [
+            "GUI displays flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI Display Requirements with Examples",
+          "req_ids": [
+            "RW-SW-46",
+            "RW-SW-47",
+            "RW-SW-48",
+            "RW-SW-49",
+            "RW-SW-50",
+            "RW-SW-53",
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller provides patient pressure data",
+            "GUI graph refresh rate is set to 20 Hz",
+            "GUI graph duration is set to 30 seconds",
+            "inspiratory tidal volume is set to <inspiratory tidal volume>",
+            "ratio of inspiration time to expiration time is set to <ratio of inspiration time to expiration time>",
+            "PEEP is set to <PEEP>",
+            "flow rate provided to patient is set to <flow rate provided to patient>"
+          ],
+          "inputs": {
+            "inspiratory tidal volume": "value",
+            "ratio of inspiration time to expiration time": "value",
+            "PEEP": "value",
+            "flow rate provided to patient": "value"
+          },
+          "steps": [
+            "GUI displays patient pressure, inspiratory tidal volume, ratio of inspiration time to expiration time, PEEP, and flow rate provided to patient"
+          ],
+          "expected": [
+            "GUI displays patient pressure measured at gas outlet port, inspiratory tidal volume with a resolution of 1 mL, ratio with a resolution of 0.1 for values under 10 and 1 for values over 10, PEEP in increments of 1 cmH2O, and flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI Display Requirements with Examples - Edge Case",
+          "req_ids": [
+            "RW-SW-46",
+            "RW-SW-47",
+            "RW-SW-48",
+            "RW-SW-49",
+            "RW-SW-50",
+            "RW-SW-53",
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller provides patient pressure data",
+            "GUI graph refresh rate is set to 20 Hz",
+            "GUI graph duration is set to 30 seconds",
+            "inspiratory tidal volume is set to 0 mL",
+            "ratio of inspiration time to expiration time is set to 10:1",
+            "PEEP is set to 0 cmH2O",
+            "flow rate provided to patient is set to 0 L/min"
+          ],
+          "inputs": {
+            "inspiratory tidal volume": "0 mL",
+            "ratio of inspiration time to expiration time": "10:1",
+            "PEEP": "0 cmH2O",
+            "flow rate provided to patient": "0 L/min"
+          },
+          "steps": [
+            "GUI displays patient pressure, inspiratory tidal volume, ratio of inspiration time to expiration time, PEEP, and flow rate provided to patient"
+          ],
+          "expected": [
+            "GUI displays patient pressure measured at gas outlet port, inspiratory tidal volume with a resolution of 1 mL, ratio with a resolution of 0.1 for values under 10 and 1 for values over 10, PEEP in increments of 1 cmH2O, and flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "GUI Display Requirements with Examples - Invalid Case",
+          "req_ids": [
+            "RW-SW-46",
+            "RW-SW-47",
+            "RW-SW-48",
+            "RW-SW-49",
+            "RW-SW-50",
+            "RW-SW-53",
+            "RW-SW-92"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "controller provides patient pressure data",
+            "GUI graph refresh rate is set to 20 Hz",
+            "GUI graph duration is set to 30 seconds",
+            "inspiratory tidal volume is set to 1001 mL",
+            "ratio of inspiration time to expiration time is set to 1:201",
+            "PEEP is set to 11 cmH2O",
+            "flow rate provided to patient is set to 21 L/min"
+          ],
+          "inputs": {
+            "inspiratory tidal volume": "1001 mL",
+            "ratio of inspiration time to expiration time": "1:201",
+            "PEEP": "11 cmH2O",
+            "flow rate provided to patient": "21 L/min"
+          },
+          "steps": [
+            "GUI displays patient pressure, inspiratory tidal volume, ratio of inspiration time to expiration time, PEEP, and flow rate provided to patient"
+          ],
+          "expected": [
+            "GUI does not display patient pressure measured at gas outlet port, inspiratory tidal volume with a resolution of 1 mL, ratio with a resolution of 0.1 for values under 10 and 1 for values over 10, PEEP in increments of 1 cmH2O, and flow rate with a duration of 30 seconds updated at a rate of at least 20 Hz and units of liters/minute"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "data_pipeline",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.25,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.8696,
+        "hallucinated": [
+          {
+            "value": "1001 mL",
+            "context": "inspiratory tidal volume",
+            "grounded": false
+          },
+          {
+            "value": "5:1",
+            "context": "ratio of inspiration to expiration",
+            "grounded": false
+          },
+          {
+            "value": "1:201",
+            "context": "ratio of inspiration to expiration",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 23,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Oracle assertions are vague and do not check concrete numeric values",
+          "Negative coverage is minimal; no tests for error handling or out‑of‑range behavior defined in the SRS",
+          "Some test values (e.g., 5:1 ratio, 1001 mL) are outside the specified ranges and may mislead",
+          "The scenario outline duplicates many individual scenarios, reducing clarity",
+          "Combined behavior of refresh rate and duration is not explicitly verified together"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.667,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

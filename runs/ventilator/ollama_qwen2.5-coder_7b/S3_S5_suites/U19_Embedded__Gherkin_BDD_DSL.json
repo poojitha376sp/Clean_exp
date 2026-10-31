@@ -1,0 +1,1114 @@
+{
+  "unit_id": "U19_Embedded",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "standard",
+  "n_attempts": 3,
+  "repairs_used": 2,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.33,
+    "oracle_assertiveness": 0.625,
+    "boundary_coverage": 0.0,
+    "groundedness_mg": 0.5312,
+    "hallucinated": [
+      {
+        "value": "100",
+        "context": "response time bound",
+        "grounded": false
+      },
+      {
+        "value": "200",
+        "context": "response time bound",
+        "grounded": false
+      },
+      {
+        "value": "300",
+        "context": "response time bound",
+        "grounded": false
+      },
+      {
+        "value": "65",
+        "context": "pressure command",
+        "grounded": false
+      },
+      {
+        "value": "1",
+        "context": "breath cycle number",
+        "grounded": false
+      },
+      {
+        "value": "2",
+        "context": "breath cycle number",
+        "grounded": false
+      },
+      {
+        "value": "3",
+        "context": "breath cycle number",
+        "grounded": false
+      },
+      {
+        "value": "10",
+        "context": "commanded value",
+        "grounded": false
+      },
+      {
+        "value": "20",
+        "context": "commanded value",
+        "grounded": false
+      },
+      {
+        "value": "30",
+        "context": "commanded value",
+        "grounded": false
+      },
+      {
+        "value": "11",
+        "context": "actual value",
+        "grounded": false
+      },
+      {
+        "value": "22",
+        "context": "actual value",
+        "grounded": false
+      },
+      {
+        "value": "33",
+        "context": "actual value",
+        "grounded": false
+      },
+      {
+        "value": "tidal_volume",
+        "context": "trigger condition",
+        "grounded": false
+      },
+      {
+        "value": "respiratory_rate",
+        "context": "trigger condition",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 32,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Include boundary and edge cases for numeric limits (e.g., test response time at -4cm, 60, 5-55 PIP, ±5 tolerance).",
+      "Provide negative test cases for invalid inputs (e.g., negative pressure, non‑numeric values).",
+      "Assert concrete expected values rather than vague descriptions (e.g., record PEEP value, trigger cycle status).",
+      "Remove unused example columns (breath_cycle, actual_value, actual_PIP, actual_rate) to avoid confusion.",
+      "Clarify incomplete requirements RW‑SW‑56 and RW‑SW‑57 before testing."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.5394,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Controller Performance and Functionality\n\n  Scenario Outline: Controller should respond fast enough to prevent pressure dropping below -4cm\n    Given the controller is initialized\n    When the pressure drops below -4cm\n    Then the controller should respond within <response_time> ms\n    Examples:\n      | response_time |\n      | 100           |\n      | 200           |\n      | 300           |\n\n  Scenario Outline: Controller should never command pressure to go above 60\n    Given the controller is initialized\n    When the commanded pressure is set to <commanded_pressure>\n    Then the actual pressure should not exceed 60\n    Examples:\n      | commanded_pressure |\n      | 55                |\n      | 60                |\n      | 65                |\n\n  Scenario Outline: SW must measure PEEP over each breath\n    Given the controller is initialized\n    When a breath cycle is completed\n    Then the PEEP value should be recorded\n    Examples:\n      | breath_cycle |\n      | 1            |\n      | 2            |\n      | 3            |\n\n  Scenario Outline: Controller should hit commanded values within 10%\n    Given the controller is initialized\n    When the commanded value is <commanded_value>\n    Then the actual value should be within 10% of <commanded_value>\n    Examples:\n      | commanded_value | actual_value |\n      | 10              | 11           |\n      | 20              | 22           |\n      | 30              | 33           |\n\n  Scenario Outline: Controller should trigger an inspiration cycle when\n    Given the controller is initialized\n    When the inspiration trigger condition is met\n    Then the controller should trigger an inspiration cycle\n    Examples:\n      | trigger_condition |\n      | tidal_volume      |\n      | respiratory_rate  |\n\n  Scenario Outline: Controller should trigger an expiration cycle when\n    Given the controller is initialized\n    When the expiration trigger condition is met\n    Then the controller should trigger an expiration cycle\n    Examples:\n      | trigger_condition |\n      | tidal_volume      |\n      | respiratory_rate  |\n\n  Scenario Outline: Controller should be able to meet PIP targets in the range 5-55cmH2O +/- 5cm\n    Given the controller is initialized\n    When the commanded PIP is <commanded_PIP>\n    Then the actual PIP should be within +/- 5cm of <commanded_PIP>\n    Examples:\n      | commanded_PIP | actual_PIP |\n      | 10            | 15         |\n      | 25            | 30         |\n      | 40            | 45         |\n\n  Scenario Outline: Controller should be able to meet commanded breath rate within +- 1 breath\n    Given the controller is initialized\n    When the commanded breath rate is <commanded_rate>\n    Then the actual breath rate should be within +- 1 breath of <commanded_rate>\n    Examples:\n      | commanded_rate | actual_rate |\n      | 10             | 11          |\n      | 20             | 21          |\n      | 30             | 31          |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Controller should respond fast enough to prevent pressure dropping below -4cm",
+      "req_ids": [
+        "RW-SW-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "response_time": "100"
+      },
+      "steps": [
+        "the pressure drops below -4cm"
+      ],
+      "expected": [
+        "the controller should respond within 100 ms"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Controller should never command pressure to go above 60",
+      "req_ids": [
+        "RW-SW-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "commanded_pressure": "55"
+      },
+      "steps": [
+        "the commanded pressure is set to 55"
+      ],
+      "expected": [
+        "the actual pressure should not exceed 60"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "SW must measure PEEP over each breath",
+      "req_ids": [
+        "RW-SW-52"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "breath_cycle": "1"
+      },
+      "steps": [
+        "a breath cycle is completed"
+      ],
+      "expected": [
+        "the PEEP value should be recorded"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Controller should hit commanded values within 10%",
+      "req_ids": [
+        "RW-SW-55"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "commanded_value": "10",
+        "actual_value": "11"
+      },
+      "steps": [
+        "the commanded value is 10"
+      ],
+      "expected": [
+        "the actual value should be within 10% of 10"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Controller should trigger an inspiration cycle when",
+      "req_ids": [
+        "RW-SW-56"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "trigger_condition": "tidal_volume"
+      },
+      "steps": [
+        "the inspiration trigger condition is met"
+      ],
+      "expected": [
+        "the controller should trigger an inspiration cycle"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Controller should trigger an expiration cycle when",
+      "req_ids": [
+        "RW-SW-57"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "trigger_condition": "tidal_volume"
+      },
+      "steps": [
+        "the expiration trigger condition is met"
+      ],
+      "expected": [
+        "the controller should trigger an expiration cycle"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Controller should be able to meet PIP targets in the range 5-55cmH2O +/- 5cm",
+      "req_ids": [
+        "RW-SW-59"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "commanded_PIP": "10",
+        "actual_PIP": "15"
+      },
+      "steps": [
+        "the commanded PIP is 10"
+      ],
+      "expected": [
+        "the actual PIP should be within +/- 5cm of 10"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Controller should be able to meet commanded breath rate within +- 1 breath",
+      "req_ids": [
+        "RW-SW-62"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is initialized"
+      ],
+      "inputs": {
+        "commanded_rate": "10",
+        "actual_rate": "11"
+      },
+      "steps": [
+        "the commanded breath rate is 10"
+      ],
+      "expected": [
+        "the actual breath rate should be within +- 1 breath of 10"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Controller Performance and Functionality\n\n  Scenario Outline: Controller should respond fast enough to prevent pressure dropping below -4cm\n    Given the controller is initialized\n    When the pressure drops below -4cm\n    Then the controller should respond within <response_time> ms\n    Examples:\n      | response_time |\n      | 100           |\n      | 200           |\n      | 300           |\n\n  Scenario Outline: Controller should never command pressure to go above 60\n    Given the controller is initialized\n    When the commanded pressure is set to <commanded_pressure>\n    Then the controller should not command pressure to go above 60\n    Examples:\n      | commanded_pressure |\n      | 55                |\n      | 60                |\n      | 65                |\n\n  Scenario Outline: SW must measure PEEP over each breath\n    Given the controller is initialized\n    When a breath cycle is completed\n    Then the controller should measure PEEP and store it\n    Examples:\n      | breath_cycle |\n      | 1            |\n      | 2            |\n      | 3            |\n\n  Scenario Outline: Controller should be able to hit commanded values within 10%\n    Given the controller is initialized\n    When the commanded value is <commanded_value>\n    Then the actual value should be within 10% of the commanded value\n    Examples:\n      | commanded_value |\n      | 10              |\n      | 20              |\n      | 30              |\n\n  Scenario Outline: Controller should trigger an inspiration cycle when\n    Given the controller is initialized\n    When the inspiration trigger condition is met\n    Then the controller should trigger an inspiration cycle\n    Examples:\n      | trigger_condition |\n      | pressure drop     |\n      | volume change     |\n\n  Scenario Outline: Controller should trigger an expiration cycle when\n    Given the controller is initialized\n    When the expiration trigger condition is met\n    Then the controller should trigger an expiration cycle\n    Examples:\n      | trigger_condition |\n      | pressure rise     |\n      | volume change     |\n\n  Scenario Outline: Controller should be able to meet PIP targets in the range 5-55cmH2O +/- 5cm\n    Given the controller is initialized\n    When the commanded PIP is <commanded_PIP>\n    Then the actual PIP should be within +/- 5cm of the commanded PIP\n    Examples:\n      | commanded_PIP |\n      | 10            |\n      | 25            |\n      | 50            |\n\n  Scenario Outline: Controller should be able to meet commanded breath rate within +- 1 breath\n    Given the controller is initialized\n    When the commanded breath rate is <commanded_breath_rate>\n    Then the actual breath rate should be within +- 1 breath of the commanded breath rate\n    Examples:\n      | commanded_breath_rate |\n      | 10                    |\n      | 20                    |\n      | 30                    |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller should respond fast enough to prevent pressure dropping below -4cm",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "response_time": "100"
+          },
+          "steps": [
+            "the pressure drops below -4cm"
+          ],
+          "expected": [
+            "the controller should respond within 100 ms"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller should never command pressure to go above 60",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_pressure": "55"
+          },
+          "steps": [
+            "the commanded pressure is set to 55"
+          ],
+          "expected": [
+            "the controller should not command pressure to go above 60"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "SW must measure PEEP over each breath",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "breath_cycle": "1"
+          },
+          "steps": [
+            "a breath cycle is completed"
+          ],
+          "expected": [
+            "the controller should measure PEEP and store it"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Controller should be able to hit commanded values within 10%",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_value": "10"
+          },
+          "steps": [
+            "the commanded value is 10"
+          ],
+          "expected": [
+            "the actual value should be within 10% of the commanded value"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller should trigger an inspiration cycle when",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "trigger_condition": "pressure drop"
+          },
+          "steps": [
+            "the inspiration trigger condition is met"
+          ],
+          "expected": [
+            "the controller should trigger an inspiration cycle"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller should trigger an expiration cycle when",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "trigger_condition": "pressure rise"
+          },
+          "steps": [
+            "the expiration trigger condition is met"
+          ],
+          "expected": [
+            "the controller should trigger an expiration cycle"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller should be able to meet PIP targets in the range 5-55cmH2O +/- 5cm",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_PIP": "10"
+          },
+          "steps": [
+            "the commanded PIP is 10"
+          ],
+          "expected": [
+            "the actual PIP should be within +/- 5cm of the commanded PIP"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Controller should be able to meet commanded breath rate within +- 1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_breath_rate": "10"
+          },
+          "steps": [
+            "the commanded breath rate is 10"
+          ],
+          "expected": [
+            "the actual breath rate should be within +- 1 breath of the commanded breath rate"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.125,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0968,
+        "hallucinated": [
+          {
+            "value": "100",
+            "context": "response_time",
+            "grounded": false
+          },
+          {
+            "value": "200",
+            "context": "response_time",
+            "grounded": false
+          },
+          {
+            "value": "300",
+            "context": "response_time",
+            "grounded": false
+          },
+          {
+            "value": "65",
+            "context": "commanded_pressure",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "breath_cycle",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "breath_cycle",
+            "grounded": false
+          },
+          {
+            "value": "3",
+            "context": "breath_cycle",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "commanded_value",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "commanded_value",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "commanded_value",
+            "grounded": false
+          },
+          {
+            "value": "pressure drop",
+            "context": "trigger_condition",
+            "grounded": false
+          },
+          {
+            "value": "volume change",
+            "context": "trigger_condition",
+            "grounded": false
+          },
+          {
+            "value": "pressure rise",
+            "context": "trigger_condition",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "commanded_PIP",
+            "grounded": false
+          },
+          {
+            "value": "25",
+            "context": "commanded_PIP",
+            "grounded": false
+          },
+          {
+            "value": "50",
+            "context": "commanded_PIP",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "commanded_breath_rate",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "commanded_breath_rate",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "commanded_breath_rate",
+            "grounded": false
+          },
+          {
+            "value": "respond within 100 ms",
+            "context": "expected_result",
+            "grounded": false
+          },
+          {
+            "value": "respond within 200 ms",
+            "context": "expected_result",
+            "grounded": false
+          },
+          {
+            "value": "respond within 300 ms",
+            "context": "expected_result",
+            "grounded": false
+          },
+          {
+            "value": "measure PEEP and store it",
+            "context": "expected_result",
+            "grounded": false
+          },
+          {
+            "value": "actual value within 10% of commanded value",
+            "context": "expected_result",
+            "grounded": false
+          },
+          {
+            "value": "trigger an inspiration cycle",
+            "context": "expected_result",
+            "grounded": false
+          },
+          {
+            "value": "trigger an expiration cycle",
+            "context": "expected_result",
+            "grounded": false
+          },
+          {
+            "value": "actual PIP within +/-5cm of commanded PIP",
+            "context": "expected_result",
+            "grounded": false
+          },
+          {
+            "value": "actual breath rate within +-1 breath of commanded breath rate",
+            "context": "expected_result",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 31,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Include boundary and invalid values for all requirements",
+          "Assert concrete system states instead of vague descriptions",
+          "Align test inputs with requirement thresholds (e.g., response time limits)",
+          "Remove contradictory test cases (e.g., commanding 65 when max is 60)",
+          "Add negative test cases for error handling and exception paths"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.082,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.082; sub-scores {'clause_coverage': 0.125, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0968}). Output the full improved suite addressing:\n- ungrounded value '100' (response_time): remove or use the SRS value\n- ungrounded value '200' (response_time): remove or use the SRS value\n- ungrounded value '300' (response_time): remove or use the SRS value\n- ungrounded value '65' (commanded_pressure): remove or use the SRS value\n- ungrounded value '1' (breath_cycle): remove or use the SRS value\n- ungrounded value '2' (breath_cycle): remove or use the SRS value\n- Include boundary and invalid values for all requirements\n- Assert concrete system states instead of vague descriptions\n- Align test inputs with requirement thresholds (e.g., response time limits)\n- Remove contradictory test cases (e.g., commanding 65 when max is 60)\n- Add negative test cases for error handling and exception paths",
+      "artifact": "Feature: Controller Performance and Functionality\n\n  Scenario Outline: Controller should respond fast enough to prevent pressure dropping below -4cm\n    Given the controller is initialized\n    When the pressure drops below -4cm under <condition>\n    Then the controller should respond within <response_time> ms\n\n    Examples:\n      | condition | response_time |\n      | normal    | as specified  |\n      | edge      | as specified  |\n      | invalid   | as specified  |\n\n  Scenario Outline: Controller should never command pressure to go above 60\n    Given the controller is initialized\n    When the commanded pressure is set to <commanded_pressure>\n    Then the controller should not command pressure to go above 60\n\n    Examples:\n      | commanded_pressure | expected |\n      | 55                 | passed   |\n      | 60                 | passed   |\n      | 65                 | failed   |\n\n  Scenario Outline: SW must measure PEEP over each breath\n    Given the controller is initialized\n    When a breath cycle is completed\n    Then the controller should measure PEEP over the breath\n\n    Examples:\n      | breath_cycle | expected |\n      | 1            | passed   |\n      | 2            | passed   |\n      | 3            | passed   |\n\n  Scenario Outline: Controller should be able to hit commanded values within 10%\n    Given the controller is initialized\n    When the commanded value is <commanded_value>\n    Then the controller should hit the commanded value within 10%\n\n    Examples:\n      | commanded_value | expected |\n      | 50              | passed   |\n      | 60              | passed   |\n      | 70              | passed   |\n\n  Scenario Outline: Controller should trigger an inspiration cycle when\n    Given the controller is initialized\n    When the inspiration trigger condition is met\n    Then the controller should trigger an inspiration cycle\n\n    Examples:\n      | inspiration_trigger | expected |\n      | as specified        | passed   |\n      | invalid             | failed   |\n\n  Scenario Outline: Controller should trigger an expiration cycle when\n    Given the controller is initialized\n    When the expiration trigger condition is met\n    Then the controller should trigger an expiration cycle\n\n    Examples:\n      | expiration_trigger | expected |\n      | as specified       | passed   |\n      | invalid            | failed   |\n\n  Scenario Outline: Controller should be able to meet PIP targets in the range 5-55cmH2O +/- 5cm\n    Given the controller is initialized\n    When the commanded PIP is set to <commanded_PIP>\n    Then the controller should meet the PIP target within +/- 5cm\n\n    Examples:\n      | commanded_PIP | expected |\n      | 5             | passed   |\n      | 30            | passed   |\n      | 55            | passed   |\n      | 60            | failed   |\n\n  Scenario Outline: Controller should be able to meet commanded breath rate within +- 1 breath\n    Given the controller is initialized\n    When the commanded breath rate is set to <commanded_breath_rate>\n    Then the controller should meet the commanded breath rate within +- 1 breath\n\n    Examples:\n      | commanded_breath_rate | expected |\n      | 10                    | passed   |\n      | 20                    | passed   |\n      | 30                    | passed   |\n      | 40                    | failed   |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller should respond fast enough to prevent pressure dropping below -4cm",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "condition": "normal"
+          },
+          "steps": [
+            "the pressure drops below -4cm under normal"
+          ],
+          "expected": [
+            "the controller should respond within as specified ms"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller should never command pressure to go above 60",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_pressure": 65
+          },
+          "steps": [
+            "the commanded pressure is set to 65"
+          ],
+          "expected": [
+            "the controller should not command pressure to go above 60"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "SW must measure PEEP over each breath",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "breath_cycle": 1
+          },
+          "steps": [
+            "a breath cycle is completed"
+          ],
+          "expected": [
+            "the controller should measure PEEP over the breath"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Controller should be able to hit commanded values within 10%",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_value": 50
+          },
+          "steps": [
+            "the commanded value is 50"
+          ],
+          "expected": [
+            "the controller should hit the commanded value within 10%"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller should trigger an inspiration cycle when",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "inspiration_trigger": "as specified"
+          },
+          "steps": [
+            "the inspiration trigger condition is met"
+          ],
+          "expected": [
+            "the controller should trigger an inspiration cycle"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller should trigger an expiration cycle when",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "expiration_trigger": "as specified"
+          },
+          "steps": [
+            "the expiration trigger condition is met"
+          ],
+          "expected": [
+            "the controller should trigger an expiration cycle"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller should be able to meet PIP targets in the range 5-55cmH2O +/- 5cm",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_PIP": 55
+          },
+          "steps": [
+            "the commanded PIP is set to 55"
+          ],
+          "expected": [
+            "the controller should meet the PIP target within +/- 5cm"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Controller should be able to meet commanded breath rate within +- 1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_breath_rate": 20
+          },
+          "steps": [
+            "the commanded breath rate is set to 20"
+          ],
+          "expected": [
+            "the controller should meet the commanded breath rate within +- 1 breath"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "error": "ollama:gpt-oss:20b returned an empty response",
+        "fsa_pass": false,
+        "fsa_score": 0.0
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.0; sub-scores {'clause_coverage': None, 'negative_coverage': None, 'oracle_assertiveness': None, 'boundary_coverage': None, 'groundedness_mg': None}). Output the full improved suite addressing:",
+      "artifact": "Feature: Controller Performance and Functionality\n\n  Scenario Outline: Controller should respond fast enough to prevent pressure dropping below -4cm\n    Given the controller is initialized\n    When the pressure drops below -4cm\n    Then the controller should respond within <response_time> ms\n    Examples:\n      | response_time |\n      | 100           |\n      | 200           |\n      | 300           |\n\n  Scenario Outline: Controller should never command pressure to go above 60\n    Given the controller is initialized\n    When the commanded pressure is set to <commanded_pressure>\n    Then the actual pressure should not exceed 60\n    Examples:\n      | commanded_pressure |\n      | 55                |\n      | 60                |\n      | 65                |\n\n  Scenario Outline: SW must measure PEEP over each breath\n    Given the controller is initialized\n    When a breath cycle is completed\n    Then the PEEP value should be recorded\n    Examples:\n      | breath_cycle |\n      | 1            |\n      | 2            |\n      | 3            |\n\n  Scenario Outline: Controller should hit commanded values within 10%\n    Given the controller is initialized\n    When the commanded value is <commanded_value>\n    Then the actual value should be within 10% of <commanded_value>\n    Examples:\n      | commanded_value | actual_value |\n      | 10              | 11           |\n      | 20              | 22           |\n      | 30              | 33           |\n\n  Scenario Outline: Controller should trigger an inspiration cycle when\n    Given the controller is initialized\n    When the inspiration trigger condition is met\n    Then the controller should trigger an inspiration cycle\n    Examples:\n      | trigger_condition |\n      | tidal_volume      |\n      | respiratory_rate  |\n\n  Scenario Outline: Controller should trigger an expiration cycle when\n    Given the controller is initialized\n    When the expiration trigger condition is met\n    Then the controller should trigger an expiration cycle\n    Examples:\n      | trigger_condition |\n      | tidal_volume      |\n      | respiratory_rate  |\n\n  Scenario Outline: Controller should be able to meet PIP targets in the range 5-55cmH2O +/- 5cm\n    Given the controller is initialized\n    When the commanded PIP is <commanded_PIP>\n    Then the actual PIP should be within +/- 5cm of <commanded_PIP>\n    Examples:\n      | commanded_PIP | actual_PIP |\n      | 10            | 15         |\n      | 25            | 30         |\n      | 40            | 45         |\n\n  Scenario Outline: Controller should be able to meet commanded breath rate within +- 1 breath\n    Given the controller is initialized\n    When the commanded breath rate is <commanded_rate>\n    Then the actual breath rate should be within +- 1 breath of <commanded_rate>\n    Examples:\n      | commanded_rate | actual_rate |\n      | 10             | 11          |\n      | 20             | 21          |\n      | 30             | 31          |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller should respond fast enough to prevent pressure dropping below -4cm",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "response_time": "100"
+          },
+          "steps": [
+            "the pressure drops below -4cm"
+          ],
+          "expected": [
+            "the controller should respond within 100 ms"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller should never command pressure to go above 60",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_pressure": "55"
+          },
+          "steps": [
+            "the commanded pressure is set to 55"
+          ],
+          "expected": [
+            "the actual pressure should not exceed 60"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "SW must measure PEEP over each breath",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "breath_cycle": "1"
+          },
+          "steps": [
+            "a breath cycle is completed"
+          ],
+          "expected": [
+            "the PEEP value should be recorded"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Controller should hit commanded values within 10%",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_value": "10",
+            "actual_value": "11"
+          },
+          "steps": [
+            "the commanded value is 10"
+          ],
+          "expected": [
+            "the actual value should be within 10% of 10"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller should trigger an inspiration cycle when",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "trigger_condition": "tidal_volume"
+          },
+          "steps": [
+            "the inspiration trigger condition is met"
+          ],
+          "expected": [
+            "the controller should trigger an inspiration cycle"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller should trigger an expiration cycle when",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "trigger_condition": "tidal_volume"
+          },
+          "steps": [
+            "the expiration trigger condition is met"
+          ],
+          "expected": [
+            "the controller should trigger an expiration cycle"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller should be able to meet PIP targets in the range 5-55cmH2O +/- 5cm",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_PIP": "10",
+            "actual_PIP": "15"
+          },
+          "steps": [
+            "the commanded PIP is 10"
+          ],
+          "expected": [
+            "the actual PIP should be within +/- 5cm of 10"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Controller should be able to meet commanded breath rate within +- 1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is initialized"
+          ],
+          "inputs": {
+            "commanded_rate": "10",
+            "actual_rate": "11"
+          },
+          "steps": [
+            "the commanded breath rate is 10"
+          ],
+          "expected": [
+            "the actual breath rate should be within +- 1 breath of 10"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.33,
+        "oracle_assertiveness": 0.625,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.5312,
+        "hallucinated": [
+          {
+            "value": "100",
+            "context": "response time bound",
+            "grounded": false
+          },
+          {
+            "value": "200",
+            "context": "response time bound",
+            "grounded": false
+          },
+          {
+            "value": "300",
+            "context": "response time bound",
+            "grounded": false
+          },
+          {
+            "value": "65",
+            "context": "pressure command",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "breath cycle number",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "breath cycle number",
+            "grounded": false
+          },
+          {
+            "value": "3",
+            "context": "breath cycle number",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "commanded value",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "commanded value",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "commanded value",
+            "grounded": false
+          },
+          {
+            "value": "11",
+            "context": "actual value",
+            "grounded": false
+          },
+          {
+            "value": "22",
+            "context": "actual value",
+            "grounded": false
+          },
+          {
+            "value": "33",
+            "context": "actual value",
+            "grounded": false
+          },
+          {
+            "value": "tidal_volume",
+            "context": "trigger condition",
+            "grounded": false
+          },
+          {
+            "value": "respiratory_rate",
+            "context": "trigger condition",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 32,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Include boundary and edge cases for numeric limits (e.g., test response time at -4cm, 60, 5-55 PIP, ±5 tolerance).",
+          "Provide negative test cases for invalid inputs (e.g., negative pressure, non‑numeric values).",
+          "Assert concrete expected values rather than vague descriptions (e.g., record PEEP value, trigger cycle status).",
+          "Remove unused example columns (breath_cycle, actual_value, actual_PIP, actual_rate) to avoid confusion.",
+          "Clarify incomplete requirements RW‑SW‑56 and RW‑SW‑57 before testing."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.5394,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

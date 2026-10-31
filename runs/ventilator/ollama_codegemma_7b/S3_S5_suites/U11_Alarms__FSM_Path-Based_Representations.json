@@ -1,0 +1,635 @@
+{
+  "unit_id": "U11_Alarms",
+  "representation": "FSM Path-Based Representations",
+  "generator": "ollama:codegemma:7b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 2,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "FSM Path-Based Representations",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.6,
+    "sfv_score": 0.8,
+    "threshold": 0.7,
+    "sfv_pass": false,
+    "issues": [
+      "missing: transitions (>=2)",
+      "missing: events/guards"
+    ]
+  },
+  "fsa": null,
+  "artifact": "## FSM Path-Based Test Suite for U11_Alarms\n\n**States:**\n\n* `BATTERY_OK`\n* `BATTERY_LOW`\n* `BATTERY_CRITICAL`\n* `BATTERY_FAILURE`\n\n**Transitions:**\n\n* `START` -> `BATTERY_OK` (sensor reading)\n* `BATTERY_OK` -> `BATTERY_LOW` (ETA < 30min)\n* `BATTERY_OK` -> `BATTERY_CRITICAL` (ETA < 10min)\n* `BATTERY_OK` -> `BATTERY_FAILURE` (sensor failure)\n* `BATTERY_LOW` -> `BATTERY_CRITICAL` (ETA < 10min)\n* `BATTERY_CRITICAL` -> `BATTERY_FAILURE` (sensor failure)\n\n**Test Cases:**\n\n**TC-001:** Battery OK - Positive\n\n* **Preconditions:** Battery sensor reading is within normal range.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"OK\".\n* **Expected:** Battery status is displayed as \"OK\".\n\n**TC-002:** Battery Low - Positive\n\n* **Preconditions:** Battery sensor reading indicates a remaining battery time of less than 30 minutes.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"Low\".\n    * Verify that the low battery alarm is triggered.\n* **Expected:** Battery status is displayed as \"Low\", low battery alarm is triggered.\n\n**TC-003:** Battery Critical - Positive\n\n* **Preconditions:** Battery sensor reading indicates a remaining battery time of less than 10 minutes.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"Critical\".\n    * Verify that the critically low battery alarm is triggered.\n* **Expected:** Battery status is displayed as \"Critical\", critically low battery alarm is triggered.\n\n**TC-004:** Battery Failure - Positive\n\n* **Preconditions:** Battery sensor fails to provide a reading.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"Failure\".\n    * Verify that the battery failure alarm is triggered.\n* **Expected:** Battery status is displayed as \"Failure\", battery failure alarm is triggered.\n\n**TC-005:** Battery Low to Critical - Positive\n\n* **Preconditions:** Battery sensor reading indicates a remaining battery time of less than 30 minutes.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"Low\".\n    * Simulate a battery level update to indicate a remaining battery time of less than 10 minutes.\n    * Verify that the battery status is updated to \"Critical\".\n* **Expected:** Battery status is updated from \"Low\" to \"Critical\".\n\n**TC-006:** Battery Failure Recovery - Positive\n\n* **Preconditions:** Battery sensor fails to provide a reading.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"Failure\".\n    * Simulate a successful battery sensor reading.\n    * Verify that the battery status is updated to \"OK\".\n* **Expected:** Battery status is updated from \"Failure\" to \"OK\".",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Battery OK - Positive",
+      "req_ids": [
+        "RW-SW-120"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Battery sensor reading is within normal range."
+      ],
+      "inputs": {},
+      "steps": [
+        "Start the application.",
+        "Verify that the battery status is displayed as 'OK'."
+      ],
+      "expected": [
+        "Battery status is displayed as 'OK'."
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Battery Low - Positive",
+      "req_ids": [
+        "RW-SW-122",
+        "RW-SW-123"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Battery sensor reading indicates a remaining battery time of less than 30 minutes."
+      ],
+      "inputs": {},
+      "steps": [
+        "Start the application.",
+        "Verify that the battery status is displayed as 'Low'.",
+        "Verify that the low battery alarm is triggered."
+      ],
+      "expected": [
+        "Battery status is displayed as 'Low', low battery alarm is triggered."
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Battery Critical - Positive",
+      "req_ids": [
+        "RW-SW-124",
+        "RW-SW-125"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Battery sensor reading indicates a remaining battery time of less than 10 minutes."
+      ],
+      "inputs": {},
+      "steps": [
+        "Start the application.",
+        "Verify that the battery status is displayed as 'Critical'.",
+        "Verify that the critically low battery alarm is triggered."
+      ],
+      "expected": [
+        "Battery status is displayed as 'Critical', critically low battery alarm is triggered."
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Battery Failure - Positive",
+      "req_ids": [
+        "RW-SW-129"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Battery sensor fails to provide a reading."
+      ],
+      "inputs": {},
+      "steps": [
+        "Start the application.",
+        "Verify that the battery status is displayed as 'Failure'.",
+        "Verify that the battery failure alarm is triggered."
+      ],
+      "expected": [
+        "Battery status is displayed as 'Failure', battery failure alarm is triggered."
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Battery Low to Critical - Positive",
+      "req_ids": [
+        "RW-SW-122",
+        "RW-SW-124"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Battery sensor reading indicates a remaining battery time of less than 30 minutes."
+      ],
+      "inputs": {},
+      "steps": [
+        "Start the application.",
+        "Verify that the battery status is displayed as 'Low'.",
+        "Simulate a battery level update to indicate a remaining battery time of less than 10 minutes.",
+        "Verify that the battery status is updated to 'Critical'."
+      ],
+      "expected": [
+        "Battery status is updated from 'Low' to 'Critical'."
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Battery Failure Recovery - Positive",
+      "req_ids": [
+        "RW-SW-129"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Battery sensor fails to provide a reading."
+      ],
+      "inputs": {},
+      "steps": [
+        "Start the application.",
+        "Verify that the battery status is displayed as 'Failure'.",
+        "Simulate a successful battery sensor reading.",
+        "Verify that the battery status is updated to 'OK'."
+      ],
+      "expected": [
+        "Battery status is updated from 'Failure' to 'OK'."
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "## FSM Path-Based Test Suite for U11_Alarms\n\n**States:**\n* `BATTERY_OK`\n* `BATTERY_ETA_BELOW_30MIN`\n* `BATTERY_ETA_BELOW_10MIN`\n* `BATTERY_FAILURE`\n\n**Transitions:**\n* `START` -> `BATTERY_OK` (if battery sensor is connected)\n* `BATTERY_OK` -> `BATTERY_ETA_BELOW_30MIN` (if battery ETA is below 30min)\n* `BATTERY_ETA_BELOW_30MIN` -> `BATTERY_ETA_BELOW_10MIN` (if battery ETA is below 10min)\n* `BATTERY_ETA_BELOW_10MIN` -> `BATTERY_FAILURE` (if battery is critically low)\n* `BATTERY_FAILURE` -> `BATTERY_OK` (if battery is recharged)\n\n**Initial state:** `START`\n\n**Final state:** `BATTERY_OK`\n\n**Path 1:**\n* `START` -> `BATTERY_OK` -> `BATTERY_ETA_BELOW_30MIN` -> `BATTERY_ETA_BELOW_10MIN` -> `BATTERY_FAILURE` -> `BATTERY_OK`\n\n**Path 2:**\n* `START` -> `BATTERY_OK` -> `BATTERY_ETA_BELOW_30MIN` -> `BATTERY_ETA_BELOW_10MIN` -> `BATTERY_FAILURE`\n\n**Path 3:**\n* `START` -> `BATTERY_OK` -> `BATTERY_ETA_BELOW_30MIN` -> `BATTERY_ETA_BELOW_10MIN`\n\n**Path 4:**\n* `START` -> `BATTERY_OK` -> `BATTERY_ETA_BELOW_30MIN`\n\n**Path 5:**\n* `START` -> `BATTERY_OK`",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Battery sensor connected and battery OK",
+          "req_ids": [
+            "RW-SW-121",
+            "RW-SW-120"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery sensor is connected"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "Battery state is OK"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Battery ETA below 30min triggers low battery alarm",
+          "req_ids": [
+            "RW-SW-122",
+            "RW-SW-123"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery ETA is below 30min"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "Low battery alarm is triggered (low priority)"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Battery ETA below 10min triggers critically low battery alarm",
+          "req_ids": [
+            "RW-SW-124",
+            "RW-SW-125"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery ETA is below 10min"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "Critically low battery alarm is triggered (high priority)"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Battery failure triggers failure alarm",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery is absent, unavailable, or unchargeable"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "Battery failure alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Recharging battery restores normal operation",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery is in failure state"
+          ],
+          "inputs": {},
+          "steps": [
+            "Recharge battery"
+          ],
+          "expected": [
+            "Battery state is OK"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "FSM Path-Based Representations",
+        "group": 2,
+        "schema_score": 0.2,
+        "representation_score": 0.6,
+        "sfv_score": 0.4,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): [] should be non-empty",
+          "test case #2 (TC-002): [] should be non-empty",
+          "test case #3 (TC-003): [] should be non-empty",
+          "test case #4 (TC-004): [] should be non-empty",
+          "missing: transitions (>=2)",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.40). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): [] should be non-empty\n- test case #2 (TC-002): [] should be non-empty\n- test case #3 (TC-003): [] should be non-empty\n- test case #4 (TC-004): [] should be non-empty\n- missing: transitions (>=2)\n- missing: events/guards",
+      "artifact": "## FSM Path-Based Test Suite for U11_Alarms\n\n**States:**\n* `BATTERY_OK`\n* `BATTERY_ETA_BELOW_30MIN`\n* `BATTERY_ETA_BELOW_10MIN`\n* `BATTERY_ABSENT`\n* `BATTERY_UNAVAILABLE`\n* `BATTERY_UNCHARGEABLE`\n\n**Transitions:**\n* `START` -> `BATTERY_OK` (sensor reading)\n* `BATTERY_OK` -> `BATTERY_ETA_BELOW_30MIN` (ETA calculation)\n* `BATTERY_ETA_BELOW_30MIN` -> `BATTERY_ETA_BELOW_10MIN` (ETA calculation)\n* `BATTERY_ETA_BELOW_10MIN` -> `BATTERY_ABSENT` (sensor reading)\n* `BATTERY_ETA_BELOW_30MIN` -> `BATTERY_UNAVAILABLE` (sensor reading)\n* `BATTERY_ETA_BELOW_30MIN` -> `BATTERY_UNCHARGEABLE` (sensor reading)\n\n**Events:**\n* `SENSOR_READING`\n* `TIME_TICK`\n\n**Guard Conditions:**\n* `is_battery_eta_below_30min(remaining_battery)`\n* `is_battery_eta_below_10min(remaining_battery)`\n\n**Test Cases:**\n\n| ID | Title | Req IDs | Kind | Preconditions | Inputs | Steps | Expected |\n|---|---|---|---|---|---|---|---|\n| TC-001 | Battery OK | [RW-SW-120, RW-SW-121] | Positive | Battery sensor is connected and reading is available | {\"remaining_battery\": 50} | - | Battery OK state is reached |\n| TC-002 | Battery ETA below 30min | [RW-SW-120, RW-SW-122] | Positive | Battery sensor is connected and reading is available | {\"remaining_battery\": 25} | - | BATTERY_ETA_BELOW_30MIN state is reached |\n| TC-003 | Battery ETA below 10min | [RW-SW-120, RW-SW-124] | Positive | Battery sensor is connected and reading is available | {\"remaining_battery\": 5} | - | BATTERY_ETA_BELOW_10MIN state is reached |\n| TC-004 | Battery absent | [RW-SW-129] | Negative | Battery sensor is disconnected | - | - | BATTERY_ABSENT state is reached |\n| TC-005 | Battery unavailable | [RW-SW-129] | Negative | Battery sensor is connected but unavailable | - | - | BATTERY_UNAVAILABLE state is reached |\n| TC-006 | Battery unchargeable | [RW-SW-129] | Negative | Battery sensor is connected but unchargeable | - | - | BATTERY_UNCHARGEABLE state is reached |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Battery OK",
+          "req_ids": [
+            "RW-SW-120",
+            "RW-SW-121"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery sensor is connected and reading is available"
+          ],
+          "inputs": {
+            "remaining_battery": 50
+          },
+          "steps": [],
+          "expected": [
+            "Battery OK state is reached"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Battery ETA below 30min",
+          "req_ids": [
+            "RW-SW-120",
+            "RW-SW-122"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery sensor is connected and reading is available"
+          ],
+          "inputs": {
+            "remaining_battery": 25
+          },
+          "steps": [],
+          "expected": [
+            "BATTERY_ETA_BELOW_30MIN state is reached"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Battery ETA below 10min",
+          "req_ids": [
+            "RW-SW-120",
+            "RW-SW-124"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery sensor is connected and reading is available"
+          ],
+          "inputs": {
+            "remaining_battery": 5
+          },
+          "steps": [],
+          "expected": [
+            "BATTERY_ETA_BELOW_10MIN state is reached"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Battery absent",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery sensor is disconnected"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "BATTERY_ABSENT state is reached"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Battery unavailable",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery sensor is connected but unavailable"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "BATTERY_UNAVAILABLE state is reached"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Battery unchargeable",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery sensor is connected but unchargeable"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "BATTERY_UNCHARGEABLE state is reached"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "FSM Path-Based Representations",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.4,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): [] should be non-empty",
+          "test case #2 (TC-002): [] should be non-empty",
+          "test case #3 (TC-003): [] should be non-empty",
+          "test case #4 (TC-004): [] should be non-empty",
+          "test case #5 (TC-005): [] should be non-empty",
+          "test case #6 (TC-006): [] should be non-empty",
+          "missing: transitions (>=2)"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.40). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): [] should be non-empty\n- test case #2 (TC-002): [] should be non-empty\n- test case #3 (TC-003): [] should be non-empty\n- test case #4 (TC-004): [] should be non-empty\n- test case #5 (TC-005): [] should be non-empty\n- test case #6 (TC-006): [] should be non-empty\n- missing: transitions (>=2)",
+      "artifact": "## FSM Path-Based Test Suite for U11_Alarms\n\n**States:**\n\n* `BATTERY_OK`\n* `BATTERY_LOW`\n* `BATTERY_CRITICAL`\n* `BATTERY_FAILURE`\n\n**Transitions:**\n\n* `START` -> `BATTERY_OK` (sensor reading)\n* `BATTERY_OK` -> `BATTERY_LOW` (ETA < 30min)\n* `BATTERY_OK` -> `BATTERY_CRITICAL` (ETA < 10min)\n* `BATTERY_OK` -> `BATTERY_FAILURE` (sensor failure)\n* `BATTERY_LOW` -> `BATTERY_CRITICAL` (ETA < 10min)\n* `BATTERY_CRITICAL` -> `BATTERY_FAILURE` (sensor failure)\n\n**Test Cases:**\n\n**TC-001:** Battery OK - Positive\n\n* **Preconditions:** Battery sensor reading is within normal range.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"OK\".\n* **Expected:** Battery status is displayed as \"OK\".\n\n**TC-002:** Battery Low - Positive\n\n* **Preconditions:** Battery sensor reading indicates a remaining battery time of less than 30 minutes.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"Low\".\n    * Verify that the low battery alarm is triggered.\n* **Expected:** Battery status is displayed as \"Low\", low battery alarm is triggered.\n\n**TC-003:** Battery Critical - Positive\n\n* **Preconditions:** Battery sensor reading indicates a remaining battery time of less than 10 minutes.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"Critical\".\n    * Verify that the critically low battery alarm is triggered.\n* **Expected:** Battery status is displayed as \"Critical\", critically low battery alarm is triggered.\n\n**TC-004:** Battery Failure - Positive\n\n* **Preconditions:** Battery sensor fails to provide a reading.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"Failure\".\n    * Verify that the battery failure alarm is triggered.\n* **Expected:** Battery status is displayed as \"Failure\", battery failure alarm is triggered.\n\n**TC-005:** Battery Low to Critical - Positive\n\n* **Preconditions:** Battery sensor reading indicates a remaining battery time of less than 30 minutes.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"Low\".\n    * Simulate a battery level update to indicate a remaining battery time of less than 10 minutes.\n    * Verify that the battery status is updated to \"Critical\".\n* **Expected:** Battery status is updated from \"Low\" to \"Critical\".\n\n**TC-006:** Battery Failure Recovery - Positive\n\n* **Preconditions:** Battery sensor fails to provide a reading.\n* **Steps:**\n    * Start the application.\n    * Verify that the battery status is displayed as \"Failure\".\n    * Simulate a successful battery sensor reading.\n    * Verify that the battery status is updated to \"OK\".\n* **Expected:** Battery status is updated from \"Failure\" to \"OK\".",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Battery OK - Positive",
+          "req_ids": [
+            "RW-SW-120"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery sensor reading is within normal range."
+          ],
+          "inputs": {},
+          "steps": [
+            "Start the application.",
+            "Verify that the battery status is displayed as 'OK'."
+          ],
+          "expected": [
+            "Battery status is displayed as 'OK'."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Battery Low - Positive",
+          "req_ids": [
+            "RW-SW-122",
+            "RW-SW-123"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery sensor reading indicates a remaining battery time of less than 30 minutes."
+          ],
+          "inputs": {},
+          "steps": [
+            "Start the application.",
+            "Verify that the battery status is displayed as 'Low'.",
+            "Verify that the low battery alarm is triggered."
+          ],
+          "expected": [
+            "Battery status is displayed as 'Low', low battery alarm is triggered."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Battery Critical - Positive",
+          "req_ids": [
+            "RW-SW-124",
+            "RW-SW-125"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery sensor reading indicates a remaining battery time of less than 10 minutes."
+          ],
+          "inputs": {},
+          "steps": [
+            "Start the application.",
+            "Verify that the battery status is displayed as 'Critical'.",
+            "Verify that the critically low battery alarm is triggered."
+          ],
+          "expected": [
+            "Battery status is displayed as 'Critical', critically low battery alarm is triggered."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Battery Failure - Positive",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery sensor fails to provide a reading."
+          ],
+          "inputs": {},
+          "steps": [
+            "Start the application.",
+            "Verify that the battery status is displayed as 'Failure'.",
+            "Verify that the battery failure alarm is triggered."
+          ],
+          "expected": [
+            "Battery status is displayed as 'Failure', battery failure alarm is triggered."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Battery Low to Critical - Positive",
+          "req_ids": [
+            "RW-SW-122",
+            "RW-SW-124"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery sensor reading indicates a remaining battery time of less than 30 minutes."
+          ],
+          "inputs": {},
+          "steps": [
+            "Start the application.",
+            "Verify that the battery status is displayed as 'Low'.",
+            "Simulate a battery level update to indicate a remaining battery time of less than 10 minutes.",
+            "Verify that the battery status is updated to 'Critical'."
+          ],
+          "expected": [
+            "Battery status is updated from 'Low' to 'Critical'."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Battery Failure Recovery - Positive",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery sensor fails to provide a reading."
+          ],
+          "inputs": {},
+          "steps": [
+            "Start the application.",
+            "Verify that the battery status is displayed as 'Failure'.",
+            "Simulate a successful battery sensor reading.",
+            "Verify that the battery status is updated to 'OK'."
+          ],
+          "expected": [
+            "Battery status is updated from 'Failure' to 'OK'."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "FSM Path-Based Representations",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.6,
+        "sfv_score": 0.8,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.80). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: events/guards",
+      "artifact": "## FSM Path-Based Test Suite for U11_Alarms\n\n**States:**\n* `BATTERY_OK`\n* `BATTERY_ETA_BELOW_30MIN`\n* `BATTERY_ETA_BELOW_10MIN`\n* `BATTERY_FAILURE`\n\n**Transitions:**\n* `SENSOR_UPDATE`: Battery amount sensor provides new data.\n* `TIME_TICK`: Timer ticks, updating battery ETA.\n* `LOW_BATTERY_THRESHOLD_PASSED`: Battery ETA falls below 30 minutes.\n* `CRITICAL_BATTERY_THRESHOLD_PASSED`: Battery ETA falls below 10 minutes.\n* `BATTERY_PRESENCE_CHANGED`: Battery presence sensor detects a change in battery presence.\n* `CHARGABILITY_CHANGED`: Battery chargeability sensor detects a change in battery chargeability.\n\n**Initial state:** `BATTERY_OK`\n\n**Test paths:**\n\n**Path 1: Battery OK**\n* `SENSOR_UPDATE`: Battery amount sensor provides a value within normal range.\n* `TIME_TICK`: Battery ETA remains above 30 minutes.\n* `LOW_BATTERY_THRESHOLD_PASSED`: No alarm triggered.\n* `CRITICAL_BATTERY_THRESHOLD_PASSED`: No alarm triggered.\n\n**Path 2: Battery ETA below 30 minutes**\n* `SENSOR_UPDATE`: Battery amount sensor provides a value indicating low battery.\n* `TIME_TICK`: Battery ETA falls below 30 minutes.\n* `LOW_BATTERY_THRESHOLD_PASSED`: Low battery alarm triggered.\n* `CRITICAL_BATTERY_THRESHOLD_PASSED`: No alarm triggered.\n\n**Path 3: Battery ETA below 10 minutes**\n* `SENSOR_UPDATE`: Battery amount sensor provides a value indicating critically low battery.\n* `TIME_TICK`: Battery ETA falls below 10 minutes.\n* `LOW_BATTERY_THRESHOLD_PASSED`: Low battery alarm triggered.\n* `CRITICAL_BATTERY_THRESHOLD_PASSED`: Critically low battery alarm triggered.\n\n**Path 4: Battery failure**\n* `BATTERY_PRESENCE_CHANGED`: Battery presence sensor detects a missing battery.\n* `CHARGABILITY_CHANGED`: Battery chargeability sensor detects an unavailable battery.\n* `TIME_TICK`: Battery failure alarm triggered.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Battery OK",
+          "req_ids": [
+            "RW-SW-120"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery amount within normal range."
+          ],
+          "inputs": {},
+          "steps": [
+            "Sensor update."
+          ],
+          "expected": [
+            "Battery OK state"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Low Battery Alarm",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery amount below 30 minutes."
+          ],
+          "inputs": {},
+          "steps": [
+            "Sensor update."
+          ],
+          "expected": [
+            "Low battery alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Critically Low Battery Alarm",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery amount below 10 minutes."
+          ],
+          "inputs": {},
+          "steps": [
+            "Sensor update."
+          ],
+          "expected": [
+            "Low battery alarm triggered",
+            "Critically low battery alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Battery Failure Alarm",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Missing or unavailable battery."
+          ],
+          "inputs": {},
+          "steps": [
+            "Battery presence change",
+            "Chargeability change"
+          ],
+          "expected": [
+            "Battery failure alarm triggered"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "FSM Path-Based Representations",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.6,
+        "sfv_score": 0.8,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: events/guards"
+        ]
+      }
+    }
+  ]
+}

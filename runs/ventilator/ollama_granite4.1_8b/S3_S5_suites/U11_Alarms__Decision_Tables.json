@@ -1,0 +1,1198 @@
+{
+  "unit_id": "U11_Alarms",
+  "representation": "Decision Tables",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 0.3,
+    "groundedness_mg": 0.8824,
+    "hallucinated": [
+      {
+        "value": "High",
+        "context": "Remaining Battery Amount",
+        "grounded": false
+      },
+      {
+        "value": "Critical",
+        "context": "Remaining Battery Amount",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 17,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Test boundary values at 10 min and 30 min to verify correct alarm thresholds.",
+      "Include tests for the battery amount sensor and battery presence sensor connectivity (RW‑SW‑121, RW‑SW‑128).",
+      "Verify the GUI’s battery ETA calculation logic directly (RW‑SW‑120).",
+      "Clarify and test the “Remaining Battery Amount” categories, as they are not defined in the SRS.",
+      "Add tests for error handling when sensor data is unavailable or corrupted."
+    ],
+    "traceability": 0.625,
+    "untraced_reqs": [
+      "RW-SW-120",
+      "RW-SW-121",
+      "RW-SW-128"
+    ],
+    "fsa_score": 0.8624,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Decision Table for Battery Alarm Logic\n\nConditions:\n1. Battery Presence (P)          : Yes / No\n2. Chargeability (C)            : Chargeable / Not Chargeable\n3. Battery ETA (E)              : <10 min / 10-30 min / >30 min\n4. Remaining Battery Amount (R) : High / Low / Critical\n\nActions:\nA1. Low Battery Alarm (LBA)      : Trigger / Not Trigger\nA2. Critically Low Battery Alarm (CLBA) : Trigger / Not Trigger\nA3. Battery Failure Alarm (BFA)  : Trigger / Not Trigger\nA4. Alarm Priority (LP / HP)     : Low / High\n\n| P   | C      | E          | R      | LBA | CLBA | BFA | Priority |\n|-----|--------|------------|--------|-----|------|-----|----------|\n| Yes | Chargeable | <10 min   | -      | Yes | Yes  | No  | High     |\n| Yes | Chargeable | 10-30 min | -      | Yes | No    | No  | Low      |\n| Yes | Chargeable | >30 min   | -      | No  | No    | No  | -        |\n| Yes | Not Chargeable | -      | -      | No  | No    | Yes | -        |\n| No  | -      | -          | -      | No  | No    | Yes | -        |\n\nNotes:\n- \"-\" denotes \"don't care\" (irrelevant) values.\n- The \"Low Battery Alarm\" (LBA) is triggered when ETA < 30 min.\n- The \"Critically Low Battery Alarm\" (CLBA) is triggered when ETA < 10 min.\n- The \"Battery Failure Alarm\" (BFA) is triggered when battery is absent or unchargeable.\n- Alarm priority is Low for LBA and High for CLBA; BFA has no priority distinction in this table.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test Low Battery Alarm triggers when ETA < 30 min",
+      "req_ids": [
+        "RW-SW-122"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Battery is present and chargeable"
+      ],
+      "inputs": {
+        "Battery ETA": "20 min",
+        "Remaining Battery Amount": "High"
+      },
+      "steps": [
+        "Observe GUI battery ETA calculation",
+        "Check for Low Battery Alarm"
+      ],
+      "expected": [
+        "Low Battery Alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test Critically Low Battery Alarm triggers when ETA < 10 min",
+      "req_ids": [
+        "RW-SW-124"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Battery is present and chargeable"
+      ],
+      "inputs": {
+        "Battery ETA": "5 min",
+        "Remaining Battery Amount": "Critical"
+      },
+      "steps": [
+        "Observe GUI battery ETA calculation",
+        "Check for Critically Low Battery Alarm"
+      ],
+      "expected": [
+        "Critically Low Battery Alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test Low Battery Alarm priority is Low",
+      "req_ids": [
+        "RW-SW-123"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Low Battery Alarm is triggered"
+      ],
+      "inputs": {
+        "Battery ETA": "20 min",
+        "Remaining Battery Amount": "High"
+      },
+      "steps": [
+        "Check alarm priority setting"
+      ],
+      "expected": [
+        "Alarm priority is Low"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test Critically Low Battery Alarm priority is High",
+      "req_ids": [
+        "RW-SW-125"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Critically Low Battery Alarm is triggered"
+      ],
+      "inputs": {
+        "Battery ETA": "5 min",
+        "Remaining Battery Amount": "Critical"
+      },
+      "steps": [
+        "Check alarm priority setting"
+      ],
+      "expected": [
+        "Alarm priority is High"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test Battery Failure Alarm triggers when battery is absent",
+      "req_ids": [
+        "RW-SW-129"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Battery is absent"
+      ],
+      "inputs": {
+        "Battery Presence": "No",
+        "Chargeability": "Chargeable"
+      },
+      "steps": [
+        "Observe GUI battery status",
+        "Check for Battery Failure Alarm"
+      ],
+      "expected": [
+        "Battery Failure Alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Test Battery Failure Alarm triggers when battery is unchargeable",
+      "req_ids": [
+        "RW-SW-129"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Battery is present but unchargeable"
+      ],
+      "inputs": {
+        "Battery Presence": "Yes",
+        "Chargeability": "Not Chargeable"
+      },
+      "steps": [
+        "Observe GUI battery status",
+        "Check for Battery Failure Alarm"
+      ],
+      "expected": [
+        "Battery Failure Alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Test No alarms when battery ETA > 30 min",
+      "req_ids": [
+        "RW-SW-122",
+        "RW-SW-124",
+        "RW-SW-129"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Battery is present and chargeable"
+      ],
+      "inputs": {
+        "Battery ETA": "45 min",
+        "Remaining Battery Amount": "High"
+      },
+      "steps": [
+        "Observe GUI battery ETA calculation",
+        "Check for any alarms"
+      ],
+      "expected": [
+        "No Low Battery Alarm",
+        "No Critically Low Battery Alarm",
+        "No Battery Failure Alarm"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Test No alarms when battery is absent and unchargeable",
+      "req_ids": [
+        "RW-SW-129"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Battery is absent and unchargeable"
+      ],
+      "inputs": {
+        "Battery Presence": "No",
+        "Chargeability": "Not Chargeable"
+      },
+      "steps": [
+        "Observe GUI battery status",
+        "Check for Battery Failure Alarm"
+      ],
+      "expected": [
+        "Battery Failure Alarm is triggered"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Decision Table for Battery Alarm Logic\n\nConditions:\n1. Battery Presence (Present/Not Present)\n2. Chargeability (Chargeable/Not Chargeable)\n3. Battery ETA (>=30 min, <30 min, <10 min)\n\nActions:\n- Low Battery Alarm (Low Priority)\n- Critically Low Battery Alarm (High Priority)\n- Battery Failure Alarm\n\n| Battery Presence | Chargeability | Battery ETA | Low Battery Alarm | Critically Low Battery Alarm | Battery Failure Alarm |\n|------------------|---------------|-------------|-------------------|-----------------------------|-----------------------|\n| Present          | Chargeable    | >=30 min    | No                | No                          | No                    |\n| Present          | Chargeable    | <30 min     | Yes (Low)         | No                          | No                    |\n| Present          | Chargeable    | <10 min     | Yes (Low)         | Yes (High)                 | No                    |\n| Present          | Not Chargeable| Any         | Yes (Low)         | Yes (High)                 | Yes                   |\n| Not Present      | Any           | Any         | No                | No                          | Yes                   |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Battery present, chargeable, ETA >= 30 min",
+          "req_ids": [
+            "RW-SW-120",
+            "RW-SW-128"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery is present",
+            "Battery is chargeable",
+            "ETA >= 30 min"
+          ],
+          "inputs": {
+            "Battery Presence": "Present",
+            "Chargeability": "Chargeable",
+            "Battery ETA": ">=30 min"
+          },
+          "steps": [
+            "Read battery presence sensor",
+            "Read chargeability sensor",
+            "Compute ETA from history",
+            "Check ETA against thresholds"
+          ],
+          "expected": [
+            "No low battery alarm",
+            "No critically low battery alarm",
+            "No battery failure alarm"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Battery present, chargeable, ETA < 30 min",
+          "req_ids": [
+            "RW-SW-120",
+            "RW-SW-122",
+            "RW-SW-128"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery is present",
+            "Battery is chargeable",
+            "ETA < 30 min"
+          ],
+          "inputs": {
+            "Battery Presence": "Present",
+            "Chargeability": "Chargeable",
+            "Battery ETA": "<30 min"
+          },
+          "steps": [
+            "Read battery presence sensor",
+            "Read chargeability sensor",
+            "Compute ETA from history",
+            "Check ETA against thresholds"
+          ],
+          "expected": [
+            "Low battery alarm (Low Priority)",
+            "No critically low battery alarm",
+            "No battery failure alarm"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Battery present, chargeable, ETA < 10 min",
+          "req_ids": [
+            "RW-SW-120",
+            "RW-SW-124",
+            "RW-SW-125",
+            "RW-SW-128"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery is present",
+            "Battery is chargeable",
+            "ETA < 10 min"
+          ],
+          "inputs": {
+            "Battery Presence": "Present",
+            "Chargeability": "Chargeable",
+            "Battery ETA": "<10 min"
+          },
+          "steps": [
+            "Read battery presence sensor",
+            "Read chargeability sensor",
+            "Compute ETA from history",
+            "Check ETA against thresholds"
+          ],
+          "expected": [
+            "Low battery alarm (Low Priority)",
+            "Critically low battery alarm (High Priority)",
+            "No battery failure alarm"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Battery present, not chargeable",
+          "req_ids": [
+            "RW-SW-129",
+            "RW-SW-128"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery is present",
+            "Battery is not chargeable"
+          ],
+          "inputs": {
+            "Battery Presence": "Present",
+            "Chargeability": "Not Chargeable",
+            "Battery ETA": "Any"
+          },
+          "steps": [
+            "Read battery presence sensor",
+            "Read chargeability sensor",
+            "Compute ETA from history",
+            "Check ETA against thresholds"
+          ],
+          "expected": [
+            "Low battery alarm (Low Priority)",
+            "Critically low battery alarm (High Priority)",
+            "Battery failure alarm"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Battery absent",
+          "req_ids": [
+            "RW-SW-129",
+            "RW-SW-128"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery is absent"
+          ],
+          "inputs": {
+            "Battery Presence": "Not Present",
+            "Chargeability": "Any",
+            "Battery ETA": "Any"
+          },
+          "steps": [
+            "Read battery presence sensor",
+            "Attempt to compute ETA from history",
+            "Check ETA against thresholds"
+          ],
+          "expected": [
+            "No low battery alarm",
+            "No critically low battery alarm",
+            "Battery failure alarm"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Boundary: ETA exactly 30 minutes",
+          "req_ids": [
+            "RW-SW-122",
+            "RW-SW-120",
+            "RW-SW-128"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery is present",
+            "Battery is chargeable",
+            "ETA = 30 min"
+          ],
+          "inputs": {
+            "Battery Presence": "Present",
+            "Chargeability": "Chargeable",
+            "Battery ETA": "30 min"
+          },
+          "steps": [
+            "Read battery presence sensor",
+            "Read chargeability sensor",
+            "Compute ETA from history",
+            "Check ETA against thresholds"
+          ],
+          "expected": [
+            "No low battery alarm",
+            "No critically low battery alarm",
+            "No battery failure alarm"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Boundary: ETA exactly 10 minutes",
+          "req_ids": [
+            "RW-SW-124",
+            "RW-SW-120",
+            "RW-SW-128"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery is present",
+            "Battery is chargeable",
+            "ETA = 10 min"
+          ],
+          "inputs": {
+            "Battery Presence": "Present",
+            "Chargeability": "Chargeable",
+            "Battery ETA": "10 min"
+          },
+          "steps": [
+            "Read battery presence sensor",
+            "Read chargeability sensor",
+            "Compute ETA from history",
+            "Check ETA against thresholds"
+          ],
+          "expected": [
+            "Low battery alarm (Low Priority)",
+            "Critically low battery alarm (High Priority)",
+            "No battery failure alarm"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "error": "ollama:gpt-oss:20b returned an empty response",
+        "fsa_pass": false,
+        "fsa_score": 0.0
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.0; sub-scores {'clause_coverage': None, 'negative_coverage': None, 'oracle_assertiveness': None, 'boundary_coverage': None, 'groundedness_mg': None}). Output the full improved suite addressing:",
+      "artifact": "Decision Table for Battery Alarm Logic\n\nConditions:\n1. Battery Presence (P)          : Yes / No\n2. Chargeability (C)            : Chargeable / Not Chargeable\n3. Battery ETA (E)              : <10 min / 10-30 min / >30 min\n4. Remaining Battery Amount (R) : High / Low / Critical\n\nActions:\nA1. Low Battery Alarm (LBA)      : Trigger / Not Trigger\nA2. Critically Low Battery Alarm (CLBA) : Trigger / Not Trigger\nA3. Battery Failure Alarm (BFA)  : Trigger / Not Trigger\nA4. Alarm Priority (LP / HP)     : Low / High\n\n| P   | C      | E          | R      | LBA | CLBA | BFA | Priority |\n|-----|--------|------------|--------|-----|------|-----|----------|\n| Yes | Chargeable | <10 min   | -      | Yes | Yes  | No  | High     |\n| Yes | Chargeable | 10-30 min | -      | Yes | No    | No  | Low      |\n| Yes | Chargeable | >30 min   | -      | No  | No    | No  | -        |\n| Yes | Not Chargeable | -      | -      | No  | No    | Yes | -        |\n| No  | -      | -          | -      | No  | No    | Yes | -        |\n\nNotes:\n- \"-\" denotes \"don't care\" (irrelevant) values.\n- The \"Low Battery Alarm\" (LBA) is triggered when ETA < 30 min.\n- The \"Critically Low Battery Alarm\" (CLBA) is triggered when ETA < 10 min.\n- The \"Battery Failure Alarm\" (BFA) is triggered when battery is absent or unchargeable.\n- Alarm priority is Low for LBA and High for CLBA; BFA has no priority distinction in this table.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Low Battery Alarm triggers when ETA < 30 min",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery is present and chargeable"
+          ],
+          "inputs": {
+            "Battery ETA": "20 min",
+            "Remaining Battery Amount": "High"
+          },
+          "steps": [
+            "Observe GUI battery ETA calculation",
+            "Check for Low Battery Alarm"
+          ],
+          "expected": [
+            "Low Battery Alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Critically Low Battery Alarm triggers when ETA < 10 min",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery is present and chargeable"
+          ],
+          "inputs": {
+            "Battery ETA": "5 min",
+            "Remaining Battery Amount": "Critical"
+          },
+          "steps": [
+            "Observe GUI battery ETA calculation",
+            "Check for Critically Low Battery Alarm"
+          ],
+          "expected": [
+            "Critically Low Battery Alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Low Battery Alarm priority is Low",
+          "req_ids": [
+            "RW-SW-123"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Low Battery Alarm is triggered"
+          ],
+          "inputs": {
+            "Battery ETA": "20 min",
+            "Remaining Battery Amount": "High"
+          },
+          "steps": [
+            "Check alarm priority setting"
+          ],
+          "expected": [
+            "Alarm priority is Low"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Critically Low Battery Alarm priority is High",
+          "req_ids": [
+            "RW-SW-125"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Critically Low Battery Alarm is triggered"
+          ],
+          "inputs": {
+            "Battery ETA": "5 min",
+            "Remaining Battery Amount": "Critical"
+          },
+          "steps": [
+            "Check alarm priority setting"
+          ],
+          "expected": [
+            "Alarm priority is High"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Battery Failure Alarm triggers when battery is absent",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery is absent"
+          ],
+          "inputs": {
+            "Battery Presence": "No",
+            "Chargeability": "Chargeable"
+          },
+          "steps": [
+            "Observe GUI battery status",
+            "Check for Battery Failure Alarm"
+          ],
+          "expected": [
+            "Battery Failure Alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Battery Failure Alarm triggers when battery is unchargeable",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery is present but unchargeable"
+          ],
+          "inputs": {
+            "Battery Presence": "Yes",
+            "Chargeability": "Not Chargeable"
+          },
+          "steps": [
+            "Observe GUI battery status",
+            "Check for Battery Failure Alarm"
+          ],
+          "expected": [
+            "Battery Failure Alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test No alarms when battery ETA > 30 min",
+          "req_ids": [
+            "RW-SW-122",
+            "RW-SW-124",
+            "RW-SW-129"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery is present and chargeable"
+          ],
+          "inputs": {
+            "Battery ETA": "45 min",
+            "Remaining Battery Amount": "High"
+          },
+          "steps": [
+            "Observe GUI battery ETA calculation",
+            "Check for any alarms"
+          ],
+          "expected": [
+            "No Low Battery Alarm",
+            "No Critically Low Battery Alarm",
+            "No Battery Failure Alarm"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test No alarms when battery is absent and unchargeable",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery is absent and unchargeable"
+          ],
+          "inputs": {
+            "Battery Presence": "No",
+            "Chargeability": "Not Chargeable"
+          },
+          "steps": [
+            "Observe GUI battery status",
+            "Check for Battery Failure Alarm"
+          ],
+          "expected": [
+            "Battery Failure Alarm is triggered"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 0.3,
+        "groundedness_mg": 0.8824,
+        "hallucinated": [
+          {
+            "value": "High",
+            "context": "Remaining Battery Amount",
+            "grounded": false
+          },
+          {
+            "value": "Critical",
+            "context": "Remaining Battery Amount",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Test boundary values at 10 min and 30 min to verify correct alarm thresholds.",
+          "Include tests for the battery amount sensor and battery presence sensor connectivity (RW‑SW‑121, RW‑SW‑128).",
+          "Verify the GUI’s battery ETA calculation logic directly (RW‑SW‑120).",
+          "Clarify and test the “Remaining Battery Amount” categories, as they are not defined in the SRS.",
+          "Add tests for error handling when sensor data is unavailable or corrupted."
+        ],
+        "traceability": 0.625,
+        "untraced_reqs": [
+          "RW-SW-120",
+          "RW-SW-121",
+          "RW-SW-128"
+        ],
+        "fsa_score": 0.8624,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.8624; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.9, 'boundary_coverage': 0.3, 'groundedness_mg': 0.8824}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-120', 'RW-SW-121', 'RW-SW-128'] (add at least one each)\n- ungrounded value 'High' (Remaining Battery Amount): remove or use the SRS value\n- ungrounded value 'Critical' (Remaining Battery Amount): remove or use the SRS value\n- Test boundary values at 10 min and 30 min to verify correct alarm thresholds.\n- Include tests for the battery amount sensor and battery presence sensor connectivity (RW‑SW‑121, RW‑SW‑128).\n- Verify the GUI’s battery ETA calculation logic directly (RW‑SW‑120).\n- Clarify and test the “Remaining Battery Amount” categories, as they are not defined in the SRS.\n- Add tests for error handling when sensor data is unavailable or corrupted.",
+      "artifact": "Decision Table for Battery Alarm Logic\n\n| Condition 1: Battery Presence | Condition 2: Chargeability | Condition 3: Remaining Battery Amount (minutes) | Action 1: Battery Failure Alarm | Action 2: Low Battery Alarm | Action 3: Critically Low Battery Alarm |\n|------------------------------|---------------------------|-----------------------------------------------|--------------------------------|----------------------------|----------------------------------------|\n| Present                      | Chargeable               | >= 10                                          | OFF                          | OFF                       | OFF                                     |\n| Present                      | Chargeable               | < 10                                           | OFF                          | OFF                       | ON                                      |\n| Present                      | Unchargeable             | -                                             | ON                          | OFF                       | OFF                                     |\n| Absent                       | -                         | -                                             | ON                          | OFF                       | OFF                                     |\n| -                           | -                         | < 10                                           | ON                          | ON                       | OFF                                     |\n| -                           | -                         | >= 10 & < 30                                 | OFF                         | ON                       | OFF                                     |\n| -                           | -                         | >= 30                                          | OFF                         | OFF                      | OFF                                     |\n\nDecision Table for GUI Battery ETA Calculation\n\n| Condition 1: Sensor Data Availability | Condition 2: Historical Battery Amounts | Action: Compute Battery ETA |\n|--------------------------------------|----------------------------------------|-----------------------------|\n| Available                            | Valid (non‑null)                      | Compute ETA as specified   |\n| Available                            | Invalid or corrupted                  | Display error message      |\n| Unavailable                         | -                                      | Display \"Sensor data unavailable\" |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test battery presence and chargeability sensors",
+          "req_ids": [
+            "RW-SW-128"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery present and chargeable"
+          ],
+          "inputs": {
+            "Battery Presence": "Present",
+            "Chargeability": "Chargeable"
+          },
+          "steps": [
+            "Connect GUI to battery presence sensor",
+            "Connect GUI to chargeability sensor",
+            "Verify battery presence sensor reports 'Present'",
+            "Verify chargeability sensor reports 'Chargeable'"
+          ],
+          "expected": [
+            "Battery Failure Alarm OFF",
+            "Low Battery Alarm OFF",
+            "Critically Low Battery Alarm OFF"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test critically low battery alarm threshold",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery present and chargeable",
+            "Remaining Battery Amount < 10 minutes"
+          ],
+          "inputs": {
+            "Remaining Battery Amount (minutes)": "9"
+          },
+          "steps": [
+            "Simulate sensor reading of 9 minutes remaining",
+            "Observe GUI alarm output"
+          ],
+          "expected": [
+            "Critically Low Battery Alarm ON",
+            "Low Battery Alarm OFF"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test low battery alarm threshold",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery present and chargeable",
+            "Remaining Battery Amount between 10 and 30 minutes"
+          ],
+          "inputs": {
+            "Remaining Battery Amount (minutes)": "20"
+          },
+          "steps": [
+            "Simulate sensor reading of 20 minutes remaining",
+            "Observe GUI alarm output"
+          ],
+          "expected": [
+            "Critically Low Battery Alarm OFF",
+            "Low Battery Alarm ON"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test battery failure alarm for absent battery",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery absent"
+          ],
+          "inputs": {
+            "Battery Presence": "Absent"
+          },
+          "steps": [
+            "Simulate battery presence sensor reporting 'Absent'",
+            "Observe GUI alarm output"
+          ],
+          "expected": [
+            "Battery Failure Alarm ON"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test battery failure alarm for unchargeable battery",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery present but unchargeable"
+          ],
+          "inputs": {
+            "Battery Presence": "Present",
+            "Chargeability": "Unchargeable"
+          },
+          "steps": [
+            "Simulate battery presence sensor reporting 'Present'",
+            "Simulate chargeability sensor reporting 'Unchargeable'",
+            "Observe GUI alarm output"
+          ],
+          "expected": [
+            "Battery Failure Alarm ON"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test GUI battery ETA calculation logic",
+          "req_ids": [
+            "RW-SW-120"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Valid historical battery amounts available"
+          ],
+          "inputs": {
+            "Historical Battery Amounts": [
+              80,
+              75,
+              70,
+              65,
+              60
+            ],
+            "Current Battery Amount": 60
+          },
+          "steps": [
+            "Feed historical battery amounts and current amount to GUI",
+            "Compute ETA as per requirement"
+          ],
+          "expected": [
+            "ETA computed correctly as per historical trend"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test sensor data unavailability",
+          "req_ids": [
+            "RW-SW-121"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery amount sensor unavailable"
+          ],
+          "inputs": {
+            "Sensor Availability": "Unavailable"
+          },
+          "steps": [
+            "Simulate battery amount sensor reporting 'Unavailable'",
+            "Observe GUI behavior"
+          ],
+          "expected": [
+            "Display 'Sensor data unavailable' message"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test corrupted sensor data handling",
+          "req_ids": [
+            "RW-SW-121"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery amount sensor provides corrupted data"
+          ],
+          "inputs": {
+            "Sensor Data": "Corrupted"
+          },
+          "steps": [
+            "Simulate corrupted sensor data",
+            "Observe GUI error handling"
+          ],
+          "expected": [
+            "Display error message indicating corrupted sensor data"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.6667,
+        "sfv_score": 0.8333,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": [
+          "Table syntax is inconsistent."
+        ]
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.625,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.5,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.8889,
+        "hallucinated": [
+          {
+            "value": "Display 'Sensor data unavailable' message",
+            "grounded": false
+          },
+          {
+            "value": "Display error message indicating corrupted sensor data",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 18,
+        "uncovered_clauses": [
+          "RW-SW-123",
+          "RW-SW-125",
+          "RW-SW-129 (unavailable)"
+        ],
+        "weaknesses": [
+          "Add tests for alarm priority levels (low vs high).",
+          "Test boundary values at exactly 10 and 30 minutes.",
+          "Verify battery failure alarm triggers on sensor unavailability.",
+          "Assert concrete ETA calculation formula and expected numeric result.",
+          "Replace vague expected statements with concrete, checkable outcomes."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "RW-SW-123",
+          "RW-SW-125"
+        ],
+        "fsa_score": 0.6833,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.6833; sub-scores {'clause_coverage': 0.625, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.5, 'boundary_coverage': 0.5, 'groundedness_mg': 0.8889}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-123', 'RW-SW-125'] (add at least one each)\n- uncovered clause: RW-SW-123\n- uncovered clause: RW-SW-125\n- uncovered clause: RW-SW-129 (unavailable)\n- ungrounded value 'Display 'Sensor data unavailable' message' (None): remove or use the SRS value\n- ungrounded value 'Display error message indicating corrupted sensor data' (None): remove or use the SRS value\n- Add tests for alarm priority levels (low vs high).\n- Test boundary values at exactly 10 and 30 minutes.\n- Verify battery failure alarm triggers on sensor unavailability.\n- Assert concrete ETA calculation formula and expected numeric result.\n- Replace vague expected statements with concrete, checkable outcomes.",
+      "artifact": "Decision Table for Battery Alarm Logic\n\nConditions:\n1. Battery Presence (Present / Absent)\n2. Chargeability (Chargeable / Unchargeable)\n3. Battery Remaining Amount History (Low / Normal)\n4. Computed Battery ETA ( <10min / 10-30min / >30min )\n\nActions:\n- Display Low Battery Alarm (Low Priority)\n- Display Critically Low Battery Alarm (High Priority)\n- Display Battery Failure Alarm\n- Compute and Display Battery ETA\n\n| Battery Presence | Chargeability | Remaining Amount History | Computed ETA (min) | Low Battery Alarm | Critically Low Battery Alarm | Battery Failure Alarm |\n|------------------|---------------|--------------------------|---------------------|-------------------|-----------------------------|-----------------------|\n| Present          | Chargeable    | Low                      | 5                   | Yes (Low)         | Yes (High)                 | No                    |\n| Present          | Chargeable    | Normal                   | 15                  | No                | No                          | No                    |\n| Present          | Chargeable    | Normal                   | 10                  | Yes (Low)         | Yes (High)                 | No                    |\n| Present          | Chargeable    | Normal                   | 30                  | Yes (Low)         | No                          | No                    |\n| Present          | Chargeable    | Normal                   | 35                  | No                | No                          | No                    |\n| Present          | Unchargeable  | Any                      | Any                 | No                | No                          | Yes                   |\n| Absent           | Any           | Any                      | Any                 | No                | No                          | Yes                   |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test critically low battery alarm (high priority) when ETA < 10 minutes",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery is present",
+            "Battery is chargeable"
+          ],
+          "inputs": {
+            "battery_presence": "Present",
+            "chargeability": "Chargeable",
+            "remaining_amount_history": "Low",
+            "computed_eta_minutes": 5
+          },
+          "steps": [
+            "Simulate battery sensor data indicating low remaining amount.",
+            "Compute battery ETA from history.",
+            "Check if ETA < 10 minutes."
+          ],
+          "expected": [
+            "Display critically low battery alarm with high priority."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test low battery alarm (low priority) when ETA is between 10 and 30 minutes",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery is present",
+            "Battery is chargeable"
+          ],
+          "inputs": {
+            "battery_presence": "Present",
+            "chargeability": "Chargeable",
+            "remaining_amount_history": "Normal",
+            "computed_eta_minutes": 20
+          },
+          "steps": [
+            "Simulate battery sensor data indicating normal remaining amount.",
+            "Compute battery ETA from history.",
+            "Check if ETA is between 10 and 30 minutes."
+          ],
+          "expected": [
+            "Display low battery alarm with low priority."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test battery failure alarm when battery is absent or unchargeable",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery is absent or unchargeable"
+          ],
+          "inputs": {
+            "battery_presence": "Absent",
+            "chargeability": "Unchargeable",
+            "remaining_amount_history": "Any",
+            "computed_eta_minutes": "Any"
+          },
+          "steps": [
+            "Simulate battery sensor indicating absence or unchargeability.",
+            "Check battery presence and chargeability sensors."
+          ],
+          "expected": [
+            "Display battery failure alarm."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test boundary value at exactly 10 minutes for critically low battery alarm",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery is present",
+            "Battery is chargeable"
+          ],
+          "inputs": {
+            "battery_presence": "Present",
+            "chargeability": "Chargeable",
+            "remaining_amount_history": "Normal",
+            "computed_eta_minutes": 10
+          },
+          "steps": [
+            "Simulate battery sensor data indicating normal remaining amount.",
+            "Compute battery ETA from history.",
+            "Check if ETA equals 10 minutes."
+          ],
+          "expected": [
+            "Display critically low battery alarm with high priority."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test boundary value at exactly 30 minutes for low battery alarm",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery is present",
+            "Battery is chargeable"
+          ],
+          "inputs": {
+            "battery_presence": "Present",
+            "chargeability": "Chargeable",
+            "remaining_amount_history": "Normal",
+            "computed_eta_minutes": 30
+          },
+          "steps": [
+            "Simulate battery sensor data indicating normal remaining amount.",
+            "Compute battery ETA from history.",
+            "Check if ETA equals 30 minutes."
+          ],
+          "expected": [
+            "Display low battery alarm with low priority."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test alarm priority levels (low vs high)",
+          "req_ids": [
+            "RW-SW-123",
+            "RW-SW-125"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery is present",
+            "Battery is chargeable"
+          ],
+          "inputs": {
+            "battery_presence": "Present",
+            "chargeability": "Chargeable",
+            "remaining_amount_history": "Low",
+            "computed_eta_minutes": 5
+          },
+          "steps": [
+            "Simulate battery sensor data indicating low remaining amount.",
+            "Compute battery ETA from history.",
+            "Check alarm priority for low battery and critically low battery alarms."
+          ],
+          "expected": [
+            "Low battery alarm should have low priority.",
+            "Critically low battery alarm should have high priority."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.8889,
+        "hallucinated": [
+          {
+            "value": "Low",
+            "context": "remaining amount history state",
+            "grounded": false
+          },
+          {
+            "value": "Normal",
+            "context": "remaining amount history state",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 18,
+        "uncovered_clauses": [
+          "RW-SW-120",
+          "RW-SW-121"
+        ],
+        "weaknesses": [
+          "Missing tests for battery ETA computation logic (RW-SW-120).",
+          "Missing tests for sensor connectivity (RW-SW-121).",
+          "Tests use pre-set ETA values instead of verifying computed ETA.",
+          "Remaining amount history values \"Low\" and \"Normal\" are not defined in the SRS.",
+          "No test for battery failure alarm when battery is unavailable (not just absent/unchargeable)."
+        ],
+        "traceability": 0.625,
+        "untraced_reqs": [
+          "RW-SW-120",
+          "RW-SW-121",
+          "RW-SW-128"
+        ],
+        "fsa_score": 0.8533,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

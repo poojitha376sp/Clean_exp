@@ -1,0 +1,915 @@
+{
+  "unit_id": "U03_2",
+  "representation": "Sequence Diagrams",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "safety_critical",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Sequence Diagrams",
+    "group": 3,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.25,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "Medicines Not Available",
+        "context": "error message",
+        "grounded": false
+      },
+      {
+        "value": "Specimen Collection Failed",
+        "context": "error message",
+        "grounded": false
+      },
+      {
+        "value": "Lab Report Not Generated",
+        "context": "error message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 3,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Expected results are vague; add concrete assertions (status codes, data fields, messages).",
+      "Network latency test does not assert latency bounds; add timing assertions.",
+      "No verification that data is persisted correctly in databases.",
+      "Limited confidentiality test; verify sensitive data is not exposed.",
+      "Admin database population tests lack data validation; ensure updates reflect input data."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.5,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "@startuml\nactor Patient\nparticipant \"Prescription System\" as PS\nparticipant Chemist\nparticipant Lab\nparticipant Admin\n\n== TC-001: Prescription Received by Patient, Chemist, and Lab ==\nPatient -> PS: Submit Prescription\nPS -> Patient: Prescription Received\nPS -> Chemist: Prescription Received\nPS -> Lab: Prescription Received\n\n== TC-002: Chemist Provides Medicines via Offline Delivery ==\nPatient -> PS: Submit Prescription\nPS -> Chemist: Prescription Received\nChemist -> Chemist: Prepare Medicines\nChemist -> Patient: Medicines Delivered\n\n== TC-003: Lab Collects Specimen and Delivers Lab Report ==\nPatient -> PS: Submit Prescription\nPS -> Lab: Prescription Received\nLab -> Lab: Collect Specimen\nLab -> Lab: Generate Lab Report\nLab -> Patient: Lab Report Delivered\nLab -> PS: Update Lab Report\n\n== TC-004: Chemist and Lab Receive Limited Information ==\nPatient -> PS: Submit Prescription\nPS -> Chemist: Prescription Received (Limited Info)\nPS -> Lab: Prescription Received (Limited Info)\n\n== TC-005: Admin Populates Speciality Database ==\nAdmin -> PS: Populate Speciality Database\nPS -> PS: Speciality Database Updated\n\n== TC-006: Admin Links Specialities to Doctors ==\nAdmin -> PS: Link Specialities to Doctors\nPS -> PS: Doctor Database Updated\n\n== TC-007: Admin Populates Labs and Chemists Databases ==\nLab -> PS: Send Lab Data\nChemist -> PS: Send Chemist Data\nPS -> PS: Labs and Chemists Databases Updated\n\n== TC-008: Patient Registers into the System ==\nPatient -> PS: Register\nPS -> PS: Patient Registered\n\n== TC-009: Prescription Not Found Error ==\nPatient -> PS: Submit Prescription\nPS -> Chemist: Prescription Received\nChemist -> Chemist: Prepare Medicines\nChemist -> Patient: Medicines Not Available\n\n== TC-010: Specimen Collection Failed Error ==\nPatient -> PS: Submit Prescription\nPS -> Lab: Prescription Received\nLab -> Lab: Collect Specimen\nLab -> Patient: Specimen Collection Failed\n\n== TC-011: Lab Report Not Generated Error ==\nPatient -> PS: Submit Prescription\nPS -> Lab: Prescription Received\nLab -> Lab: Collect Specimen\nLab -> Lab: Generate Lab Report\nLab -> Patient: Lab Report Not Generated\n\n== TC-012: Network Latency Boundary Test ==\nPatient -> PS: Submit Prescription\nactivate PS\nactivate Chemist\nactivate Lab\nactivate Patient\n... Network Latency ...\nPS -> Chemist: Prescription Received\nChemist -> Chemist: Prepare Medicines\nChemist -> Patient: Medicines Delivered\nPS -> Lab: Prescription Received\nLab -> Lab: Collect Specimen\nLab -> Lab: Generate Lab Report\nLab -> Patient: Lab Report Delivered\ndeactivate Patient\ndeactivate Lab\ndeactivate Chemist\ndeactivate PS\n@enduml",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Prescription Received by Patient, Chemist, and Lab",
+      "req_ids": [
+        "VIRTUA-2.1-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient submits a prescription"
+      ],
+      "inputs": {
+        "prescription": "as specified"
+      },
+      "steps": [
+        "Patient submits prescription",
+        "System sends prescription to patient, chemist, and lab"
+      ],
+      "expected": [
+        "Patient, Chemist, and Lab receive prescription"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Chemist Provides Medicines via Offline Delivery",
+      "req_ids": [
+        "VIRTUA-2.1-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist receives prescription"
+      ],
+      "inputs": {
+        "prescription": "as specified"
+      },
+      "steps": [
+        "Chemist prepares medicines",
+        "Chemist delivers medicines to patient"
+      ],
+      "expected": [
+        "Patient receives medicines"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Lab Collects Specimen and Delivers Lab Report",
+      "req_ids": [
+        "VIRTUA-2.1-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Lab receives prescription"
+      ],
+      "inputs": {
+        "prescription": "as specified"
+      },
+      "steps": [
+        "Lab collects specimen",
+        "Lab generates lab report",
+        "Lab delivers lab report to patient",
+        "Lab updates lab report on system"
+      ],
+      "expected": [
+        "Patient receives lab report",
+        "Lab report updated on system"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Chemist and Lab Receive Limited Information",
+      "req_ids": [
+        "VIRTUA-2.1-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist and Lab receive prescription"
+      ],
+      "inputs": {
+        "prescription": "as specified"
+      },
+      "steps": [
+        "System sends limited prescription info to chemist and lab"
+      ],
+      "expected": [
+        "Chemist and Lab receive limited prescription info"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Admin Populates Speciality Database",
+      "req_ids": [
+        "VIRTUA-2.2-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin has speciality data"
+      ],
+      "inputs": {
+        "speciality_data": "as specified"
+      },
+      "steps": [
+        "Admin populates speciality database"
+      ],
+      "expected": [
+        "Speciality database updated"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Admin Links Specialities to Doctors",
+      "req_ids": [
+        "VIRTUA-2.2-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin has speciality and doctor data"
+      ],
+      "inputs": {
+        "speciality_doctor_data": "as specified"
+      },
+      "steps": [
+        "Admin links specialities to doctors"
+      ],
+      "expected": [
+        "Doctor database updated"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Admin Populates Labs and Chemists Databases",
+      "req_ids": [
+        "VIRTUA-2.2-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Labs and Chemists send data"
+      ],
+      "inputs": {
+        "lab_chemist_data": "as specified"
+      },
+      "steps": [
+        "Labs and Chemists send data to system",
+        "System updates labs and chemists databases"
+      ],
+      "expected": [
+        "Labs and chemists databases updated"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Patient Registers into the System",
+      "req_ids": [
+        "VIRTUA-2.2-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient has registration details"
+      ],
+      "inputs": {
+        "registration_details": "as specified"
+      },
+      "steps": [
+        "Patient registers into system"
+      ],
+      "expected": [
+        "Patient registered"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Medicines Not Available Error",
+      "req_ids": [
+        "VIRTUA-2.1-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Chemist receives prescription"
+      ],
+      "inputs": {
+        "prescription": "as specified"
+      },
+      "steps": [
+        "Chemist prepares medicines",
+        "Chemist delivers medicines to patient"
+      ],
+      "expected": [
+        "Patient receives 'Medicines Not Available' message"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Specimen Collection Failed Error",
+      "req_ids": [
+        "VIRTUA-2.1-3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Lab receives prescription"
+      ],
+      "inputs": {
+        "prescription": "as specified"
+      },
+      "steps": [
+        "Lab collects specimen",
+        "Lab generates lab report",
+        "Lab delivers lab report to patient"
+      ],
+      "expected": [
+        "Patient receives 'Specimen Collection Failed' message"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Lab Report Not Generated Error",
+      "req_ids": [
+        "VIRTUA-2.1-3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Lab receives prescription"
+      ],
+      "inputs": {
+        "prescription": "as specified"
+      },
+      "steps": [
+        "Lab collects specimen",
+        "Lab generates lab report",
+        "Lab delivers lab report to patient"
+      ],
+      "expected": [
+        "Patient receives 'Lab Report Not Generated' message"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Network Latency Boundary Test",
+      "req_ids": [
+        "VIRTUA-2.1-1",
+        "VIRTUA-2.1-2",
+        "VIRTUA-2.1-3"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Network latency is at boundary"
+      ],
+      "inputs": {
+        "prescription": "as specified"
+      },
+      "steps": [
+        "Patient submits prescription",
+        "System sends prescription to patient, chemist, and lab",
+        "Chemist prepares medicines",
+        "Chemist delivers medicines to patient",
+        "Lab collects specimen",
+        "Lab generates lab report",
+        "Lab delivers lab report to patient",
+        "Lab updates lab report on system"
+      ],
+      "expected": [
+        "Patient, Chemist, and Lab receive prescription",
+        "Patient receives medicines",
+        "Patient receives lab report",
+        "Lab report updated on system"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "@startuml\nactor Patient\nactor Chemist\nactor Lab\nactor Admin\nparticipant System\n\n== Prescription Reception ==\nPatient -> System: Submit Prescription\nSystem -> Chemist: Notify Prescription Received\nSystem -> Lab: Notify Prescription Received\n\n== Chemist Offline Delivery ==\nChemist -> System: Request Medicines\nSystem -> Chemist: Provide Medicines\nChemist -> Patient: Deliver Medicines Offline\n\n== Lab Specimen Collection and Report Delivery ==\nLab -> System: Request Specimen Collection\nSystem -> Patient: Notify Specimen Collection\nPatient -> Lab: Provide Specimen\nLab -> System: Submit Lab Report\nSystem -> Patient: Notify Lab Report Available\n\n== Admin Speciality and Doctor Database ==\nAdmin -> System: Populate Speciality Database\nAdmin -> System: Link Specialities to Doctors\nAdmin -> System: Populate Doctor Database\n\n== Patient Registration ==\nPatient -> System: Register\nSystem -> Patient: Confirm Registration\n\n== Error Handling ==\nalt Prescription Not Found\n    System -> Patient: Notify Prescription Not Found\nelse Medicines Not Available\n    Chemist -> Patient: Notify Medicines Not Available\nelse Specimen Collection Failed\n    Lab -> Patient: Notify Specimen Collection Failed\nelse Lab Report Not Generated\n    Lab -> Patient: Notify Lab Report Not Generated\nend\n\n@enduml",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Prescription Reception",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has submitted a prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "Patient submits prescription",
+            "System notifies Chemist and Lab"
+          ],
+          "expected": [
+            "Chemist and Lab receive prescription notification"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Chemist Offline Delivery",
+          "req_ids": [
+            "VIRTUA-2.1-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist has received prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "Chemist requests medicines",
+            "System provides medicines",
+            "Chemist delivers medicines offline"
+          ],
+          "expected": [
+            "Patient receives medicines offline"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Lab Specimen Collection and Report Delivery",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab has received prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "Lab requests specimen collection",
+            "System notifies patient",
+            "Patient provides specimen",
+            "Lab submits lab report",
+            "System notifies patient"
+          ],
+          "expected": [
+            "Patient receives lab report"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Admin Speciality and Doctor Database",
+          "req_ids": [
+            "VIRTUA-2.2-1",
+            "VIRTUA-2.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin has access to system"
+          ],
+          "inputs": {},
+          "steps": [
+            "Admin populates speciality database",
+            "Admin links specialities to doctors",
+            "Admin populates doctor database"
+          ],
+          "expected": [
+            "Speciality and doctor databases are populated"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Patient Registration",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has access to system"
+          ],
+          "inputs": {},
+          "steps": [
+            "Patient registers",
+            "System confirms registration"
+          ],
+          "expected": [
+            "Patient is registered in the system"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Prescription Not Found",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient has submitted a prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "Patient submits prescription",
+            "System does not find prescription"
+          ],
+          "expected": [
+            "Patient is notified that prescription is not found"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Medicines Not Available",
+          "req_ids": [
+            "VIRTUA-2.1-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist has received prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "Chemist requests medicines",
+            "System does not have medicines"
+          ],
+          "expected": [
+            "Chemist notifies patient that medicines are not available"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Specimen Collection Failed",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Lab has received prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "Lab requests specimen collection",
+            "Patient fails to provide specimen"
+          ],
+          "expected": [
+            "Lab notifies patient that specimen collection failed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Lab Report Not Generated",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Lab has received specimen"
+          ],
+          "inputs": {},
+          "steps": [
+            "Lab fails to generate lab report"
+          ],
+          "expected": [
+            "Lab notifies patient that lab report is not generated"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.8571428571428571,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "Prescription Not Found",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Medicines Not Available",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Specimen Collection Failed",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Lab Report Not Generated",
+            "context": "error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 4,
+        "uncovered_clauses": [
+          "VIRTUA-2.1-4",
+          "VIRTUA-2.2-3"
+        ],
+        "weaknesses": [
+          "Add tests for confidentiality constraint (2.1-4).",
+          "Add tests for populating labs and chemists databases (2.2-3).",
+          "Include concrete assertions such as specific messages or status codes.",
+          "Verify that chemist and lab only receive limited information.",
+          "Add boundary tests for network latency if applicable."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VIRTUA-2.1-4",
+          "VIRTUA-2.2-3"
+        ],
+        "fsa_score": 0.4543,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.4543; sub-scores {'clause_coverage': 0.8571428571428571, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-2.1-4', 'VIRTUA-2.2-3'] (add at least one each)\n- uncovered clause: VIRTUA-2.1-4\n- uncovered clause: VIRTUA-2.2-3\n- ungrounded value 'Prescription Not Found' (error message): remove or use the SRS value\n- ungrounded value 'Medicines Not Available' (error message): remove or use the SRS value\n- ungrounded value 'Specimen Collection Failed' (error message): remove or use the SRS value\n- ungrounded value 'Lab Report Not Generated' (error message): remove or use the SRS value\n- Add tests for confidentiality constraint (2.1-4).\n- Add tests for populating labs and chemists databases (2.2-3).\n- Include concrete assertions such as specific messages or status codes.\n- Verify that chemist and lab only receive limited information.\n- Add boundary tests for network latency if applicable.",
+      "artifact": "@startuml\nactor Patient\nparticipant \"Prescription System\" as PS\nparticipant Chemist\nparticipant Lab\nparticipant Admin\n\n== TC-001: Prescription Received by Patient, Chemist, and Lab ==\nPatient -> PS: Submit Prescription\nPS -> Patient: Prescription Received\nPS -> Chemist: Prescription Received\nPS -> Lab: Prescription Received\n\n== TC-002: Chemist Provides Medicines via Offline Delivery ==\nPatient -> PS: Submit Prescription\nPS -> Chemist: Prescription Received\nChemist -> Chemist: Prepare Medicines\nChemist -> Patient: Medicines Delivered\n\n== TC-003: Lab Collects Specimen and Delivers Lab Report ==\nPatient -> PS: Submit Prescription\nPS -> Lab: Prescription Received\nLab -> Lab: Collect Specimen\nLab -> Lab: Generate Lab Report\nLab -> Patient: Lab Report Delivered\nLab -> PS: Update Lab Report\n\n== TC-004: Chemist and Lab Receive Limited Information ==\nPatient -> PS: Submit Prescription\nPS -> Chemist: Prescription Received (Limited Info)\nPS -> Lab: Prescription Received (Limited Info)\n\n== TC-005: Admin Populates Speciality Database ==\nAdmin -> PS: Populate Speciality Database\nPS -> PS: Speciality Database Updated\n\n== TC-006: Admin Links Specialities to Doctors ==\nAdmin -> PS: Link Specialities to Doctors\nPS -> PS: Doctor Database Updated\n\n== TC-007: Admin Populates Labs and Chemists Databases ==\nLab -> PS: Send Lab Data\nChemist -> PS: Send Chemist Data\nPS -> PS: Labs and Chemists Databases Updated\n\n== TC-008: Patient Registers into the System ==\nPatient -> PS: Register\nPS -> PS: Patient Registered\n\n== TC-009: Prescription Not Found Error ==\nPatient -> PS: Submit Prescription\nPS -> Chemist: Prescription Received\nChemist -> Chemist: Prepare Medicines\nChemist -> Patient: Medicines Not Available\n\n== TC-010: Specimen Collection Failed Error ==\nPatient -> PS: Submit Prescription\nPS -> Lab: Prescription Received\nLab -> Lab: Collect Specimen\nLab -> Patient: Specimen Collection Failed\n\n== TC-011: Lab Report Not Generated Error ==\nPatient -> PS: Submit Prescription\nPS -> Lab: Prescription Received\nLab -> Lab: Collect Specimen\nLab -> Lab: Generate Lab Report\nLab -> Patient: Lab Report Not Generated\n\n== TC-012: Network Latency Boundary Test ==\nPatient -> PS: Submit Prescription\nactivate PS\nactivate Chemist\nactivate Lab\nactivate Patient\n... Network Latency ...\nPS -> Chemist: Prescription Received\nChemist -> Chemist: Prepare Medicines\nChemist -> Patient: Medicines Delivered\nPS -> Lab: Prescription Received\nLab -> Lab: Collect Specimen\nLab -> Lab: Generate Lab Report\nLab -> Patient: Lab Report Delivered\ndeactivate Patient\ndeactivate Lab\ndeactivate Chemist\ndeactivate PS\n@enduml",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Prescription Received by Patient, Chemist, and Lab",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient submits a prescription"
+          ],
+          "inputs": {
+            "prescription": "as specified"
+          },
+          "steps": [
+            "Patient submits prescription",
+            "System sends prescription to patient, chemist, and lab"
+          ],
+          "expected": [
+            "Patient, Chemist, and Lab receive prescription"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Chemist Provides Medicines via Offline Delivery",
+          "req_ids": [
+            "VIRTUA-2.1-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist receives prescription"
+          ],
+          "inputs": {
+            "prescription": "as specified"
+          },
+          "steps": [
+            "Chemist prepares medicines",
+            "Chemist delivers medicines to patient"
+          ],
+          "expected": [
+            "Patient receives medicines"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Lab Collects Specimen and Delivers Lab Report",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab receives prescription"
+          ],
+          "inputs": {
+            "prescription": "as specified"
+          },
+          "steps": [
+            "Lab collects specimen",
+            "Lab generates lab report",
+            "Lab delivers lab report to patient",
+            "Lab updates lab report on system"
+          ],
+          "expected": [
+            "Patient receives lab report",
+            "Lab report updated on system"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Chemist and Lab Receive Limited Information",
+          "req_ids": [
+            "VIRTUA-2.1-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist and Lab receive prescription"
+          ],
+          "inputs": {
+            "prescription": "as specified"
+          },
+          "steps": [
+            "System sends limited prescription info to chemist and lab"
+          ],
+          "expected": [
+            "Chemist and Lab receive limited prescription info"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Admin Populates Speciality Database",
+          "req_ids": [
+            "VIRTUA-2.2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin has speciality data"
+          ],
+          "inputs": {
+            "speciality_data": "as specified"
+          },
+          "steps": [
+            "Admin populates speciality database"
+          ],
+          "expected": [
+            "Speciality database updated"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin Links Specialities to Doctors",
+          "req_ids": [
+            "VIRTUA-2.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin has speciality and doctor data"
+          ],
+          "inputs": {
+            "speciality_doctor_data": "as specified"
+          },
+          "steps": [
+            "Admin links specialities to doctors"
+          ],
+          "expected": [
+            "Doctor database updated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Admin Populates Labs and Chemists Databases",
+          "req_ids": [
+            "VIRTUA-2.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Labs and Chemists send data"
+          ],
+          "inputs": {
+            "lab_chemist_data": "as specified"
+          },
+          "steps": [
+            "Labs and Chemists send data to system",
+            "System updates labs and chemists databases"
+          ],
+          "expected": [
+            "Labs and chemists databases updated"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient Registers into the System",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has registration details"
+          ],
+          "inputs": {
+            "registration_details": "as specified"
+          },
+          "steps": [
+            "Patient registers into system"
+          ],
+          "expected": [
+            "Patient registered"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Medicines Not Available Error",
+          "req_ids": [
+            "VIRTUA-2.1-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist receives prescription"
+          ],
+          "inputs": {
+            "prescription": "as specified"
+          },
+          "steps": [
+            "Chemist prepares medicines",
+            "Chemist delivers medicines to patient"
+          ],
+          "expected": [
+            "Patient receives 'Medicines Not Available' message"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Specimen Collection Failed Error",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Lab receives prescription"
+          ],
+          "inputs": {
+            "prescription": "as specified"
+          },
+          "steps": [
+            "Lab collects specimen",
+            "Lab generates lab report",
+            "Lab delivers lab report to patient"
+          ],
+          "expected": [
+            "Patient receives 'Specimen Collection Failed' message"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Lab Report Not Generated Error",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Lab receives prescription"
+          ],
+          "inputs": {
+            "prescription": "as specified"
+          },
+          "steps": [
+            "Lab collects specimen",
+            "Lab generates lab report",
+            "Lab delivers lab report to patient"
+          ],
+          "expected": [
+            "Patient receives 'Lab Report Not Generated' message"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Network Latency Boundary Test",
+          "req_ids": [
+            "VIRTUA-2.1-1",
+            "VIRTUA-2.1-2",
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Network latency is at boundary"
+          ],
+          "inputs": {
+            "prescription": "as specified"
+          },
+          "steps": [
+            "Patient submits prescription",
+            "System sends prescription to patient, chemist, and lab",
+            "Chemist prepares medicines",
+            "Chemist delivers medicines to patient",
+            "Lab collects specimen",
+            "Lab generates lab report",
+            "Lab delivers lab report to patient",
+            "Lab updates lab report on system"
+          ],
+          "expected": [
+            "Patient, Chemist, and Lab receive prescription",
+            "Patient receives medicines",
+            "Patient receives lab report",
+            "Lab report updated on system"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.25,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "Medicines Not Available",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Specimen Collection Failed",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Lab Report Not Generated",
+            "context": "error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 3,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Expected results are vague; add concrete assertions (status codes, data fields, messages).",
+          "Network latency test does not assert latency bounds; add timing assertions.",
+          "No verification that data is persisted correctly in databases.",
+          "Limited confidentiality test; verify sensitive data is not exposed.",
+          "Admin database population tests lack data validation; ensure updates reflect input data."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.5,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

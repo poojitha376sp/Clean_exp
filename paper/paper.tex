@@ -8,6 +8,12 @@
 \usepackage{cite}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,positioning}
+\definecolor{pnavy}{HTML}{0E2A47}
+\definecolor{pteal}{HTML}{356170}
+\definecolor{pgold}{HTML}{B5842A}
 
 \newcommand{\eg}{e.g.,\ }
 \newcommand{\ie}{i.e.,\ }
@@ -181,7 +187,7 @@ concrete rather than asserted.
 \caption{The six representation paradigms (30 representations total)}
 \label{tab:paradigms}
 \small
-\begin{tabular}{@{}p{0.34\linewidth}p{0.58\linewidth}@{}}
+\begin{tabular}{@{}p{0.40\linewidth}p{0.52\linewidth}@{}}
 \toprule
 \textbf{Paradigm} & \textbf{Representative forms} \\
 \midrule
@@ -241,7 +247,24 @@ which is precisely what Gate 1 is designed to catch.
 Every generated suite passes through three gates in sequence, each with a
 fixed, pre-registered threshold; thresholds below are exactly what the
 pipeline implementation enforces, not an idealized or aspirational version of
-the design.
+the design. Table~\ref{tab:gates} summarizes the three gates before the
+formulas and thresholds are given in full.
+
+\begin{table}[t]
+\centering
+\caption{The three gates at a glance}
+\label{tab:gates}
+\small
+\begin{tabular}{@{}p{0.15\linewidth}p{0.18\linewidth}p{0.59\linewidth}@{}}
+\toprule
+\textbf{Gate} & \textbf{Threshold} & \textbf{What it checks} \\
+\midrule
+Gate 1: RSS & $\geq 0.60$ & Is the chosen test-case representation actually suited to this requirement's kind of behaviour? \\
+Gate 2: SFV & $\geq 0.60$ & Is the generated suite syntactically well formed, both as canonical JSON and in its chosen notation? \\
+Gate 3: FSA + $M_g$ & $\geq 0.50$ & Does the suite cover the right clauses, including negative and boundary cases, with precise oracles and values grounded in the requirement text? \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \textbf{Gate 1: Representational Suitability (RSS).} Before any test is
 generated, the model must choose, or be offered, a representation for the
@@ -253,20 +276,90 @@ where $M_1$ is concern alignment (does the representation match the kind of
 property the requirement describes), $M_2$ is abstraction-level alignment,
 $M_3$ penalizes unnecessary representational complexity (Occam's razor), and
 $M_4$ scores whether the representation is one an LLM can plausibly generate
-correctly. An extended ten-metric form with six system-profile-specific
-weight sets (standard, safety-critical, rapid-prototyping, data-pipeline,
-distributed-concurrent, interaction-heavy) is available for domain-specific
-weighting. \textbf{Threshold: RSS $\geq 0.60$}, with up to three re-picks
+correctly. An extended ten-metric form adds six further metrics,
+$M_5$ to $M_{10}$ (Table~\ref{tab:extmetrics}), reweighted under six
+system-profile-specific weight sets (standard, safety-critical,
+rapid-prototyping, data-pipeline, distributed-concurrent,
+interaction-heavy) for domain-specific weighting. Each requirement's
+system profile is inferred automatically from its text; in the benchmark,
+248 of 496 suites were scored under the standard profile and the
+remaining 248 split across the other five, so the extended metrics are
+not a dormant option but an active part of roughly half the reported
+results. \textbf{Threshold: RSS $\geq 0.60$}, with up to three re-picks
 before the pipeline falls back to a default representation.
 
+\begin{table}[t]
+\centering
+\caption{The six metrics added under the extended RSS form ($M_5$-$M_{10}$)}
+\label{tab:extmetrics}
+\small
+\begin{tabular}{@{}p{0.20\linewidth}p{0.75\linewidth}@{}}
+\toprule
+\textbf{Metric} & \textbf{What it scores} \\
+\midrule
+$M_5$ Oracle Executability & Can a test runner execute the suite's assertions automatically, without adapter code or a human in the loop. \\
+$M_6$ Traceability Density & How directly each generated test maps back to one specific requirement clause. \\
+$M_7$ Cognitive Auditability & Whether a human reviewer can read a test and spot a hallucinated value at a glance. \\
+$M_8$ Change Fragility & Whether a small requirement edit needs only a localized change to the suite, rather than breaking the whole model. \\
+$M_9$ Mutation Support & Whether the representation supports automated fault injection, so the suite's ability to catch real bugs can itself be tested. \\
+$M_{10}$ Standards and Compliance Fit & Whether the representation is an officially recognized formal model for the applicable safety-certification standard (e.g.\ ISO~26262, DO-178C); capped at 0.65 outside safety-critical systems. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \textbf{Gate 2: Syntactic Form Validity (SFV).} Once a suite is generated,
-a representation-specific parser checks whether it is well-formed:
+SFV checks two things separately and blends them evenly:
 \begin{equation}
-\mathrm{SFV} = \frac{\text{syntactically correct elements}}{\text{total elements}}.
+\mathrm{SFV} = 0.5\,S_{\text{schema}} + 0.5\,S_{\text{repr}}.
 \end{equation}
-\textbf{Threshold: SFV $\geq 0.60$} (code-format suites are held to
-effectively 1.00, since a syntax error there means the suite does not run at
-all).
+$S_{\text{schema}}$ is the fraction of canonical test cases that validate
+against the pipeline's JSON schema, meaning every required field is
+present, case ids are unique, and every \texttt{req\_id} the case cites
+traces to a requirement actually present in the unit. $S_{\text{repr}}$ is
+a family-specific syntax check of the representation artifact itself,
+routed by the suite's \emph{actual} representation group rather than one
+generic parser applied to everything. Gherkin suites are parsed with the
+official Gherkin grammar (0.0 on a parse error, 0.4 if it parses but
+declares no \texttt{Scenario}, 0.8-1.0 depending on step density);
+Programmatic/Code-level suites are checked with Python's \texttt{ast}
+parser plus the presence of test functions and assertions;
+Stateful/Transitions suites are scored on five structural signals
+(declared states, an initial state, at least two transitions,
+events/guards, and balanced brackets); Scenario/Behavioral suites that are
+not Gherkin, such as use cases and user stories, are scored on four
+signals (a named actor, a main flow, at least one alternative or
+exception flow, and numbered steps); Concurrency/Interaction,
+Logical/Combinatorial, and Formal/Symbolic/Contract suites each get an
+analogous family-specific structural check (arrow and participant markers
+for sequence diagrams, consistent column counts and separator rows for
+decision tables, relational operators and matrix-like rows for symbolic
+notations). A suite passes Gate 2 only if $S_{\text{schema}} = 1.0$
+\emph{and} $S_{\text{repr}}$ separately clears a per-group threshold
+(Table~\ref{tab:sfvthresh}); a perfect schema score cannot compensate for
+a failing representation score, or vice versa. \textbf{Threshold: SFV
+$\geq 0.60$} by default, tightened to $\geq 0.70$ for
+Stateful/Transitions and Formal/Symbolic/Contract suites, and to $1.00$
+for Programmatic/Code-level suites, since a syntax error there means the
+suite does not run at all.
+
+\begin{table}[t]
+\centering
+\caption{Gate 2 representation-score threshold by paradigm group}
+\label{tab:sfvthresh}
+\small
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Paradigm group (Table~\ref{tab:paradigms})} & \textbf{$S_{\text{repr}}$ threshold} \\
+\midrule
+Scenario/Behavioral & $\geq 0.60$ \\
+Stateful/Transitions & $\geq 0.70$ \\
+Concurrency/Interaction & $\geq 0.60$ \\
+Logical/Combinatorial & $\geq 0.60$ \\
+Programmatic/Code-level & $\geq 1.00$ \\
+Formal/Symbolic/Contract & $\geq 0.70$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \textbf{Gate 3: Functional Semantic Adequacy with Groundedness (FSA+$M_g$).}
 Suites that clear Gates 1 and 2 are reviewed by a frontier-model judge along four
@@ -275,7 +368,7 @@ adequacy dimensions plus groundedness:
 \mathrm{FSA} = w_c C_{\text{clause}} + w_n C_{\text{neg}} + w_o A_{\text{oracle}} + w_b C_{\text{bound}} + w_g M_g,
 \end{equation}
 with standard-profile weights $w_c=0.30$ (clause coverage), $w_n=0.20$
-(negative-path coverage), $w_o=0.15$ (oracle precision), $w_b=0.20$
+(negative-path coverage), $w_o=0.15$ (oracle assertiveness), $w_b=0.20$
 (boundary-case coverage), $w_g=0.15$ (groundedness), and six system profiles
 analogous to Gate 1. Groundedness itself is
 \begin{equation}
@@ -289,7 +382,27 @@ full pipeline is shown in Fig.~\ref{fig:pipeline}.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{fig/pipeline.pdf}
+\begin{tikzpicture}[
+  box/.style={rectangle, rounded corners=2pt, text=white, align=center,
+    text width=2.15cm, minimum height=2.5cm, inner sep=3pt, font=\scriptsize},
+  node distance=0.32cm
+]
+\node[box, fill=pnavy] (s01) {\textbf{S0 to S1}\\[2pt]{\small\textbf{Ingest +}}\\{\small\textbf{Extract}}\\[2pt]\tiny parse SRS text into atomic requirement clauses};
+\node[box, fill=pteal, right=of s01] (g1) {\textbf{GATE 1}\\[2pt]{\small\textbf{RSS}}\\[2pt]\tiny weighted suitability score; pass $\geq 0.60$, up to 3 re-picks};
+\node[box, fill=pnavy, right=of g1] (s3) {\textbf{S3}\\[2pt]{\small\textbf{Generate}}\\[2pt]\tiny produce test suite in the chosen representation};
+\node[box, fill=pteal, right=of s3] (g2) {\textbf{GATE 2}\\[2pt]{\small\textbf{SFV}}\\[2pt]\tiny syntax validity ratio; pass $\geq 0.60$};
+\node[box, fill=pteal, right=of g2] (g3) {\textbf{GATE 3}\\[2pt]{\small\textbf{FSA + $M_g$}}\\[2pt]\tiny weighted adequacy plus groundedness; pass $\geq 0.50$};
+\node[box, fill=pgold, right=of g3] (s6) {\textbf{S6}\\[2pt]{\small\textbf{Execute +}}\\{\small\textbf{Audit}}\\[2pt]\tiny run suite against real code; LLM audits code match};
+\node[box, fill=pnavy, right=of s6] (s7) {\textbf{S7}\\[2pt]{\small\textbf{Report}}\\[2pt]\tiny aggregate suite and corpus level statistics};
+
+\foreach \a/\b in {s01/g1, g1/s3, s3/g2, g2/g3, g3/s6, s6/s7}
+  \draw[-{Stealth[length=2mm]}, thick, gray!70!black] (\a.east) -- (\b.west);
+
+\coordinate (dropg3) at ($(g3.south)+(0,-0.55cm)$);
+\coordinate (drops3) at ($(s3.south)+(0,-0.55cm)$);
+\draw[-{Stealth[length=2mm]}, thick, pgold] (g3.south) -- (dropg3) -- (drops3) -- (s3.south);
+\node[below, font=\scriptsize\bfseries, text=pgold] at ($(dropg3)!0.5!(drops3)$) {closed-loop repair (up to 3 attempts)};
+\end{tikzpicture}
 \caption{The requirement-to-test pipeline: extraction, the three gates in
 sequence with their exact formulas and thresholds as implemented, closed-loop
 repair on Gate-3 failure, then execution/audit against the real
@@ -308,6 +421,52 @@ followed the more demanding, unimplemented thresholds would misrepresent the
 very results it reports, an error of exactly the kind this paper is
 arguing the field should stop making silently.
 
+\subsection{Prompt Design}
+\label{sec:prompts}
+Every prompt used in the pipeline is a plain text template with explicit
+placeholders, stored and versioned separately from the pipeline code, so that
+what a model was actually asked is always directly inspectable rather than
+reconstructed from code. Table~\ref{tab:prompts} gives the abbreviated form of
+the three prompts most central to this paper's argument: the representation
+choice prompt (Gate 1), the generation prompt (Stage S3), and the judge
+prompt (Gate 3). Full prompt text is included in the project repository.
+
+\begin{table*}[t]
+\centering
+\caption{Abbreviated prompt templates for the stages central to this paper (placeholders shown as \texttt{\{\{FIELD\}\}})}
+\label{tab:prompts}
+\small
+\begin{tabular}{@{}p{0.17\linewidth}p{0.17\linewidth}p{0.61\linewidth}@{}}
+\toprule
+\textbf{Prompt} & \textbf{Used at} & \textbf{Abbreviated template} \\
+\midrule
+\texttt{select\_reps.txt} & Gate 1 (representation choice) &
+\texttt{"Choose the test-case representations best suited to the requirements below.} \newline
+\texttt{REQUIREMENTS: \{\{REQS\}\}\ \ DEPENDENCIES: \{\{DEPS\}\}\ \ AVAILABLE REPRESENTATIONS: \{\{CATALOG\}\}} \newline
+\texttt{Pick the \{\{K\}\} most suitable, judged by concern alignment, abstraction level, simplicity, and LLM feasibility.} \newline
+\texttt{Respond with ONLY a JSON object: \{"selected": [\{"representation": ..., "covers": [...], "reason": ...\}]\}"} \\
+\addlinespace
+\texttt{generate.txt} & Stage S3 (test generation) &
+\texttt{"Write a complete test suite for the requirements below in the representation \{\{REP\}\}.} \newline
+\texttt{REQUIREMENTS: \{\{REQS\}\}\ \ DEPENDENCIES (context only): \{\{DEPS\}\}\ \ SUFFICIENCY CRITERIA: \{\{CHECKLIST\}\}} \newline
+\texttt{The suite will be scored on: syntactic validity; clause coverage; negative and boundary paths; oracle assertiveness; groundedness (every concrete value must come from the requirement text, never invented).} \newline
+\texttt{Output exactly two fenced blocks: the artifact in \{\{REP\}\} notation, and the same cases as canonical JSON."} \\
+\addlinespace
+\texttt{fsa\_judge.txt} & Gate 3 (semantic adequacy judge) &
+\texttt{"You are an independent test-quality evaluator. You did NOT write the suite below. Score it strictly against the SRS requirements, and check every concrete value for hallucination.} \newline
+\texttt{REQUIREMENTS (ground truth): \{\{REQS\}\}\ \ ARTIFACT: \{\{ARTIFACT\}\}\ \ CANONICAL CASES: \{\{TESTCASES\}\}} \newline
+\texttt{Score clause\_coverage, negative\_coverage, oracle\_assertiveness, boundary\_coverage in [0,1]; for every concrete element asserted, decide "grounded": true/false by entailment against the SRS text.} \newline
+\texttt{Respond with ONLY a JSON object: \{"clause\_coverage": ..., ..., "concrete\_elements": [\{"value": ..., "grounded": ...\}], "weaknesses": [...]\}"} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The judge prompt (\texttt{fsa\_judge.txt}) is the one most relevant to
+Section~\ref{sec:validity}: it instructs the judge to decide, value by value,
+whether a concrete number, name, or state asserted in the suite is actually
+entailed by the requirement text, which is exactly the groundedness check
+later found to disagree so often with what execution against real code shows.
+
 \section{Experimental Setup}
 \label{sec:setup}
 
@@ -315,7 +474,8 @@ arguing the field should stop making silently.
 Candidate models were narrowed from an initial pool of 65 through a
 four-stage funnel: licensing/recency screening (65$\rightarrow$31$\rightarrow$29),
 hardware feasibility by VRAM and context length (29$\rightarrow$22), capability
-and benchmark screening (22$\rightarrow$16), and a final SOTA/diversity pass
+and benchmark screening (22$\rightarrow$16), and a final state-of-the-art
+(SOTA)/diversity pass
 (16$\rightarrow$14), yielding 12 open-weight models plus two closed-source
 controls (GPT-4o, Claude 3.5 Sonnet) intended as reference points.
 
@@ -361,7 +521,8 @@ generation.
 \begin{table}[t]
 \centering
 \caption{Mean adequacy by model, doorstop case study (same units for every
-model; $n=4$ suites/model)}
+model; $n=4$ suites/model). G2 and G3 are the Gate 2 (SFV) and Gate 3 (FSA)
+pass rates; ``both'' is the share of suites passing both gates.}
 \label{tab:doorstop}
 \small
 \begin{tabular}{@{}lrrrr@{}}
@@ -396,14 +557,15 @@ where every model attempted the same four suites), Llama-3.1-8B is the
 clearest overall performer (FSA 0.73, both-gates 100\%) and CodeGemma-7B the
 weakest among models that passed Gate 1 at all (FSA 0.47, both-gates 25\%).
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{fig/fsa_by_model.pdf}
-\caption{Mean FSA per model, pooled across all three case studies. Sample
-sizes vary sharply by model (6 to 61 judged suites); see text for why this
-figure alone should not be read as a leaderboard.}
+\includegraphics[width=\textwidth]{fig/fsa_by_model.pdf}
+\caption{Mean FSA per model, pooled across all three case studies, with the
+number of judged suites each mean is computed over. Sample sizes vary sharply
+by model (6 to 61 judged suites); see text for why this figure alone should
+not be read as a leaderboard.}
 \label{fig:fsa-model}
-\end{figure}
+\end{figure*}
 
 Two comparisons that a practitioner might expect to predict quality do not:
 model size (Spearman $\rho(\text{parameters}, \text{FSA})=-0.015$, $n=311$)
@@ -438,7 +600,9 @@ automatically an adequate one.
 
 \begin{table}[t]
 \centering
-\caption{Gate outcomes by representation ($n \geq 15$ suites)}
+\caption{Gate outcomes by representation ($n \geq 15$ suites; $n$ = suites
+generated in that representation; ``both-pass'' = share passing both
+Gate 2 and Gate 3)}
 \label{tab:byrepr}
 \small
 \begin{tabular}{@{}lrrrr@{}}
@@ -457,13 +621,13 @@ UML Testing Profile (UTP) & 15 & 0.92 & 27\% & 0.58 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{fig/fsa_by_repr_group.pdf}
+\includegraphics[width=\textwidth]{fig/fsa_by_repr_group.pdf}
 \caption{Mean FSA and both-gates pass rate by representation paradigm, pooled
 across all models and case studies.}
 \label{fig:fsa-repr}
-\end{figure}
+\end{figure*}
 
 Closed-loop repair is effective where it is invoked: 207 of the 496 suites
 were repaired after an initial Gate-3 failure, with a mean FSA gain of
@@ -500,18 +664,28 @@ execute correctly.
 doorstop (ventilator and virtual\_clinic lack an automatable test harness in
 this study), the other two case studies instead rely on an LLM-judge
 \emph{code audit}: the same judge model is shown retrieved code excerpts and
-asked whether each test's assertions hold against the real implementation.
-On the subset of doorstop suites where both execution and audit results are
-available ($n=11$), \textbf{the audit agrees with real execution only 18\% of
-the time}. This is the single most important caveat on every audit-based
-result reported for ventilator and virtual\_clinic elsewhere in this paper
-and in the underlying analysis report: audit mode should be read as a weak,
-frequently-wrong proxy for ground truth, not a substitute for execution.
-Separately, across all three case studies, the audit flagged 173 individual
-test cases as contradicting the real implementation (\texttt{code\_mismatch}
-or an explicit \texttt{violated} verdict), a number that, given the 18\%
-agreement rate just reported, should be treated as a rough signal requiring
-manual confirmation, not a verified defect count.
+asked, for each test case, to return one of four verdicts describing whether
+the code's behaviour matches the test's expectation: \texttt{satisfied}, the
+code does what the test expects; \texttt{violated}, the code implements the
+feature but disagrees with the expectation; \texttt{not\_implemented}, the
+feature is absent; or \texttt{unclear}, the retrieved excerpt is insufficient
+to tell. (On doorstop, actually running a test and seeing it fail triggers a
+separate, three-way triage of \emph{why} it failed, by the same judge model:
+\texttt{code\_mismatch}, the implementation disagrees with the requirement;
+\texttt{test\_bug}, the generated test itself is wrong; or
+\texttt{spec\_ambiguous}, the requirement does not clearly settle the
+question.) On the subset of doorstop suites where both execution and audit
+results are available ($n=11$), \textbf{the audit agrees with real execution
+only 18\% of the time}. This is the single most important caveat on every
+audit-based result reported for ventilator and virtual\_clinic elsewhere in
+this paper and in the underlying analysis report: audit mode should be read
+as a weak, frequently-wrong proxy for ground truth, not a substitute for
+execution. Separately, across all three case studies, the audit flagged 190
+individual test cases as contradicting the real implementation, combining an
+audit \texttt{violated} verdict with, on the executed doorstop suites, an
+execution-triage \texttt{code\_mismatch} verdict; given the 18\% agreement
+rate just reported, this combined count should be treated as a rough signal
+requiring manual confirmation, not a verified defect count.
 
 \textbf{Representation-choice agreement.} As noted in
 Section~\ref{sec:results}, a model's own Gate-1 pick of representation agrees
@@ -633,32 +807,160 @@ our benchmark are drawn from model families documented in
 \cite{li2023starcoder,deepseek2024coderv2}, with general LLM behaviour and
 instruction-tuning background from \cite{chen2023chatgpt,ouyang2022instructgpt}.
 
-\section{Conclusion and Future Work}
+\section{Conclusion}
 
 We set out to build a careful, multi-gate alternative to text-similarity
 metrics for evaluating LLM-generated, requirement-derived test suites, and
 benchmarked it across 10 models and three real SRS/implementation pairs. The
 resulting comparative findings, that model size and code specialization do
 not predict adequacy while representation choice does, are useful on their
-own. But
-the paper's central result is that the pipeline's own gate-passing, checked
-against real execution, a code audit, and an independent heuristic, agrees
-with ground truth far less often than its pass rates alone would suggest.
-We report this as a finding about the field's current direction, not only
-about our own pipeline: as LLM-as-judge evaluation becomes the default
+own. But the paper's central result is that the pipeline's own gate-passing,
+checked against real execution, a code audit, and an independent heuristic,
+agrees with ground truth far less often than its pass rates alone would
+suggest. We report this as a finding about the field's current direction, not
+only about our own pipeline: as LLM-as-judge evaluation becomes the default
 replacement for text-similarity metrics in test generation research, it needs
 to be held to the same standard it was introduced to meet, with
 execution-grounded validity checks reported as a matter of course rather than
 as an afterthought.
 
-Future work on this project proceeds in two directions motivated directly by
-Section~\ref{sec:validity}: first, formalizing the dependency-type-to-
-representation mapping rules that Section~\ref{sec:results} shows matter more
-than model choice, so that representation selection can be made less
-heuristic; and second, extending real test execution (rather than the
-weaker audit proxy) to the ventilator and virtual\_clinic case studies, to
-determine whether the 18\% audit-execution agreement observed on doorstop
-generalizes or was specific to that codebase.
+\section{Planned Changes}
+\label{sec:future}
+
+Table~\ref{tab:gaps} collects, in one place, every validity gap this paper
+measured and the specific change we plan to make in response to it. Each row
+names the evidence (already reported in Section~\ref{sec:validity}) rather
+than repeating it, so this table should be read as a punch list rather than a
+new set of claims.
+
+\begin{table*}[t]
+\centering
+\caption{Every validity gap measured in this paper, and the planned change addressing it}
+\label{tab:gaps}
+\small
+\begin{tabular}{@{}p{0.27\linewidth}p{0.33\linewidth}p{0.33\linewidth}@{}}
+\toprule
+\textbf{Gap} & \textbf{Evidence (Section~\ref{sec:validity})} & \textbf{Planned change} \\
+\midrule
+Gate-passing does not predict execution success & 1 to 2 of 148 to 315 generated doorstop tests actually pass; $\rho=0.433$ between FSA and execution pass rate, $n=15$ &
+Report an execution-grounded pass rate alongside every gate score, not only on doorstop (see ``Full Execution Coverage'' below) \\
+\addlinespace
+Code audit is an unreliable stand-in for execution & Audit agrees with real execution only 18\% of the time ($n=11$) &
+Replace audit-only results for ventilator and virtual\_clinic with real execution, and report audit-execution agreement per project rather than assuming it transfers \\
+\addlinespace
+Representation choice is not accountable to an external standard & Model's own Gate-1 pick agrees with the independent RSS heuristic's top-3 only 20\% of the time &
+Formalize explicit dependency-type-to-representation mapping rules (see ``Representation Mapping Rules'' below) rather than leaving the mapping heuristic \\
+\addlinespace
+Groundedness can hide inside a passing adequacy score & 243 of 496 suites (49\%) assert an ungrounded value; 22 of 61 Gate-3-passing suites have $M_g<0.5$ &
+Promote groundedness from a weighted FSA component to its own independently thresholded gate \\
+\addlinespace
+Evaluation stops at a single requirement unit & Every suite in this study covers one unit of up to 8 requirements in isolation; no end-to-end, interaction, failure, or quality-attribute coverage is measured &
+Extend the framework to system-level testing with an explicit, multi-dimensional coverage denominator (see ``System-Level Test Generation'' below) \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Representation Mapping Rules}
+The 20\% agreement between a model's free Gate-1 choice and the independent
+RSS heuristic (Section~\ref{sec:validity}) shows the two views of
+``suitable representation'' are, at present, only loosely connected. We plan
+to formalize explicit mapping rules from requirement dependency type (state,
+interaction, data, concurrency, as used in the RSS heuristic itself) to a
+short ranked list of representations, so that representation selection is
+governed by a documented, inspectable rule set rather than left to either an
+LLM's free choice or a keyword heuristic alone.
+
+\subsection{Full Execution Coverage}
+Real execution in this study was only feasible for doorstop; ventilator and
+virtual\_clinic results rely on the weaker audit proxy, which
+Section~\ref{sec:validity} shows agrees with execution only 18\% of the time
+on the one case study where both are available. The next iteration of this
+work builds an automatable execution harness for both remaining case studies,
+so that the 18\% audit-execution agreement figure can either be confirmed as
+a general property of this evaluation approach or shown to be specific to
+doorstop.
+
+\subsection{System-Level Test Generation}
+\label{sec:sysleveltesting}
+Every suite reported in this paper covers exactly one requirement unit, up to
+8 requirements drawn from a single SRS section, in isolation. Nothing in the
+current framework exercises a flow that spans multiple units, a dependency
+between two separately specified requirements, an environment or component
+failure, or a quality attribute (latency, throughput, reliability) that only
+manifests across the running system rather than inside one function. Closing
+this gap is the most structurally different piece of planned work, since it
+requires a ground-truth structure the current unit-level canonical schema
+(Section~\ref{sec:framework}) does not provide: an explicit coverage
+denominator at the system level, analogous to what traceability already gives
+at the unit level.
+
+We are evaluating two candidate ground-truth formats for this purpose, shown
+in Fig.~\ref{fig:sysgt} and summarized below.
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  dimbox/.style={rectangle, rounded corners=2pt, text=white, align=center,
+    text width=3.6cm, minimum height=2.3cm, inner sep=4pt, font=\small},
+  node distance=0.4cm
+]
+\node[dimbox, fill=pteal] (d1) {\textbf{D1: End-to-end}\\[3pt]\footnotesize flow . interface . input class . name\\[3pt]\textcolor{pgold!60!white}{\textbf{104 cells}}};
+\node[dimbox, fill=pnavy, right=of d1] (d2) {\textbf{D2: Interaction}\\[3pt]\footnotesize req A . req B . dependency type . variant\\[3pt]\textcolor{pgold!60!white}{\textbf{24 cells}}};
+\node[dimbox, fill=pteal, right=of d2] (d3) {\textbf{D3: Environment failure}\\[3pt]\footnotesize dependency . failure type . phase\\[3pt]\textcolor{pgold!60!white}{\textbf{24 cells}}};
+\node[dimbox, fill=pnavy, right=of d3] (d4) {\textbf{D4: Quality attributes}\\[3pt]\footnotesize attribute . test at (below / at / above)\\[3pt]\textcolor{pgold!60!white}{\textbf{37 cells}}};
+\coordinate (rowmid) at ($(d1.south)!0.5!(d4.south)$);
+\node[below=0.5cm of rowmid, font=\small, text width=15.5cm, align=center] (inv)
+  {Every cell carries a composite id, for example \texttt{E2E.F01.web-ui.negative.add-duplicate},
+  and appears once in a shared \textbf{Core} record (preconditions, steps, expected result, test data)
+  and once in a shared \textbf{Inventory} line (requirement references, the coverage denominator),
+  the sync rule that makes system-level coverage mechanically checkable.};
+\end{tikzpicture}
+\caption{The four coverage dimensions of the structured ground-truth
+candidate for planned system-level testing (Section~\ref{sec:sysleveltesting}),
+with the pilot inventory's cell count per dimension (189 cells total).}
+\label{fig:sysgt}
+\end{figure*}
+
+\textbf{Candidate 1: a structured, dimension-based schema.} Every test is one
+cell addressed by a composite id, for example
+\texttt{E2E.F01.web-ui.negative.add-duplicate}, decomposing into a flow, an
+interface, an input class, and a name. Each cell appears in three places: a
+core record (preconditions, steps with an expected result per step, test
+data), a dimension-specific record (one of D1 end-to-end, D2 interaction
+between two requirements, D3 environment or component failure, or D4 a
+quality attribute tested below, at, or above its threshold), and an inventory
+line carrying the requirement references that cell covers. A sync rule, every
+cell id appears exactly once in the core, once in its dimension, and once in
+the inventory, makes system-level coverage mechanically checkable the same
+way unit-level traceability already is in this paper's framework (a pilot
+inventory built this way holds 189 cells across the four dimensions).
+
+\textbf{Candidate 2: an industrial, spreadsheet-style sheet.} A simpler
+alternative closer to common ISO/IEC/IEEE 29119 (the international software
+testing standard) style test-case documentation:
+one row per test, with id, name, requirement links, precondition, steps,
+expected result, postcondition, and use case as columns, plus a separate
+methodology sheet classifying each row as happy-path, negative, or boundary.
+This format is easier for a human reviewer to read and already separates
+expected result from postcondition, but it has no explicit coverage-item
+inventory or denominator, so system-level coverage cannot be computed from it
+the way it can from Candidate 1, and concrete test-data values are more often
+left as vague placeholders.
+
+We plan to pilot Candidate 1 first, since its explicit, checkable denominator
+extends this paper's existing traceability methodology most directly from the
+unit level to the system level, and to compare it against Candidate 2 on
+reviewer readability and on whether the heavier structure measurably improves
+coverage auditability in practice before committing to either format for the
+full benchmark.
+
+\section*{Data and Code Availability}
+The pipeline, prompts, gate implementation, aggregated results
+(\texttt{suites.csv}, the analysis report), and this paper's own source are
+published at \url{https://github.com/poojitha376sp/Clean_exp}. The planned
+system-level ground-truth templates discussed in
+Section~\ref{sec:sysleveltesting} are tracked in the same repository under
+\texttt{paper/}.
 
 \begin{thebibliography}{00}
 \bibitem{chen2023chatgpt} L. Chen, M. Chen, and J. Zou, ``How is ChatGPT's Behavior Changing Over Time?'' arXiv preprint arXiv:2307.09009, 2023.

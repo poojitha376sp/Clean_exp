@@ -1,0 +1,700 @@
+{
+  "unit_id": "U20_3",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.1818,
+    "hallucinated": [
+      {
+        "value": "12345",
+        "context": "patient pincode",
+        "grounded": false
+      },
+      {
+        "value": "67890",
+        "context": "patient pincode",
+        "grounded": false
+      },
+      {
+        "value": "invalid",
+        "context": "patient pincode",
+        "grounded": false
+      },
+      {
+        "value": "0.5 MB",
+        "context": "report size",
+        "grounded": false
+      },
+      {
+        "value": "1.1 MB",
+        "context": "report size",
+        "grounded": false
+      },
+      {
+        "value": "6 files",
+        "context": "number of reports",
+        "grounded": false
+      },
+      {
+        "value": "fever, cough",
+        "context": "symptoms",
+        "grounded": false
+      },
+      {
+        "value": "success",
+        "context": "upload result",
+        "grounded": false
+      },
+      {
+        "value": "failure",
+        "context": "upload result",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 11,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Oracle assertions are vague; add concrete state checks (e.g., status codes, DB entries).",
+      "Missing negative test for pincode mismatch in VIRTUA-3-9.",
+      "No test verifies offline nature of lab report delivery per VIRTUA-3-11.",
+      "Doctor specialty routing not validated; test that correct specialty is assigned.",
+      "ML algorithm output not specified; test for disease name and confidence score."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.7573,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Lab Request and Consultation Management\n\n  Scenario: Lab requests are routed to the Laboratory after matching the Patient Pincode\n    Given a patient with Pincode \"12345\"\n    When a lab request is submitted with Pincode \"12345\"\n    Then the request should be routed to the Laboratory\n\n  Scenario Outline: Lab personnel make appointments and perform home collection of specimen\n    Given lab personnel are available\n    When they make an appointment for a patient with Pincode \"<pincode>\"\n    Then the appointment should be scheduled and specimen collection should be arranged\n\n    Examples:\n      | pincode |\n      | 12345   |\n      | 67890   |\n      | invalid |\n\n  Scenario: Lab personnel email or send reports to Patients directly\n    Given lab personnel have completed a test for a patient with Pincode \"12345\"\n    When they generate a report\n    Then the report should be emailed or sent directly to the patient\n\n  Scenario Outline: Patients upload reports up to 5 reports (up to 1 MB size) per Consultation\n    Given a patient with Pincode \"12345\" is in a consultation\n    When they upload a report of size \"<size>\"\n    Then the upload should be \"<result>\"\n\n    Examples:\n      | size    | result  |\n      | 0.5 MB  | success |\n      | 1 MB    | success |\n      | 1.1 MB  | failure |\n      | 5 files | success |\n      | 6 files | failure |\n\n  Scenario: Each Patient Consultation request is routed to 1 Doctor of a Speciality\n    Given a patient with Pincode \"12345\" requests a consultation\n    When the request is processed\n    Then the request should be routed to 1 Doctor of a Speciality\n\n  Scenario: Machine Learning Algorithm predicts diseases based on Symptoms\n    Given a patient with Pincode \"12345\" has symptoms \"fever, cough\"\n    When the symptoms are input into the Machine Learning Algorithm\n    Then the algorithm should predict a disease\n\n  Scenario: Doctors can accept or modify the diagnosis\n    Given a doctor receives a diagnosis from the Machine Learning Algorithm\n    When they review the diagnosis\n    Then they should be able to accept or modify the diagnosis\n\n  Scenario: The responsibility is with Doctor to perform Diagnosis\n    Given a patient with Pincode \"12345\" has a consultation\n    When the doctor reviews the patient's symptoms\n    Then the doctor should be responsible for performing the diagnosis",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Lab requests are routed to the Laboratory after matching the Patient Pincode",
+      "req_ids": [
+        "VIRTUA-3-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a patient with Pincode '12345'"
+      ],
+      "inputs": {
+        "pincode": "12345"
+      },
+      "steps": [
+        "a lab request is submitted with Pincode '12345'"
+      ],
+      "expected": [
+        "the request should be routed to the Laboratory"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Lab personnel make appointments and perform home collection of specimen",
+      "req_ids": [
+        "VIRTUA-3-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "lab personnel are available"
+      ],
+      "inputs": {
+        "pincode": "12345"
+      },
+      "steps": [
+        "they make an appointment for a patient with Pincode '12345'"
+      ],
+      "expected": [
+        "the appointment should be scheduled and specimen collection should be arranged"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Lab personnel make appointments and perform home collection of specimen with invalid pincode",
+      "req_ids": [
+        "VIRTUA-3-10"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "lab personnel are available"
+      ],
+      "inputs": {
+        "pincode": "invalid"
+      },
+      "steps": [
+        "they make an appointment for a patient with Pincode 'invalid'"
+      ],
+      "expected": [
+        "the appointment should not be scheduled and specimen collection should not be arranged"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Lab personnel email or send reports to Patients directly",
+      "req_ids": [
+        "VIRTUA-3-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "lab personnel have completed a test for a patient with Pincode '12345'"
+      ],
+      "inputs": {},
+      "steps": [
+        "they generate a report"
+      ],
+      "expected": [
+        "the report should be emailed or sent directly to the patient"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Patients upload reports up to 5 reports (up to 1 MB size) per Consultation",
+      "req_ids": [
+        "VIRTUA-3-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a patient with Pincode '12345' is in a consultation"
+      ],
+      "inputs": {
+        "size": "0.5 MB"
+      },
+      "steps": [
+        "they upload a report of size '0.5 MB'"
+      ],
+      "expected": [
+        "the upload should be 'success'"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Patients upload reports up to 5 reports (up to 1 MB size) per Consultation",
+      "req_ids": [
+        "VIRTUA-3-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a patient with Pincode '12345' is in a consultation"
+      ],
+      "inputs": {
+        "size": "1 MB"
+      },
+      "steps": [
+        "they upload a report of size '1 MB'"
+      ],
+      "expected": [
+        "the upload should be 'success'"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Patients upload reports up to 5 reports (up to 1 MB size) per Consultation",
+      "req_ids": [
+        "VIRTUA-3-12"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "a patient with Pincode '12345' is in a consultation"
+      ],
+      "inputs": {
+        "size": "1.1 MB"
+      },
+      "steps": [
+        "they upload a report of size '1.1 MB'"
+      ],
+      "expected": [
+        "the upload should be 'failure'"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Patients upload reports up to 5 reports (up to 1 MB size) per Consultation",
+      "req_ids": [
+        "VIRTUA-3-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a patient with Pincode '12345' is in a consultation"
+      ],
+      "inputs": {
+        "size": "5 files"
+      },
+      "steps": [
+        "they upload 5 reports"
+      ],
+      "expected": [
+        "the upload should be 'success'"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Patients upload reports up to 5 reports (up to 1 MB size) per Consultation",
+      "req_ids": [
+        "VIRTUA-3-12"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "a patient with Pincode '12345' is in a consultation"
+      ],
+      "inputs": {
+        "size": "6 files"
+      },
+      "steps": [
+        "they upload 6 reports"
+      ],
+      "expected": [
+        "the upload should be 'failure'"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Each Patient Consultation request is routed to 1 Doctor of a Speciality",
+      "req_ids": [
+        "VIRTUA-3-13"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a patient with Pincode '12345' requests a consultation"
+      ],
+      "inputs": {},
+      "steps": [
+        "the request is processed"
+      ],
+      "expected": [
+        "the request should be routed to 1 Doctor of a Speciality"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Machine Learning Algorithm predicts diseases based on Symptoms",
+      "req_ids": [
+        "VIRTUA-3-14"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a patient with Pincode '12345' has symptoms 'fever, cough'"
+      ],
+      "inputs": {
+        "symptoms": "fever, cough"
+      },
+      "steps": [
+        "the symptoms are input into the Machine Learning Algorithm"
+      ],
+      "expected": [
+        "the algorithm should predict a disease"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Doctors can accept or modify the diagnosis",
+      "req_ids": [
+        "VIRTUA-3-15"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a doctor receives a diagnosis from the Machine Learning Algorithm"
+      ],
+      "inputs": {},
+      "steps": [
+        "they review the diagnosis"
+      ],
+      "expected": [
+        "they should be able to accept or modify the diagnosis"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "The responsibility is with Doctor to perform Diagnosis",
+      "req_ids": [
+        "VIRTUA-3-16"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a patient with Pincode '12345' has a consultation"
+      ],
+      "inputs": {},
+      "steps": [
+        "the doctor reviews the patient's symptoms"
+      ],
+      "expected": [
+        "the doctor should be responsible for performing the diagnosis"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Lab Request and Consultation Management\n\n  Scenario: Lab requests are routed to the Laboratory after matching the Patient Pincode\n    Given a patient with Pincode \"12345\"\n    When a lab request is submitted with Pincode \"12345\"\n    Then the request should be routed to the Laboratory\n\n  Scenario Outline: Lab personnel make appointments and perform home collection of specimen\n    Given lab personnel are available\n    When they make an appointment for a patient with Pincode \"<pincode>\"\n    Then the appointment should be scheduled and specimen collection should be arranged\n\n    Examples:\n      | pincode |\n      | 12345   |\n      | 67890   |\n      | invalid |\n\n  Scenario: Lab personnel email or send reports to Patients directly\n    Given lab personnel have completed a test for a patient with Pincode \"12345\"\n    When they generate a report\n    Then the report should be emailed or sent directly to the patient\n\n  Scenario Outline: Patients upload reports up to 5 reports (up to 1 MB size) per Consultation\n    Given a patient with Pincode \"12345\" is in a consultation\n    When they upload a report of size \"<size>\"\n    Then the upload should be \"<result>\"\n\n    Examples:\n      | size    | result  |\n      | 0.5 MB  | success |\n      | 1 MB    | success |\n      | 1.1 MB  | failure |\n      | 5 files | success |\n      | 6 files | failure |\n\n  Scenario: Each Patient Consultation request is routed to 1 Doctor of a Speciality\n    Given a patient with Pincode \"12345\" requests a consultation\n    When the request is processed\n    Then the request should be routed to 1 Doctor of a Speciality\n\n  Scenario: Machine Learning Algorithm predicts diseases based on Symptoms\n    Given a patient with Pincode \"12345\" has symptoms \"fever, cough\"\n    When the symptoms are input into the Machine Learning Algorithm\n    Then the algorithm should predict a disease\n\n  Scenario: Doctors can accept or modify the diagnosis\n    Given a doctor receives a diagnosis from the Machine Learning Algorithm\n    When they review the diagnosis\n    Then they should be able to accept or modify the diagnosis\n\n  Scenario: The responsibility is with Doctor to perform Diagnosis\n    Given a patient with Pincode \"12345\" has a consultation\n    When the doctor reviews the patient's symptoms\n    Then the doctor should be responsible for performing the diagnosis",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Lab requests are routed to the Laboratory after matching the Patient Pincode",
+          "req_ids": [
+            "VIRTUA-3-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with Pincode '12345'"
+          ],
+          "inputs": {
+            "pincode": "12345"
+          },
+          "steps": [
+            "a lab request is submitted with Pincode '12345'"
+          ],
+          "expected": [
+            "the request should be routed to the Laboratory"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Lab personnel make appointments and perform home collection of specimen",
+          "req_ids": [
+            "VIRTUA-3-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "lab personnel are available"
+          ],
+          "inputs": {
+            "pincode": "12345"
+          },
+          "steps": [
+            "they make an appointment for a patient with Pincode '12345'"
+          ],
+          "expected": [
+            "the appointment should be scheduled and specimen collection should be arranged"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Lab personnel make appointments and perform home collection of specimen with invalid pincode",
+          "req_ids": [
+            "VIRTUA-3-10"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "lab personnel are available"
+          ],
+          "inputs": {
+            "pincode": "invalid"
+          },
+          "steps": [
+            "they make an appointment for a patient with Pincode 'invalid'"
+          ],
+          "expected": [
+            "the appointment should not be scheduled and specimen collection should not be arranged"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Lab personnel email or send reports to Patients directly",
+          "req_ids": [
+            "VIRTUA-3-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "lab personnel have completed a test for a patient with Pincode '12345'"
+          ],
+          "inputs": {},
+          "steps": [
+            "they generate a report"
+          ],
+          "expected": [
+            "the report should be emailed or sent directly to the patient"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Patients upload reports up to 5 reports (up to 1 MB size) per Consultation",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with Pincode '12345' is in a consultation"
+          ],
+          "inputs": {
+            "size": "0.5 MB"
+          },
+          "steps": [
+            "they upload a report of size '0.5 MB'"
+          ],
+          "expected": [
+            "the upload should be 'success'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patients upload reports up to 5 reports (up to 1 MB size) per Consultation",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with Pincode '12345' is in a consultation"
+          ],
+          "inputs": {
+            "size": "1 MB"
+          },
+          "steps": [
+            "they upload a report of size '1 MB'"
+          ],
+          "expected": [
+            "the upload should be 'success'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patients upload reports up to 5 reports (up to 1 MB size) per Consultation",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a patient with Pincode '12345' is in a consultation"
+          ],
+          "inputs": {
+            "size": "1.1 MB"
+          },
+          "steps": [
+            "they upload a report of size '1.1 MB'"
+          ],
+          "expected": [
+            "the upload should be 'failure'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patients upload reports up to 5 reports (up to 1 MB size) per Consultation",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with Pincode '12345' is in a consultation"
+          ],
+          "inputs": {
+            "size": "5 files"
+          },
+          "steps": [
+            "they upload 5 reports"
+          ],
+          "expected": [
+            "the upload should be 'success'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Patients upload reports up to 5 reports (up to 1 MB size) per Consultation",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "a patient with Pincode '12345' is in a consultation"
+          ],
+          "inputs": {
+            "size": "6 files"
+          },
+          "steps": [
+            "they upload 6 reports"
+          ],
+          "expected": [
+            "the upload should be 'failure'"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Each Patient Consultation request is routed to 1 Doctor of a Speciality",
+          "req_ids": [
+            "VIRTUA-3-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with Pincode '12345' requests a consultation"
+          ],
+          "inputs": {},
+          "steps": [
+            "the request is processed"
+          ],
+          "expected": [
+            "the request should be routed to 1 Doctor of a Speciality"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Machine Learning Algorithm predicts diseases based on Symptoms",
+          "req_ids": [
+            "VIRTUA-3-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with Pincode '12345' has symptoms 'fever, cough'"
+          ],
+          "inputs": {
+            "symptoms": "fever, cough"
+          },
+          "steps": [
+            "the symptoms are input into the Machine Learning Algorithm"
+          ],
+          "expected": [
+            "the algorithm should predict a disease"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Doctors can accept or modify the diagnosis",
+          "req_ids": [
+            "VIRTUA-3-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a doctor receives a diagnosis from the Machine Learning Algorithm"
+          ],
+          "inputs": {},
+          "steps": [
+            "they review the diagnosis"
+          ],
+          "expected": [
+            "they should be able to accept or modify the diagnosis"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "The responsibility is with Doctor to perform Diagnosis",
+          "req_ids": [
+            "VIRTUA-3-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a patient with Pincode '12345' has a consultation"
+          ],
+          "inputs": {},
+          "steps": [
+            "the doctor reviews the patient's symptoms"
+          ],
+          "expected": [
+            "the doctor should be responsible for performing the diagnosis"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.1818,
+        "hallucinated": [
+          {
+            "value": "12345",
+            "context": "patient pincode",
+            "grounded": false
+          },
+          {
+            "value": "67890",
+            "context": "patient pincode",
+            "grounded": false
+          },
+          {
+            "value": "invalid",
+            "context": "patient pincode",
+            "grounded": false
+          },
+          {
+            "value": "0.5 MB",
+            "context": "report size",
+            "grounded": false
+          },
+          {
+            "value": "1.1 MB",
+            "context": "report size",
+            "grounded": false
+          },
+          {
+            "value": "6 files",
+            "context": "number of reports",
+            "grounded": false
+          },
+          {
+            "value": "fever, cough",
+            "context": "symptoms",
+            "grounded": false
+          },
+          {
+            "value": "success",
+            "context": "upload result",
+            "grounded": false
+          },
+          {
+            "value": "failure",
+            "context": "upload result",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 11,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Oracle assertions are vague; add concrete state checks (e.g., status codes, DB entries).",
+          "Missing negative test for pincode mismatch in VIRTUA-3-9.",
+          "No test verifies offline nature of lab report delivery per VIRTUA-3-11.",
+          "Doctor specialty routing not validated; test that correct specialty is assigned.",
+          "ML algorithm output not specified; test for disease name and confidence score."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.7573,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

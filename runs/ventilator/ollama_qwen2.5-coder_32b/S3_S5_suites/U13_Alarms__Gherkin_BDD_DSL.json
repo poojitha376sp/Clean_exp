@@ -1,0 +1,970 @@
+{
+  "unit_id": "U13_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.5,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.6667,
+    "hallucinated": [
+      {
+        "value": "4",
+        "context": "HIGH RR threshold",
+        "grounded": false
+      },
+      {
+        "value": "31",
+        "context": "HIGH RR threshold",
+        "grounded": false
+      },
+      {
+        "value": "4",
+        "context": "LOW RR threshold",
+        "grounded": false
+      },
+      {
+        "value": "31",
+        "context": "LOW RR threshold",
+        "grounded": false
+      },
+      {
+        "value": "0",
+        "context": "apnea threshold",
+        "grounded": false
+      },
+      {
+        "value": "31",
+        "context": "apnea threshold",
+        "grounded": false
+      },
+      {
+        "value": "the HIGH RR alarm threshold is set to 4",
+        "context": "state",
+        "grounded": false
+      },
+      {
+        "value": "the HIGH RR alarm threshold is set to 31",
+        "context": "state",
+        "grounded": false
+      },
+      {
+        "value": "the LOW RR alarm threshold is set to 4",
+        "context": "state",
+        "grounded": false
+      },
+      {
+        "value": "the LOW RR alarm threshold is set to 31",
+        "context": "state",
+        "grounded": false
+      },
+      {
+        "value": "the apnea alarm threshold is set to 0 seconds",
+        "context": "state",
+        "grounded": false
+      },
+      {
+        "value": "the apnea alarm threshold is set to 31 seconds",
+        "context": "state",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 36,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Negative test cases incorrectly assert that invalid values are accepted; they should assert rejection or error.",
+      "Oracle assertions for negative cases are not grounded; they should check for error messages or state changes.",
+      "The test suite does not verify that the GUI control actually restricts input to the specified range; it only sets values.",
+      "Boundary tests use only single boundary values; they should also test values just inside the boundary (e.g., 6, 29) to ensure correct handling.",
+      "The alarm test for relief valve opens does not verify that the alarm is triggered only when flow increases unexpectedly; it lacks a control scenario where flow is normal."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.875,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Alarm Threshold Settings and Detection\n  As a user of the GUI\n  I want to set thresholds for alarms\n  So that I can configure the system to alert me appropriately\n\n  @RW-SW-144\n  Scenario: GUI has a control for setting the threshold for HIGH RR alarm\n    Given the GUI is displayed\n    Then the HIGH RR alarm threshold control is visible\n\n  @RW-SW-145\n  Scenario Outline: The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1\n    Given the HIGH RR alarm threshold control is visible\n    When I set the threshold to <value>\n    Then the HIGH RR alarm threshold is set to <value>\n    Examples:\n      | value |\n      | 5     |\n      | 15    |\n      | 30    |\n      | 4     | # invalid\n      | 31    | # invalid\n\n  @RW-SW-146\n  Scenario: GUI has a control for setting the threshold for LOW RR alarm\n    Given the GUI is displayed\n    Then the LOW RR alarm threshold control is visible\n\n  @RW-SW-147\n  Scenario Outline: The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1\n    Given the LOW RR alarm threshold control is visible\n    When I set the threshold to <value>\n    Then the LOW RR alarm threshold is set to <value>\n    Examples:\n      | value |\n      | 5     |\n      | 15    |\n      | 30    |\n      | 4     | # invalid\n      | 31    | # invalid\n\n  @RW-SW-148\n  Scenario: GUI has a control for setting the threshold for the apnea alarm\n    Given the GUI is displayed\n    Then the apnea alarm threshold control is visible\n\n  @RW-SW-149\n  Scenario Outline: The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s\n    Given the apnea alarm threshold control is visible\n    When I set the threshold to <value> seconds\n    Then the apnea alarm threshold is set to <value> seconds\n    Examples:\n      | value |\n      | 1     |\n      | 15    |\n      | 30    |\n      | 0     | # invalid\n      | 31    | # invalid\n\n  @RW-SW-158\n  Scenario: Alarm when relief valve opens based on unexpected increase in flow\n    Given the system is monitoring flow\n    When there is an unexpected increase in flow\n    Then the relief valve opens alarm is triggered",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "GUI has a control for setting the threshold for HIGH RR alarm",
+      "req_ids": [
+        "RW-SW-144"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is displayed"
+      ],
+      "inputs": {},
+      "steps": [
+        "the HIGH RR alarm threshold control is visible"
+      ],
+      "expected": [
+        "the HIGH RR alarm threshold control is visible"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1",
+      "req_ids": [
+        "RW-SW-145"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the HIGH RR alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "5"
+      },
+      "steps": [
+        "I set the threshold to 5"
+      ],
+      "expected": [
+        "the HIGH RR alarm threshold is set to 5"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1",
+      "req_ids": [
+        "RW-SW-145"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the HIGH RR alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "15"
+      },
+      "steps": [
+        "I set the threshold to 15"
+      ],
+      "expected": [
+        "the HIGH RR alarm threshold is set to 15"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1",
+      "req_ids": [
+        "RW-SW-145"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the HIGH RR alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "30"
+      },
+      "steps": [
+        "I set the threshold to 30"
+      ],
+      "expected": [
+        "the HIGH RR alarm threshold is set to 30"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1",
+      "req_ids": [
+        "RW-SW-145"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the HIGH RR alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "4"
+      },
+      "steps": [
+        "I set the threshold to 4"
+      ],
+      "expected": [
+        "the HIGH RR alarm threshold is set to 4"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1",
+      "req_ids": [
+        "RW-SW-145"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the HIGH RR alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "31"
+      },
+      "steps": [
+        "I set the threshold to 31"
+      ],
+      "expected": [
+        "the HIGH RR alarm threshold is set to 31"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "GUI has a control for setting the threshold for LOW RR alarm",
+      "req_ids": [
+        "RW-SW-146"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is displayed"
+      ],
+      "inputs": {},
+      "steps": [
+        "the LOW RR alarm threshold control is visible"
+      ],
+      "expected": [
+        "the LOW RR alarm threshold control is visible"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1",
+      "req_ids": [
+        "RW-SW-147"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the LOW RR alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "5"
+      },
+      "steps": [
+        "I set the threshold to 5"
+      ],
+      "expected": [
+        "the LOW RR alarm threshold is set to 5"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1",
+      "req_ids": [
+        "RW-SW-147"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the LOW RR alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "15"
+      },
+      "steps": [
+        "I set the threshold to 15"
+      ],
+      "expected": [
+        "the LOW RR alarm threshold is set to 15"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1",
+      "req_ids": [
+        "RW-SW-147"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the LOW RR alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "30"
+      },
+      "steps": [
+        "I set the threshold to 30"
+      ],
+      "expected": [
+        "the LOW RR alarm threshold is set to 30"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1",
+      "req_ids": [
+        "RW-SW-147"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the LOW RR alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "4"
+      },
+      "steps": [
+        "I set the threshold to 4"
+      ],
+      "expected": [
+        "the LOW RR alarm threshold is set to 4"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1",
+      "req_ids": [
+        "RW-SW-147"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the LOW RR alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "31"
+      },
+      "steps": [
+        "I set the threshold to 31"
+      ],
+      "expected": [
+        "the LOW RR alarm threshold is set to 31"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "GUI has a control for setting the threshold for the apnea alarm",
+      "req_ids": [
+        "RW-SW-148"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is displayed"
+      ],
+      "inputs": {},
+      "steps": [
+        "the apnea alarm threshold control is visible"
+      ],
+      "expected": [
+        "the apnea alarm threshold control is visible"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s",
+      "req_ids": [
+        "RW-SW-149"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the apnea alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "1"
+      },
+      "steps": [
+        "I set the threshold to 1 seconds"
+      ],
+      "expected": [
+        "the apnea alarm threshold is set to 1 seconds"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s",
+      "req_ids": [
+        "RW-SW-149"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the apnea alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "15"
+      },
+      "steps": [
+        "I set the threshold to 15 seconds"
+      ],
+      "expected": [
+        "the apnea alarm threshold is set to 15 seconds"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s",
+      "req_ids": [
+        "RW-SW-149"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the apnea alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "30"
+      },
+      "steps": [
+        "I set the threshold to 30 seconds"
+      ],
+      "expected": [
+        "the apnea alarm threshold is set to 30 seconds"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s",
+      "req_ids": [
+        "RW-SW-149"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the apnea alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "0"
+      },
+      "steps": [
+        "I set the threshold to 0 seconds"
+      ],
+      "expected": [
+        "the apnea alarm threshold is set to 0 seconds"
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s",
+      "req_ids": [
+        "RW-SW-149"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the apnea alarm threshold control is visible"
+      ],
+      "inputs": {
+        "value": "31"
+      },
+      "steps": [
+        "I set the threshold to 31 seconds"
+      ],
+      "expected": [
+        "the apnea alarm threshold is set to 31 seconds"
+      ]
+    },
+    {
+      "id": "TC-019",
+      "title": "Alarm when relief valve opens based on unexpected increase in flow",
+      "req_ids": [
+        "RW-SW-158"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is monitoring flow"
+      ],
+      "inputs": {},
+      "steps": [
+        "there is an unexpected increase in flow"
+      ],
+      "expected": [
+        "the relief valve opens alarm is triggered"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarm Threshold Settings and Detection\n  As a user of the GUI\n  I want to set thresholds for alarms\n  So that I can configure the system to alert me appropriately\n\n  @RW-SW-144\n  Scenario: GUI has a control for setting the threshold for HIGH RR alarm\n    Given the GUI is displayed\n    Then the HIGH RR alarm threshold control is visible\n\n  @RW-SW-145\n  Scenario Outline: The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1\n    Given the HIGH RR alarm threshold control is visible\n    When I set the threshold to <value>\n    Then the HIGH RR alarm threshold is set to <value>\n    Examples:\n      | value |\n      | 5     |\n      | 15    |\n      | 30    |\n      | 4     | # invalid\n      | 31    | # invalid\n\n  @RW-SW-146\n  Scenario: GUI has a control for setting the threshold for LOW RR alarm\n    Given the GUI is displayed\n    Then the LOW RR alarm threshold control is visible\n\n  @RW-SW-147\n  Scenario Outline: The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1\n    Given the LOW RR alarm threshold control is visible\n    When I set the threshold to <value>\n    Then the LOW RR alarm threshold is set to <value>\n    Examples:\n      | value |\n      | 5     |\n      | 15    |\n      | 30    |\n      | 4     | # invalid\n      | 31    | # invalid\n\n  @RW-SW-148\n  Scenario: GUI has a control for setting the threshold for the apnea alarm\n    Given the GUI is displayed\n    Then the apnea alarm threshold control is visible\n\n  @RW-SW-149\n  Scenario Outline: The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s\n    Given the apnea alarm threshold control is visible\n    When I set the threshold to <value> seconds\n    Then the apnea alarm threshold is set to <value> seconds\n    Examples:\n      | value |\n      | 1     |\n      | 15    |\n      | 30    |\n      | 0     | # invalid\n      | 31    | # invalid\n\n  @RW-SW-158\n  Scenario: Alarm when relief valve opens based on unexpected increase in flow\n    Given the system is monitoring flow\n    When there is an unexpected increase in flow\n    Then the relief valve opens alarm is triggered",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI has a control for setting the threshold for HIGH RR alarm",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is displayed"
+          ],
+          "inputs": {},
+          "steps": [
+            "the HIGH RR alarm threshold control is visible"
+          ],
+          "expected": [
+            "the HIGH RR alarm threshold control is visible"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1",
+          "req_ids": [
+            "RW-SW-145"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the HIGH RR alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "5"
+          },
+          "steps": [
+            "I set the threshold to 5"
+          ],
+          "expected": [
+            "the HIGH RR alarm threshold is set to 5"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1",
+          "req_ids": [
+            "RW-SW-145"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the HIGH RR alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "15"
+          },
+          "steps": [
+            "I set the threshold to 15"
+          ],
+          "expected": [
+            "the HIGH RR alarm threshold is set to 15"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1",
+          "req_ids": [
+            "RW-SW-145"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the HIGH RR alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "30"
+          },
+          "steps": [
+            "I set the threshold to 30"
+          ],
+          "expected": [
+            "the HIGH RR alarm threshold is set to 30"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1",
+          "req_ids": [
+            "RW-SW-145"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the HIGH RR alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "4"
+          },
+          "steps": [
+            "I set the threshold to 4"
+          ],
+          "expected": [
+            "the HIGH RR alarm threshold is set to 4"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "The control for setting the threshold for HIGH RR alarm allows setting values between 5-30 in increments of 1",
+          "req_ids": [
+            "RW-SW-145"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the HIGH RR alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "31"
+          },
+          "steps": [
+            "I set the threshold to 31"
+          ],
+          "expected": [
+            "the HIGH RR alarm threshold is set to 31"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI has a control for setting the threshold for LOW RR alarm",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is displayed"
+          ],
+          "inputs": {},
+          "steps": [
+            "the LOW RR alarm threshold control is visible"
+          ],
+          "expected": [
+            "the LOW RR alarm threshold control is visible"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1",
+          "req_ids": [
+            "RW-SW-147"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the LOW RR alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "5"
+          },
+          "steps": [
+            "I set the threshold to 5"
+          ],
+          "expected": [
+            "the LOW RR alarm threshold is set to 5"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1",
+          "req_ids": [
+            "RW-SW-147"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the LOW RR alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "15"
+          },
+          "steps": [
+            "I set the threshold to 15"
+          ],
+          "expected": [
+            "the LOW RR alarm threshold is set to 15"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1",
+          "req_ids": [
+            "RW-SW-147"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the LOW RR alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "30"
+          },
+          "steps": [
+            "I set the threshold to 30"
+          ],
+          "expected": [
+            "the LOW RR alarm threshold is set to 30"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1",
+          "req_ids": [
+            "RW-SW-147"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the LOW RR alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "4"
+          },
+          "steps": [
+            "I set the threshold to 4"
+          ],
+          "expected": [
+            "the LOW RR alarm threshold is set to 4"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "The control for setting the threshold for LOW RR alarm allows setting values between 5-30 in increments of 1",
+          "req_ids": [
+            "RW-SW-147"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the LOW RR alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "31"
+          },
+          "steps": [
+            "I set the threshold to 31"
+          ],
+          "expected": [
+            "the LOW RR alarm threshold is set to 31"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "GUI has a control for setting the threshold for the apnea alarm",
+          "req_ids": [
+            "RW-SW-148"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is displayed"
+          ],
+          "inputs": {},
+          "steps": [
+            "the apnea alarm threshold control is visible"
+          ],
+          "expected": [
+            "the apnea alarm threshold control is visible"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s",
+          "req_ids": [
+            "RW-SW-149"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the apnea alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "1"
+          },
+          "steps": [
+            "I set the threshold to 1 seconds"
+          ],
+          "expected": [
+            "the apnea alarm threshold is set to 1 seconds"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s",
+          "req_ids": [
+            "RW-SW-149"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the apnea alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "15"
+          },
+          "steps": [
+            "I set the threshold to 15 seconds"
+          ],
+          "expected": [
+            "the apnea alarm threshold is set to 15 seconds"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s",
+          "req_ids": [
+            "RW-SW-149"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the apnea alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "30"
+          },
+          "steps": [
+            "I set the threshold to 30 seconds"
+          ],
+          "expected": [
+            "the apnea alarm threshold is set to 30 seconds"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s",
+          "req_ids": [
+            "RW-SW-149"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the apnea alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "0"
+          },
+          "steps": [
+            "I set the threshold to 0 seconds"
+          ],
+          "expected": [
+            "the apnea alarm threshold is set to 0 seconds"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "The control for setting the threshold for the apnea alarm allows setting values between 1-30 seconds in increments of 1s",
+          "req_ids": [
+            "RW-SW-149"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the apnea alarm threshold control is visible"
+          ],
+          "inputs": {
+            "value": "31"
+          },
+          "steps": [
+            "I set the threshold to 31 seconds"
+          ],
+          "expected": [
+            "the apnea alarm threshold is set to 31 seconds"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Alarm when relief valve opens based on unexpected increase in flow",
+          "req_ids": [
+            "RW-SW-158"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is monitoring flow"
+          ],
+          "inputs": {},
+          "steps": [
+            "there is an unexpected increase in flow"
+          ],
+          "expected": [
+            "the relief valve opens alarm is triggered"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.5,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.6667,
+        "hallucinated": [
+          {
+            "value": "4",
+            "context": "HIGH RR threshold",
+            "grounded": false
+          },
+          {
+            "value": "31",
+            "context": "HIGH RR threshold",
+            "grounded": false
+          },
+          {
+            "value": "4",
+            "context": "LOW RR threshold",
+            "grounded": false
+          },
+          {
+            "value": "31",
+            "context": "LOW RR threshold",
+            "grounded": false
+          },
+          {
+            "value": "0",
+            "context": "apnea threshold",
+            "grounded": false
+          },
+          {
+            "value": "31",
+            "context": "apnea threshold",
+            "grounded": false
+          },
+          {
+            "value": "the HIGH RR alarm threshold is set to 4",
+            "context": "state",
+            "grounded": false
+          },
+          {
+            "value": "the HIGH RR alarm threshold is set to 31",
+            "context": "state",
+            "grounded": false
+          },
+          {
+            "value": "the LOW RR alarm threshold is set to 4",
+            "context": "state",
+            "grounded": false
+          },
+          {
+            "value": "the LOW RR alarm threshold is set to 31",
+            "context": "state",
+            "grounded": false
+          },
+          {
+            "value": "the apnea alarm threshold is set to 0 seconds",
+            "context": "state",
+            "grounded": false
+          },
+          {
+            "value": "the apnea alarm threshold is set to 31 seconds",
+            "context": "state",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 36,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Negative test cases incorrectly assert that invalid values are accepted; they should assert rejection or error.",
+          "Oracle assertions for negative cases are not grounded; they should check for error messages or state changes.",
+          "The test suite does not verify that the GUI control actually restricts input to the specified range; it only sets values.",
+          "Boundary tests use only single boundary values; they should also test values just inside the boundary (e.g., 6, 29) to ensure correct handling.",
+          "The alarm test for relief valve opens does not verify that the alarm is triggered only when flow increases unexpectedly; it lacks a control scenario where flow is normal."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.875,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

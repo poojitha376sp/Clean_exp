@@ -1,0 +1,1123 @@
+{
+  "unit_id": "U36_15",
+  "representation": "Use-Cases & User Stories",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 2,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Use-Cases & User Stories",
+    "group": 1,
+    "schema_score": 0.8182,
+    "representation_score": 1.0,
+    "sfv_score": 0.9091,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "test case #4 (TC-004): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "test case #5 (TC-005): 'exception' is not one of ['positive', 'negative', 'boundary']"
+    ]
+  },
+  "fsa": null,
+  "artifact": "**Use-Case: Doctor, Chemist, and Lab Login**\n\n**Primary Actor:** Doctor, Chemist, Lab User\n\n**Goal:** Authenticate a user to access the system.\n\n**Preconditions:**  \n- The user (Doctor, Chemist, or Lab) has been set up with a default password by an Admin.  \n- The system is operational and accessible.\n\n**Main Success Scenario (Positive Flow):**  \n1. User enters the correct username and password.  \n2. System validates the credentials.  \n3. System grants access and displays the user's dashboard.\n\n**Alternative Flows:**  \n- **AF-1:** User enters an incorrect password.  \n  1. System rejects the credentials.  \n  2. System prompts the user to re-enter the password.  \n\n- **AF-2:** User enters an incorrect username.  \n  1. System rejects the credentials.  \n  2. System prompts the user to enter a valid username.\n\n**Exception Flows:**  \n- **EF-1:** System is unavailable due to maintenance.  \n  1. User attempts to log in.  \n  2. System displays a maintenance notice and denies access.  \n\n- **EF-2:** User account is locked due to multiple failed login attempts.  \n  1. User attempts to log in.  \n  2. System denies access and informs the user that the account is locked.  \n\n**Postconditions:**  \n- Successful login updates user session state.  \n- Failed login attempts increment the failed login counter.\n\n**Related Requirements:**  \n- Req-15: The system shall have a login functionality for Doctors, Chemists, and Labs set up with default passwords by Admin.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Successful login for a valid Doctor",
+      "req_ids": [
+        "Req-15"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor account is set up with a default password by Admin"
+      ],
+      "inputs": {
+        "username": "doctor1",
+        "password": "defaultPass"
+      },
+      "steps": [
+        "User enters username 'doctor1' and password 'defaultPass'",
+        "System validates credentials",
+        "System grants access"
+      ],
+      "expected": [
+        "User is redirected to the Doctor dashboard"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Login with incorrect password for a valid Chemist",
+      "req_ids": [
+        "Req-15"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Chemist account is set up with a default password by Admin"
+      ],
+      "inputs": {
+        "username": "chemist1",
+        "password": "wrongPass"
+      },
+      "steps": [
+        "User enters username 'chemist1' and incorrect password",
+        "System validates credentials",
+        "System denies access"
+      ],
+      "expected": [
+        "User receives an error message indicating incorrect password"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Login with incorrect username for a valid Lab",
+      "req_ids": [
+        "Req-15"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Lab account is set up with a default password by Admin"
+      ],
+      "inputs": {
+        "username": "labX",
+        "password": "defaultPass"
+      },
+      "steps": [
+        "User enters an incorrect username 'labX_wrong' and correct password",
+        "System validates credentials",
+        "System denies access"
+      ],
+      "expected": [
+        "User receives an error message indicating incorrect username"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "System unavailable due to maintenance",
+      "req_ids": [
+        "Req-15"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "System is scheduled for maintenance"
+      ],
+      "inputs": {
+        "username": "doctor1",
+        "password": "defaultPass"
+      },
+      "steps": [
+        "User attempts to log in",
+        "System checks maintenance status",
+        "System denies access with maintenance notice"
+      ],
+      "expected": [
+        "User sees a maintenance notice and is denied access"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Account locked due to multiple failed attempts",
+      "req_ids": [
+        "Req-15"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "User has exceeded the maximum number of failed login attempts"
+      ],
+      "inputs": {
+        "username": "doctor1",
+        "password": "wrongPass"
+      },
+      "steps": [
+        "User attempts to log in multiple times with incorrect password",
+        "System increments failed attempts counter",
+        "System denies access with account lock message"
+      ],
+      "expected": [
+        "User receives a message indicating the account is locked"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Boundary test: First login attempt after account lock reset",
+      "req_ids": [
+        "Req-15"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Account lock has been reset by Admin"
+      ],
+      "inputs": {
+        "username": "doctor1",
+        "password": "defaultPass"
+      },
+      "steps": [
+        "User attempts to log in immediately after lock reset",
+        "System validates credentials",
+        "System grants access"
+      ],
+      "expected": [
+        "User is successfully logged in and redirected to the dashboard"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Boundary test: Maximum number of failed login attempts reached",
+      "req_ids": [
+        "Req-15"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "User has made the maximum number of failed attempts"
+      ],
+      "inputs": {
+        "username": "doctor1",
+        "password": "wrongPass"
+      },
+      "steps": [
+        "User attempts to log in at the maximum allowed failed attempts",
+        "System denies access and locks account"
+      ],
+      "expected": [
+        "User receives an account lock message"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Boundary test: Valid login at the edge of allowed time window",
+      "req_ids": [
+        "Req-15"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Login attempt is made exactly at the edge of the allowed time window"
+      ],
+      "inputs": {
+        "username": "chemist1",
+        "password": "defaultPass"
+      },
+      "steps": [
+        "User attempts to log in at the edge of the allowed time window",
+        "System validates credentials within the time window",
+        "System grants access"
+      ],
+      "expected": [
+        "User is successfully logged in"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Boundary test: Login attempt just outside the allowed time window",
+      "req_ids": [
+        "Req-15"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Login attempt is made just outside the allowed time window"
+      ],
+      "inputs": {
+        "username": "lab1",
+        "password": "defaultPass"
+      },
+      "steps": [
+        "User attempts to log in just outside the allowed time window",
+        "System validates time window",
+        "System denies access"
+      ],
+      "expected": [
+        "User receives a message indicating the login attempt is outside the allowed time window"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Boundary test: Login with the minimum allowed password length",
+      "req_ids": [
+        "Req-15"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Password length meets the minimum requirement"
+      ],
+      "inputs": {
+        "username": "doctor1",
+        "password": "minPass"
+      },
+      "steps": [
+        "User enters a password of minimum length",
+        "System validates password length",
+        "System grants access"
+      ],
+      "expected": [
+        "User is successfully logged in"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Boundary test: Login with the maximum allowed password length",
+      "req_ids": [
+        "Req-15"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Password length meets the maximum requirement"
+      ],
+      "inputs": {
+        "username": "chemist1",
+        "password": "maxPass1234567890"
+      },
+      "steps": [
+        "User enters a password of maximum length",
+        "System validates password length",
+        "System grants access"
+      ],
+      "expected": [
+        "User is successfully logged in"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Use-Case: UC-001 - Doctor Login\nActor: Doctor\nGoal: To authenticate and gain access to the system.\n\nPrimary Success Flow:\n1. Doctor enters the system URL.\n2. System displays the login page.\n3. Doctor inputs valid username and password.\n4. System validates credentials.\n5. System grants access to the Doctor's dashboard.\n\nAlternative Flow: Invalid Credentials\n1. Doctor inputs incorrect username or password.\n2. System displays an error message: \"Invalid username or password.\"\n3. System prompts Doctor to retry login.\n\nException Flow: System Unavailable\n1. System is down for maintenance.\n2. System displays a maintenance notice: \"The system is currently unavailable. Please try again later.\"\n3. Doctor cannot log in until the system is restored.\n\n---\n\nUse-Case: UC-002 - Chemist Login\nActor: Chemist\nGoal: To authenticate and gain access to the system.\n\nPrimary Success Flow:\n1. Chemist enters the system URL.\n2. System displays the login page.\n3. Chemist inputs valid username and password.\n4. System validates credentials.\n5. System grants access to the Chemist's dashboard.\n\nAlternative Flow: Invalid Credentials\n1. Chemist inputs incorrect username or password.\n2. System displays an error message: \"Invalid username or password.\"\n3. System prompts Chemist to retry login.\n\nException Flow: System Unavailable\n1. System is down for maintenance.\n2. System displays a maintenance notice: \"The system is currently unavailable. Please try again later.\"\n3. Chemist cannot log in until the system is restored.\n\n---\n\nUse-Case: UC-003 - Lab Login\nActor: Lab\nGoal: To authenticate and gain access to the system.\n\nPrimary Success Flow:\n1. Lab enters the system URL.\n2. System displays the login page.\n3. Lab inputs valid username and password.\n4. System validates credentials.\n5. System grants access to the Lab's dashboard.\n\nAlternative Flow: Invalid Credentials\n1. Lab inputs incorrect username or password.\n2. System displays an error message: \"Invalid username or password.\"\n3. System prompts Lab to retry login.\n\nException Flow: System Unavailable\n1. System is down for maintenance.\n2. System displays a maintenance notice: \"The system is currently unavailable. Please try again later.\"\n3. Lab cannot log in until the system is restored.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Doctor logs in with valid credentials",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor account is set up with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "Open system URL",
+            "Navigate to login page",
+            "Enter username and password",
+            "Submit login form"
+          ],
+          "expected": [
+            "Access granted to Doctor's dashboard"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Doctor attempts login with invalid credentials",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor account is set up with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "wrongPass"
+          },
+          "steps": [
+            "Open system URL",
+            "Navigate to login page",
+            "Enter username and password",
+            "Submit login form"
+          ],
+          "expected": [
+            "Error message displayed: 'Invalid username or password.'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor tries to log in when the system is unavailable",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "System is down for maintenance"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "Open system URL",
+            "Navigate to login page",
+            "Enter username and password",
+            "Submit login form"
+          ],
+          "expected": [
+            "Maintenance notice displayed: 'The system is currently unavailable. Please try again later.'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Chemist logs in with valid credentials",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist account is set up with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "chemist1",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "Open system URL",
+            "Navigate to login page",
+            "Enter username and password",
+            "Submit login form"
+          ],
+          "expected": [
+            "Access granted to Chemist's dashboard"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Chemist attempts login with invalid credentials",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist account is set up with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "chemist1",
+            "password": "wrongPass"
+          },
+          "steps": [
+            "Open system URL",
+            "Navigate to login page",
+            "Enter username and password",
+            "Submit login form"
+          ],
+          "expected": [
+            "Error message displayed: 'Invalid username or password.'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Chemist tries to log in when the system is unavailable",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "System is down for maintenance"
+          ],
+          "inputs": {
+            "username": "chemist1",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "Open system URL",
+            "Navigate to login page",
+            "Enter username and password",
+            "Submit login form"
+          ],
+          "expected": [
+            "Maintenance notice displayed: 'The system is currently unavailable. Please try again later.'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Lab logs in with valid credentials",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab account is set up with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "lab1",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "Open system URL",
+            "Navigate to login page",
+            "Enter username and password",
+            "Submit login form"
+          ],
+          "expected": [
+            "Access granted to Lab's dashboard"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Lab attempts login with invalid credentials",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Lab account is set up with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "lab1",
+            "password": "wrongPass"
+          },
+          "steps": [
+            "Open system URL",
+            "Navigate to login page",
+            "Enter username and password",
+            "Submit login form"
+          ],
+          "expected": [
+            "Error message displayed: 'Invalid username or password.'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Lab tries to log in when the system is unavailable",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "System is down for maintenance"
+          ],
+          "inputs": {
+            "username": "lab1",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "Open system URL",
+            "Navigate to login page",
+            "Enter username and password",
+            "Submit login form"
+          ],
+          "expected": [
+            "Maintenance notice displayed: 'The system is currently unavailable. Please try again later.'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.6667,
+        "representation_score": 1.0,
+        "sfv_score": 0.8333,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.83). Fix these problems and output the full corrected suite:\n- test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Case: Doctor, Chemist, and Lab Login**\n\n**Primary Actor:** Doctor, Chemist, Lab User  \n**Goal:** Authenticate and gain access to the system after being provisioned by an Admin.\n\n**Preconditions:**  \n- An Admin has set up the Doctor, Chemist, and Lab users with default passwords.  \n- The user possesses a valid username.\n\n**Main Success Scenario (Positive Flow):**  \n1. User enters the correct username.  \n2. User enters the correct password.  \n3. System validates credentials.  \n4. System grants access and displays the user’s dashboard.\n\n**Alternative Flows:**  \n- **AF1:** User enters an incorrect password.  \n  1. System rejects the password.  \n  2. System prompts the user to re-enter the password.  \n  3. User retries with the correct password (returns to step 2 of the Main Success Scenario).  \n\n**Exception Flows:**  \n- **EF1:** User enters an invalid username (not provisioned).  \n  1. System displays an error message: “Username not found. Please contact Admin.”  \n  2. Access denied; user cannot proceed.  \n\n- **EF2:** System experiences a failure during authentication (e.g., backend error).  \n  1. System displays a generic error message: “Authentication failed. Please try again later.”  \n  2. User may retry or contact support.\n\n**Postconditions:**  \n- Upon successful login, user’s session is established, and system-specific permissions are enforced.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Successful login for a Doctor",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor user is provisioned with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "defaultPass123"
+          },
+          "steps": [
+            "User enters username 'doctor1'",
+            "User enters password 'defaultPass123'",
+            "System validates credentials"
+          ],
+          "expected": [
+            "System grants access and displays Doctor's dashboard"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Incorrect password attempt",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor user is provisioned"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "wrongPass"
+          },
+          "steps": [
+            "User enters username 'doctor1'",
+            "User enters incorrect password 'wrongPass'",
+            "System validates credentials"
+          ],
+          "expected": [
+            "System displays error message and prompts re-entry"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Invalid username attempt",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "exception",
+          "preconditions": [],
+          "inputs": {
+            "username": "nonexistentUser",
+            "password": "anyPassword"
+          },
+          "steps": [
+            "User attempts to log in with non-existent username"
+          ],
+          "expected": [
+            "System displays error: 'Username not found. Please contact Admin.'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Successful login for a Chemist",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist user is provisioned with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "chemist1",
+            "password": "defaultPass123"
+          },
+          "steps": [
+            "User enters username 'chemist1'",
+            "User enters password 'defaultPass123'",
+            "System validates credentials"
+          ],
+          "expected": [
+            "System grants access and displays Chemist's dashboard"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Successful login for a Lab",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab user is provisioned with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "lab1",
+            "password": "defaultPass123"
+          },
+          "steps": [
+            "User enters username 'lab1'",
+            "User enters password 'defaultPass123'",
+            "System validates credentials"
+          ],
+          "expected": [
+            "System grants access and displays Lab's dashboard"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "System backend failure during login",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "All users are provisioned"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "defaultPass123"
+          },
+          "steps": [
+            "User attempts login while backend is down"
+          ],
+          "expected": [
+            "System displays error: 'Authentication failed. Please try again later.'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Boundary test: Maximum allowed login attempts",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User is provisioned and attempts login multiple times"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "defaultPass123"
+          },
+          "steps": [
+            "User enters correct credentials after 5 failed attempts"
+          ],
+          "expected": [
+            "System grants access after the 6th attempt; locks account if exceeded"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Boundary test: Minimum allowed login attempts",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User is provisioned"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "defaultPass123"
+          },
+          "steps": [
+            "User enters correct credentials on the first attempt"
+          ],
+          "expected": [
+            "System grants access immediately"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Exception: Duplicate login attempt within lockout period",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "User has exceeded max attempts and is locked out"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "defaultPass123"
+          },
+          "steps": [
+            "User attempts login within lockout period"
+          ],
+          "expected": [
+            "System denies access and informs user of lockout duration"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Exception: Admin resets password during login",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Admin resets Doctor's password while user is attempting login"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "oldPass"
+          },
+          "steps": [
+            "User enters old password during reset"
+          ],
+          "expected": [
+            "System prompts user to enter new password after reset"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.6,
+        "representation_score": 1.0,
+        "sfv_score": 0.8,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.80). Fix these problems and output the full corrected suite:\n- test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Case: Doctor, Chemist, and Lab Login**\n\n**Primary Actor:** Doctor, Chemist, Lab User\n\n**Goal:** Authenticate a user to access the system.\n\n**Preconditions:**  \n- The user (Doctor, Chemist, or Lab) has been set up with a default password by an Admin.  \n- The system is operational and accessible.\n\n**Main Success Scenario (Positive Flow):**  \n1. User enters the correct username and password.  \n2. System validates the credentials.  \n3. System grants access and displays the user's dashboard.\n\n**Alternative Flows:**  \n- **AF-1:** User enters an incorrect password.  \n  1. System rejects the credentials.  \n  2. System prompts the user to re-enter the password.  \n\n- **AF-2:** User enters an incorrect username.  \n  1. System rejects the credentials.  \n  2. System prompts the user to enter a valid username.\n\n**Exception Flows:**  \n- **EF-1:** System is unavailable due to maintenance.  \n  1. User attempts to log in.  \n  2. System displays a maintenance notice and denies access.  \n\n- **EF-2:** User account is locked due to multiple failed login attempts.  \n  1. User attempts to log in.  \n  2. System denies access and informs the user that the account is locked.  \n\n**Postconditions:**  \n- Successful login updates user session state.  \n- Failed login attempts increment the failed login counter.\n\n**Related Requirements:**  \n- Req-15: The system shall have a login functionality for Doctors, Chemists, and Labs set up with default passwords by Admin.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Successful login for a valid Doctor",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor account is set up with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "User enters username 'doctor1' and password 'defaultPass'",
+            "System validates credentials",
+            "System grants access"
+          ],
+          "expected": [
+            "User is redirected to the Doctor dashboard"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Login with incorrect password for a valid Chemist",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist account is set up with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "chemist1",
+            "password": "wrongPass"
+          },
+          "steps": [
+            "User enters username 'chemist1' and incorrect password",
+            "System validates credentials",
+            "System denies access"
+          ],
+          "expected": [
+            "User receives an error message indicating incorrect password"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Login with incorrect username for a valid Lab",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Lab account is set up with a default password by Admin"
+          ],
+          "inputs": {
+            "username": "labX",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "User enters an incorrect username 'labX_wrong' and correct password",
+            "System validates credentials",
+            "System denies access"
+          ],
+          "expected": [
+            "User receives an error message indicating incorrect username"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "System unavailable due to maintenance",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "System is scheduled for maintenance"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "User attempts to log in",
+            "System checks maintenance status",
+            "System denies access with maintenance notice"
+          ],
+          "expected": [
+            "User sees a maintenance notice and is denied access"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Account locked due to multiple failed attempts",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "User has exceeded the maximum number of failed login attempts"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "wrongPass"
+          },
+          "steps": [
+            "User attempts to log in multiple times with incorrect password",
+            "System increments failed attempts counter",
+            "System denies access with account lock message"
+          ],
+          "expected": [
+            "User receives a message indicating the account is locked"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Boundary test: First login attempt after account lock reset",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Account lock has been reset by Admin"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "User attempts to log in immediately after lock reset",
+            "System validates credentials",
+            "System grants access"
+          ],
+          "expected": [
+            "User is successfully logged in and redirected to the dashboard"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Boundary test: Maximum number of failed login attempts reached",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User has made the maximum number of failed attempts"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "wrongPass"
+          },
+          "steps": [
+            "User attempts to log in at the maximum allowed failed attempts",
+            "System denies access and locks account"
+          ],
+          "expected": [
+            "User receives an account lock message"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Boundary test: Valid login at the edge of allowed time window",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Login attempt is made exactly at the edge of the allowed time window"
+          ],
+          "inputs": {
+            "username": "chemist1",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "User attempts to log in at the edge of the allowed time window",
+            "System validates credentials within the time window",
+            "System grants access"
+          ],
+          "expected": [
+            "User is successfully logged in"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Boundary test: Login attempt just outside the allowed time window",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Login attempt is made just outside the allowed time window"
+          ],
+          "inputs": {
+            "username": "lab1",
+            "password": "defaultPass"
+          },
+          "steps": [
+            "User attempts to log in just outside the allowed time window",
+            "System validates time window",
+            "System denies access"
+          ],
+          "expected": [
+            "User receives a message indicating the login attempt is outside the allowed time window"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Boundary test: Login with the minimum allowed password length",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Password length meets the minimum requirement"
+          ],
+          "inputs": {
+            "username": "doctor1",
+            "password": "minPass"
+          },
+          "steps": [
+            "User enters a password of minimum length",
+            "System validates password length",
+            "System grants access"
+          ],
+          "expected": [
+            "User is successfully logged in"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Boundary test: Login with the maximum allowed password length",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Password length meets the maximum requirement"
+          ],
+          "inputs": {
+            "username": "chemist1",
+            "password": "maxPass1234567890"
+          },
+          "steps": [
+            "User enters a password of maximum length",
+            "System validates password length",
+            "System grants access"
+          ],
+          "expected": [
+            "User is successfully logged in"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.8182,
+        "representation_score": 1.0,
+        "sfv_score": 0.9091,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #4 (TC-004): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #5 (TC-005): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.91). Fix these problems and output the full corrected suite:\n- test case #4 (TC-004): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #5 (TC-005): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Case: Doctor, Chemist, and Lab Login**\n\n**Primary Actor:** Doctor, Chemist, Lab User  \n**Goal:** Authenticate and gain access to the system after being provisioned with a default password by an Admin.\n\n**Preconditions:**  \n1. An Admin has provisioned the user (Doctor, Chemist, or Lab) with a default password.  \n2. The user knows the assigned username and default password.\n\n**Main Success Scenario (Positive Flow):**  \n1. User enters the correct username and default password on the login screen.  \n2. System validates the credentials.  \n3. System grants access to the user's respective interface (Doctor Dashboard, Chemist Interface, or Lab Management).  \n\n**Alternative Flows:**  \n- **AF1:** User enters an incorrect password.  \n  1. System rejects the credentials.  \n  2. System displays an error message: “Invalid password. Please try again.”  \n  3. User may attempt to log in again.  \n\n**Exception Flows:**  \n- **EF1:** User account is locked due to multiple failed login attempts.  \n  1. System rejects the credentials.  \n  2. System displays an error message: “Account is locked. Contact Admin for assistance.”  \n\n**Postconditions:**  \n- Successful login updates the system state to reflect the authenticated user session.  \n- Failed login attempts increment the failed login counter for the user account.  \n\n**Notes:**  \n- The login functionality is limited to users provisioned by an Admin. Unauthorized users attempting login will trigger an exception flow leading to a denial of access.  \n- Passwords can be reset by an Admin post-provisioning.  \n\n---\n\n**User Story: Admin Provisions Default Passwords**\n\n**Primary Actor:** Admin  \n**Goal:** Set up default passwords for Doctors, Chemists, and Labs to enable initial login.\n\n**Preconditions:**  \n1. Admin has access to the system's provisioning interface.  \n2. User IDs for Doctors, Chemists, and Labs are available for assignment.\n\n**Steps:**  \n1. Admin selects the “Provision Users” option.  \n2. Admin enters the username for each user type (Doctor, Chemist, Lab).  \n3. Admin sets a default password for each user.  \n4. Admin confirms the provisioning.  \n\n**Success Criteria:**  \n- System stores the default passwords securely.  \n- Users can log in using the provided credentials immediately after provisioning.  \n\n**Failure Criteria:**  \n- If the system fails to store the password, an error message is displayed, and the Admin must retry.  \n\n**Postconditions:**  \n- Users are ready to log in with the default credentials.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Successful login with correct credentials",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "An Admin has provisioned the user with a default password."
+          ],
+          "inputs": {
+            "username": "doctor_user",
+            "password": "defaultPass123"
+          },
+          "steps": [
+            "Navigate to the login screen.",
+            "Enter the username 'doctor_user'.",
+            "Enter the password 'defaultPass123'.",
+            "Submit the login form."
+          ],
+          "expected": [
+            "System displays the Doctor Dashboard indicating successful authentication."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Login with incorrect password",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "An Admin has provisioned the user with a default password."
+          ],
+          "inputs": {
+            "username": "chemist_user",
+            "password": "wrongPass"
+          },
+          "steps": [
+            "Navigate to the login screen.",
+            "Enter the username 'chemist_user'.",
+            "Enter the incorrect password 'wrongPass'.",
+            "Submit the login form."
+          ],
+          "expected": [
+            "System displays an error message: 'Invalid password. Please try again.'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Login after multiple failed attempts (account lock)",
+          "req_ids": [
+            "Req-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "User has attempted login three times with incorrect passwords.",
+            "System has a lockout policy after three failed attempts."
+          ],
+          "inputs": {
+            "username": "lab_user",
+            "password": "anotherWrongPass"
+          },
+          "steps": [
+            "Attempt login with incorrect password three times.",
+            "On the fourth attempt, submit the login form with any password."
+          ],
+          "expected": [
+            "System displays an error message: 'Account is locked. Contact Admin for assistance.'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.6667,
+        "representation_score": 1.0,
+        "sfv_score": 0.8333,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    }
+  ]
+}

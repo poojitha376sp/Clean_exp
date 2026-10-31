@@ -1,0 +1,800 @@
+{
+  "unit_id": "U11_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 10,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add concrete expected values for battery ETA and alarm triggers.",
+      "Include tests for battery ETA >= thresholds (30min, 10min) to confirm no alarm.",
+      "Add boundary tests at exact threshold values and above to verify correct behavior.",
+      "Make oracle assertions more precise (e.g., specific priority codes or messages).",
+      "Test sensor connection failures and invalid battery status inputs."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.805,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Battery Alarms and Monitoring\n\n  Scenario: GUI computes battery ETA from a history of remaining battery amounts\n    Given the GUI has a history of remaining battery amounts\n    When the GUI calculates the battery ETA\n    Then the battery ETA is computed accurately based on the history\n\n  Scenario: GUI is connected to a battery amount sensor\n    Given the GUI is initialized\n    When the GUI connects to the battery amount sensor\n    Then the GUI successfully retrieves battery amount data from the sensor\n\n  Scenario Outline: GUI computes a \"low battery\" alarm when battery ETA is <30min\n    Given the battery ETA is <time> minutes\n    When the GUI checks the battery ETA\n    Then the \"low battery\" alarm is triggered\n    Examples:\n      | time |\n      | 29   |\n      | 15   |\n      | 0    |\n\n  Scenario Outline: The \"low battery\" alarm is low priority\n    Given the \"low battery\" alarm is triggered\n    When the GUI checks the alarm priority\n    Then the alarm priority is set to low\n    Examples:\n      | time |\n      | 29   |\n      | 15   |\n      | 0    |\n\n  Scenario Outline: GUI computes a \"critically low battery\" alarm when battery ETA is <10min\n    Given the battery ETA is <time> minutes\n    When the GUI checks the battery ETA\n    Then the \"critically low battery\" alarm is triggered\n    Examples:\n      | time |\n      | 9    |\n      | 5    |\n      | 0    |\n\n  Scenario Outline: The \"critically low battery\" alarm is high priority\n    Given the \"critically low battery\" alarm is triggered\n    When the GUI checks the alarm priority\n    Then the alarm priority is set to high\n    Examples:\n      | time |\n      | 9    |\n      | 5    |\n      | 0    |\n\n  Scenario: GUI reads hardware battery presence and chargeability sensors\n    Given the GUI is initialized\n    When the GUI reads the hardware battery presence and chargeability sensors\n    Then the GUI successfully retrieves battery presence and chargeability status\n\n  Scenario: GUI has a \"battery failure\" alarm when the battery is absent, unavailable, or unchargeable\n    Given the battery is <status>\n    When the GUI checks the battery status\n    Then the \"battery failure\" alarm is triggered\n    Examples:\n      | status       |\n      | absent       |\n      | unavailable  |\n      | unchargeable |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "GUI computes battery ETA from a history of remaining battery amounts",
+      "req_ids": [
+        "RW-SW-120"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI has a history of remaining battery amounts"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI calculates the battery ETA"
+      ],
+      "expected": [
+        "the battery ETA is computed accurately based on the history"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "GUI is connected to a battery amount sensor",
+      "req_ids": [
+        "RW-SW-121"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI connects to the battery amount sensor"
+      ],
+      "expected": [
+        "the GUI successfully retrieves battery amount data from the sensor"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "GUI computes a 'low battery' alarm when battery ETA is <30min",
+      "req_ids": [
+        "RW-SW-122"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the battery ETA is <time> minutes"
+      ],
+      "inputs": {
+        "time": "29"
+      },
+      "steps": [
+        "the GUI checks the battery ETA"
+      ],
+      "expected": [
+        "the 'low battery' alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "GUI computes a 'low battery' alarm when battery ETA is <30min",
+      "req_ids": [
+        "RW-SW-122"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the battery ETA is <time> minutes"
+      ],
+      "inputs": {
+        "time": "15"
+      },
+      "steps": [
+        "the GUI checks the battery ETA"
+      ],
+      "expected": [
+        "the 'low battery' alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "GUI computes a 'low battery' alarm when battery ETA is <30min",
+      "req_ids": [
+        "RW-SW-122"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the battery ETA is <time> minutes"
+      ],
+      "inputs": {
+        "time": "0"
+      },
+      "steps": [
+        "the GUI checks the battery ETA"
+      ],
+      "expected": [
+        "the 'low battery' alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "The 'low battery' alarm is low priority",
+      "req_ids": [
+        "RW-SW-123"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the 'low battery' alarm is triggered"
+      ],
+      "inputs": {
+        "time": "29"
+      },
+      "steps": [
+        "the GUI checks the alarm priority"
+      ],
+      "expected": [
+        "the alarm priority is set to low"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "The 'low battery' alarm is low priority",
+      "req_ids": [
+        "RW-SW-123"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the 'low battery' alarm is triggered"
+      ],
+      "inputs": {
+        "time": "15"
+      },
+      "steps": [
+        "the GUI checks the alarm priority"
+      ],
+      "expected": [
+        "the alarm priority is set to low"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "The 'low battery' alarm is low priority",
+      "req_ids": [
+        "RW-SW-123"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the 'low battery' alarm is triggered"
+      ],
+      "inputs": {
+        "time": "0"
+      },
+      "steps": [
+        "the GUI checks the alarm priority"
+      ],
+      "expected": [
+        "the alarm priority is set to low"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "GUI computes a 'critically low battery' alarm when battery ETA is <10min",
+      "req_ids": [
+        "RW-SW-124"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the battery ETA is <time> minutes"
+      ],
+      "inputs": {
+        "time": "9"
+      },
+      "steps": [
+        "the GUI checks the battery ETA"
+      ],
+      "expected": [
+        "the 'critically low battery' alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "GUI computes a 'critically low battery' alarm when battery ETA is <10min",
+      "req_ids": [
+        "RW-SW-124"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the battery ETA is <time> minutes"
+      ],
+      "inputs": {
+        "time": "5"
+      },
+      "steps": [
+        "the GUI checks the battery ETA"
+      ],
+      "expected": [
+        "the 'critically low battery' alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "GUI computes a 'critically low battery' alarm when battery ETA is <10min",
+      "req_ids": [
+        "RW-SW-124"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the battery ETA is <time> minutes"
+      ],
+      "inputs": {
+        "time": "0"
+      },
+      "steps": [
+        "the GUI checks the battery ETA"
+      ],
+      "expected": [
+        "the 'critically low battery' alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "The 'critically low battery' alarm is high priority",
+      "req_ids": [
+        "RW-SW-125"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the 'critically low battery' alarm is triggered"
+      ],
+      "inputs": {
+        "time": "9"
+      },
+      "steps": [
+        "the GUI checks the alarm priority"
+      ],
+      "expected": [
+        "the alarm priority is set to high"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "The 'critically low battery' alarm is high priority",
+      "req_ids": [
+        "RW-SW-125"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the 'critically low battery' alarm is triggered"
+      ],
+      "inputs": {
+        "time": "5"
+      },
+      "steps": [
+        "the GUI checks the alarm priority"
+      ],
+      "expected": [
+        "the alarm priority is set to high"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "The 'critically low battery' alarm is high priority",
+      "req_ids": [
+        "RW-SW-125"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the 'critically low battery' alarm is triggered"
+      ],
+      "inputs": {
+        "time": "0"
+      },
+      "steps": [
+        "the GUI checks the alarm priority"
+      ],
+      "expected": [
+        "the alarm priority is set to high"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "GUI reads hardware battery presence and chargeability sensors",
+      "req_ids": [
+        "RW-SW-128"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI reads the hardware battery presence and chargeability sensors"
+      ],
+      "expected": [
+        "the GUI successfully retrieves battery presence and chargeability status"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "GUI has a 'battery failure' alarm when the battery is absent",
+      "req_ids": [
+        "RW-SW-129"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the battery is absent"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI checks the battery status"
+      ],
+      "expected": [
+        "the 'battery failure' alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "GUI has a 'battery failure' alarm when the battery is unavailable",
+      "req_ids": [
+        "RW-SW-129"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the battery is unavailable"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI checks the battery status"
+      ],
+      "expected": [
+        "the 'battery failure' alarm is triggered"
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "GUI has a 'battery failure' alarm when the battery is unchargeable",
+      "req_ids": [
+        "RW-SW-129"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the battery is unchargeable"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI checks the battery status"
+      ],
+      "expected": [
+        "the 'battery failure' alarm is triggered"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Battery Alarms and Monitoring\n\n  Scenario: GUI computes battery ETA from a history of remaining battery amounts\n    Given the GUI has a history of remaining battery amounts\n    When the GUI calculates the battery ETA\n    Then the battery ETA is computed accurately based on the history\n\n  Scenario: GUI is connected to a battery amount sensor\n    Given the GUI is initialized\n    When the GUI connects to the battery amount sensor\n    Then the GUI successfully retrieves battery amount data from the sensor\n\n  Scenario Outline: GUI computes a \"low battery\" alarm when battery ETA is <30min\n    Given the battery ETA is <time> minutes\n    When the GUI checks the battery ETA\n    Then the \"low battery\" alarm is triggered\n    Examples:\n      | time |\n      | 29   |\n      | 15   |\n      | 0    |\n\n  Scenario Outline: The \"low battery\" alarm is low priority\n    Given the \"low battery\" alarm is triggered\n    When the GUI checks the alarm priority\n    Then the alarm priority is set to low\n    Examples:\n      | time |\n      | 29   |\n      | 15   |\n      | 0    |\n\n  Scenario Outline: GUI computes a \"critically low battery\" alarm when battery ETA is <10min\n    Given the battery ETA is <time> minutes\n    When the GUI checks the battery ETA\n    Then the \"critically low battery\" alarm is triggered\n    Examples:\n      | time |\n      | 9    |\n      | 5    |\n      | 0    |\n\n  Scenario Outline: The \"critically low battery\" alarm is high priority\n    Given the \"critically low battery\" alarm is triggered\n    When the GUI checks the alarm priority\n    Then the alarm priority is set to high\n    Examples:\n      | time |\n      | 9    |\n      | 5    |\n      | 0    |\n\n  Scenario: GUI reads hardware battery presence and chargeability sensors\n    Given the GUI is initialized\n    When the GUI reads the hardware battery presence and chargeability sensors\n    Then the GUI successfully retrieves battery presence and chargeability status\n\n  Scenario: GUI has a \"battery failure\" alarm when the battery is absent, unavailable, or unchargeable\n    Given the battery is <status>\n    When the GUI checks the battery status\n    Then the \"battery failure\" alarm is triggered\n    Examples:\n      | status       |\n      | absent       |\n      | unavailable  |\n      | unchargeable |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI computes battery ETA from a history of remaining battery amounts",
+          "req_ids": [
+            "RW-SW-120"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI has a history of remaining battery amounts"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI calculates the battery ETA"
+          ],
+          "expected": [
+            "the battery ETA is computed accurately based on the history"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI is connected to a battery amount sensor",
+          "req_ids": [
+            "RW-SW-121"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI connects to the battery amount sensor"
+          ],
+          "expected": [
+            "the GUI successfully retrieves battery amount data from the sensor"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI computes a 'low battery' alarm when battery ETA is <30min",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the battery ETA is <time> minutes"
+          ],
+          "inputs": {
+            "time": "29"
+          },
+          "steps": [
+            "the GUI checks the battery ETA"
+          ],
+          "expected": [
+            "the 'low battery' alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI computes a 'low battery' alarm when battery ETA is <30min",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the battery ETA is <time> minutes"
+          ],
+          "inputs": {
+            "time": "15"
+          },
+          "steps": [
+            "the GUI checks the battery ETA"
+          ],
+          "expected": [
+            "the 'low battery' alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI computes a 'low battery' alarm when battery ETA is <30min",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the battery ETA is <time> minutes"
+          ],
+          "inputs": {
+            "time": "0"
+          },
+          "steps": [
+            "the GUI checks the battery ETA"
+          ],
+          "expected": [
+            "the 'low battery' alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "The 'low battery' alarm is low priority",
+          "req_ids": [
+            "RW-SW-123"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the 'low battery' alarm is triggered"
+          ],
+          "inputs": {
+            "time": "29"
+          },
+          "steps": [
+            "the GUI checks the alarm priority"
+          ],
+          "expected": [
+            "the alarm priority is set to low"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "The 'low battery' alarm is low priority",
+          "req_ids": [
+            "RW-SW-123"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the 'low battery' alarm is triggered"
+          ],
+          "inputs": {
+            "time": "15"
+          },
+          "steps": [
+            "the GUI checks the alarm priority"
+          ],
+          "expected": [
+            "the alarm priority is set to low"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "The 'low battery' alarm is low priority",
+          "req_ids": [
+            "RW-SW-123"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the 'low battery' alarm is triggered"
+          ],
+          "inputs": {
+            "time": "0"
+          },
+          "steps": [
+            "the GUI checks the alarm priority"
+          ],
+          "expected": [
+            "the alarm priority is set to low"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI computes a 'critically low battery' alarm when battery ETA is <10min",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the battery ETA is <time> minutes"
+          ],
+          "inputs": {
+            "time": "9"
+          },
+          "steps": [
+            "the GUI checks the battery ETA"
+          ],
+          "expected": [
+            "the 'critically low battery' alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI computes a 'critically low battery' alarm when battery ETA is <10min",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the battery ETA is <time> minutes"
+          ],
+          "inputs": {
+            "time": "5"
+          },
+          "steps": [
+            "the GUI checks the battery ETA"
+          ],
+          "expected": [
+            "the 'critically low battery' alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "GUI computes a 'critically low battery' alarm when battery ETA is <10min",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the battery ETA is <time> minutes"
+          ],
+          "inputs": {
+            "time": "0"
+          },
+          "steps": [
+            "the GUI checks the battery ETA"
+          ],
+          "expected": [
+            "the 'critically low battery' alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "The 'critically low battery' alarm is high priority",
+          "req_ids": [
+            "RW-SW-125"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the 'critically low battery' alarm is triggered"
+          ],
+          "inputs": {
+            "time": "9"
+          },
+          "steps": [
+            "the GUI checks the alarm priority"
+          ],
+          "expected": [
+            "the alarm priority is set to high"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "The 'critically low battery' alarm is high priority",
+          "req_ids": [
+            "RW-SW-125"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the 'critically low battery' alarm is triggered"
+          ],
+          "inputs": {
+            "time": "5"
+          },
+          "steps": [
+            "the GUI checks the alarm priority"
+          ],
+          "expected": [
+            "the alarm priority is set to high"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "The 'critically low battery' alarm is high priority",
+          "req_ids": [
+            "RW-SW-125"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the 'critically low battery' alarm is triggered"
+          ],
+          "inputs": {
+            "time": "0"
+          },
+          "steps": [
+            "the GUI checks the alarm priority"
+          ],
+          "expected": [
+            "the alarm priority is set to high"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "GUI reads hardware battery presence and chargeability sensors",
+          "req_ids": [
+            "RW-SW-128"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI reads the hardware battery presence and chargeability sensors"
+          ],
+          "expected": [
+            "the GUI successfully retrieves battery presence and chargeability status"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "GUI has a 'battery failure' alarm when the battery is absent",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the battery is absent"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks the battery status"
+          ],
+          "expected": [
+            "the 'battery failure' alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "GUI has a 'battery failure' alarm when the battery is unavailable",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the battery is unavailable"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks the battery status"
+          ],
+          "expected": [
+            "the 'battery failure' alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "GUI has a 'battery failure' alarm when the battery is unchargeable",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the battery is unchargeable"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks the battery status"
+          ],
+          "expected": [
+            "the 'battery failure' alarm is triggered"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 10,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add concrete expected values for battery ETA and alarm triggers.",
+          "Include tests for battery ETA >= thresholds (30min, 10min) to confirm no alarm.",
+          "Add boundary tests at exact threshold values and above to verify correct behavior.",
+          "Make oracle assertions more precise (e.g., specific priority codes or messages).",
+          "Test sensor connection failures and invalid battery status inputs."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.805,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

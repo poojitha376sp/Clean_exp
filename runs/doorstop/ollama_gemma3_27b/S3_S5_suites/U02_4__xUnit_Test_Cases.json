@@ -1,0 +1,448 @@
+{
+  "unit_id": "U02_4",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:gemma3:27b",
+  "system_type": "standard",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.75,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "REQ001",
+        "context": "requirement ID",
+        "grounded": false
+      },
+      {
+        "value": "This is a test requirement.",
+        "context": "requirement text",
+        "grounded": false
+      },
+      {
+        "value": "dev123",
+        "context": "developer ID",
+        "grounded": false
+      },
+      {
+        "value": "datetime.datetime instance",
+        "context": "timestamp type",
+        "grounded": false
+      },
+      {
+        "value": "Updated requirement text.",
+        "context": "updated requirement text",
+        "grounded": false
+      },
+      {
+        "value": "dev456",
+        "context": "developer ID for update",
+        "grounded": false
+      },
+      {
+        "value": 1,
+        "context": "change history length",
+        "grounded": false
+      },
+      {
+        "value": "Initial requirement text.",
+        "context": "old requirement text",
+        "grounded": false
+      },
+      {
+        "value": "REQ999",
+        "context": "nonexistent requirement ID",
+        "grounded": false
+      },
+      {
+        "value": 1000,
+        "context": "number of requirements stored",
+        "grounded": false
+      },
+      {
+        "value": "dev001",
+        "context": "developer ID for scalability",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 11,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add tests for security aspects of requirement storage.",
+      "Verify persistence across sessions to ensure permanence.",
+      "Test scalability with higher thresholds (e.g., 10,000).",
+      "Add explicit exception handling tests for invalid inputs.",
+      "Improve assertion of lightweight installation by checking installation footprint."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.5125,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "import unittest\nfrom unittest.mock import patch\nimport datetime\n\n# Mock Doorstop class for testing.  Replace with actual implementation in a real test suite.\nclass Doorstop:\n    def __init__(self):\n        self.requirements = {}\n        self.change_history = {}\n\n    def store_requirement(self, req_id, requirement_text, developer_id):\n        self.requirements[req_id] = {\"text\": requirement_text, \"developer_id\": developer_id, \"timestamp\": datetime.datetime.now()}\n        self.change_history[req_id] = []\n\n    def update_requirement(self, req_id, new_requirement_text, developer_id):\n        if req_id in self.requirements:\n            old_text = self.requirements[req_id][\"text\"]\n            self.requirements[req_id] = {\"text\": new_requirement_text, \"developer_id\": developer_id, \"timestamp\": datetime.datetime.now()}\n            self.change_history[req_id].append({\"old_text\": old_text, \"developer_id\": developer_id, \"timestamp\": datetime.datetime.now()})\n            return True\n        else:\n            return False\n\n    def get_requirement(self, req_id):\n        return self.requirements.get(req_id)\n\n    def get_change_history(self, req_id):\n        return self.change_history.get(req_id)\n\nclass TestDoorstop(unittest.TestCase):\n\n    def setUp(self):\n        self.doorstop = Doorstop()\n\n    def test_store_requirement(self):\n        #REQ011, REQ013\n        req_id = \"REQ001\"\n        requirement_text = \"This is a test requirement.\"\n        developer_id = \"dev123\"\n        self.doorstop.store_requirement(req_id, requirement_text, developer_id)\n        stored_req = self.doorstop.get_requirement(req_id)\n        self.assertEqual(stored_req[\"text\"], requirement_text)\n        self.assertEqual(stored_req[\"developer_id\"], developer_id)\n        self.assertIsInstance(stored_req[\"timestamp\"], datetime.datetime)\n\n    def test_update_requirement(self):\n        #REQ012, REQ013\n        req_id = \"REQ001\"\n        initial_text = \"Initial requirement text.\"\n        developer_id_initial = \"dev123\"\n        self.doorstop.store_requirement(req_id, initial_text, developer_id_initial)\n\n        new_text = \"Updated requirement text.\"\n        developer_id_update = \"dev456\"\n        success = self.doorstop.update_requirement(req_id, new_text, developer_id_update)\n        self.assertTrue(success)\n\n        updated_req = self.doorstop.get_requirement(req_id)\n        self.assertEqual(updated_req[\"text\"], new_text)\n        self.assertEqual(updated_req[\"developer_id\"], developer_id_update)\n\n        change_history = self.doorstop.get_change_history(req_id)\n        self.assertEqual(len(change_history), 1)\n        self.assertEqual(change_history[0][\"old_text\"], initial_text)\n        self.assertEqual(change_history[0][\"developer_id\"], developer_id_initial)\n        self.assertIsInstance(change_history[0][\"timestamp\"], datetime.datetime)\n\n    def test_update_nonexistent_requirement(self):\n        #REQ012 (negative)\n        req_id = \"REQ999\"\n        new_text = \"Some text\"\n        developer_id = \"dev789\"\n        success = self.doorstop.update_requirement(req_id, new_text, developer_id)\n        self.assertFalse(success)\n\n    def test_get_nonexistent_requirement(self):\n        #REQ011 (negative)\n        req_id = \"REQ999\"\n        req = self.doorstop.get_requirement(req_id)\n        self.assertIsNone(req)\n\n    def test_scalability(self):\n        #REQ014\n        num_requirements = 1000\n        for i in range(num_requirements):\n            req_id = f\"REQ{i:03d}\"\n            self.doorstop.store_requirement(req_id, f\"Requirement {i}\", \"dev001\")\n\n        for i in range(num_requirements):\n            req_id = f\"REQ{i:03d}\"\n            self.assertIn(req_id, self.doorstop.requirements)\n\n    def test_lightweight_installation(self):\n        #REQ015 - This is difficult to test directly without knowing the installation process.\n        # We'll simulate a lightweight installation by checking that the Doorstop class can be instantiated\n        # without external dependencies (beyond standard library).  This is a weak test, but the best we can do\n        # given the requirement's vagueness.\n        try:\n            doorstop = Doorstop()\n            self.assertTrue(True) # If instantiation succeeds, the test passes.\n        except Exception as e:\n            self.fail(f\"Lightweight installation failed: {e}\")",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Store Requirement - Positive",
+      "req_ids": [
+        "REQ011",
+        "REQ013"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "req_id": "REQ001",
+        "requirement_text": "This is a test requirement.",
+        "developer_id": "dev123"
+      },
+      "steps": [
+        "Store a requirement"
+      ],
+      "expected": [
+        "Requirement is stored with correct text and developer ID."
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Update Requirement - Positive",
+      "req_ids": [
+        "REQ012",
+        "REQ013"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "REQ001 exists"
+      ],
+      "inputs": {
+        "req_id": "REQ001",
+        "new_requirement_text": "Updated requirement text.",
+        "developer_id": "dev456"
+      },
+      "steps": [
+        "Update an existing requirement"
+      ],
+      "expected": [
+        "Requirement is updated with new text and developer ID. Change history is updated."
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Update Nonexistent Requirement - Negative",
+      "req_ids": [
+        "REQ012"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "req_id": "REQ999",
+        "new_requirement_text": "Some text",
+        "developer_id": "dev789"
+      },
+      "steps": [
+        "Attempt to update a non-existent requirement"
+      ],
+      "expected": [
+        "Update operation returns False."
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Get Nonexistent Requirement - Negative",
+      "req_ids": [
+        "REQ011"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "req_id": "REQ999"
+      },
+      "steps": [
+        "Attempt to retrieve a non-existent requirement"
+      ],
+      "expected": [
+        "Retrieval operation returns None."
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Scalability - Thousands of Requirements",
+      "req_ids": [
+        "REQ014"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "num_requirements": 1000
+      },
+      "steps": [
+        "Store 1000 requirements"
+      ],
+      "expected": [
+        "All 1000 requirements are stored successfully."
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Lightweight Installation - Positive",
+      "req_ids": [
+        "REQ015"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Instantiate Doorstop class"
+      ],
+      "expected": [
+        "Doorstop class can be instantiated without errors."
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "import unittest\nfrom unittest.mock import patch\nimport datetime\n\n# Mock Doorstop class for testing.  Replace with actual implementation in a real test suite.\nclass Doorstop:\n    def __init__(self):\n        self.requirements = {}\n        self.change_history = {}\n\n    def store_requirement(self, req_id, requirement_text, developer_id):\n        self.requirements[req_id] = {\"text\": requirement_text, \"developer_id\": developer_id, \"timestamp\": datetime.datetime.now()}\n        self.change_history[req_id] = []\n\n    def update_requirement(self, req_id, new_requirement_text, developer_id):\n        if req_id in self.requirements:\n            old_text = self.requirements[req_id][\"text\"]\n            self.requirements[req_id] = {\"text\": new_requirement_text, \"developer_id\": developer_id, \"timestamp\": datetime.datetime.now()}\n            self.change_history[req_id].append({\"old_text\": old_text, \"developer_id\": developer_id, \"timestamp\": datetime.datetime.now()})\n            return True\n        else:\n            return False\n\n    def get_requirement(self, req_id):\n        return self.requirements.get(req_id)\n\n    def get_change_history(self, req_id):\n        return self.change_history.get(req_id)\n\nclass TestDoorstop(unittest.TestCase):\n\n    def setUp(self):\n        self.doorstop = Doorstop()\n\n    def test_store_requirement(self):\n        #REQ011, REQ013\n        req_id = \"REQ001\"\n        requirement_text = \"This is a test requirement.\"\n        developer_id = \"dev123\"\n        self.doorstop.store_requirement(req_id, requirement_text, developer_id)\n        stored_req = self.doorstop.get_requirement(req_id)\n        self.assertEqual(stored_req[\"text\"], requirement_text)\n        self.assertEqual(stored_req[\"developer_id\"], developer_id)\n        self.assertIsInstance(stored_req[\"timestamp\"], datetime.datetime)\n\n    def test_update_requirement(self):\n        #REQ012, REQ013\n        req_id = \"REQ001\"\n        initial_text = \"Initial requirement text.\"\n        developer_id_initial = \"dev123\"\n        self.doorstop.store_requirement(req_id, initial_text, developer_id_initial)\n\n        new_text = \"Updated requirement text.\"\n        developer_id_update = \"dev456\"\n        success = self.doorstop.update_requirement(req_id, new_text, developer_id_update)\n        self.assertTrue(success)\n\n        updated_req = self.doorstop.get_requirement(req_id)\n        self.assertEqual(updated_req[\"text\"], new_text)\n        self.assertEqual(updated_req[\"developer_id\"], developer_id_update)\n\n        change_history = self.doorstop.get_change_history(req_id)\n        self.assertEqual(len(change_history), 1)\n        self.assertEqual(change_history[0][\"old_text\"], initial_text)\n        self.assertEqual(change_history[0][\"developer_id\"], developer_id_initial)\n        self.assertIsInstance(change_history[0][\"timestamp\"], datetime.datetime)\n\n    def test_update_nonexistent_requirement(self):\n        #REQ012 (negative)\n        req_id = \"REQ999\"\n        new_text = \"Some text\"\n        developer_id = \"dev789\"\n        success = self.doorstop.update_requirement(req_id, new_text, developer_id)\n        self.assertFalse(success)\n\n    def test_get_nonexistent_requirement(self):\n        #REQ011 (negative)\n        req_id = \"REQ999\"\n        req = self.doorstop.get_requirement(req_id)\n        self.assertIsNone(req)\n\n    def test_scalability(self):\n        #REQ014\n        num_requirements = 1000\n        for i in range(num_requirements):\n            req_id = f\"REQ{i:03d}\"\n            self.doorstop.store_requirement(req_id, f\"Requirement {i}\", \"dev001\")\n\n        for i in range(num_requirements):\n            req_id = f\"REQ{i:03d}\"\n            self.assertIn(req_id, self.doorstop.requirements)\n\n    def test_lightweight_installation(self):\n        #REQ015 - This is difficult to test directly without knowing the installation process.\n        # We'll simulate a lightweight installation by checking that the Doorstop class can be instantiated\n        # without external dependencies (beyond standard library).  This is a weak test, but the best we can do\n        # given the requirement's vagueness.\n        try:\n            doorstop = Doorstop()\n            self.assertTrue(True) # If instantiation succeeds, the test passes.\n        except Exception as e:\n            self.fail(f\"Lightweight installation failed: {e}\")",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Store Requirement - Positive",
+          "req_ids": [
+            "REQ011",
+            "REQ013"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "req_id": "REQ001",
+            "requirement_text": "This is a test requirement.",
+            "developer_id": "dev123"
+          },
+          "steps": [
+            "Store a requirement"
+          ],
+          "expected": [
+            "Requirement is stored with correct text and developer ID."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Update Requirement - Positive",
+          "req_ids": [
+            "REQ012",
+            "REQ013"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "REQ001 exists"
+          ],
+          "inputs": {
+            "req_id": "REQ001",
+            "new_requirement_text": "Updated requirement text.",
+            "developer_id": "dev456"
+          },
+          "steps": [
+            "Update an existing requirement"
+          ],
+          "expected": [
+            "Requirement is updated with new text and developer ID. Change history is updated."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Update Nonexistent Requirement - Negative",
+          "req_ids": [
+            "REQ012"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "req_id": "REQ999",
+            "new_requirement_text": "Some text",
+            "developer_id": "dev789"
+          },
+          "steps": [
+            "Attempt to update a non-existent requirement"
+          ],
+          "expected": [
+            "Update operation returns False."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Get Nonexistent Requirement - Negative",
+          "req_ids": [
+            "REQ011"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "req_id": "REQ999"
+          },
+          "steps": [
+            "Attempt to retrieve a non-existent requirement"
+          ],
+          "expected": [
+            "Retrieval operation returns None."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Scalability - Thousands of Requirements",
+          "req_ids": [
+            "REQ014"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "num_requirements": 1000
+          },
+          "steps": [
+            "Store 1000 requirements"
+          ],
+          "expected": [
+            "All 1000 requirements are stored successfully."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Lightweight Installation - Positive",
+          "req_ids": [
+            "REQ015"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Instantiate Doorstop class"
+          ],
+          "expected": [
+            "Doorstop class can be instantiated without errors."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.75,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "REQ001",
+            "context": "requirement ID",
+            "grounded": false
+          },
+          {
+            "value": "This is a test requirement.",
+            "context": "requirement text",
+            "grounded": false
+          },
+          {
+            "value": "dev123",
+            "context": "developer ID",
+            "grounded": false
+          },
+          {
+            "value": "datetime.datetime instance",
+            "context": "timestamp type",
+            "grounded": false
+          },
+          {
+            "value": "Updated requirement text.",
+            "context": "updated requirement text",
+            "grounded": false
+          },
+          {
+            "value": "dev456",
+            "context": "developer ID for update",
+            "grounded": false
+          },
+          {
+            "value": 1,
+            "context": "change history length",
+            "grounded": false
+          },
+          {
+            "value": "Initial requirement text.",
+            "context": "old requirement text",
+            "grounded": false
+          },
+          {
+            "value": "REQ999",
+            "context": "nonexistent requirement ID",
+            "grounded": false
+          },
+          {
+            "value": 1000,
+            "context": "number of requirements stored",
+            "grounded": false
+          },
+          {
+            "value": "dev001",
+            "context": "developer ID for scalability",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 11,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add tests for security aspects of requirement storage.",
+          "Verify persistence across sessions to ensure permanence.",
+          "Test scalability with higher thresholds (e.g., 10,000).",
+          "Add explicit exception handling tests for invalid inputs.",
+          "Improve assertion of lightweight installation by checking installation footprint."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.5125,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

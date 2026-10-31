@@ -1,0 +1,344 @@
+{
+  "unit_id": "U21_Logging",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:qwen3:30b-a3b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "Flow rate: 10 L/min",
+        "context": "ventilation setting string",
+        "grounded": false
+      },
+      {
+        "value": "timestamp",
+        "context": "key in log entry",
+        "grounded": false
+      },
+      {
+        "value": "2023-10-05T12:00:00",
+        "context": "current time string",
+        "grounded": false
+      },
+      {
+        "value": "2023-10-05T12:05:00",
+        "context": "new time string",
+        "grounded": false
+      },
+      {
+        "value": "Current: 2023-10-05T12:00:00",
+        "context": "log entry content",
+        "grounded": false
+      },
+      {
+        "value": "New: 2023-10-05T12:05:00",
+        "context": "log entry content",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 6,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "1. Mock responses are not deterministic; ensure mock_non_volatile_storage.read_last_entry returns a predictable structure.",
+      "2. Timestamp format is not verified; add checks for ISO 8601 or required format.",
+      "3. No tests for exception handling or invalid inputs; use pytest.raises to cover error paths.",
+      "4. Verify that write is called with the correct log entry structure, not just that it was called.",
+      "5. Add boundary tests for maximum log size or log entry count if applicable."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.835,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "import pytest\nfrom unittest.mock import MagicMock\n\nclass TestEventLogger:\n    def test_ventilation_setting_confirmed_logs_setting_and_timestamp(self, mock_non_volatile_storage):\n        # Precondition: mock_non_volatile_storage is set up to be non-volatile\n        logger = EventLogger(mock_non_volatile_storage)\n        # Action: Confirm a ventilation setting\n        logger.log_ventilation_setting(\"Flow rate: 10 L/min\")\n        # Expected: The log entry contains the setting and a timestamp\n        last_entry = mock_non_volatile_storage.read_last_entry()\n        assert \"Flow rate: 10 L/min\" in last_entry\n        assert \"timestamp\" in last_entry\n        assert last_entry[\"timestamp\"] != \"\"\n\n    def test_rtc_change_logs_current_and_new_time(self, mock_non_volatile_storage):\n        logger = EventLogger(mock_non_volatile_storage)\n        current_time = \"2023-10-05T12:00:00\"\n        new_time = \"2023-10-05T12:05:00\"\n        logger.log_rtc_change(current_time, new_time)\n        last_entry = mock_non_volatile_storage.read_last_entry()\n        assert \"Current: \" + current_time in last_entry\n        assert \"New: \" + new_time in last_entry\n\n    def test_log_is_stored_in_non_volatile_memory(self, mock_non_volatile_storage):\n        logger = EventLogger(mock_non_volatile_storage)\n        logger.log_ventilation_setting(\"Flow rate: 10 L/min\")\n        # Check that the mock storage was written to\n        assert mock_non_volatile_storage.write.called\n\n    def test_unconfirmed_ventilation_setting_not_logged(self, mock_non_volatile_storage):\n        logger = EventLogger(mock_non_volatile_storage)\n        # Set without confirmation (assuming a method that doesn't log until confirmed)\n        logger.set_ventilation_setting(\"Flow rate: 10 L/min\")\n        # Check that no log was written\n        assert not mock_non_volatile_storage.write.called",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Confirmed ventilation setting is logged with timestamp",
+      "req_ids": [
+        "RW-SW-25",
+        "RW-SW-29"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "EventLogger initialized with non-volatile storage"
+      ],
+      "inputs": {
+        "ventilation_setting": "Flow rate: 10 L/min"
+      },
+      "steps": [
+        "Confirm ventilation setting",
+        "Check log entry"
+      ],
+      "expected": [
+        "Log entry contains ventilation setting",
+        "Log entry contains timestamp"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "RTC change is logged with current and new time",
+      "req_ids": [
+        "RW-SW-30"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Current RTC set to '2023-10-05T12:00:00'",
+        "New RTC set to '2023-10-05T12:05:00'"
+      ],
+      "inputs": {
+        "current_time": "2023-10-05T12:00:00",
+        "new_time": "2023-10-05T12:05:00"
+      },
+      "steps": [
+        "Change RTC",
+        "Check log entry"
+      ],
+      "expected": [
+        "Log entry contains 'Current: 2023-10-05T12:00:00'",
+        "Log entry contains 'New: 2023-10-05T12:05:00'"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Log is stored in non-volatile memory",
+      "req_ids": [
+        "RW-SW-23"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "EventLogger initialized with non-volatile storage mock"
+      ],
+      "inputs": {
+        "event": "ventilation setting confirmation"
+      },
+      "steps": [
+        "Log an event",
+        "Check storage"
+      ],
+      "expected": [
+        "Non-volatile storage was written to"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Unconfirmed ventilation setting is not logged",
+      "req_ids": [
+        "RW-SW-25"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "EventLogger initialized with non-volatile storage"
+      ],
+      "inputs": {
+        "ventilation_setting": "Flow rate: 10 L/min"
+      },
+      "steps": [
+        "Set ventilation setting without confirmation",
+        "Check log"
+      ],
+      "expected": [
+        "No log entry created"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "import pytest\nfrom unittest.mock import MagicMock\n\nclass TestEventLogger:\n    def test_ventilation_setting_confirmed_logs_setting_and_timestamp(self, mock_non_volatile_storage):\n        # Precondition: mock_non_volatile_storage is set up to be non-volatile\n        logger = EventLogger(mock_non_volatile_storage)\n        # Action: Confirm a ventilation setting\n        logger.log_ventilation_setting(\"Flow rate: 10 L/min\")\n        # Expected: The log entry contains the setting and a timestamp\n        last_entry = mock_non_volatile_storage.read_last_entry()\n        assert \"Flow rate: 10 L/min\" in last_entry\n        assert \"timestamp\" in last_entry\n        assert last_entry[\"timestamp\"] != \"\"\n\n    def test_rtc_change_logs_current_and_new_time(self, mock_non_volatile_storage):\n        logger = EventLogger(mock_non_volatile_storage)\n        current_time = \"2023-10-05T12:00:00\"\n        new_time = \"2023-10-05T12:05:00\"\n        logger.log_rtc_change(current_time, new_time)\n        last_entry = mock_non_volatile_storage.read_last_entry()\n        assert \"Current: \" + current_time in last_entry\n        assert \"New: \" + new_time in last_entry\n\n    def test_log_is_stored_in_non_volatile_memory(self, mock_non_volatile_storage):\n        logger = EventLogger(mock_non_volatile_storage)\n        logger.log_ventilation_setting(\"Flow rate: 10 L/min\")\n        # Check that the mock storage was written to\n        assert mock_non_volatile_storage.write.called\n\n    def test_unconfirmed_ventilation_setting_not_logged(self, mock_non_volatile_storage):\n        logger = EventLogger(mock_non_volatile_storage)\n        # Set without confirmation (assuming a method that doesn't log until confirmed)\n        logger.set_ventilation_setting(\"Flow rate: 10 L/min\")\n        # Check that no log was written\n        assert not mock_non_volatile_storage.write.called",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Confirmed ventilation setting is logged with timestamp",
+          "req_ids": [
+            "RW-SW-25",
+            "RW-SW-29"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "EventLogger initialized with non-volatile storage"
+          ],
+          "inputs": {
+            "ventilation_setting": "Flow rate: 10 L/min"
+          },
+          "steps": [
+            "Confirm ventilation setting",
+            "Check log entry"
+          ],
+          "expected": [
+            "Log entry contains ventilation setting",
+            "Log entry contains timestamp"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "RTC change is logged with current and new time",
+          "req_ids": [
+            "RW-SW-30"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Current RTC set to '2023-10-05T12:00:00'",
+            "New RTC set to '2023-10-05T12:05:00'"
+          ],
+          "inputs": {
+            "current_time": "2023-10-05T12:00:00",
+            "new_time": "2023-10-05T12:05:00"
+          },
+          "steps": [
+            "Change RTC",
+            "Check log entry"
+          ],
+          "expected": [
+            "Log entry contains 'Current: 2023-10-05T12:00:00'",
+            "Log entry contains 'New: 2023-10-05T12:05:00'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Log is stored in non-volatile memory",
+          "req_ids": [
+            "RW-SW-23"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "EventLogger initialized with non-volatile storage mock"
+          ],
+          "inputs": {
+            "event": "ventilation setting confirmation"
+          },
+          "steps": [
+            "Log an event",
+            "Check storage"
+          ],
+          "expected": [
+            "Non-volatile storage was written to"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Unconfirmed ventilation setting is not logged",
+          "req_ids": [
+            "RW-SW-25"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "EventLogger initialized with non-volatile storage"
+          ],
+          "inputs": {
+            "ventilation_setting": "Flow rate: 10 L/min"
+          },
+          "steps": [
+            "Set ventilation setting without confirmation",
+            "Check log"
+          ],
+          "expected": [
+            "No log entry created"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "Flow rate: 10 L/min",
+            "context": "ventilation setting string",
+            "grounded": false
+          },
+          {
+            "value": "timestamp",
+            "context": "key in log entry",
+            "grounded": false
+          },
+          {
+            "value": "2023-10-05T12:00:00",
+            "context": "current time string",
+            "grounded": false
+          },
+          {
+            "value": "2023-10-05T12:05:00",
+            "context": "new time string",
+            "grounded": false
+          },
+          {
+            "value": "Current: 2023-10-05T12:00:00",
+            "context": "log entry content",
+            "grounded": false
+          },
+          {
+            "value": "New: 2023-10-05T12:05:00",
+            "context": "log entry content",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 6,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "1. Mock responses are not deterministic; ensure mock_non_volatile_storage.read_last_entry returns a predictable structure.",
+          "2. Timestamp format is not verified; add checks for ISO 8601 or required format.",
+          "3. No tests for exception handling or invalid inputs; use pytest.raises to cover error paths.",
+          "4. Verify that write is called with the correct log entry structure, not just that it was called.",
+          "5. Add boundary tests for maximum log size or log entry count if applicable."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.835,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

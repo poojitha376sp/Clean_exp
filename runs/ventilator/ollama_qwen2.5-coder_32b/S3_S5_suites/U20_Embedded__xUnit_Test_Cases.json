@@ -1,0 +1,554 @@
+{
+  "unit_id": "U20_Embedded",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "safety_critical",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 1.0,
+    "boundary_coverage": 0.0,
+    "groundedness_mg": 0.2105,
+    "hallucinated": [
+      {
+        "value": 10,
+        "context": "commanded pressure value",
+        "grounded": false
+      },
+      {
+        "value": 5,
+        "context": "PEEP value",
+        "grounded": false
+      },
+      {
+        "value": -0.1,
+        "context": "offset to keep measured pressure within limit",
+        "grounded": false
+      },
+      {
+        "value": 10,
+        "context": "commanded PEEP value",
+        "grounded": false
+      },
+      {
+        "value": -0.1,
+        "context": "offset for PEEP measurement",
+        "grounded": false
+      },
+      {
+        "value": 0.21,
+        "context": "target FiO2 value",
+        "grounded": false
+      },
+      {
+        "value": -0.01,
+        "context": "offset for FiO2 measurement",
+        "grounded": false
+      },
+      {
+        "value": 0.21,
+        "context": "measured FiO2 value",
+        "grounded": false
+      },
+      {
+        "value": 10,
+        "context": "commanded pressure in commanded_values",
+        "grounded": false
+      },
+      {
+        "value": 5,
+        "context": "commanded PEEP in commanded_values",
+        "grounded": false
+      },
+      {
+        "value": 0.21,
+        "context": "commanded FiO2 in commanded_values",
+        "grounded": false
+      },
+      {
+        "value": 1000,
+        "context": "absurd pressure command",
+        "grounded": false
+      },
+      {
+        "value": 1000,
+        "context": "absurd PEEP command",
+        "grounded": false
+      },
+      {
+        "value": 2,
+        "context": "absurd FiO2 command",
+        "grounded": false
+      },
+      {
+        "value": "Invalid command values",
+        "context": "error message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 19,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Boundary values not tested – only values slightly within limits are used.",
+      "Lower bounds and negative tolerance checks are missing.",
+      "Mocks hide actual controller logic – integration tests are absent.",
+      "Safety test only verifies exception raising, not that the controller ignores absurd commands.",
+      "Error messages and data‑corruption handling are not fully verified."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.7211,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\nfrom controller import Controller  # Assuming the controller logic is in a module named 'controller'\n\nclass TestController(unittest.TestCase):\n\n    def setUp(self):\n        self.controller = Controller()\n\n    @patch('controller.Controller.get_measured_pressure')\n    def test_meet_commanded_pressure_within_overshoot(self, mock_get_measured_pressure):\n        # Given\n        commanded_pressure = 10  # Example commanded pressure\n        PEEP = 5  # Example PEEP value\n        overshoot_limit = 0.8 * PEEP - 1  # Calculated overshoot limit\n        mock_get_measured_pressure.return_value = commanded_pressure + overshoot_limit - 0.1  # Slightly within limit\n\n        # When\n        self.controller.set_commanded_pressure(commanded_pressure)\n        self.controller.set_PEEP(PEEP)\n        self.controller.pressure_fall_phase()\n\n        # Then\n        self.assertTrue(mock_get_measured_pressure.return_value <= commanded_pressure + overshoot_limit)\n\n    @patch('controller.Controller.get_measured_PEEP')\n    def test_meet_commanded_PEEP_within_tolerance(self, mock_get_measured_PEEP):\n        # Given\n        commanded_PEEP = 10  # Example commanded PEEP\n        tolerance = 1 + 0.1 * commanded_PEEP  # Calculated tolerance\n        mock_get_measured_PEEP.return_value = commanded_PEEP + tolerance - 0.1  # Slightly within limit\n\n        # When\n        self.controller.set_commanded_PEEP(commanded_PEEP)\n        self.controller.apply_PEEP()\n\n        # Then\n        self.assertTrue(mock_get_measured_PEEP.return_value <= commanded_PEEP + tolerance)\n\n    @patch('controller.Controller.get_measured_FiO2')\n    def test_achieve_target_FiO2_within_tolerance(self, mock_get_measured_FiO2):\n        # Given\n        target_FiO2 = 0.21  # Example target FiO2\n        tolerance = 0.05  # Tolerance as specified\n        mock_get_measured_FiO2.return_value = target_FiO2 + tolerance - 0.01  # Slightly within limit\n\n        # When\n        self.controller.set_target_FiO2(target_FiO2)\n        self.controller.adjust_FiO2()\n\n        # Then\n        self.assertTrue(mock_get_measured_FiO2.return_value <= target_FiO2 + tolerance)\n\n    @patch('controller.Controller.get_measured_FiO2')\n    def test_report_measured_FiO2_before_patient_inhale(self, mock_get_measured_FiO2):\n        # Given\n        mock_get_measured_FiO2.return_value = 0.21  # Example measured FiO2\n\n        # When\n        measured_FiO2 = self.controller.report_measured_FiO2()\n\n        # Then\n        self.assertEqual(measured_FiO2, mock_get_measured_FiO2.return_value)\n\n    @patch('controller.Controller.adjust_for_air_conditions')\n    def test_achieve_commanded_values_under_different_air_conditions(self, mock_adjust_for_air_conditions):\n        # Given\n        commanded_values = {'pressure': 10, 'PEEP': 5, 'FiO2': 0.21}\n        mock_adjust_for_air_conditions.return_value = commanded_values  # Assuming adjustment returns the same values\n\n        # When\n        self.controller.set_commanded_values(commanded_values)\n        adjusted_values = self.controller.adjust_for_air_conditions()\n\n        # Then\n        self.assertEqual(adjusted_values, commanded_values)\n\n    @patch('controller.Controller.detect_patient_inspiration')\n    def test_assist_control_with_pressure_controlled_ventilation_mode(self, mock_detect_patient_inspiration):\n        # Given\n        mock_detect_patient_inspiration.return_value = True  # Simulate patient inspiration detected\n\n        # When\n        inspiration_detected = self.controller.detect_patient_inspiration()\n\n        # Then\n        self.assertTrue(inspiration_detected)\n\n    @patch('controller.Controller.handle_command')\n    def test_safety_measures_for_absurd_commands(self, mock_handle_command):\n        # Given\n        absurd_command = {'pressure': 1000, 'PEEP': 1000, 'FiO2': 2}  # Clearly absurd command\n        mock_handle_command.side_effect = ValueError(\"Invalid command values\")\n\n        # When / Then\n        with self.assertRaises(ValueError):\n            self.controller.handle_command(absurd_command)\n\nif __name__ == '__main__':\n    unittest.main()",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Controller meets commanded pressure within overshoot during pressure fall phase",
+      "req_ids": [
+        "RW-SW-63"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is initialized"
+      ],
+      "inputs": {
+        "commanded_pressure": 10,
+        "PEEP": 5
+      },
+      "steps": [
+        "Set commanded pressure and PEEP",
+        "Invoke pressure fall phase"
+      ],
+      "expected": [
+        "Measured pressure should be within overshoot limit"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Controller meets commanded PEEP within tolerance",
+      "req_ids": [
+        "RW-SW-64"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is initialized"
+      ],
+      "inputs": {
+        "commanded_PEEP": 10
+      },
+      "steps": [
+        "Set commanded PEEP",
+        "Apply PEEP"
+      ],
+      "expected": [
+        "Measured PEEP should be within tolerance"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Controller achieves target FiO2 within tolerance",
+      "req_ids": [
+        "RW-SW-95"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is initialized"
+      ],
+      "inputs": {
+        "target_FiO2": 0.21
+      },
+      "steps": [
+        "Set target FiO2",
+        "Adjust FiO2"
+      ],
+      "expected": [
+        "Measured FiO2 should be within tolerance"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Controller reports measured FiO2 before patient inhale",
+      "req_ids": [
+        "RW-SW-97"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "Report measured FiO2"
+      ],
+      "expected": [
+        "Reported FiO2 should match measured value"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Controller achieves commanded values under different air conditions",
+      "req_ids": [
+        "RW-SW-98"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is initialized"
+      ],
+      "inputs": {
+        "commanded_values": {
+          "pressure": 10,
+          "PEEP": 5,
+          "FiO2": 0.21
+        }
+      },
+      "steps": [
+        "Set commanded values",
+        "Adjust for air conditions"
+      ],
+      "expected": [
+        "Adjusted values should match commanded values"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Controller implements assist/control with pressure controlled ventilation mode",
+      "req_ids": [
+        "RW-SW-153"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "Detect patient inspiration"
+      ],
+      "expected": [
+        "Inspiration should be detected"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Controller handles absurd commands with safety measures",
+      "req_ids": [
+        "RW-SW-156"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Controller is initialized"
+      ],
+      "inputs": {
+        "absurd_command": {
+          "pressure": 1000,
+          "PEEP": 1000,
+          "FiO2": 2
+        }
+      },
+      "steps": [
+        "Handle absurd command"
+      ],
+      "expected": [
+        "ValueError should be raised"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\nfrom controller import Controller  # Assuming the controller logic is in a module named 'controller'\n\nclass TestController(unittest.TestCase):\n\n    def setUp(self):\n        self.controller = Controller()\n\n    @patch('controller.Controller.get_measured_pressure')\n    def test_meet_commanded_pressure_within_overshoot(self, mock_get_measured_pressure):\n        # Given\n        commanded_pressure = 10  # Example commanded pressure\n        PEEP = 5  # Example PEEP value\n        overshoot_limit = 0.8 * PEEP - 1  # Calculated overshoot limit\n        mock_get_measured_pressure.return_value = commanded_pressure + overshoot_limit - 0.1  # Slightly within limit\n\n        # When\n        self.controller.set_commanded_pressure(commanded_pressure)\n        self.controller.set_PEEP(PEEP)\n        self.controller.pressure_fall_phase()\n\n        # Then\n        self.assertTrue(mock_get_measured_pressure.return_value <= commanded_pressure + overshoot_limit)\n\n    @patch('controller.Controller.get_measured_PEEP')\n    def test_meet_commanded_PEEP_within_tolerance(self, mock_get_measured_PEEP):\n        # Given\n        commanded_PEEP = 10  # Example commanded PEEP\n        tolerance = 1 + 0.1 * commanded_PEEP  # Calculated tolerance\n        mock_get_measured_PEEP.return_value = commanded_PEEP + tolerance - 0.1  # Slightly within limit\n\n        # When\n        self.controller.set_commanded_PEEP(commanded_PEEP)\n        self.controller.apply_PEEP()\n\n        # Then\n        self.assertTrue(mock_get_measured_PEEP.return_value <= commanded_PEEP + tolerance)\n\n    @patch('controller.Controller.get_measured_FiO2')\n    def test_achieve_target_FiO2_within_tolerance(self, mock_get_measured_FiO2):\n        # Given\n        target_FiO2 = 0.21  # Example target FiO2\n        tolerance = 0.05  # Tolerance as specified\n        mock_get_measured_FiO2.return_value = target_FiO2 + tolerance - 0.01  # Slightly within limit\n\n        # When\n        self.controller.set_target_FiO2(target_FiO2)\n        self.controller.adjust_FiO2()\n\n        # Then\n        self.assertTrue(mock_get_measured_FiO2.return_value <= target_FiO2 + tolerance)\n\n    @patch('controller.Controller.get_measured_FiO2')\n    def test_report_measured_FiO2_before_patient_inhale(self, mock_get_measured_FiO2):\n        # Given\n        mock_get_measured_FiO2.return_value = 0.21  # Example measured FiO2\n\n        # When\n        measured_FiO2 = self.controller.report_measured_FiO2()\n\n        # Then\n        self.assertEqual(measured_FiO2, mock_get_measured_FiO2.return_value)\n\n    @patch('controller.Controller.adjust_for_air_conditions')\n    def test_achieve_commanded_values_under_different_air_conditions(self, mock_adjust_for_air_conditions):\n        # Given\n        commanded_values = {'pressure': 10, 'PEEP': 5, 'FiO2': 0.21}\n        mock_adjust_for_air_conditions.return_value = commanded_values  # Assuming adjustment returns the same values\n\n        # When\n        self.controller.set_commanded_values(commanded_values)\n        adjusted_values = self.controller.adjust_for_air_conditions()\n\n        # Then\n        self.assertEqual(adjusted_values, commanded_values)\n\n    @patch('controller.Controller.detect_patient_inspiration')\n    def test_assist_control_with_pressure_controlled_ventilation_mode(self, mock_detect_patient_inspiration):\n        # Given\n        mock_detect_patient_inspiration.return_value = True  # Simulate patient inspiration detected\n\n        # When\n        inspiration_detected = self.controller.detect_patient_inspiration()\n\n        # Then\n        self.assertTrue(inspiration_detected)\n\n    @patch('controller.Controller.handle_command')\n    def test_safety_measures_for_absurd_commands(self, mock_handle_command):\n        # Given\n        absurd_command = {'pressure': 1000, 'PEEP': 1000, 'FiO2': 2}  # Clearly absurd command\n        mock_handle_command.side_effect = ValueError(\"Invalid command values\")\n\n        # When / Then\n        with self.assertRaises(ValueError):\n            self.controller.handle_command(absurd_command)\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller meets commanded pressure within overshoot during pressure fall phase",
+          "req_ids": [
+            "RW-SW-63"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is initialized"
+          ],
+          "inputs": {
+            "commanded_pressure": 10,
+            "PEEP": 5
+          },
+          "steps": [
+            "Set commanded pressure and PEEP",
+            "Invoke pressure fall phase"
+          ],
+          "expected": [
+            "Measured pressure should be within overshoot limit"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller meets commanded PEEP within tolerance",
+          "req_ids": [
+            "RW-SW-64"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is initialized"
+          ],
+          "inputs": {
+            "commanded_PEEP": 10
+          },
+          "steps": [
+            "Set commanded PEEP",
+            "Apply PEEP"
+          ],
+          "expected": [
+            "Measured PEEP should be within tolerance"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Controller achieves target FiO2 within tolerance",
+          "req_ids": [
+            "RW-SW-95"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is initialized"
+          ],
+          "inputs": {
+            "target_FiO2": 0.21
+          },
+          "steps": [
+            "Set target FiO2",
+            "Adjust FiO2"
+          ],
+          "expected": [
+            "Measured FiO2 should be within tolerance"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Controller reports measured FiO2 before patient inhale",
+          "req_ids": [
+            "RW-SW-97"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "Report measured FiO2"
+          ],
+          "expected": [
+            "Reported FiO2 should match measured value"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller achieves commanded values under different air conditions",
+          "req_ids": [
+            "RW-SW-98"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is initialized"
+          ],
+          "inputs": {
+            "commanded_values": {
+              "pressure": 10,
+              "PEEP": 5,
+              "FiO2": 0.21
+            }
+          },
+          "steps": [
+            "Set commanded values",
+            "Adjust for air conditions"
+          ],
+          "expected": [
+            "Adjusted values should match commanded values"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller implements assist/control with pressure controlled ventilation mode",
+          "req_ids": [
+            "RW-SW-153"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "Detect patient inspiration"
+          ],
+          "expected": [
+            "Inspiration should be detected"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller handles absurd commands with safety measures",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Controller is initialized"
+          ],
+          "inputs": {
+            "absurd_command": {
+              "pressure": 1000,
+              "PEEP": 1000,
+              "FiO2": 2
+            }
+          },
+          "steps": [
+            "Handle absurd command"
+          ],
+          "expected": [
+            "ValueError should be raised"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.2105,
+        "hallucinated": [
+          {
+            "value": 10,
+            "context": "commanded pressure value",
+            "grounded": false
+          },
+          {
+            "value": 5,
+            "context": "PEEP value",
+            "grounded": false
+          },
+          {
+            "value": -0.1,
+            "context": "offset to keep measured pressure within limit",
+            "grounded": false
+          },
+          {
+            "value": 10,
+            "context": "commanded PEEP value",
+            "grounded": false
+          },
+          {
+            "value": -0.1,
+            "context": "offset for PEEP measurement",
+            "grounded": false
+          },
+          {
+            "value": 0.21,
+            "context": "target FiO2 value",
+            "grounded": false
+          },
+          {
+            "value": -0.01,
+            "context": "offset for FiO2 measurement",
+            "grounded": false
+          },
+          {
+            "value": 0.21,
+            "context": "measured FiO2 value",
+            "grounded": false
+          },
+          {
+            "value": 10,
+            "context": "commanded pressure in commanded_values",
+            "grounded": false
+          },
+          {
+            "value": 5,
+            "context": "commanded PEEP in commanded_values",
+            "grounded": false
+          },
+          {
+            "value": 0.21,
+            "context": "commanded FiO2 in commanded_values",
+            "grounded": false
+          },
+          {
+            "value": 1000,
+            "context": "absurd pressure command",
+            "grounded": false
+          },
+          {
+            "value": 1000,
+            "context": "absurd PEEP command",
+            "grounded": false
+          },
+          {
+            "value": 2,
+            "context": "absurd FiO2 command",
+            "grounded": false
+          },
+          {
+            "value": "Invalid command values",
+            "context": "error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 19,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Boundary values not tested – only values slightly within limits are used.",
+          "Lower bounds and negative tolerance checks are missing.",
+          "Mocks hide actual controller logic – integration tests are absent.",
+          "Safety test only verifies exception raising, not that the controller ignores absurd commands.",
+          "Error messages and data‑corruption handling are not fully verified."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.7211,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

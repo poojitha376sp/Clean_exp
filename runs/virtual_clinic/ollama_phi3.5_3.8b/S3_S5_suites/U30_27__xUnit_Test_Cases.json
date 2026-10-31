@@ -1,0 +1,1186 @@
+{
+  "unit_id": "U30_27",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:phi3.5:3.8b",
+  "system_type": "safety_critical",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 0.8333,
+    "representation_score": 0.5,
+    "sfv_score": 0.6667,
+    "threshold": 1.0,
+    "sfv_pass": false,
+    "issues": [
+      "test case #1 (TC-001): traces to unknown requirement ids ['U30_27']",
+      "Python syntax error: invalid syntax"
+    ]
+  },
+  "fsa": null,
+  "artifact": "using pytest\nimport pytest\nfrom unittest.mock import patch\n\n# Test Case TC-001: Number of Consultations by Doctor (Month/Quarter/Year) Speciality wise - Revenue Earned per Month/Quarter/Year\n@pytest.mark.parametrize(\"month, quarter, year, speciality\", [(\"January\", \"Q1\", 2021, \"Cardiology\")])\ndef test_consultations_revenue_earned(month, quarter, year, speciality):\n    with patch('module.get_patient_history') as mock_get_patient_history:\n        mock_get_patient_history.return_value = {\"consultations\": [{\"date\": \"2021-01-01\", \"speciality\": \"Cardiology\"}]\n        # Assertion to be made here based on the actual implementation\n\n# Test Case TC-002: Registered Patients shall have the ability to raise Consultation Requests - Appointment Mode\n@pytest.mark.parametrize(\"mode\", [\"Appointment\"])\ndef test_appointment_request_creation(mode):\n    with patch('module.create_appointment_request') as mock_create_appointment_request:\n        mock_create_appointment_request.assert_called_once_with(symptoms=\"Sample symptoms\", mode=mode)\n\n# Test Case TC-003: Appointment Requests creation for next day\n@pytest.mark.parametrize(\"start_date, end_date\", [(\"2021-01-01\", \"2021-01-05\")])\ndef test_nightly_appointment_creation(start_date, end_date):\n    with patch('module.run_nightly_batch_program') as mock_run_nightly_batch_program:\n        mock_run_nightly_batch_program.assert_called_once_with(start_date, end_date)\n        # Additional assertions to verify file creation and purging\n\n# Test Case TC-004: Disease Prediction and Prioritization of Consultation Requests\n@pytest.mark.parametrize(\"request_data\", [\"Sample Consultation Request Data\"])\ndef test_disease_prediction_and_prioritization(request_data):\n    with patch('module.run_disease_prediction_algorithm') as mock_run_disease_prediction_algorithm:\n        mock_run_disease_prediction_algorithm.return_value = {\"priority\": \"Critical\"}\n        # Assertion to be made here based on the actual implementation\n\n# Test Case TC-005: Doctors shall see the prioritized consultation requests and provide diagnosis, prescribe medicines, and suggest lab requests\n@pytest.mark.parametrize(\"request_id\", [\"Prioritized Request ID\"])\ndef test_doctor_response_to_prioritized_requests(request_id):\n    with patch('module.doctor_actions') as mock_doctor_actions:\n        mock_doctor_actions.assert_called_once_with(request_id, expected_actions=[\"diagnose\", \"prescribe\", \"suggest_labs\"])\n\n# Test Case TC-006: Chemist shall be able to view the open prescriptions and update the status\n@pytest.mark.parametrize(\"chemist_id, pincode\", [(\"Specific Chemist ID\", \"4720201\")])\ndef test_chemist_prescription_status_update(chemist_id, pincode):\n    with patch('module.chemist_status_update') as mock_chemist_status_update:\n        mock_chemist_status_update.assert_called_once_with(chemist_id)",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test for Number of Consultations by Doctor (Month/Quarter/Year) Speciality wise - Revenue Earned per Month/Quarter/Year",
+      "req_ids": [
+        "U30_27"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient has a registered history file"
+      ],
+      "inputs": {
+        "month": "January",
+        "quarter": "Q1",
+        "year": 2021,
+        "speciality": "Cardiology"
+      },
+      "steps": [
+        "Access the patient history file based on Patient Id",
+        "Count the number of consultations for the specified month, quarter, and year",
+        "Calculate the revenue earned per consultation based on the speciality"
+      ],
+      "expected": [
+        "Revenue matches expected calculation for Cardiology consultations in January 2021"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test for Appointment Request Creation by Registered Patients",
+      "req_ids": [
+        "Req-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient is registered"
+      ],
+      "inputs": {
+        "mode": "Appointment"
+      },
+      "steps": [
+        "Patient enters symptoms",
+        "Patient selects Appointment mode",
+        "Verify an entry is created in the Patient Appointment File for the next day"
+      ],
+      "expected": [
+        "Entry in Patient Appointment File for next day is created"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test for Nightly Administration Batch Program for Appointment Creation",
+      "req_ids": [
+        "Req-6/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Nightly administration batch program is scheduled"
+      ],
+      "inputs": {
+        "start_date": "2021-01-01",
+        "end_date": "2021-01-05"
+      },
+      "steps": [
+        "Run the batch program",
+        "Verify Appointment Files are created for the next 5 days starting from the start date",
+        "Check that existing files are purged before new files are created"
+      ],
+      "expected": [
+        "Correct Appointment Files are created and existing files are purged for the specified period"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test for Disease Prediction and Prioritization of Consultation Requests",
+      "req_ids": [
+        "Req-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "New Consultation Requests are available"
+      ],
+      "inputs": {
+        "request_data": "Sample Consultation Request Data"
+      },
+      "steps": [
+        "Run the machine learning algorithm on the request data",
+        "Verify that the requests are prioritized into Critical, Medium, Low categories"
+      ],
+      "expected": [
+        "Requests are correctly prioritized"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test for Doctor's Response to Prioritized Requests",
+      "req_ids": [
+        "Req-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Requests have been prioritized"
+      ],
+      "inputs": {
+        "request_id": "Prioritized Request ID"
+      },
+      "steps": [
+        "Doctor reviews the prioritized request",
+        "Doctor provides diagnosis, prescribes medicines, and suggests lab requests if necessary"
+      ],
+      "expected": [
+        "Doctor's actions align with the request priority"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Test for Chemist's Access to Open Prescriptions",
+      "req_ids": [
+        "Req-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Prescriptions are assigned to Chemist"
+      ],
+      "inputs": {
+        "chemist_id": "Specific Chemist ID",
+        "pincode": "4720201"
+      },
+      "steps": [
+        "Chemist accesses their assigned prescriptions",
+        "Chemist updates the status of prescriptions"
+      ],
+      "expected": [
+        "Chemist successfully updates the status of prescriptions"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Verify that registered patients can create a Consultation Request",
+          "req_ids": [
+            "U30_27",
+            "Req-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "symptoms": "User enters symptoms",
+            "mode": "Appointment"
+          },
+          "steps": [
+            "Navigate to the Consultation Request section",
+            "Enter symptoms into the input field",
+            "Select the Appointment mode",
+            "Submit the request"
+          ],
+          "expected": [
+            "System confirms the creation of the appointment request"
+          ]
+        },
+        {
+          "id": "TC-0 extraneous",
+          "title": "Verify that offline consultation requests are created",
+          "req_ids": [
+            "U30_27",
+            "Req-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "symptoms": "User enters symptoms",
+            "mode": "Offline"
+          },
+          "steps": [
+            "Navigate to the Consultation Request section",
+            "Enter symptoms into the input field",
+            "Select the Offline mode",
+            "Submit the request"
+          ],
+          "expected": [
+            "System confirms the creation of the offline consultation request"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Verify that an appointment request creates an entry in the Patient Appointment File",
+          "req_ids": [
+            "U30_27",
+            "Req-6/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Appointment request is created"
+          ],
+          "inputs": {
+            "request_id": "Generated request ID"
+          },
+          "steps": [
+            "Retrieve the generated request ID",
+            "Check the Patient Appointment File for the corresponding entry"
+          ],
+          "expected": [
+            "Entry found for the next day' extraneous request"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Verify that the batch program creates appointments for the next 5 days",
+          "req_ids": [
+            "U30_27",
+            "Req-6/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Batch program is scheduled to run"
+          ],
+          "inputs": {},
+          "steps": [
+            "Initiate the batch program",
+            "Verify the creation of appointment entries for the next 5 days"
+          ],
+          "expected": [
+            "Appointment entries for the next 5 days are created and existing files are purged"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Verify that the batch program purges existing appointment files",
+          "req_ids": [
+            "U30_27",
+            "Req-6/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Batch program has run"
+          ],
+          "inputs": {},
+          "steps": [
+            "Check the Patient Appointment File before and after the batch program execution"
+          ],
+          "expected": [
+            "Existing appointment files are purged post-execution"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Verify that the machine learning algorithm prioritizes consultation requests",
+          "req_ids": [
+            "U30_27",
+            "Req-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "New consultation requests are received"
+          ],
+          "inputs": {},
+          "steps": [
+            "Run the machine learning algorithm on the new requests",
+            "Check the prioritization of requests"
+          ],
+          "expected": [
+            "Requests are correctly prioritized as Critical/Medium/Low"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Verify that doctors review and respond to prioritized consultation requests",
+          "req_ids": [
+            "U30_27",
+            "Req-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prioritized requests are available"
+          ],
+          "inputs": {},
+          "steps": [
+            "Doctors access the prioritized requests",
+            "Check for doctor's actions (diagnosis, prescriptions, lab requests)"
+          ],
+          "expected": [
+            "Doctors provide appropriate medical responses"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Verify that chemists can view and update open prescriptions",
+          "req_ids": [
+            "Req-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescriptions are assigned"
+          ],
+          "inputs": {},
+          "steps": [
+            "Chemists access their assigned prescriptions",
+            "Check for updates to the prescription status"
+          ],
+          "expected": [
+            "Chemists can successfully update the prescription status"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Verify offline medicine delivery for patients",
+          "req_ids": [
+            "Req-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescriptions are assigned and pending delivery"
+          ],
+          "inputs": {},
+          "steps": [
+            "Check the process of medicine delivery",
+            "Confirm medicine is delivered to the patient"
+          ],
+          "expected": [
+            "Medicine is delivered to the patient offline"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Verify handling of incorrect or incomplete input for symptoms",
+          "req_ids": [
+            "Req-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User attempts to create a consultation request with incorrect or incomplete symptoms"
+          ],
+          "inputs": {
+            "symptoms": "Incomplete or incorrect symptom data"
+          },
+          "steps": [
+            "Submit the request with incorrect or incomplete data",
+            "Observe the system's response"
+          ],
+          "expected": [
+            "System should not create the request and should prompt for correct information"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Verify handling of invalid mode selection for appointment requests",
+          "req_ids": [
+            "Req-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User selects an invalid mode for appointment request"
+          ],
+          "inputs": {
+            "mode": "Invalid selection"
+          },
+          "steps": [
+            "Select the invalid mode",
+            "Submit the request",
+            "Observe the system's response"
+          ],
+          "expected": [
+            "System rejects the request and prompts for a valid mode"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Verify handling of system errors during batch processing",
+          "req_ids": [
+            "U30_27",
+            "Req-6/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Batch program is running"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate a system error during batch processing",
+            "Observe the system's response and recovery"
+          ],
+          "expected": [
+            "System handles the error gracefully and continues processing where possible"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Verify handling of system errors in machine learning prediction",
+          "req_ids": [
+            "U30_27",
+            "Req-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "New consultation requests are received"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate an error in the machine learning prediction process",
+            "Observe the system's response and handling of the request"
+          ],
+          "expected": [
+            "System should handle the error gracefully and provide a fallback mechanism"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Verify handling of system errors in appointment file creation",
+          "req_ids": [
+            "U30_27",
+            "Req-6/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Appointment request is created"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate an error during appointment file creation",
+            "Observe the system's response and recovery"
+          ],
+          "expected": [
+            "System should handle the error gracefully and maintain data integrity"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Verify handling of system errors in appointment file purging",
+          "req_ids": [
+            "U30_27",
+            "Req-6/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Batch program is running"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate an error during appointment file purging",
+            "Observe the system's response and recovery"
+          ],
+          "expected": [
+            "System should handle the error gracefully and maintain data integrity"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Verify handling of system errors in request prioritization",
+          "req_ids": [
+            "U30_27",
+            "Req-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "New consultation requests are received"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate an error in the prioritization process",
+            "Observe the system'sin response and handling of the request"
+          ],
+          "expected": [
+            "System should handle the error gracefully and maintain request order"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Verify handling of system errors in doctor's response to requests",
+          "req_ids": [
+            "U30_27",
+            "Req-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Prioritized requests are available"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate an error in the doctor's response process",
+            "Observe the system's response and handling of the request"
+          ],
+          "expected": [
+            "System should handle the error gracefully and maintain communication with the patient"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Verify handling of system errors in chemist's prescription status update",
+          "req_ids": [
+            "Req-9"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Prescriptions are assigned"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate an error in the prescription status update process",
+            "Observe the system's response and handling of the request"
+          ],
+          "expected": [
+            "System should handle the error gracefully and maintain communication with the chemist"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Verify handling of system errors in medicine delivery",
+          "req_ids": [
+            "Req-9"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Prescriptions are assigned and pending delivery"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate an error in the delivery process",
+            "Observe the system's response and handling of the request"
+          ],
+          "expected": [
+            "System should handle the error gracefully and maintain communication with the patient"
+          ]
+        }
+      ],
+      "raw_if_unparsed": "```json\n[\n  {\n    \"id\": \"TC-001\",\n    \"title\": \"Verify that registered patients can create a Consultation Request\",\n    \"req_ids\": [\"U30_27\", \"Req-6\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"Patient is registered\"],\n    \"inputs\": {\"symptoms\": \"User enters symptoms\", \"mode\": \"Appointment\"},\n    \"steps\": [\n      \"Navigate to the Consultation Request section\",\n      \"Enter symptoms into the input field\",\n      \"Select the Appointment mode\",\n      \"Submit the request\"\n    ],\n    \"expected\": [\"System confirms the creation of the appointment request\"]\n  },\n  {\n    \"id\": \"TC-0 extraneous\",\n    \"title\": \"Verify that offline consultation requests are created\",\n    \"req_ids\": [\"U30_27\", \"Req-6\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"Patient is registered\"],\n    \"inputs\": {\"symptoms\": \"User enters symptoms\", \"mode\": \"Offline\"},\n    \"steps\": [\n      \"Navigate to the Consultation Request section\",\n      \"Enter symptoms into the input field\",\n      \"Select the Offline mode\",\n      \"Submit the request\"\n    ],\n    \"expected\": [\"System confirms the creation of the offline consultation request\"]\n  },\n  {\n    \"id\": \"TC-002\",\n    \"title\": \"Verify that an appointment request creates an entry in the Patient Appointment File\",\n    \"req_ids\": [\"U30_27\", \"Req-6/2\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"Appointment request is created\"],\n    \"inputs\": {\"request_id\": \"Generated request ID\"},\n    \"steps\": [\n      \"Retrieve the generated request ID\",\n      \"Check the Patient Appointment File for the corresponding entry\"\n    ],\n    \"expected\": [\"Entry found for the next day' extraneous request\"]\n  },\n  {\n    \"id\": \"TC-003\",\n    \"title\": \"Verify that the batch program creates appointments for the next 5 days\",\n    \"req_ids\": [\"U30_27\", \"Req-6/3\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"Batch program is scheduled to run\"],\n    \"inputs\": {},\n    \"steps\": [\n      \"Initiate the batch program\",\n      \"Verify the creation of appointment entries for the next 5 days\"\n    ],\n    \"expected\": [\"Appointment entries for the next 5 days are created and existing files are purged\"]\n  },\n  {\n    \"id\": \"TC-004\",\n    \"title\": \"Verify that the batch program purges existing appointment files\",\n    \"req_ids\": [\"U30_27\", \"Req-6/3\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"Batch program has run\"],\n    \"inputs\": {},\n    \"steps\": [\n      \"Check the Patient Appointment File before and after the batch program execution\"\n    ],\n    \"expected\": [\"Existing appointment files are purged post-execution\"]\n  },\n  {\n    \"id\": \"TC-005\",\n    \"title\": \"Verify that the machine learning algorithm prioritizes consultation requests\",\n    \"req_ids\": [\"U30_27\", \"Req-7\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"New consultation requests are received\"],\n    \"inputs\": {},\n    \"steps\": [\n      \"Run the machine learning algorithm on the new requests\",\n      \"Check the prioritization of requests\"\n    ],\n    \"expected\": [\"Requests are correctly prioritized as Critical/Medium/Low\"]",
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.3158,
+        "representation_score": 0.0,
+        "sfv_score": 0.1579,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U30_27']",
+          "test case #2 (TC-0 extraneous): 'TC-0 extraneous' does not match '^TC-[A-Za-z0-9_.-]+$'; traces to unknown requirement ids ['U30_27']",
+          "test case #3 (TC-002): traces to unknown requirement ids ['U30_27']",
+          "test case #4 (TC-003): traces to unknown requirement ids ['U30_27']",
+          "test case #5 (TC-004): traces to unknown requirement ids ['U30_27']",
+          "test case #6 (TC-005): traces to unknown requirement ids ['U30_27']",
+          "test case #7 (TC-006): traces to unknown requirement ids ['U30_27']",
+          "test case #12 (TC-011): traces to unknown requirement ids ['U30_27']",
+          "test case #13 (TC-012): traces to unknown requirement ids ['U30_27']",
+          "test case #14 (TC-013): traces to unknown requirement ids ['U30_27']",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.16). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): traces to unknown requirement ids ['U30_27']\n- test case #2 (TC-0 extraneous): 'TC-0 extraneous' does not match '^TC-[A-Za-z0-9_.-]+$'; traces to unknown requirement ids ['U30_27']\n- test case #3 (TC-002): traces to unknown requirement ids ['U30_27']\n- test case #4 (TC-003): traces to unknown requirement ids ['U30_27']\n- test case #5 (TC-004): traces to unknown requirement ids ['U30_27']\n- test case #6 (TC-005): traces to unknown requirement ids ['U30_27']\n- test case #7 (TC-006): traces to unknown requirement ids ['U30_27']\n- test case #12 (TC-011): traces to unknown requirement ids ['U30_27']\n- test case #13 (TC-012): traces to unknown requirement ids ['U30_27']\n- test case #14 (TC-013): traces to unknown requirement ids ['U30_27']\n- Representation artifact is empty.",
+      "artifact": null,
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Verify number of consultations by doctor specialty per month",
+          "req_ids": [
+            "U30_27"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "month": "January",
+            "specialty": "Cardiology"
+          },
+          "steps": [
+            "Navigate to the doctor specialty selection.",
+            "Select the 'Cardiology' specialty.",
+            "Initiate the monthly consultation count retrieval process.",
+            "Assert that the retrieved consultation count matches expected value."
+          ],
+          "expected": "The consultation count for Cardiology in January should match the expected value as per the requirements."
+        },
+        {
+          "id": "TC-002",
+          "title": "Verify number of consultations by doctor specialty per quarter",
+          "req_ids": [
+            "U30_27"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "quarter": "Q1",
+            "specialty": "Cardiology"
+          },
+          "steps": [
+            "Select the 'Cardiology' specialty.",
+            "Initiate the quarterly consultation count retrieval process.",
+            "Assert that the retrieved consultation count matches expected value."
+          ],
+          "expected": "The consultation count for Cardiology in Q1 should match the expected value as per the requirements."
+        },
+        {
+          "id": "TC-003",
+          "title": "Verify number of consultations by doctor specialty per year",
+          "req_ids": [
+            "U30_27"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "year": "2022",
+            "specialty": "Cardiology"
+          },
+          "steps": [
+            "Initiate the yearly consultation count retrieval process.",
+            "Assert that the retrieved consultation count matches expected value."
+          ],
+          "expected": "The consultation count for Cardiology in 2022 should match the expected value as per the requirements."
+        },
+        {
+          "id": "TC-004",
+          "title": "Verify revenue earned per month and quarter by doctor specialty",
+          "req_ids": [
+            "U30_27"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "month": "January",
+            "specialty": "Cardiology"
+          },
+          "steps": [
+            "Initiate the retrieval of revenue data for January.",
+            "Assert that the revenue data matches expected value."
+          ],
+          "expected": "The revenue for Cardiology in January should match the expected value as per the requirements."
+        },
+        {
+          "id": "TC-005",
+          "title": "Verify revenue earned per year by doctor specialty",
+          "req_ids": [
+            "U30_27"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "year": "2022",
+            "specialty": "Cardiology"
+          },
+          "steps": [
+            "Assert that the annual revenue data matches expected value."
+          ],
+          "expected": "The annual revenue for Cardiology in 2022 should match the expected value as per the requirements."
+        },
+        {
+          "id": "TC-006",
+          "title": "Verify creation of consultation request for appointment mode",
+          "req_ids": [
+            "Req-6/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptoms": "chest pain",
+            "mode": "Appointment"
+          },
+          "steps": [
+            "Enter symptoms into the system.",
+            "Select 'Appointment' mode for consultation request.",
+            "Assert that an appointment entry is created in the Patient Appointment File."
+          ],
+          "expected": "An appointment entry should be created for the provided symptoms and mode."
+        },
+        {
+          "id": "TC-007",
+          "title": "Verify creation of consultation request for offline mode",
+          "req_ids": [
+            "Req-6/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptoms": "chest pain",
+            "mode": "Offline"
+          },
+          "steps": [
+            "Enter symptoms into the system.",
+            "Select 'Offline' mode for consultation request.",
+            "Assert that an offline consultation request is created."
+          ],
+          "expected": "An offline consultation request should be created for the provided symptoms."
+        },
+        {
+          "id": "TC-008",
+          "title": "Verify administration batch program creates appointments for next 5 days",
+          "req_ids": [
+            "Req-6/3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Trigger the administration batch program.",
+            "Assert that appointments are created for the next 5 days and existing files are purged."
+          ],
+          "expected": "Appointments should be created for the next 5 days and existing files should be purged as expected."
+        },
+        {
+          "id": "TC-009",
+          "title": "Verify disease prediction and prioritization based on new consultation requests",
+          "req_ids": [
+            "Req-7"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Submit a new consultation request.",
+            "Assert that the system uses the machine learning algorithm to predict diseases and prioritize the request."
+          ],
+          "expected": "The system should predict diseases and prioritize the request accordingly."
+        },
+        {
+          "id": "TC-010",
+          "title": "Verify doctors review and respond to prioritized consultation requests",
+          "req_ids": [
+            "Req-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Req-009"
+          ],
+          "inputs": {},
+          "steps": [
+            "Submit a prioritized consultation request.",
+            "Assert that the doctor reviews the request and provides diagnosis, prescriptions, and lab requests."
+          ],
+          "expected": "The doctor should review the request and provide the necessary medical responses."
+        },
+        {
+          "id": "TC-011",
+          "title": "Verify chemists view and update open prescriptions",
+          "req_ids": [
+            "Req-9"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pincode": "471701"
+          },
+          "steps": [
+            "Submit a request for prescription view.",
+            "Assert that the chemist can view the open prescriptions assigned to them.",
+            "Submit a request to update the status of a prescription."
+          ],
+          "expected": "The chemist should be able to view and update the prescription status as expected."
+        }
+      ],
+      "raw_if_unparsed": "```json\n[\n  {\n    \"id\": \"TC-001\",\n    \"title\": \"Verify number of consultations by doctor specialty per month\",\n    \"req_ids\": [\"U30_27\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"month\": \"January\", \"specialty\": \"Cardiology\"},\n    \"steps\": [\n      \"Navigate to the doctor specialty selection.\",\n      \"Select the 'Cardiology' specialty.\",\n      \"Initiate the monthly consultation count retrieval process.\",\n      \"Assert that the retrieved consultation count matches expected value.\"\n    ],\n    \"expected\": \"The consultation count for Cardiology in January should match the expected value as per the requirements.\"\n  },\n  {\n    \"id\": \"TC-002\",\n    \"title\": \"Verify number of consultations by doctor specialty per quarter\",\n    \"req_ids\": [\"U30_27\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"quarter\": \"Q1\", \"specialty\": \"Cardiology\"},\n    \"steps\": [\n      \"Select the 'Cardiology' specialty.\",\n      \"Initiate the quarterly consultation count retrieval process.\",\n      \"Assert that the retrieved consultation count matches expected value.\"\n    ],\n    \"expected\": \"The consultation count for Cardiology in Q1 should match the expected value as per the requirements.\"\n  },\n  {\n    \"id\": \"TC-003\",\n    \"title\": \"Verify number of consultations by doctor specialty per year\",\n    \"req_ids\": [\"U30_27\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"year\": \"2022\", \"specialty\": \"Cardiology\"},\n    \"steps\": [\n      \"Initiate the yearly consultation count retrieval process.\",\n      \"Assert that the retrieved consultation count matches expected value.\"\n    ],\n    \"expected\": \"The consultation count for Cardiology in 2022 should match the expected value as per the requirements.\"\n  },\n  {\n    \"id\": \"TC-004\",\n    \"title\": \"Verify revenue earned per month and quarter by doctor specialty\",\n    \"req_ids\": [\"U30_27\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"month\": \"January\", \"specialty\": \"Cardiology\"},\n    \"steps\": [\n      \"Initiate the retrieval of revenue data for January.\",\n      \"Assert that the revenue data matches expected value.\"\n    ],\n    \"expected\": \"The revenue for Cardiology in January should match the expected value as per the requirements.\"\n  },\n  {\n    \"id\": \"TC-005\",\n    \"title\": \"Verify revenue earned per year by doctor specialty\",\n    \"req_ids\": [\"U30_27\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"year\": \"2022\", \"specialty\": \"Cardiology\"},\n    \"steps\": [\n      \"Assert that the annual revenue data matches expected value.\"\n    ],\n    \"expected\": \"The annual revenue for Cardiology in 2022 should match the expected value as per the requirements.\"\n  },\n  {\n    \"id\": \"TC-006\",\n    \"title\": \"Verify creation of consultation request for appointment mode\",\n    \"req_ids\": [\"Req-6/1\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"symptoms\": \"chest pain\", \"mode\": \"Appointment\"},\n    \"steps\": [\n      \"Enter symptoms into the system.\",\n      \"Selec",
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): 'The consultation count for Cardiology in January should match the expected value as per the requirements.' is not of type 'array'; traces to unknown requirement ids ['U30_27']",
+          "test case #2 (TC-002): 'The consultation count for Cardiology in Q1 should match the expected value as per the requirements.' is not of type 'array'; traces to unknown requirement ids ['U30_27']",
+          "test case #3 (TC-003): 'The consultation count for Cardiology in 2022 should match the expected value as per the requirements.' is not of type 'array'; traces to unknown requirement ids ['U30_27']",
+          "test case #4 (TC-004): 'The revenue for Cardiology in January should match the expected value as per the requirements.' is not of type 'array'; traces to unknown requirement ids ['U30_27']",
+          "test case #5 (TC-005): 'The annual revenue for Cardiology in 2022 should match the expected value as per the requirements.' is not of type 'array'; traces to unknown requirement ids ['U30_27']",
+          "test case #6 (TC-006): 'An appointment entry should be created for the provided symptoms and mode.' is not of type 'array'",
+          "test case #7 (TC-007): 'An offline consultation request should be created for the provided symptoms.' is not of type 'array'",
+          "test case #8 (TC-008): 'Appointments should be created for the next 5 days and existing files should be purged as expected.' is not of type 'array'",
+          "test case #9 (TC-009): 'The system should predict diseases and prioritize the request accordingly.' is not of type 'array'",
+          "test case #10 (TC-010): 'The doctor should review the request and provide the necessary medical responses.' is not of type 'array'",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): 'The consultation count for Cardiology in January should match the expected value as per the requirements.' is not of type 'array'; traces to unknown requirement ids ['U30_27']\n- test case #2 (TC-002): 'The consultation count for Cardiology in Q1 should match the expected value as per the requirements.' is not of type 'array'; traces to unknown requirement ids ['U30_27']\n- test case #3 (TC-003): 'The consultation count for Cardiology in 2022 should match the expected value as per the requirements.' is not of type 'array'; traces to unknown requirement ids ['U30_27']\n- test case #4 (TC-004): 'The revenue for Cardiology in January should match the expected value as per the requirements.' is not of type 'array'; traces to unknown requirement ids ['U30_27']\n- test case #5 (TC-005): 'The annual revenue for Cardiology in 2022 should match the expected value as per the requirements.' is not of type 'array'; traces to unknown requirement ids ['U30_27']\n- test case #6 (TC-006): 'An appointment entry should be created for the provided symptoms and mode.' is not of type 'array'\n- test case #7 (TC-007): 'An offline consultation request should be created for the provided symptoms.' is not of type 'array'\n- test case #8 (TC-008): 'Appointments should be created for the next 5 days and existing files should be purged as expected.' is not of type 'array'\n- test case #9 (TC-009): 'The system should predict diseases and prioritize the request accordingly.' is not of type 'array'\n- test case #10 (TC-010): 'The doctor should review the request and provide the necessary medical responses.' is not of type 'array'\n- Representation artifact is empty.",
+      "artifact": null,
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Verify Cardiology Consultation Count for January",
+          "req_ids": [
+            "U30_27"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "month": "January",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Navigate to the Patient History File section.",
+            "Filter records by the speciality 'Cardiology' and the month 'January'.",
+            "Count the number of consultations."
+          ],
+          "expected": [
+            "The count should match the expected value as specified in the requirements."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Verify Cardiology Consultation Count for Q1",
+          "req_ids": [
+            "U30_27"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "quarter": "Q1",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Navigate to the Patient History File section.",
+            "Filter records by the speciality 'Cardiology' and the quarter 'Q1'.",
+            "Count the number of consultations."
+          ],
+          "expected": [
+            "The count should match the expected value as specified in the requirements."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Verify Cardiology Consultation Count for the year 2022",
+          "req_ids": [
+            "U30_27"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "year": 2022,
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Navigate to the Patient History File section.",
+            "Filter records by the speciality 'Cardiology' and the year '2022'.",
+            "Count the number of consultations."
+          ],
+          "expected": [
+            "The count should match the expected value as specified in the requirements."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Verify Appointment Creation for Provided Symptoms",
+          "req_ids": [
+            "Req-6/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptoms": "Provided symptoms",
+            "mode": "Appointment"
+          },
+          "steps": [
+            "Navigate to the Patient Consultation Request section.",
+            "Create a new appointment request with the provided symptoms and appointment mode.",
+            "Verify an appointment entry is created."
+          ],
+          "expected": [
+            "An appointment entry should be created for the provided symptoms and mode."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Verify Appointment Creation for Provided Symptoms",
+          "req_ids": [
+            "Req-6/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptoms": "Provided symptoms",
+            "mode": "Offline"
+          },
+          "steps": [
+            "Navigate to the Patient Consultation Request section.",
+            "Create a new offline consultation request with the provided symptoms.",
+            "Verify an offline consultation request is created."
+          ],
+          "expected": [
+            "An offline consultation request should be created for the provided symptoms."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Verify Appointment Entry Creation for Provided Symptoms",
+          "req_ids": [
+            "Req-6/2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptoms": "Provided symptoms",
+            "mode": "Appointment"
+          },
+          "steps": [
+            "Navigate to the Patient Appointment File section.",
+            "Filter appointments by the provided symptoms and appointment mode.",
+            "Verify an appointment entry is created for the next day."
+          ],
+          "expected": [
+            "An appointment entry should be created for the provided symptoms and mode."
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Verify Offline Consultation Request Creation for Provided Symptoms",
+          "req_ids": [
+            "Req-6/2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "symptoms": "Provided symptoms",
+            "mode": "Offline"
+          },
+          "steps": [
+            "Navigate to the Patient Consultation Request section.",
+            "Create a new offline consultation request with the provided symptoms.",
+            "Verify an offline consultation request is created."
+          ],
+          "expected": [
+            "An offline consultation request should be created for the provided symptoms."
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Verify Appointment Creation and File Purging for Next 5 Days",
+          "req_ids": [
+            "Req-6/3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Trigger the nightly batch program.",
+            "Verify appointments are created for the next 5 days.",
+            "Verify existing files are purged as expected."
+          ],
+          "expected": [
+            "Appointments should be created for the next 5 days and existing files should be purged as expected."
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Verify Disease Prediction and Request Prioritization",
+          "req_ids": [
+            "Req-7"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Trigger the disease prediction batch program.",
+            "Verify the system predicts diseases and prioritizes the requests accordingly."
+          ],
+          "expected": [
+            "The system should predict diseases and prioritize the request accordingly."
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Verify Doctor's Response to Prioritized Requests",
+          "req_ids": [
+            "Req-8"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Present a prioritized request to the doctor.",
+            "Verify the doctor reviews the request and provides necessary medical responses."
+          ],
+          "expected": [
+            "The doctor should review the request and provide the necessary medical responses."
+          ]
+        }
+      ],
+      "raw_if_unparsed": "```json\n[\n  {\n    \"id\": \"TC-001\",\n    \"title\": \"Verify Cardiology Consultation Count for January\",\n    \"req_ids\": [\"U30_27\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"month\": \"January\", \"speciality\": \"Cardiology\"},\n    \"steps\": [\n      \"Navigate to the Patient History File section.\",\n      \"Filter records by the speciality 'Cardiology' and the month 'January'.\",\n      \"Count the number of consultations.\"\n    ],\n    \"expected\": [\"The count should match the expected value as specified in the requirements.\"]\n  },\n  {\n    \"id\": \"TC-002\",\n    \"title\": \"Verify Cardiology Consultation Count for Q1\",\n    \"req_ids\": [\"U30_27\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"quarter\": \"Q1\", \"speciality\": \"Cardiology\"},\n    \"steps\": [\n      \"Navigate to the Patient History File section.\",\n      \"Filter records by the speciality 'Cardiology' and the quarter 'Q1'.\",\n      \"Count the number of consultations.\"\n    ],\n    \"expected\": [\"The count should match the expected value as specified in the requirements.\"]\n  },\n  {\n    \"id\": \"TC-003\",\n    \"title\": \"Verify Cardiology Consultation Count for the year 2022\",\n    \"req_ids\": [\"U30_27\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"year\": 2022, \"speciality\": \"Cardiology\"},\n    \"steps\": [\n      \"Navigate to the Patient History File section.\",\n      \"Filter records by the speciality 'Cardiology' and the year '2022'.\",\n      \"Count the number of consultations.\"\n    ],\n    \"expected\": [\"The count should match the expected value as specified in the requirements.\"]\n  },\n  {\n    \"id\": \"TC-004\",\n    \"title\": \"Verify Appointment Creation for Provided Symptoms\",\n    \"req_ids\": [\"Req-6/1\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"symptoms\": \"Provided symptoms\", \"mode\": \"Appointment\"},\n    \"steps\": [\n      \"Navigate to the Patient Consultation Request section.\",\n      \"Create a new appointment request with the provided symptoms and appointment mode.\",\n      \"Verify an appointment entry is created.\"\n    ],\n    \"expected\": [\"An appointment entry should be created for the provided symptoms and mode.\"]\n  },\n  {\n    \"id\": \"TC-005\",\n    \"title\": \"Verify Appointment Creation for Provided Symptoms\",\n    \"req_ids\": [\"Req-6/1\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"symptoms\": \"Provided symptoms\", \"mode\": \"Offline\"},\n    \"steps\": [\n      \"Navigate to the Patient Consultation Request section.\",\n      \"Create a new offline consultation request with the provided symptoms.\",\n      \"Verify an offline consultation request is created.\"\n    ],\n    \"expected\": [\"An offline consultation request should be created for the provided symptoms.\"]\n  },\n  {\n    \"id\": \"TC-006\",\n    \"title\": \"Verify Appointment Entry Creation for Provided Symptoms\",\n    \"req_ids\": [\"Req-6/2\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [],\n    \"inputs\": {\"symptoms\": \"Provided symptoms\", \"mode\": \"Appointment\"},\n    \"steps\": [\n      \"Navigate to the Patient A",
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.7,
+        "representation_score": 0.0,
+        "sfv_score": 0.35,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U30_27']",
+          "test case #2 (TC-002): traces to unknown requirement ids ['U30_27']",
+          "test case #3 (TC-003): traces to unknown requirement ids ['U30_27']",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.35). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): traces to unknown requirement ids ['U30_27']\n- test case #2 (TC-002): traces to unknown requirement ids ['U30_27']\n- test case #3 (TC-003): traces to unknown requirement ids ['U30_27']\n- Representation artifact is empty.",
+      "artifact": "using pytest\nimport pytest\nfrom unittest.mock import patch\n\n# Test Case TC-001: Number of Consultations by Doctor (Month/Quarter/Year) Speciality wise - Revenue Earned per Month/Quarter/Year\n@pytest.mark.parametrize(\"month, quarter, year, speciality\", [(\"January\", \"Q1\", 2021, \"Cardiology\")])\ndef test_consultations_revenue_earned(month, quarter, year, speciality):\n    with patch('module.get_patient_history') as mock_get_patient_history:\n        mock_get_patient_history.return_value = {\"consultations\": [{\"date\": \"2021-01-01\", \"speciality\": \"Cardiology\"}]\n        # Assertion to be made here based on the actual implementation\n\n# Test Case TC-002: Registered Patients shall have the ability to raise Consultation Requests - Appointment Mode\n@pytest.mark.parametrize(\"mode\", [\"Appointment\"])\ndef test_appointment_request_creation(mode):\n    with patch('module.create_appointment_request') as mock_create_appointment_request:\n        mock_create_appointment_request.assert_called_once_with(symptoms=\"Sample symptoms\", mode=mode)\n\n# Test Case TC-003: Appointment Requests creation for next day\n@pytest.mark.parametrize(\"start_date, end_date\", [(\"2021-01-01\", \"2021-01-05\")])\ndef test_nightly_appointment_creation(start_date, end_date):\n    with patch('module.run_nightly_batch_program') as mock_run_nightly_batch_program:\n        mock_run_nightly_batch_program.assert_called_once_with(start_date, end_date)\n        # Additional assertions to verify file creation and purging\n\n# Test Case TC-004: Disease Prediction and Prioritization of Consultation Requests\n@pytest.mark.parametrize(\"request_data\", [\"Sample Consultation Request Data\"])\ndef test_disease_prediction_and_prioritization(request_data):\n    with patch('module.run_disease_prediction_algorithm') as mock_run_disease_prediction_algorithm:\n        mock_run_disease_prediction_algorithm.return_value = {\"priority\": \"Critical\"}\n        # Assertion to be made here based on the actual implementation\n\n# Test Case TC-005: Doctors shall see the prioritized consultation requests and provide diagnosis, prescribe medicines, and suggest lab requests\n@pytest.mark.parametrize(\"request_id\", [\"Prioritized Request ID\"])\ndef test_doctor_response_to_prioritized_requests(request_id):\n    with patch('module.doctor_actions') as mock_doctor_actions:\n        mock_doctor_actions.assert_called_once_with(request_id, expected_actions=[\"diagnose\", \"prescribe\", \"suggest_labs\"])\n\n# Test Case TC-006: Chemist shall be able to view the open prescriptions and update the status\n@pytest.mark.parametrize(\"chemist_id, pincode\", [(\"Specific Chemist ID\", \"4720201\")])\ndef test_chemist_prescription_status_update(chemist_id, pincode):\n    with patch('module.chemist_status_update') as mock_chemist_status_update:\n        mock_chemist_status_update.assert_called_once_with(chemist_id)",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test for Number of Consultations by Doctor (Month/Quarter/Year) Speciality wise - Revenue Earned per Month/Quarter/Year",
+          "req_ids": [
+            "U30_27"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has a registered history file"
+          ],
+          "inputs": {
+            "month": "January",
+            "quarter": "Q1",
+            "year": 2021,
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Access the patient history file based on Patient Id",
+            "Count the number of consultations for the specified month, quarter, and year",
+            "Calculate the revenue earned per consultation based on the speciality"
+          ],
+          "expected": [
+            "Revenue matches expected calculation for Cardiology consultations in January 2021"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test for Appointment Request Creation by Registered Patients",
+          "req_ids": [
+            "Req-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered"
+          ],
+          "inputs": {
+            "mode": "Appointment"
+          },
+          "steps": [
+            "Patient enters symptoms",
+            "Patient selects Appointment mode",
+            "Verify an entry is created in the Patient Appointment File for the next day"
+          ],
+          "expected": [
+            "Entry in Patient Appointment File for next day is created"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test for Nightly Administration Batch Program for Appointment Creation",
+          "req_ids": [
+            "Req-6/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Nightly administration batch program is scheduled"
+          ],
+          "inputs": {
+            "start_date": "2021-01-01",
+            "end_date": "2021-01-05"
+          },
+          "steps": [
+            "Run the batch program",
+            "Verify Appointment Files are created for the next 5 days starting from the start date",
+            "Check that existing files are purged before new files are created"
+          ],
+          "expected": [
+            "Correct Appointment Files are created and existing files are purged for the specified period"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test for Disease Prediction and Prioritization of Consultation Requests",
+          "req_ids": [
+            "Req-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "New Consultation Requests are available"
+          ],
+          "inputs": {
+            "request_data": "Sample Consultation Request Data"
+          },
+          "steps": [
+            "Run the machine learning algorithm on the request data",
+            "Verify that the requests are prioritized into Critical, Medium, Low categories"
+          ],
+          "expected": [
+            "Requests are correctly prioritized"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test for Doctor's Response to Prioritized Requests",
+          "req_ids": [
+            "Req-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Requests have been prioritized"
+          ],
+          "inputs": {
+            "request_id": "Prioritized Request ID"
+          },
+          "steps": [
+            "Doctor reviews the prioritized request",
+            "Doctor provides diagnosis, prescribes medicines, and suggests lab requests if necessary"
+          ],
+          "expected": [
+            "Doctor's actions align with the request priority"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test for Chemist's Access to Open Prescriptions",
+          "req_ids": [
+            "Req-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescriptions are assigned to Chemist"
+          ],
+          "inputs": {
+            "chemist_id": "Specific Chemist ID",
+            "pincode": "4720201"
+          },
+          "steps": [
+            "Chemist accesses their assigned prescriptions",
+            "Chemist updates the status of prescriptions"
+          ],
+          "expected": [
+            "Chemist successfully updates the status of prescriptions"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.8333,
+        "representation_score": 0.5,
+        "sfv_score": 0.6667,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U30_27']",
+          "Python syntax error: invalid syntax"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,1018 @@
+{
+  "unit_id": "U06_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.4,
+    "boundary_coverage": 0.1,
+    "groundedness_mg": 0.4167,
+    "hallucinated": [
+      {
+        "value": "MEDIUM",
+        "context": "alarm severity",
+        "grounded": false
+      },
+      {
+        "value": "HIGH",
+        "context": "alarm code",
+        "grounded": false
+      },
+      {
+        "value": "MEDIUM",
+        "context": "alarm code",
+        "grounded": false
+      },
+      {
+        "value": "LOW",
+        "context": "alarm code",
+        "grounded": false
+      },
+      {
+        "value": "1 alarm",
+        "context": "display for 1 alarm",
+        "grounded": false
+      },
+      {
+        "value": "5 alarms",
+        "context": "display for 5 alarms",
+        "grounded": false
+      },
+      {
+        "value": "No alarms",
+        "context": "display for no alarms",
+        "grounded": false
+      },
+      {
+        "value": "true",
+        "context": "alarm signal flag",
+        "grounded": false
+      },
+      {
+        "value": "true",
+        "context": "buzzer command flag",
+        "grounded": false
+      },
+      {
+        "value": "['HIGH', 'MEDIUM', 'LOW']",
+        "context": "list of alarm codes",
+        "grounded": false
+      },
+      {
+        "value": "{'HIGH': 'HIGH', 'MEDIUM': 'MEDIUM', 'LOW': 'LOW'}",
+        "context": "dict of alarms and priorities",
+        "grounded": false
+      },
+      {
+        "value": "1",
+        "context": "number of alarms",
+        "grounded": false
+      },
+      {
+        "value": "5",
+        "context": "number of alarms",
+        "grounded": false
+      },
+      {
+        "value": "0",
+        "context": "number of alarms",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 24,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add negative test cases for invalid alarm codes or severities",
+      "Include boundary checks for legibility at distances slightly less/more than 1 meter",
+      "Verify flashing frequency and duty cycle with timing measurements",
+      "Test buzzer command failure scenarios (e.g., buzzer disconnected)",
+      "Ensure test cases assert specific alarm identifiers rather than generic \"alarm is displayed\""
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.5375,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Alarms\n  As a user\n  I want the controller to detect and receive alarms from the GUI\n  So that I can be notified of any issues\n\n  Scenario: Controller detects and receives alarms from GUI\n    Given the GUI is sending an alarm signal to the controller\n    When the controller receives the alarm signal\n    Then the controller should detect the alarm and display it on the main screen\n\n  Scenario: Controller commands hardware PCB buzzer\n    Given the controller is connected to the hardware PCB buzzer\n    When the controller sends a command to the buzzer to sound an alarm\n    Then the buzzer should sound an alarm\n\n  Scenario: GUI enumerates alarm codes and assigns priorities\n    Given the GUI has a list of alarm codes and their corresponding priorities\n    When the GUI is asked to display the alarm codes and priorities\n    Then the GUI should display the alarm codes and their corresponding priorities\n\n  Scenario: GUI displays highest priority alarm on main screen\n    Given the GUI has a list of alarms with their corresponding priorities\n    When the GUI is asked to display the highest priority alarm on the main screen\n    Then the GUI should display the highest priority alarm on the main screen\n\n  Scenario: GUI displays list of active alarms on button press\n    Given the GUI has a list of active alarms\n    When the user presses the button to view active alarms\n    Then the GUI should display the list of active alarms\n\n  Scenario: GUI displays alarm on main screen legible at distance of 1 meter\n    Given the GUI is displaying an alarm on the main screen\n    When the user is viewing the main screen from a distance of 1 meter\n    Then the alarm should be legible\n\n  Scenario: High severity alarms are indicated with red color and flashing frequency of 2Hz with 50% duty cycle\n    Given the GUI is displaying a high severity alarm\n    When the user is viewing the alarm on the main screen\n    Then the alarm should be indicated with a red color and a flashing frequency of 2Hz with a 50% duty cycle\n\n  Scenario: Low severity alarms are indicated with yellow color which is constantly on\n    Given the GUI is displaying a low severity alarm\n    When the user is viewing the alarm on the main screen\n    Then the alarm should be indicated with a yellow color which is constantly on\n\n  Scenario Outline: GUI displays alarm on main screen for different alarm codes\n    Given the GUI has a list of alarm codes\n    When the user is viewing the main screen\n    Then the GUI should display the alarm code on the main screen\n    Examples:\n      | alarm_code | expected_display |\n      | HIGH       | Red flashing     |\n      | MEDIUM     | Yellow constant  |\n      | LOW        | Yellow constant  |\n\n  Scenario Outline: GUI displays list of active alarms for different numbers of alarms\n    Given the GUI has a list of active alarms\n    When the user presses the button to view active alarms\n    Then the GUI should display the list of active alarms\n    Examples:\n      | num_alarms | expected_display |\n      | 1          | 1 alarm          |\n      | 5          | 5 alarms         |\n      | 0          | No alarms        |\n\n  Scenario Outline: GUI displays alarm on main screen for different alarm priorities\n    Given the GUI has a list of alarm codes and their corresponding priorities\n    When the user is viewing the main screen\n    Then the GUI should display the alarm code on the main screen\n    Examples:\n      | alarm_code | priority | expected_display |\n      | HIGH       | HIGH     | Red flashing     |\n      | MEDIUM     | MEDIUM   | Yellow constant  |\n      | LOW        | LOW      | Yellow constant  |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Controller detects and receives alarms from GUI",
+      "req_ids": [
+        "RW-SW-66"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI is sending an alarm signal to the controller"
+      ],
+      "inputs": {
+        "alarm_signal": "true"
+      },
+      "steps": [
+        "controller receives alarm signal",
+        "controller detects alarm",
+        "controller displays alarm on main screen"
+      ],
+      "expected": [
+        "alarm is displayed on main screen"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Controller commands hardware PCB buzzer",
+      "req_ids": [
+        "RW-SW-67"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "controller is connected to hardware PCB buzzer"
+      ],
+      "inputs": {
+        "buzzer_command": "true"
+      },
+      "steps": [
+        "controller sends command to buzzer",
+        "buzzer sounds alarm"
+      ],
+      "expected": [
+        "buzzer sounds alarm"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "GUI enumerates alarm codes and assigns priorities",
+      "req_ids": [
+        "RW-SW-68"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI has list of alarm codes and priorities"
+      ],
+      "inputs": {
+        "alarm_codes": "['HIGH', 'MEDIUM', 'LOW']"
+      },
+      "steps": [
+        "GUI displays alarm codes and priorities"
+      ],
+      "expected": [
+        "alarm codes and priorities are displayed"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "GUI displays highest priority alarm on main screen",
+      "req_ids": [
+        "RW-SW-69"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI has list of alarms with priorities"
+      ],
+      "inputs": {
+        "alarms": "{'HIGH': 'HIGH', 'MEDIUM': 'MEDIUM', 'LOW': 'LOW'}"
+      },
+      "steps": [
+        "GUI displays highest priority alarm on main screen"
+      ],
+      "expected": [
+        "highest priority alarm is displayed on main screen"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "GUI displays list of active alarms on button press",
+      "req_ids": [
+        "RW-SW-70"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI has list of active alarms"
+      ],
+      "inputs": {
+        "alarms": "['HIGH', 'MEDIUM', 'LOW']"
+      },
+      "steps": [
+        "user presses button to view active alarms",
+        "GUI displays list of active alarms"
+      ],
+      "expected": [
+        "list of active alarms is displayed"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "GUI displays alarm on main screen legible at distance of 1 meter",
+      "req_ids": [
+        "RW-SW-71"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI is displaying alarm on main screen"
+      ],
+      "inputs": {
+        "distance": "1 meter"
+      },
+      "steps": [
+        "user views main screen from distance of 1 meter"
+      ],
+      "expected": [
+        "alarm is legible"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "High severity alarms are indicated with red color and flashing frequency of 2Hz with 50% duty cycle",
+      "req_ids": [
+        "RW-SW-73"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI is displaying high severity alarm"
+      ],
+      "inputs": {
+        "alarm_severity": "HIGH"
+      },
+      "steps": [
+        "user views alarm on main screen"
+      ],
+      "expected": [
+        "alarm is indicated with red color and flashing frequency of 2Hz with 50% duty cycle"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Low severity alarms are indicated with yellow color which is constantly on",
+      "req_ids": [
+        "RW-SW-74"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI is displaying low severity alarm"
+      ],
+      "inputs": {
+        "alarm_severity": "LOW"
+      },
+      "steps": [
+        "user views alarm on main screen"
+      ],
+      "expected": [
+        "alarm is indicated with yellow color which is constantly on"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "GUI displays alarm on main screen for different alarm codes",
+      "req_ids": [
+        "RW-SW-73",
+        "RW-SW-74"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI has list of alarm codes"
+      ],
+      "inputs": {
+        "alarm_codes": "['HIGH', 'MEDIUM', 'LOW']"
+      },
+      "steps": [
+        "user views main screen"
+      ],
+      "expected": [
+        "alarm code is displayed on main screen"
+      ],
+      "examples": [
+        {
+          "alarm_code": "HIGH",
+          "expected_display": "Red flashing"
+        },
+        {
+          "alarm_code": "MEDIUM",
+          "expected_display": "Yellow constant"
+        },
+        {
+          "alarm_code": "LOW",
+          "expected_display": "Yellow constant"
+        }
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "GUI displays list of active alarms for different numbers of alarms",
+      "req_ids": [
+        "RW-SW-70"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI has list of active alarms"
+      ],
+      "inputs": {
+        "alarms": "['HIGH', 'MEDIUM', 'LOW']"
+      },
+      "steps": [
+        "user presses button to view active alarms"
+      ],
+      "expected": [
+        "list of active alarms is displayed"
+      ],
+      "examples": [
+        {
+          "num_alarms": "1",
+          "expected_display": "1 alarm"
+        },
+        {
+          "num_alarms": "5",
+          "expected_display": "5 alarms"
+        },
+        {
+          "num_alarms": "0",
+          "expected_display": "No alarms"
+        }
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "GUI displays alarm on main screen for different alarm priorities",
+      "req_ids": [
+        "RW-SW-73",
+        "RW-SW-74"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI has list of alarm codes and priorities"
+      ],
+      "inputs": {
+        "alarm_codes": "['HIGH', 'MEDIUM', 'LOW']",
+        "priorities": "{'HIGH': 'HIGH', 'MEDIUM': 'MEDIUM', 'LOW': 'LOW'}"
+      },
+      "steps": [
+        "user views main screen"
+      ],
+      "expected": [
+        "alarm code is displayed on main screen"
+      ],
+      "examples": [
+        {
+          "alarm_code": "HIGH",
+          "priority": "HIGH",
+          "expected_display": "Red flashing"
+        },
+        {
+          "alarm_code": "MEDIUM",
+          "priority": "MEDIUM",
+          "expected_display": "Yellow constant"
+        },
+        {
+          "alarm_code": "LOW",
+          "priority": "LOW",
+          "expected_display": "Yellow constant"
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller detects and receives alarms from GUI",
+          "req_ids": [
+            "RW-SW-66"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is connected to controller"
+          ],
+          "inputs": {
+            "alarm": "HIGH"
+          },
+          "steps": [
+            "GUI sends alarm to controller",
+            "controller receives alarm"
+          ],
+          "expected": [
+            "controller detects alarm"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller commands hardware PCB buzzer",
+          "req_ids": [
+            "RW-SW-67"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is connected to hardware PCB buzzer"
+          ],
+          "inputs": {
+            "command": "sound"
+          },
+          "steps": [
+            "controller commands buzzer to sound"
+          ],
+          "expected": [
+            "buzzer sounds"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI/Controller enumerates alarm codes and assigns priorities",
+          "req_ids": [
+            "RW-SW-68"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller has list of alarm codes and priorities"
+          ],
+          "inputs": {
+            "alarm_code": "HIGH",
+            "priority": "1"
+          },
+          "steps": [
+            "GUI requests list of alarm codes and priorities"
+          ],
+          "expected": [
+            "GUI displays list of alarm codes and priorities"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI displays highest priority alarm on main screen",
+          "req_ids": [
+            "RW-SW-69"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller has list of active alarms with different priorities"
+          ],
+          "inputs": {
+            "alarm_code": "HIGH",
+            "priority": "1"
+          },
+          "steps": [
+            "GUI displays main screen"
+          ],
+          "expected": [
+            "GUI displays highest priority alarm on main screen"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI displays list of active alarms on button press",
+          "req_ids": [
+            "RW-SW-70"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller has list of active alarms"
+          ],
+          "inputs": {
+            "alarm_code": "HIGH",
+            "priority": "1"
+          },
+          "steps": [
+            "user presses button to view active alarms"
+          ],
+          "expected": [
+            "GUI displays list of active alarms"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI displays alarm on main screen legible at distance of 1 meter",
+          "req_ids": [
+            "RW-SW-71"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI displays alarm on main screen"
+          ],
+          "inputs": {
+            "distance": "1 meter"
+          },
+          "steps": [
+            "user views main screen from distance of 1 meter"
+          ],
+          "expected": [
+            "alarm is legible"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "High severity alarms are indicated with red color and flashing frequency of 2Hz with 50% duty cycle",
+          "req_ids": [
+            "RW-SW-73"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller has high severity alarm"
+          ],
+          "inputs": {
+            "alarm_code": "HIGH",
+            "priority": "1"
+          },
+          "steps": [
+            "GUI displays alarm"
+          ],
+          "expected": [
+            "alarm is displayed with red color and flashing frequency of 2Hz with 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Low severity alarms are indicated with yellow color which is constantly on",
+          "req_ids": [
+            "RW-SW-74"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller has low severity alarm"
+          ],
+          "inputs": {
+            "alarm_code": "LOW",
+            "priority": "3"
+          },
+          "steps": [
+            "GUI displays alarm"
+          ],
+          "expected": [
+            "alarm is displayed with yellow color which is constantly on"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI displays alarm on main screen with different alarm codes and priorities",
+          "req_ids": [
+            "RW-SW-69"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller has list of alarm codes and priorities"
+          ],
+          "inputs": {
+            "alarm_code": "MEDIUM",
+            "priority": "2"
+          },
+          "steps": [
+            "GUI displays main screen with alarm code and priority"
+          ],
+          "expected": [
+            "GUI displays alarm on main screen with alarm code and priority"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI displays list of active alarms with different alarm codes and priorities",
+          "req_ids": [
+            "RW-SW-70"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller has list of active alarms with alarm codes and priorities"
+          ],
+          "inputs": {
+            "alarm_code": "LOW",
+            "priority": "3"
+          },
+          "steps": [
+            "user presses button to view active alarms"
+          ],
+          "expected": [
+            "GUI displays list of active alarms with alarm codes and priorities"
+          ]
+        }
+      ],
+      "raw_if_unparsed": "```gherkin\nFeature: Alarms\n\n  Scenario: Controller detects and receives alarms from GUI\n    Given the GUI sends an alarm to the controller\n    When the controller receives the alarm\n    Then the controller detects the alarm\n\n  Scenario: Controller commands hardware PCB buzzer\n    Given the controller is connected to the hardware PCB buzzer\n    When the controller commands the buzzer to sound\n    Then the buzzer sounds\n\n  Scenario: GUI/Controller enumerates alarm codes and assigns priorities\n    Given the controller has a list of alarm codes and priorities\n    When the GUI requests the list of alarm codes and priorities\n    Then the GUI displays the list of alarm codes and priorities\n\n  Scenario: GUI displays highest priority alarm on main screen\n    Given the controller has a list of active alarms with different priorities\n    When the GUI displays the main screen\n    Then the GUI displays the highest priority alarm on the main screen\n\n  Scenario: GUI displays list of active alarms on button press\n    Given the controller has a list of active alarms\n    When the user presses the button to view active alarms\n    Then the GUI displays the list of active alarms\n\n  Scenario: GUI displays alarm on main screen legible at distance of 1 meter\n    Given the GUI displays an alarm on the main screen\n    When the user views the main screen from a distance of 1 meter\n    Then the alarm is legible\n\n  Scenario: High severity alarms are indicated with red color and flashing frequency of 2Hz with 50% duty cycle\n    Given the controller has a high severity alarm\n    When the GUI displays the alarm\n    Then the alarm is displayed with a red color and a flashing frequency of 2Hz with a 50% duty cycle\n\n  Scenario: Low severity alarms are indicated with yellow color which is constantly on\n    Given the controller has a low severity alarm\n    When the GUI displays the alarm\n    Then the alarm is displayed with a yellow color which is constantly on\n\n  Scenario Outline: GUI displays alarm on main screen with different alarm codes and priorities\n    Given the controller has a list of alarm codes and priorities\n    When the GUI displays the main screen with the alarm code <alarm_code> and priority <priority>\n    Then the GUI displays the alarm on the main screen with the alarm code <alarm_code> and priority <priority>\n\n    Examples:\n      | alarm_code | priority |\n      | HIGH       | 1        |\n      | MEDIUM     | 2        |\n      | LOW        | 3        |\n\n  Scenario Outline: GUI displays list of active alarms with different alarm codes and priorities\n    Given the controller has a list of active alarms with alarm codes <alarm_code> and priorities <priority>\n    When the user presses the button to view active alarms\n    Then the GUI displays the list of active alarms with alarm codes <alarm_code> and priorities <priority>\n\n    Examples:\n      | alarm_code | priority |\n      | HIGH       | 1        |\n      | MEDIUM     | 2        |\n      | LOW        | 3        |\n```\n\n``",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Representation artifact is empty.",
+      "artifact": "Feature: Alarms\n  As a user\n  I want the controller to detect and receive alarms from the GUI\n  So that I can be notified of any issues\n\n  Scenario: Controller detects and receives alarms from GUI\n    Given the GUI is sending an alarm signal to the controller\n    When the controller receives the alarm signal\n    Then the controller should detect the alarm and display it on the main screen\n\n  Scenario: Controller commands hardware PCB buzzer\n    Given the controller is connected to the hardware PCB buzzer\n    When the controller sends a command to the buzzer to sound an alarm\n    Then the buzzer should sound an alarm\n\n  Scenario: GUI enumerates alarm codes and assigns priorities\n    Given the GUI has a list of alarm codes and their corresponding priorities\n    When the GUI is asked to display the alarm codes and priorities\n    Then the GUI should display the alarm codes and their corresponding priorities\n\n  Scenario: GUI displays highest priority alarm on main screen\n    Given the GUI has a list of alarms with their corresponding priorities\n    When the GUI is asked to display the highest priority alarm on the main screen\n    Then the GUI should display the highest priority alarm on the main screen\n\n  Scenario: GUI displays list of active alarms on button press\n    Given the GUI has a list of active alarms\n    When the user presses the button to view active alarms\n    Then the GUI should display the list of active alarms\n\n  Scenario: GUI displays alarm on main screen legible at distance of 1 meter\n    Given the GUI is displaying an alarm on the main screen\n    When the user is viewing the main screen from a distance of 1 meter\n    Then the alarm should be legible\n\n  Scenario: High severity alarms are indicated with red color and flashing frequency of 2Hz with 50% duty cycle\n    Given the GUI is displaying a high severity alarm\n    When the user is viewing the alarm on the main screen\n    Then the alarm should be indicated with a red color and a flashing frequency of 2Hz with a 50% duty cycle\n\n  Scenario: Low severity alarms are indicated with yellow color which is constantly on\n    Given the GUI is displaying a low severity alarm\n    When the user is viewing the alarm on the main screen\n    Then the alarm should be indicated with a yellow color which is constantly on\n\n  Scenario Outline: GUI displays alarm on main screen for different alarm codes\n    Given the GUI has a list of alarm codes\n    When the user is viewing the main screen\n    Then the GUI should display the alarm code on the main screen\n    Examples:\n      | alarm_code | expected_display |\n      | HIGH       | Red flashing     |\n      | MEDIUM     | Yellow constant  |\n      | LOW        | Yellow constant  |\n\n  Scenario Outline: GUI displays list of active alarms for different numbers of alarms\n    Given the GUI has a list of active alarms\n    When the user presses the button to view active alarms\n    Then the GUI should display the list of active alarms\n    Examples:\n      | num_alarms | expected_display |\n      | 1          | 1 alarm          |\n      | 5          | 5 alarms         |\n      | 0          | No alarms        |\n\n  Scenario Outline: GUI displays alarm on main screen for different alarm priorities\n    Given the GUI has a list of alarm codes and their corresponding priorities\n    When the user is viewing the main screen\n    Then the GUI should display the alarm code on the main screen\n    Examples:\n      | alarm_code | priority | expected_display |\n      | HIGH       | HIGH     | Red flashing     |\n      | MEDIUM     | MEDIUM   | Yellow constant  |\n      | LOW        | LOW      | Yellow constant  |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller detects and receives alarms from GUI",
+          "req_ids": [
+            "RW-SW-66"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is sending an alarm signal to the controller"
+          ],
+          "inputs": {
+            "alarm_signal": "true"
+          },
+          "steps": [
+            "controller receives alarm signal",
+            "controller detects alarm",
+            "controller displays alarm on main screen"
+          ],
+          "expected": [
+            "alarm is displayed on main screen"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller commands hardware PCB buzzer",
+          "req_ids": [
+            "RW-SW-67"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is connected to hardware PCB buzzer"
+          ],
+          "inputs": {
+            "buzzer_command": "true"
+          },
+          "steps": [
+            "controller sends command to buzzer",
+            "buzzer sounds alarm"
+          ],
+          "expected": [
+            "buzzer sounds alarm"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI enumerates alarm codes and assigns priorities",
+          "req_ids": [
+            "RW-SW-68"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI has list of alarm codes and priorities"
+          ],
+          "inputs": {
+            "alarm_codes": "['HIGH', 'MEDIUM', 'LOW']"
+          },
+          "steps": [
+            "GUI displays alarm codes and priorities"
+          ],
+          "expected": [
+            "alarm codes and priorities are displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI displays highest priority alarm on main screen",
+          "req_ids": [
+            "RW-SW-69"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI has list of alarms with priorities"
+          ],
+          "inputs": {
+            "alarms": "{'HIGH': 'HIGH', 'MEDIUM': 'MEDIUM', 'LOW': 'LOW'}"
+          },
+          "steps": [
+            "GUI displays highest priority alarm on main screen"
+          ],
+          "expected": [
+            "highest priority alarm is displayed on main screen"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI displays list of active alarms on button press",
+          "req_ids": [
+            "RW-SW-70"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI has list of active alarms"
+          ],
+          "inputs": {
+            "alarms": "['HIGH', 'MEDIUM', 'LOW']"
+          },
+          "steps": [
+            "user presses button to view active alarms",
+            "GUI displays list of active alarms"
+          ],
+          "expected": [
+            "list of active alarms is displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI displays alarm on main screen legible at distance of 1 meter",
+          "req_ids": [
+            "RW-SW-71"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is displaying alarm on main screen"
+          ],
+          "inputs": {
+            "distance": "1 meter"
+          },
+          "steps": [
+            "user views main screen from distance of 1 meter"
+          ],
+          "expected": [
+            "alarm is legible"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "High severity alarms are indicated with red color and flashing frequency of 2Hz with 50% duty cycle",
+          "req_ids": [
+            "RW-SW-73"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is displaying high severity alarm"
+          ],
+          "inputs": {
+            "alarm_severity": "HIGH"
+          },
+          "steps": [
+            "user views alarm on main screen"
+          ],
+          "expected": [
+            "alarm is indicated with red color and flashing frequency of 2Hz with 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Low severity alarms are indicated with yellow color which is constantly on",
+          "req_ids": [
+            "RW-SW-74"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is displaying low severity alarm"
+          ],
+          "inputs": {
+            "alarm_severity": "LOW"
+          },
+          "steps": [
+            "user views alarm on main screen"
+          ],
+          "expected": [
+            "alarm is indicated with yellow color which is constantly on"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI displays alarm on main screen for different alarm codes",
+          "req_ids": [
+            "RW-SW-73",
+            "RW-SW-74"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI has list of alarm codes"
+          ],
+          "inputs": {
+            "alarm_codes": "['HIGH', 'MEDIUM', 'LOW']"
+          },
+          "steps": [
+            "user views main screen"
+          ],
+          "expected": [
+            "alarm code is displayed on main screen"
+          ],
+          "examples": [
+            {
+              "alarm_code": "HIGH",
+              "expected_display": "Red flashing"
+            },
+            {
+              "alarm_code": "MEDIUM",
+              "expected_display": "Yellow constant"
+            },
+            {
+              "alarm_code": "LOW",
+              "expected_display": "Yellow constant"
+            }
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI displays list of active alarms for different numbers of alarms",
+          "req_ids": [
+            "RW-SW-70"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI has list of active alarms"
+          ],
+          "inputs": {
+            "alarms": "['HIGH', 'MEDIUM', 'LOW']"
+          },
+          "steps": [
+            "user presses button to view active alarms"
+          ],
+          "expected": [
+            "list of active alarms is displayed"
+          ],
+          "examples": [
+            {
+              "num_alarms": "1",
+              "expected_display": "1 alarm"
+            },
+            {
+              "num_alarms": "5",
+              "expected_display": "5 alarms"
+            },
+            {
+              "num_alarms": "0",
+              "expected_display": "No alarms"
+            }
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "GUI displays alarm on main screen for different alarm priorities",
+          "req_ids": [
+            "RW-SW-73",
+            "RW-SW-74"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI has list of alarm codes and priorities"
+          ],
+          "inputs": {
+            "alarm_codes": "['HIGH', 'MEDIUM', 'LOW']",
+            "priorities": "{'HIGH': 'HIGH', 'MEDIUM': 'MEDIUM', 'LOW': 'LOW'}"
+          },
+          "steps": [
+            "user views main screen"
+          ],
+          "expected": [
+            "alarm code is displayed on main screen"
+          ],
+          "examples": [
+            {
+              "alarm_code": "HIGH",
+              "priority": "HIGH",
+              "expected_display": "Red flashing"
+            },
+            {
+              "alarm_code": "MEDIUM",
+              "priority": "MEDIUM",
+              "expected_display": "Yellow constant"
+            },
+            {
+              "alarm_code": "LOW",
+              "priority": "LOW",
+              "expected_display": "Yellow constant"
+            }
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.4,
+        "boundary_coverage": 0.1,
+        "groundedness_mg": 0.4167,
+        "hallucinated": [
+          {
+            "value": "MEDIUM",
+            "context": "alarm severity",
+            "grounded": false
+          },
+          {
+            "value": "HIGH",
+            "context": "alarm code",
+            "grounded": false
+          },
+          {
+            "value": "MEDIUM",
+            "context": "alarm code",
+            "grounded": false
+          },
+          {
+            "value": "LOW",
+            "context": "alarm code",
+            "grounded": false
+          },
+          {
+            "value": "1 alarm",
+            "context": "display for 1 alarm",
+            "grounded": false
+          },
+          {
+            "value": "5 alarms",
+            "context": "display for 5 alarms",
+            "grounded": false
+          },
+          {
+            "value": "No alarms",
+            "context": "display for no alarms",
+            "grounded": false
+          },
+          {
+            "value": "true",
+            "context": "alarm signal flag",
+            "grounded": false
+          },
+          {
+            "value": "true",
+            "context": "buzzer command flag",
+            "grounded": false
+          },
+          {
+            "value": "['HIGH', 'MEDIUM', 'LOW']",
+            "context": "list of alarm codes",
+            "grounded": false
+          },
+          {
+            "value": "{'HIGH': 'HIGH', 'MEDIUM': 'MEDIUM', 'LOW': 'LOW'}",
+            "context": "dict of alarms and priorities",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "number of alarms",
+            "grounded": false
+          },
+          {
+            "value": "5",
+            "context": "number of alarms",
+            "grounded": false
+          },
+          {
+            "value": "0",
+            "context": "number of alarms",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 24,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test cases for invalid alarm codes or severities",
+          "Include boundary checks for legibility at distances slightly less/more than 1 meter",
+          "Verify flashing frequency and duty cycle with timing measurements",
+          "Test buzzer command failure scenarios (e.g., buzzer disconnected)",
+          "Ensure test cases assert specific alarm identifiers rather than generic \"alarm is displayed\""
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.5375,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

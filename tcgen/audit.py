@@ -161,10 +161,17 @@ def run(project, gen):
         for i in range(0, len(cases), bs):
             jobs.append((s, cases[i:i + bs]))
 
+    def _strs(xs):
+        """Schema-nonconformant suites can have dict entries where a plain
+        string is expected (e.g. a model emitting structured sub-steps);
+        coerce for query-building, which only affects code retrieval, not
+        the verdicts themselves."""
+        return [x if isinstance(x, str) else json.dumps(x) for x in xs]
+
     def one(job):
         s, batch = job
         unit = units[s["unit_id"]]
-        queries = [" ".join([c.get("title", ""), " ".join(c.get("steps", [])), " ".join(c.get("expected", []))]) for c in batch]
+        queries = [" ".join([c.get("title", ""), " ".join(_strs(c.get("steps", []))), " ".join(_strs(c.get("expected", [])))]) for c in batch]
         p = prompt("audit", REQS=fmt_reqs(unit["reqs"]), CASES=json.dumps(batch, indent=1), MAP=index.map_text(queries=queries),
                    CODE=index.search_many(queries, CFG["execution"].get("audit_code_chars", 14000)))
         try:

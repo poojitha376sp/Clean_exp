@@ -1,0 +1,426 @@
+{
+  "unit_id": "U31_10",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.8,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.6,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.4,
+    "hallucinated": [
+      {
+        "value": "4 years",
+        "context": "archiving threshold",
+        "grounded": false
+      },
+      {
+        "value": "2 years",
+        "context": "archiving threshold",
+        "grounded": false
+      },
+      {
+        "value": "3 years old or less",
+        "context": "archiving threshold",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 5,
+    "uncovered_clauses": [
+      "lab tests shall be offline",
+      "labs shall submit reports to patient offline"
+    ],
+    "weaknesses": [
+      "Add tests for offline lab tests and offline report submission as per Req-10.",
+      "Include explicit checks for the number of items displayed in lists to improve oracle assertiveness.",
+      "Add status code or message assertions for API responses to increase precision.",
+      "Expand boundary tests to include invalid values (e.g., negative years, zero, non-integer) to satisfy scenario outline requirement.",
+      "Ensure each requirement clause maps to a unique scenario; currently some clauses share scenarios."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.79,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Lab Management and Patient Profile Archiving\n\n  Scenario: Lab In-charge views open lab-requests and updates status\n    Given the Lab In-charge is logged into the system\n    When the Lab In-charge views the open lab-requests\n    Then the system displays a list of open lab-requests\n    And the Lab In-charge updates the status to \"Actual Sample Collection\"\n    Then the status of the lab-request is updated to \"Actual Sample Collection\"\n\n  Scenario: Patient views Prescription and prints the invoice\n    Given the Patient is logged into the system\n    When the Patient views the Prescription\n    Then the system displays the Prescription\n    And the Patient prints the invoice\n    Then the system generates and prints the invoice\n\n  Scenario: Admin prints and emails the Prescription and Invoice\n    Given the Admin is logged into the system\n    When the Admin prints the Prescription and Invoice for a Patient\n    Then the system generates and prints the Prescription and Invoice\n    And the Admin emails the Prescription and Invoice to the Patient\n    Then the system sends an email containing the Prescription and Invoice to the Patient\n\n  Scenario Outline: Quarterly archiving of Patient Profiles and Consultation Requests\n    Given the system is at the end of a quarter\n    When the system performs the quarterly archiving process\n    Then the system archives Patient Profiles that have not raised any Consultation Request for the last <years> years\n    And the system archives Consultation Requests that are more than <years> years old\n\n    Examples:\n      | years |\n      | 3     |\n      | 4     |\n      | 2     |\n\n  Scenario: Archiving process handles edge cases\n    Given the system is at the end of a quarter\n    When the system performs the quarterly archiving process\n    Then the system does not archive Patient Profiles that have raised Consultation Requests within the last 3 years\n    And the system does not archive Consultation Requests that are 3 years old or less",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Lab In-charge views open lab-requests and updates status",
+      "req_ids": [
+        "Req-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Lab In-charge is logged into the system"
+      ],
+      "inputs": {},
+      "steps": [
+        "views the open lab-requests",
+        "updates the status to 'Actual Sample Collection'"
+      ],
+      "expected": [
+        "system displays a list of open lab-requests",
+        "status of the lab-request is updated to 'Actual Sample Collection'"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Patient views Prescription and prints the invoice",
+      "req_ids": [
+        "Req-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient is logged into the system"
+      ],
+      "inputs": {},
+      "steps": [
+        "views the Prescription",
+        "prints the invoice"
+      ],
+      "expected": [
+        "system displays the Prescription",
+        "system generates and prints the invoice"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Admin prints and emails the Prescription and Invoice",
+      "req_ids": [
+        "Req-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin is logged into the system"
+      ],
+      "inputs": {},
+      "steps": [
+        "prints the Prescription and Invoice for a Patient",
+        "emails the Prescription and Invoice to the Patient"
+      ],
+      "expected": [
+        "system generates and prints the Prescription and Invoice",
+        "system sends an email containing the Prescription and Invoice to the Patient"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Quarterly archiving of Patient Profiles and Consultation Requests",
+      "req_ids": [
+        "Req-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system is at the end of a quarter"
+      ],
+      "inputs": {
+        "years": 3
+      },
+      "steps": [
+        "performs the quarterly archiving process"
+      ],
+      "expected": [
+        "system archives Patient Profiles that have not raised any Consultation Request for the last 3 years",
+        "system archives Consultation Requests that are more than 3 years old"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Quarterly archiving of Patient Profiles and Consultation Requests with more than 3 years",
+      "req_ids": [
+        "Req-12"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "system is at the end of a quarter"
+      ],
+      "inputs": {
+        "years": 4
+      },
+      "steps": [
+        "performs the quarterly archiving process"
+      ],
+      "expected": [
+        "system archives Patient Profiles that have not raised any Consultation Request for the last 4 years",
+        "system archives Consultation Requests that are more than 4 years old"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Quarterly archiving of Patient Profiles and Consultation Requests with less than 3 years",
+      "req_ids": [
+        "Req-12"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "system is at the end of a quarter"
+      ],
+      "inputs": {
+        "years": 2
+      },
+      "steps": [
+        "performs the quarterly archiving process"
+      ],
+      "expected": [
+        "system archives Patient Profiles that have not raised any Consultation Request for the last 2 years",
+        "system archives Consultation Requests that are more than 2 years old"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Archiving process handles edge cases",
+      "req_ids": [
+        "Req-12"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "system is at the end of a quarter"
+      ],
+      "inputs": {},
+      "steps": [
+        "performs the quarterly archiving process"
+      ],
+      "expected": [
+        "system does not archive Patient Profiles that have raised Consultation Requests within the last 3 years",
+        "system does not archive Consultation Requests that are 3 years old or less"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Lab Management and Patient Profile Archiving\n\n  Scenario: Lab In-charge views open lab-requests and updates status\n    Given the Lab In-charge is logged into the system\n    When the Lab In-charge views the open lab-requests\n    Then the system displays a list of open lab-requests\n    And the Lab In-charge updates the status to \"Actual Sample Collection\"\n    Then the status of the lab-request is updated to \"Actual Sample Collection\"\n\n  Scenario: Patient views Prescription and prints the invoice\n    Given the Patient is logged into the system\n    When the Patient views the Prescription\n    Then the system displays the Prescription\n    And the Patient prints the invoice\n    Then the system generates and prints the invoice\n\n  Scenario: Admin prints and emails the Prescription and Invoice\n    Given the Admin is logged into the system\n    When the Admin prints the Prescription and Invoice for a Patient\n    Then the system generates and prints the Prescription and Invoice\n    And the Admin emails the Prescription and Invoice to the Patient\n    Then the system sends an email containing the Prescription and Invoice to the Patient\n\n  Scenario Outline: Quarterly archiving of Patient Profiles and Consultation Requests\n    Given the system is at the end of a quarter\n    When the system performs the quarterly archiving process\n    Then the system archives Patient Profiles that have not raised any Consultation Request for the last <years> years\n    And the system archives Consultation Requests that are more than <years> years old\n\n    Examples:\n      | years |\n      | 3     |\n      | 4     |\n      | 2     |\n\n  Scenario: Archiving process handles edge cases\n    Given the system is at the end of a quarter\n    When the system performs the quarterly archiving process\n    Then the system does not archive Patient Profiles that have raised Consultation Requests within the last 3 years\n    And the system does not archive Consultation Requests that are 3 years old or less",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Lab In-charge views open lab-requests and updates status",
+          "req_ids": [
+            "Req-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab In-charge is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "views the open lab-requests",
+            "updates the status to 'Actual Sample Collection'"
+          ],
+          "expected": [
+            "system displays a list of open lab-requests",
+            "status of the lab-request is updated to 'Actual Sample Collection'"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient views Prescription and prints the invoice",
+          "req_ids": [
+            "Req-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "views the Prescription",
+            "prints the invoice"
+          ],
+          "expected": [
+            "system displays the Prescription",
+            "system generates and prints the invoice"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Admin prints and emails the Prescription and Invoice",
+          "req_ids": [
+            "Req-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "prints the Prescription and Invoice for a Patient",
+            "emails the Prescription and Invoice to the Patient"
+          ],
+          "expected": [
+            "system generates and prints the Prescription and Invoice",
+            "system sends an email containing the Prescription and Invoice to the Patient"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Quarterly archiving of Patient Profiles and Consultation Requests",
+          "req_ids": [
+            "Req-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is at the end of a quarter"
+          ],
+          "inputs": {
+            "years": 3
+          },
+          "steps": [
+            "performs the quarterly archiving process"
+          ],
+          "expected": [
+            "system archives Patient Profiles that have not raised any Consultation Request for the last 3 years",
+            "system archives Consultation Requests that are more than 3 years old"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Quarterly archiving of Patient Profiles and Consultation Requests with more than 3 years",
+          "req_ids": [
+            "Req-12"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "system is at the end of a quarter"
+          ],
+          "inputs": {
+            "years": 4
+          },
+          "steps": [
+            "performs the quarterly archiving process"
+          ],
+          "expected": [
+            "system archives Patient Profiles that have not raised any Consultation Request for the last 4 years",
+            "system archives Consultation Requests that are more than 4 years old"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Quarterly archiving of Patient Profiles and Consultation Requests with less than 3 years",
+          "req_ids": [
+            "Req-12"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "system is at the end of a quarter"
+          ],
+          "inputs": {
+            "years": 2
+          },
+          "steps": [
+            "performs the quarterly archiving process"
+          ],
+          "expected": [
+            "system archives Patient Profiles that have not raised any Consultation Request for the last 2 years",
+            "system archives Consultation Requests that are more than 2 years old"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Archiving process handles edge cases",
+          "req_ids": [
+            "Req-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system is at the end of a quarter"
+          ],
+          "inputs": {},
+          "steps": [
+            "performs the quarterly archiving process"
+          ],
+          "expected": [
+            "system does not archive Patient Profiles that have raised Consultation Requests within the last 3 years",
+            "system does not archive Consultation Requests that are 3 years old or less"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.8,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.6,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.4,
+        "hallucinated": [
+          {
+            "value": "4 years",
+            "context": "archiving threshold",
+            "grounded": false
+          },
+          {
+            "value": "2 years",
+            "context": "archiving threshold",
+            "grounded": false
+          },
+          {
+            "value": "3 years old or less",
+            "context": "archiving threshold",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 5,
+        "uncovered_clauses": [
+          "lab tests shall be offline",
+          "labs shall submit reports to patient offline"
+        ],
+        "weaknesses": [
+          "Add tests for offline lab tests and offline report submission as per Req-10.",
+          "Include explicit checks for the number of items displayed in lists to improve oracle assertiveness.",
+          "Add status code or message assertions for API responses to increase precision.",
+          "Expand boundary tests to include invalid values (e.g., negative years, zero, non-integer) to satisfy scenario outline requirement.",
+          "Ensure each requirement clause maps to a unique scenario; currently some clauses share scenarios."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.79,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

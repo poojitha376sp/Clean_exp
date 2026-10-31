@@ -1,0 +1,1525 @@
+{
+  "unit_id": "U12_Alarms",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:hf.co/bartowski/Phi-3.5-MoE-instruct-GGUF:Q4_K_M",
+  "system_type": "safety_critical",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 0.8333,
+    "representation_score": 0.8,
+    "sfv_score": 0.8167,
+    "threshold": 0.7,
+    "sfv_pass": false,
+    "issues": [
+      "test case #4 (TC-004): traces to unknown requirement ids ['RW-SW-136']",
+      "test case #10 (TC-010): traces to unknown requirement ids ['RW-SW-136']",
+      "missing: states declared"
+    ]
+  },
+  "fsa": null,
+  "artifact": "Statechart for Alarm System\n\n1. Start\n2. Idle\n3. Blower Motor Temperature Monitoring\n4. Blower Power Management Temperature Monitoring\n5. Battery Temperature Monitoring\n6. High Priority Battery Failure Alarm\n7. Safety Action Invocation\n8. End\n\nTransitions:\n- Idle -> Blower Motor Temperature Monitoring (on temperature sensing)\n- Blower Motor Temperature Monitoring -> Blower Power Management Temperature Monitoring (on user threshold)\n- Blower Power Management Temperature Monitoring -> Battery Temperature Monitoring (on user threshold)\n- Battery Temperature Monitoring -> High Priority Battery Failure Alarm (on user threshold)\n- High Priority Battery Failure Alarm -> Safety Action Invocation (automatic)\n- Safety Action Invocation -> End (on action completion)\n- Blower Motor Temperature Monitoring -> Idle (on temperature normal)\n- Blower Power Management Temperature Monitoring -> Idle (on temperature normal)\n- Battery Temperature Monitoring -> Idle (on temperature normal)\n\n\nStatechart for GUI\n\n1. Start\n2. Idle\n3. Temperature Sensing\n4. Threshold Setting\n5. Alarm Triggering\n6. Safety Action Invocation\n7. End\n\nTransitions:\n- Idle -> Temperature Sensing (on user action)\n- Temperature Sensing -> Threshold Setting (on temperature reading)\n- Threshold Setting -> Alarm Triggering (on threshold setting)\n- Alarm Triggering -> Safety Action Invocation (on alarm)\n- Safety Action Invocation -> End (on action completion)\n- Temperature Sensing -> Idle (on temperature normal)",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Monitor Blower Motor Temperature",
+      "req_ids": [
+        "RW-SW-131"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is operational"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Alarm if temperature exceeds threshold"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Monitor Blower Power Management Temperature",
+      "req_ids": [
+        "RW-SW-132"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is operational"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Alarm if temperature exceeds threshold"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Monitor Battery Temperature",
+      "req_ids": [
+        "RW-SW-133"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is operational"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Alarm if temperature exceeds threshold"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Trigger High Priority Battery Failure Alarm",
+      "req_ids": [
+        "RW-SW-136"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "High Priority Battery Failure Alarm is not active"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Alarm if temperature exceeds threshold"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Invoke Safety Action for Blower Power Management Temperature",
+      "req_ids": [
+        "RW-SW-137"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Blower Power Management Temperature is above threshold"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Safety Action Invocation"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Invoke Safety Action for Battery Temperature",
+      "req_ids": [
+        "RW-SW-138"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Battery Temperature is above threshold"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Safety Action Invocation"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Monitor Blower Motor Temperature (Boundary)",
+      "req_ids": [
+        "RW-SW-131"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is operational"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Alarm if temperature is within or outside threshold"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Monitor Blower Power Management Temperature (Boundary)",
+      "req_ids": [
+        "RW-SW-132"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is operational"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Alarm if temperature is within or outside threshold"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Monitor Battery Temperature (Boundary)",
+      "req_ids": [
+        "RW-SW-133"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is operational"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Alarm if temperature is within or outside threshold"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Trigger High Priority Battery Failure Alarm (Boundary)",
+      "req_ids": [
+        "RW-SW-136"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "High Priority Battery Failure Alarm is not active"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Alarm if temperature is within or outside threshold"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Invoke Safety Action for Blower Power Management Temperature (Boundary)",
+      "req_ids": [
+        "RW-SW-137"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Blower Power Management Temperature is above threshold"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Safety Action Invocation if temperature is within or outside threshold"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Invoke Safety Action for Battery Temperature (Boundary)",
+      "req_ids": [
+        "RW-SW-138"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Battery Temperature is above threshold"
+      ],
+      "inputs": {
+        "name": "temperature"
+      },
+      "steps": [
+        "Read temperature",
+        "Compare with threshold"
+      ],
+      "expected": [
+        "Safety Action Invocation if temperature is within or outside threshold"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Statechart for U12_Alarms System\n\n1. Start\n2. Idle\n3. Blower Motor Temperature Monitoring\n4. Blower Power System Temperature Monitoring\n5. Battery Temperature Monitoring\n6. Blower Motor Temperature Too High Alarm\n7. Blower Power System Temperature Too High Alarm\n8. Battery Temperature Too High Alarm\n9. Safety Action Invocation\n10. Battery Failure Alarm\n11. End\n\nTransitions:\n- From Idle to Blower Motor Temperature Monitoring (on temperature sensing)\n- From Blower Motor Temperature Monitoring to Blower Motor Temperature Too High Alarm (on threshold exceeded)\n- From Blower Motor Temperature Too High Alarm to Safety Action Invocation (automatic)\n- From Safety Action Invocation to End (on action completed)\n- From Idle to Blower Power System Temperature Monitoring (on temperature sensing)\n- From Blower Power System Temperature Monitoring to Blower Power System Temperature Too High Alarm (on threshold exceeded)\n- From Blower Power System Temperature Too High Alarm to Safety Action Invocation (automatic)\n- From Safety Action Invocation to End (on action completed)\n- From Idle to Battery Temperature Monitoring (on temperature sensing)\n- From Battery Temperature Monitoring to Battery Temperature Too High Alarm (on threshold exceeded)\n- From Battery Temperature Too High Alarm to Safety Action Invocation (automatic)\n- From Safety Action Invocation to End (on action completed)\n- From Blower Motor Temperature Too High Alarm to Battery Failure Alarm (on battery temperature too high)\n- From Battery Power System Temperature Too High Alarm to Battery Failure Alarm (on battery temperature too high)\n- From Battery Temperature Too High Alarm to Safety Action Invocation (automatic)\n\nGuards:\n- Temperature sensing is active\n- Threshold is specified\n- Battery temperature is too high\n\n\nStatechart for U12_Alarms GUI\n\n1. Start\n2. Idle\n3. Blower Motor Temperature Setting\n4. Blower Power System Temperature Setting\n5. Battery Temperature Setting\n6. Blower Motor Temperature Too High Alarm\n7. Blower Power System Temperature Too High Alarm\n8. Battery Temperature Too High Alarm\n9. Safety Action Invocation\n10. Battery Failure Alarm\n11. End\n\nTransitions:\n- From Idle to Blower Motor Temperature Setting (on user input)\n- From Blower Motor Temperature Setting to Blower Motor Temperature Too High Alarm (on threshold exceeded)\n- From Blower Motor Temperature Too High Alarm to Safety Action Invocation (automatic)\n- From Safety Action Invocation to End (on action completed)\n- From Idle to Blower Power System Temperature Setting (on user input)\n- From Blower Power System Temperature Setting to Blower Power System Temperature Too High Alarm (on threshold exceeded)\n- From Blower Power System Temperature Too High Alarm to Safety Action Invocation (automatic)\n- From Safety Action Invocation to End (on action completed)\n- From Idle to Battery Temperature Setting (on user input)\n- From Battery Temperature Setting to Battery Temperature Too High Alarm (on threshold exceeded)\n- From Battery Temperature Too High Alarm to Safety Action Invocation (automatic)\n- From Safety Action Invocation to End (on action completed)\n- From Blower Motor Temperature Too High Alarm to Battery Failure Alarm (on battery temperature too high)\n- From Blower Power System Temperature Too High Alarm to Battery Failure Alarm (on battery temperature too high)\n- From Battery Temperature Too High Alarm to Safety Action Invocation (automatic)",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Monitoring Blower Motor Temperature",
+          "req_ids": [
+            "RW-SW-131"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower motor temperature within threshold"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Trigger Blower Motor Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active",
+            "Blower motor temperature exceeds threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower motor temperature exceeds threshold"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Invoking Safety Action for Blower Motor Temperature Too High",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational",
+            "Blower power system temperature exceeds threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower power system temperature exceeds threshold",
+            "Safety action invoked"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Monitoring Blower Power System Temperature",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower power system temperature within threshold"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Trigger Blower Power System Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active",
+            "Blower power system temperature exceeds threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower power system temperature exceeds threshold"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Invoking Safety Action for Blower Power System Temperature Too High",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational",
+            "Blower power system temperature exceeds threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower power system temperature exceeds threshold",
+            "Safety action invoked"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Monitoring Battery Temperature",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Battery temperature within threshold"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Trigger Battery Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational",
+            "Battery temperature exceeds threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Battery temperature exceeds threshold"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Invoking Safety Action for Battery Temperature Too High",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational",
+            "Battery temperature exceeds threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Battery temperature exceeds threshold",
+            "Safety action invoked"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Monitoring Battery Failure",
+          "req_ids": [
+            "RW-SW-130"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational",
+            "Battery temperature exceeds threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Battery temperature exceeds threshold",
+            "Battery failure alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Trigger Battery Failure Alarm",
+          "req_ids": [
+            "RW-SW-130"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is operational",
+            "Battery temperature does not exceed threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Battery temperature does not exceed threshold",
+            "No battery failure alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Boundary Test for Blower Motor Temperature",
+          "req_ids": [
+            "RW-SW-131"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower motor temperature threshold boundary"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Boundary Test for Blower Power System Temperature",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower power system temperature threshold boundary"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Boundary Test for Battery Temperature",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Battery temperature threshold boundary"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Negative Test for Blower Motor Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active",
+            "Blower motor temperature does not exceed threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower motor temperature does not exceed threshold",
+            "No blower motor temperature too high alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Negative Test for Blower Power System Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active",
+            "Blower power system temperature does not exceed threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower power system temperature does not exceed threshold",
+            "No blower power system temperature too high alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Negative Test for Battery Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active",
+            "Battery temperature does not exceed threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Battery temperature does not exceed threshold",
+            "No battery temperature too high alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Negative Test for Safety Action Invocation",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is operational",
+            "Blower power system temperature does not exceed threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower power system temperature does not exceed threshold",
+            "No safety action invocation"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Negative Test for Battery Failure Alarm",
+          "req_ids": [
+            "RW-SW-130"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is operational",
+            "Battery temperature does not exceed threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Battery temperature does not exceed threshold",
+            "No battery failure alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Boundary Test for Safety Action Invocation",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is operational",
+            "Blower power system temperature does not exceed threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower power system temperature threshold boundary",
+            "Safety action invocation boundary"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "Boundary Test for Battery Failure Alarm",
+          "req_ids": [
+            "RW-SW-130"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is operational",
+            "Battery temperature does not exceed threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Battery temperature threshold boundary",
+            "Battery failure alarm boundary"
+          ]
+        },
+        {
+          "id": "TC-022",
+          "title": "Boundary Test for Blower Motor Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower motor temperature threshold boundary",
+            "Blower motor temperature too high alarm boundary"
+          ]
+        },
+        {
+          "id": "TC-023",
+          "title": "Boundary Test for Blower Power System Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Blower power system temperature threshold boundary",
+            "Blower power system temperature too high alarm boundary"
+          ]
+        },
+        {
+          "id": "TC-024",
+          "title": "Boundary Test for Battery Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is operational",
+            "Temperature sensor is active"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Battery temperature threshold boundary",
+            "Battery temperature too high alarm boundary"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.6,
+        "sfv_score": 0.8,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.80). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: states declared",
+      "artifact": "",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Blower Motor Temperature Monitoring",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is idle"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Monitor temperature"
+          ],
+          "expected": [
+            "Temperature within threshold"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Blower Motor Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Blower Motor Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature above threshold"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Blower Power Management Temperature Monitoring",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Blower Power Management Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Monitor temperature"
+          ],
+          "expected": [
+            "Temperature within threshold"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Blower Power Management Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Blower Power Management Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature above threshold"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Battery Temperature Monitoring",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Monitor temperature"
+          ],
+          "expected": [
+            "Temperature within threshold"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Battery Temperature Too High Alarm",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature above threshold"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Safety Action Invocation",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Blower Power Management Temperature Too High Alarm"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Invoke safety action"
+          ],
+          "expected": [
+            "Safety action invoked"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Battery Failure Alarm",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature above threshold"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test Blower Motor Temperature Too High Alarm Negative",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Blower Motor Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature below threshold"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test Blower Power Management Temperature Too High Alarm Negative",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Blower Power Management Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature below threshold"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Test Battery Temperature Too High Alarm Negative",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature below threshold"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Test Safety Action Invocation Negative",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Blower Power Management Temperature Too High Alarm"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Invoke safety action"
+          ],
+          "expected": [
+            "Safety action not invoked"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Test Battery Failure Alarm Negative",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature below threshold"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Test Blower Motor Temperature Too High Alarm Boundary",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Blower Motor Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature at threshold"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Test Blower Power Management Temperature Too High Alarm Boundary",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Blower Power Management Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature at threshold"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Test Battery Temperature Too High Alarm Boundary",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature at threshold"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Test Safety Action Invocation Boundary",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Blower Power Management Temperature Too High Alarm"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Invoke safety action"
+          ],
+          "expected": [
+            "Safety action invoked at threshold"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Test Battery Failure Alarm Boundary",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery Temperature Monitoring"
+          ],
+          "inputs": {
+            "name": "Temperature"
+          },
+          "steps": [
+            "Check temperature"
+          ],
+          "expected": [
+            "Temperature at threshold"
+          ]
+        }
+      ],
+      "raw_if_unparsed": "```artifact\n```\nStatechart for Alarm System:\n\n1. Start\n2. Idle\n3. Blower Motor Temperature Monitoring\n4. Blower Power Management Temperature Monitoring\n5. Battery Temperature Monitoring\n6. Blower Motor Temperature Too High Alarm\n7. Blower Power Management Temperature Too High Alarm\n8. Battery Temperature Too High Alarm\n9. Safety Action Invocation\n10. Battery Failure Alarm\n\nTransitions:\n- Start -> Idle\n- Idle -> Blower Motor Temperature Monitoring\n- Blower Motor Temperature Monitoring -> Blower Motor Temperature Too High Alarm\n- Blower Motor Temperature Too High Alarm -> Idle\n- Idle -> Blower Power Management Temperature Monitoring\n- Blower Power Management Temperature Monitoring -> Blower Power Management Temperature Too High Alarm\n- Blower Power Management Temperature Too High Alarm -> Idle\n- Idle -> Battery Temperature Monitoring\n- Battery Temperature Monitoring -> Battery Temperature Too High Alarm\n- Battery Temperature Too High Alarm -> Idle\n- Idle -> Safety Action Invocation\n- Safety Action Invocation -> Idle\n- Idle -> Battery Failure Alarm\n- Battery Failure Alarm -> Idle\n\nGuards:\n- Blower Motor Temperature Too High Alarm: Temperature > Threshold\n- Blower Power Management Temperature Too High Alarm: Temperature > Threshold\n- Battery Temperature Too High Alarm: Temperature > Threshold\n- Safety Action Invocation: Temperature > Threshold\n- Battery Failure Alarm: Temperature > Threshold\n\n```\n\n```json\n[\n  {\"id\": \"TC-001\", \"title\": \"Test Blower Motor Temperature Monitoring\", \"req_ids\": [\"RW-SW-132\"], \"kind\": \"positive\",\n   \"preconditions\": [\"System is idle\"], \"inputs\": {\"name\": \"Temperature\"}, \"steps\": [\"Monitor temperature\"], \"expected\": [\"Temperature within threshold\"]},\n  {\"id\": \"TC-002\", \"title\": \"Test Blower Motor Temperature Too High Alarm\", \"req_ids\": [\"RW-SW-133\"], \"kind\": \"positive\",\n   \"preconditions\": [\"Blower Motor Temperature Monitoring\"], \"inputs\": {\"name\": \"Temperature\"}, \"steps\": [\"Check temperature\"], \"expected\": [\"Temperature above threshold\"]},\n  {\"id\": \"TC-003\", \"title\": \"Test Blower Power Management Temperature Monitoring\", \"req_ids\": [\"RW-SW-134\"], \"kind\": \"positive\",\n   \"preconditions\": [\"Blower Power Management Temperature Monitoring\"], \"inputs\": {\"name\": \"Temperature\"}, \"steps\": [\"Monitor temperature\"], \"expected\": [\"Temperature within threshold\"]},\n  {\"id\": \"TC-004\", \"title\": \"Test Blower Power Management Temperature Too High Alarm\", \"req_ids\": [\"RW-SW-134\"], \"kind\": \"positive\",\n   \"preconditions\": [\"Blower Power Management Temperature Monitoring\"], \"inputs\": {\"name\": \"Temperature\"}, \"steps\": [\"Check temperature\"], \"expected\": [\"Temperature above threshold\"]},\n  {\"id\": \"TC-005\", \"title\": \"Test Battery Temperature Monitoring\", \"req_ids\": [\"RW-SW-135\"], \"kind\": \"positive\",\n   \"preconditions\": [\"Battery Temperature Monitoring\"], \"inputs\": {\"name\": \"Temperature\"}, \"steps\": [\"Monitor temperature\"], \"expected\": [\"Temperature within threshold\"]},\n  {\"id\": \"TC-006\", \"title\": \"Test Battery Temperature Too High Alarm\", \"req_ids\": [",
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Representation artifact is empty.",
+      "artifact": "Statechart for Alarm System Test Suite\n\nInitial State: System Idle\nState: Battery Failure Alarm Active\nState: Blower Motor Temperature Alarm Active\nState: Blower Power Management System Temperature Alarm Active\nState: Battery Temperature Alarm Active\n\nEvents:\n- Battery Failure Detected\n- Blower Motor Temperature Exceeded Threshold\n- Blower Power Management System Temperature Exceeded Threshold\n- Battery Temperature Exceeded Threshold\n- Safety Action Invoked\n\nGuards:\n- Battery Failure Priority High\n- Blower Motor Temperature Threshold Exceeded\n- Blower Power Management System Temperature Threshold Exceeded\n- Battery Temperature Threshold Exceeded\n\nTransitions:\n- From System Idle to Battery Failure Alarm Active when Battery Failure Detected\n- From System Idle to Blower Motor Temperature Alarm Active when Blower Motor Temperature Exceeded Threshold\n- From System Idle to Blower Power Management System Temperature Alarm Active when Blower Power Management System Temperature Exceeded Threshold\n- From System Idle to Battery Temperature Alarm Active when Battery Temperature Exceeded Threshold\n- From any Alarm Active State to Safety Action Invoked when Temperature Exceeded Threshold\n\nLifecycle:\n- System Idle -> Battery Failure Alarm Active -> System Idle\n- System Idle -> Blower Motor Temperature Alarm Active -> System Idle\n- System Idle -> Blower Power Management System Temperature Alarm Active -> System Idle\n- System Idle -> Battery Temperature Alarm Active -> System Idle\n\nMode-Switching Behaviour:\n- System Idle -> Battery Failure Alarm Active (High Priority)\n- System Idle -> Blower Motor Temperature Alarm Active (Normal Priority)\n- System Idle -> Blower Power Management System Temperature Alarm Active (Normal Priority)\n- System Idle -> Battery Temperature Alarm Active (Normal Priority)\n\nTest Suite:\n\n1. Test Case: Battery Failure Alarm Triggered\n   Preconditions: System Idle\n   Inputs: Battery Failure Detected\n   Steps: Transition to Battery Failure Alarm Active\n   Expected: Battery Failure Alarm Active\n\n2. Test Case: Blower Motor Temperature Alarm Triggered\n   Preconditions: System Idle\n   Inputs: Blower Motor Temperature Exceeded Threshold\n   Steps: Transition to Blower Motor Temperature Alarm Active\n   Expected: Blower Motor Temperature Alarm Active\n\n3. Test Case: Blower Power Management System Temperature Alarm Triggered\n   Preconditions: System Idle\n   Inputs: Blower Power Management System Temperature Exceeded Threshold\n   Steps: Transition to Blower Power Management System Temperature Alarm Active\n   Expected: Blower Power Management System Temperature Alarm Active\n\n4. Test Case: Battery Temperature Alarm Triggered\n   Preconditions: System Idle\n   Inputs: Battery Temperature Exceeded Threshold\n   Steps: Transition to Battery Temperature Alarm Active\n   Expected: Battery Temperature Alarm Active\n\n5. Test Case: Safety Action Invoked for Blower Motor Temperature\n   Preconditions: Blower Motor Temperature Alarm Active\n   Inputs: Temperature Exceeded Threshold\n   Steps: Transition to Safety Action Invoked\n   Expected: Safety Action Invoked\n\n6. Test Case: Safety Action Invoked for Blower Power Management System Temperature\n   Preconditions: Blower Power Management System Temperature Alarm Active\n   Inputs: Temperature Exceeded Threshold\n   Steps: Transition to Safety Action Invoked\n   Expected: Safety Action Invoked\n\n7. Test Case: Safety Action Invoked for Battery Temperature\n   Preconditions: Battery Temperature Alarm Active\n   Inputs: Temperature Exceeded Threshold\n   Steps: Transition to Safety Action Invoked\n   Expected: Safety Action Invoked",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).",
+      "artifact": "Statechart for Alarm System\n\n1. Start\n2. Idle\n3. Blower Motor Temperature Monitoring\n4. Blower Power Management Temperature Monitoring\n5. Battery Temperature Monitoring\n6. High Priority Battery Failure Alarm\n7. Safety Action Invocation\n8. End\n\nTransitions:\n- Idle -> Blower Motor Temperature Monitoring (on temperature sensing)\n- Blower Motor Temperature Monitoring -> Blower Power Management Temperature Monitoring (on user threshold)\n- Blower Power Management Temperature Monitoring -> Battery Temperature Monitoring (on user threshold)\n- Battery Temperature Monitoring -> High Priority Battery Failure Alarm (on user threshold)\n- High Priority Battery Failure Alarm -> Safety Action Invocation (automatic)\n- Safety Action Invocation -> End (on action completion)\n- Blower Motor Temperature Monitoring -> Idle (on temperature normal)\n- Blower Power Management Temperature Monitoring -> Idle (on temperature normal)\n- Battery Temperature Monitoring -> Idle (on temperature normal)\n\n\nStatechart for GUI\n\n1. Start\n2. Idle\n3. Temperature Sensing\n4. Threshold Setting\n5. Alarm Triggering\n6. Safety Action Invocation\n7. End\n\nTransitions:\n- Idle -> Temperature Sensing (on user action)\n- Temperature Sensing -> Threshold Setting (on temperature reading)\n- Threshold Setting -> Alarm Triggering (on threshold setting)\n- Alarm Triggering -> Safety Action Invocation (on alarm)\n- Safety Action Invocation -> End (on action completion)\n- Temperature Sensing -> Idle (on temperature normal)",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Monitor Blower Motor Temperature",
+          "req_ids": [
+            "RW-SW-131"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Alarm if temperature exceeds threshold"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Monitor Blower Power Management Temperature",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Alarm if temperature exceeds threshold"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Monitor Battery Temperature",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is operational"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Alarm if temperature exceeds threshold"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Trigger High Priority Battery Failure Alarm",
+          "req_ids": [
+            "RW-SW-136"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "High Priority Battery Failure Alarm is not active"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Alarm if temperature exceeds threshold"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Invoke Safety Action for Blower Power Management Temperature",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Blower Power Management Temperature is above threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Safety Action Invocation"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Invoke Safety Action for Battery Temperature",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery Temperature is above threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Safety Action Invocation"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Monitor Blower Motor Temperature (Boundary)",
+          "req_ids": [
+            "RW-SW-131"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is operational"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Alarm if temperature is within or outside threshold"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Monitor Blower Power Management Temperature (Boundary)",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is operational"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Alarm if temperature is within or outside threshold"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Monitor Battery Temperature (Boundary)",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is operational"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Alarm if temperature is within or outside threshold"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Trigger High Priority Battery Failure Alarm (Boundary)",
+          "req_ids": [
+            "RW-SW-136"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "High Priority Battery Failure Alarm is not active"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Alarm if temperature is within or outside threshold"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Invoke Safety Action for Blower Power Management Temperature (Boundary)",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Blower Power Management Temperature is above threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Safety Action Invocation if temperature is within or outside threshold"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Invoke Safety Action for Battery Temperature (Boundary)",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery Temperature is above threshold"
+          ],
+          "inputs": {
+            "name": "temperature"
+          },
+          "steps": [
+            "Read temperature",
+            "Compare with threshold"
+          ],
+          "expected": [
+            "Safety Action Invocation if temperature is within or outside threshold"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.8333,
+        "representation_score": 0.8,
+        "sfv_score": 0.8167,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #4 (TC-004): traces to unknown requirement ids ['RW-SW-136']",
+          "test case #10 (TC-010): traces to unknown requirement ids ['RW-SW-136']",
+          "missing: states declared"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,668 @@
+{
+  "unit_id": "U27_misc",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.5,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.8636,
+    "hallucinated": [
+      {
+        "value": "123",
+        "context": "Speciality Id",
+        "grounded": false
+      },
+      {
+        "value": "456",
+        "context": "Doctor Id (non-existent)",
+        "grounded": false
+      },
+      {
+        "value": "789",
+        "context": "Doctor Id with open requests",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 22,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No boundary value testing for numeric fields (Age, Experience).",
+      "No scenario outlines with Examples tables for normal, edge, and invalid values.",
+      "Assertions for successful operations are vague (e.g., \"Doctor should be added successfully\").",
+      "No verification of data persistence or state after operations.",
+      "Missing tests for editing non-existent doctors or providing invalid field values."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.9045,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: U27_misc\n\n  Scenario: Speciality does not exist with Speciality Id\n    Given the Speciality with Id \"123\" does not exist\n    When the system attempts to retrieve the Speciality\n    Then an exception error message \"Speciality does not exist\" should be displayed\n\n  Scenario: Administrators Menu Screen to Maintain Doctors\n    Given the user is logged in as an Administrator\n    When the user navigates to the Administrators Menu Screen\n    Then the screen should display options to Maintain Doctors\n\n  Scenario: Add Doctor Screen\n    Given the user is on the Add Doctor Screen\n    When the user enters the following details:\n      | Doctor Id | Doctor Name | Age | Sex | Qualification | Experience |\n      | 1         | John Doe    | 30  | M   | MBBS          | 5          |\n    And the user submits the form\n    Then the Doctor should be added successfully\n\n  Scenario: Edit/Update Doctors Screen\n    Given the user is on the Edit/Update Doctors Screen\n    When the user enters the following details:\n      | Doctor Id | Doctor Name | Age | Sex | Experience | Qualification |\n      | 1         | John Doe    | 31  | M   | 6          | MD            |\n    And the user submits the form\n    Then the Doctor details should be updated successfully\n\n  Scenario: Doctor does not exist with Doctor Id\n    Given the Doctor with Id \"456\" does not exist\n    When the system attempts to retrieve the Doctor\n    Then an exception error message \"Doctor does not exist\" should be displayed\n\n  Scenario: Deleting Doctor Details with open Consultation Requests\n    Given the Doctor with Id \"789\" has open Consultation Requests\n    When the user attempts to delete the Doctor\n    Then an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed\n\n  Scenario: Administrators Menu Screen to Maintain Chemist & Labs\n    Given the user is logged in as an Administrator\n    When the user navigates to the Administrators Menu Screen\n    Then the screen should display options to Maintain Chemist & Labs\n\n  Scenario: Add Chemist/ Lab Screen\n    Given the user is on the Add Chemist/ Lab Screen\n    When the user enters the following details:\n      | Chemist/Lab Id | Chemist/Lab Flag | Chemist Lab Name | Chemist Lab Address | Chemist Lab Contact Details |\n      | 1              | C                | ChemLab Inc.     | 123 Main St         | contact@chemlab.com         |\n    And the user submits the form\n    Then the Chemist/ Lab should be added successfully",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Speciality does not exist with Speciality Id",
+      "req_ids": [
+        "VCMSP03-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Speciality with Id '123' does not exist"
+      ],
+      "inputs": {},
+      "steps": [
+        "Retrieve Speciality with Id '123'",
+        "Check for exception error message"
+      ],
+      "expected": [
+        "Exception error message 'Speciality does not exist' should be displayed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Administrators Menu Screen to Maintain Doctors",
+      "req_ids": [
+        "VCMDR01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User is logged in as an Administrator"
+      ],
+      "inputs": {},
+      "steps": [
+        "Navigate to Administrators Menu Screen",
+        "Check for options to Maintain Doctors"
+      ],
+      "expected": [
+        "Screen should display options to Maintain Doctors"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Add Doctor Screen",
+      "req_ids": [
+        "VCMDR02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User is on the Add Doctor Screen"
+      ],
+      "inputs": {
+        "Doctor Id": "1",
+        "Doctor Name": "John Doe",
+        "Age": "30",
+        "Sex": "M",
+        "Qualification": "MBBS",
+        "Experience": "5"
+      },
+      "steps": [
+        "Enter Doctor details",
+        "Submit form"
+      ],
+      "expected": [
+        "Doctor should be added successfully"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Edit/Update Doctors Screen",
+      "req_ids": [
+        "VCMDR03-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User is on the Edit/Update Doctors Screen"
+      ],
+      "inputs": {
+        "Doctor Id": "1",
+        "Doctor Name": "John Doe",
+        "Age": "31",
+        "Sex": "M",
+        "Experience": "6",
+        "Qualification": "MD"
+      },
+      "steps": [
+        "Enter Doctor details",
+        "Submit form"
+      ],
+      "expected": [
+        "Doctor details should be updated successfully"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Doctor does not exist with Doctor Id",
+      "req_ids": [
+        "VCMDR03-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Doctor with Id '456' does not exist"
+      ],
+      "inputs": {},
+      "steps": [
+        "Retrieve Doctor with Id '456'",
+        "Check for exception error message"
+      ],
+      "expected": [
+        "Exception error message 'Doctor does not exist' should be displayed"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Deleting Doctor Details with open Consultation Requests",
+      "req_ids": [
+        "VCMDR03-3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Doctor with Id '789' has open Consultation Requests"
+      ],
+      "inputs": {},
+      "steps": [
+        "Attempt to delete Doctor with Id '789'",
+        "Check for exception error message"
+      ],
+      "expected": [
+        "Exception error message 'Doctor has open Consultation Requests - cannot delete' should be displayed"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Administrators Menu Screen to Maintain Chemist & Labs",
+      "req_ids": [
+        "VCMCL01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User is logged in as an Administrator"
+      ],
+      "inputs": {},
+      "steps": [
+        "Navigate to Administrators Menu Screen",
+        "Check for options to Maintain Chemist & Labs"
+      ],
+      "expected": [
+        "Screen should display options to Maintain Chemist & Labs"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Add Chemist/ Lab Screen",
+      "req_ids": [
+        "VCMCL02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User is on the Add Chemist/ Lab Screen"
+      ],
+      "inputs": {
+        "Chemist/Lab Id": "1",
+        "Chemist/Lab Flag": "C",
+        "Chemist Lab Name": "ChemLab Inc.",
+        "Chemist Lab Address": "123 Main St",
+        "Chemist Lab Contact Details": "contact@chemlab.com"
+      },
+      "steps": [
+        "Enter Chemist/ Lab details",
+        "Submit form"
+      ],
+      "expected": [
+        "Chemist/ Lab should be added successfully"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: U27_misc\n\n  Scenario: Speciality does not exist with Speciality Id\n    Given the Speciality with Id \"123\" does not exist\n    When the system attempts to retrieve the Speciality\n    Then an exception error message \"Speciality does not exist\" should be displayed\n\n  Scenario: Administrators Menu Screen to Maintain Doctors\n    Given the user is logged in as an Administrator\n    When the user navigates to the Administrators Menu Screen\n    Then the screen should display options to Maintain Doctors\n\n  Scenario: Add Doctor Screen\n    Given the user is on the Add Doctor Screen\n    When the user enters the following details:\n      | Doctor Id | Doctor Name | Age | Sex | Qualification | Experience |\n      |-----------|-------------|-----|-----|---------------|------------|\n      | as specified | as specified | as specified | as specified | as specified | as specified |\n    And the user clicks on the \"Add\" button\n    Then the Doctor should be added successfully\n\n  Scenario: Edit/Update Doctors Screen\n    Given the user is on the Edit/Update Doctors Screen\n    When the user enters the following details:\n      | Doctor Id | Doctor Name | Age | Sex | Experience | Qualification |\n      |-----------|-------------|-----|-----|------------|---------------|\n      | as specified | as specified | as specified | as specified | as specified | as specified |\n    And the user clicks on the \"Update\" button\n    Then the Doctor details should be updated successfully\n\n  Scenario: If Doctor does not exist with Doctor Id\n    Given the Doctor with Id \"123\" does not exist\n    When the system attempts to retrieve the Doctor\n    Then an exception error message \"Doctor does not exist\" should be displayed\n\n  Scenario: For Deleting Doctor Details\n    Given the Doctor with Id \"123\" has open Consultation Requests\n    When the user attempts to delete the Doctor\n    Then an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed\n\n  Scenario: Administrators Menu Screen to Maintain Chemist & Labs\n    Given the user is logged in as an Administrator\n    When the user navigates to the Administrators Menu Screen\n    Then the screen should display options to Maintain Chemist & Labs\n\n  Scenario: Add Chemist/ Lab Screen\n    Given the user is on the Add Chemist/ Lab Screen\n    When the user enters the following details:\n      | Chemist/Lab Id | Chemist/Lab Flag | Chemist Lab Name | Chemist Lab Address | Chemist Lab Contact Details |\n      |----------------|------------------|------------------|---------------------|-----------------------------|\n      | as specified | as specified | as specified | as specified | as specified |\n    And the user clicks on the \"Add\" button\n    Then the Chemist/ Lab should be added successfully",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Speciality does not exist with Speciality Id",
+          "req_ids": [
+            "VCMSP03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Speciality with Id '123' does not exist"
+          ],
+          "inputs": {},
+          "steps": [
+            "Retrieve Speciality with Id '123'"
+          ],
+          "expected": [
+            "Exception error message 'Speciality does not exist' should be displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Administrators Menu Screen to Maintain Doctors",
+          "req_ids": [
+            "VCMDR01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is logged in as an Administrator"
+          ],
+          "inputs": {},
+          "steps": [
+            "Navigate to Administrators Menu Screen"
+          ],
+          "expected": [
+            "Screen should display options to Maintain Doctors"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Add Doctor Screen",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "Doctor Id": "as specified",
+            "Doctor Name": "as specified",
+            "Age": "as specified",
+            "Sex": "as specified",
+            "Qualification": "as specified",
+            "Experience": "as specified"
+          },
+          "steps": [
+            "Enter Doctor details",
+            "Click on 'Add' button"
+          ],
+          "expected": [
+            "Doctor should be added successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Edit/Update Doctors Screen",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Edit/Update Doctors Screen"
+          ],
+          "inputs": {
+            "Doctor Id": "as specified",
+            "Doctor Name": "as specified",
+            "Age": "as specified",
+            "Sex": "as specified",
+            "Experience": "as specified",
+            "Qualification": "as specified"
+          },
+          "steps": [
+            "Enter Doctor details",
+            "Click on 'Update' button"
+          ],
+          "expected": [
+            "Doctor details should be updated successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "If Doctor does not exist with Doctor Id",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor with Id '123' does not exist"
+          ],
+          "inputs": {},
+          "steps": [
+            "Retrieve Doctor with Id '123'"
+          ],
+          "expected": [
+            "Exception error message 'Doctor does not exist' should be displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "For Deleting Doctor Details",
+          "req_ids": [
+            "VCMDR03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor with Id '123' has open Consultation Requests"
+          ],
+          "inputs": {},
+          "steps": [
+            "Attempt to delete Doctor with Id '123'"
+          ],
+          "expected": [
+            "Exception error message 'Doctor has open Consultation Requests - cannot delete' should be displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Administrators Menu Screen to Maintain Chemist & Labs",
+          "req_ids": [
+            "VCMDCL01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is logged in as an Administrator"
+          ],
+          "inputs": {},
+          "steps": [
+            "Navigate to Administrators Menu Screen"
+          ],
+          "expected": [
+            "Screen should display options to Maintain Chemist & Labs"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Add Chemist/ Lab Screen",
+          "req_ids": [
+            "VCMDCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Add Chemist/ Lab Screen"
+          ],
+          "inputs": {
+            "Chemist/Lab Id": "as specified",
+            "Chemist/Lab Flag": "as specified",
+            "Chemist Lab Name": "as specified",
+            "Chemist Lab Address": "as specified",
+            "Chemist Lab Contact Details": "as specified"
+          },
+          "steps": [
+            "Enter Chemist/ Lab details",
+            "Click on 'Add' button"
+          ],
+          "expected": [
+            "Chemist/ Lab should be added successfully"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.75,
+        "representation_score": 1.0,
+        "sfv_score": 0.875,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #7 (TC-007): traces to unknown requirement ids ['VCMDCL01']",
+          "test case #8 (TC-008): traces to unknown requirement ids ['VCMDCL02']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.88). Fix these problems and output the full corrected suite:\n- test case #7 (TC-007): traces to unknown requirement ids ['VCMDCL01']\n- test case #8 (TC-008): traces to unknown requirement ids ['VCMDCL02']",
+      "artifact": "Feature: U27_misc\n\n  Scenario: Speciality does not exist with Speciality Id\n    Given the Speciality with Id \"123\" does not exist\n    When the system attempts to retrieve the Speciality\n    Then an exception error message \"Speciality does not exist\" should be displayed\n\n  Scenario: Administrators Menu Screen to Maintain Doctors\n    Given the user is logged in as an Administrator\n    When the user navigates to the Administrators Menu Screen\n    Then the screen should display options to Maintain Doctors\n\n  Scenario: Add Doctor Screen\n    Given the user is on the Add Doctor Screen\n    When the user enters the following details:\n      | Doctor Id | Doctor Name | Age | Sex | Qualification | Experience |\n      | 1         | John Doe    | 30  | M   | MBBS          | 5          |\n    And the user submits the form\n    Then the Doctor should be added successfully\n\n  Scenario: Edit/Update Doctors Screen\n    Given the user is on the Edit/Update Doctors Screen\n    When the user enters the following details:\n      | Doctor Id | Doctor Name | Age | Sex | Experience | Qualification |\n      | 1         | John Doe    | 31  | M   | 6          | MD            |\n    And the user submits the form\n    Then the Doctor details should be updated successfully\n\n  Scenario: Doctor does not exist with Doctor Id\n    Given the Doctor with Id \"456\" does not exist\n    When the system attempts to retrieve the Doctor\n    Then an exception error message \"Doctor does not exist\" should be displayed\n\n  Scenario: Deleting Doctor Details with open Consultation Requests\n    Given the Doctor with Id \"789\" has open Consultation Requests\n    When the user attempts to delete the Doctor\n    Then an exception error message \"Doctor has open Consultation Requests - cannot delete\" should be displayed\n\n  Scenario: Administrators Menu Screen to Maintain Chemist & Labs\n    Given the user is logged in as an Administrator\n    When the user navigates to the Administrators Menu Screen\n    Then the screen should display options to Maintain Chemist & Labs\n\n  Scenario: Add Chemist/ Lab Screen\n    Given the user is on the Add Chemist/ Lab Screen\n    When the user enters the following details:\n      | Chemist/Lab Id | Chemist/Lab Flag | Chemist Lab Name | Chemist Lab Address | Chemist Lab Contact Details |\n      | 1              | C                | ChemLab Inc.     | 123 Main St         | contact@chemlab.com         |\n    And the user submits the form\n    Then the Chemist/ Lab should be added successfully",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Speciality does not exist with Speciality Id",
+          "req_ids": [
+            "VCMSP03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Speciality with Id '123' does not exist"
+          ],
+          "inputs": {},
+          "steps": [
+            "Retrieve Speciality with Id '123'",
+            "Check for exception error message"
+          ],
+          "expected": [
+            "Exception error message 'Speciality does not exist' should be displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Administrators Menu Screen to Maintain Doctors",
+          "req_ids": [
+            "VCMDR01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is logged in as an Administrator"
+          ],
+          "inputs": {},
+          "steps": [
+            "Navigate to Administrators Menu Screen",
+            "Check for options to Maintain Doctors"
+          ],
+          "expected": [
+            "Screen should display options to Maintain Doctors"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Add Doctor Screen",
+          "req_ids": [
+            "VCMDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Add Doctor Screen"
+          ],
+          "inputs": {
+            "Doctor Id": "1",
+            "Doctor Name": "John Doe",
+            "Age": "30",
+            "Sex": "M",
+            "Qualification": "MBBS",
+            "Experience": "5"
+          },
+          "steps": [
+            "Enter Doctor details",
+            "Submit form"
+          ],
+          "expected": [
+            "Doctor should be added successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Edit/Update Doctors Screen",
+          "req_ids": [
+            "VCMDR03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Edit/Update Doctors Screen"
+          ],
+          "inputs": {
+            "Doctor Id": "1",
+            "Doctor Name": "John Doe",
+            "Age": "31",
+            "Sex": "M",
+            "Experience": "6",
+            "Qualification": "MD"
+          },
+          "steps": [
+            "Enter Doctor details",
+            "Submit form"
+          ],
+          "expected": [
+            "Doctor details should be updated successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor does not exist with Doctor Id",
+          "req_ids": [
+            "VCMDR03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor with Id '456' does not exist"
+          ],
+          "inputs": {},
+          "steps": [
+            "Retrieve Doctor with Id '456'",
+            "Check for exception error message"
+          ],
+          "expected": [
+            "Exception error message 'Doctor does not exist' should be displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Deleting Doctor Details with open Consultation Requests",
+          "req_ids": [
+            "VCMDR03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor with Id '789' has open Consultation Requests"
+          ],
+          "inputs": {},
+          "steps": [
+            "Attempt to delete Doctor with Id '789'",
+            "Check for exception error message"
+          ],
+          "expected": [
+            "Exception error message 'Doctor has open Consultation Requests - cannot delete' should be displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Administrators Menu Screen to Maintain Chemist & Labs",
+          "req_ids": [
+            "VCMCL01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is logged in as an Administrator"
+          ],
+          "inputs": {},
+          "steps": [
+            "Navigate to Administrators Menu Screen",
+            "Check for options to Maintain Chemist & Labs"
+          ],
+          "expected": [
+            "Screen should display options to Maintain Chemist & Labs"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Add Chemist/ Lab Screen",
+          "req_ids": [
+            "VCMCL02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is on the Add Chemist/ Lab Screen"
+          ],
+          "inputs": {
+            "Chemist/Lab Id": "1",
+            "Chemist/Lab Flag": "C",
+            "Chemist Lab Name": "ChemLab Inc.",
+            "Chemist Lab Address": "123 Main St",
+            "Chemist Lab Contact Details": "contact@chemlab.com"
+          },
+          "steps": [
+            "Enter Chemist/ Lab details",
+            "Submit form"
+          ],
+          "expected": [
+            "Chemist/ Lab should be added successfully"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.5,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.8636,
+        "hallucinated": [
+          {
+            "value": "123",
+            "context": "Speciality Id",
+            "grounded": false
+          },
+          {
+            "value": "456",
+            "context": "Doctor Id (non-existent)",
+            "grounded": false
+          },
+          {
+            "value": "789",
+            "context": "Doctor Id with open requests",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 22,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No boundary value testing for numeric fields (Age, Experience).",
+          "No scenario outlines with Examples tables for normal, edge, and invalid values.",
+          "Assertions for successful operations are vague (e.g., \"Doctor should be added successfully\").",
+          "No verification of data persistence or state after operations.",
+          "Missing tests for editing non-existent doctors or providing invalid field values."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.9045,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

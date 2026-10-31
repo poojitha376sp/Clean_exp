@@ -1,0 +1,1111 @@
+{
+  "unit_id": "U19_3",
+  "representation": "Decision Tables",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 0.9,
+    "representation_score": 0.6667,
+    "sfv_score": 0.7833,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "test case #9 (TC-009): 'constraint' is not one of ['positive', 'negative', 'boundary']",
+      "Table syntax is inconsistent."
+    ]
+  },
+  "fsa": null,
+  "artifact": "Decision Table for Requirement VIRTUA-3-1:\n| Condition | Patient Location | Within 25 sqkm of Padmavathi Hospital | Specified PinCodes | Action |\n|-----------|------------------|----------------------------------------|-------------------|--------|\n| Yes       | Inside           | Yes                                    | -                 | Service Available |\n| Yes       | Outside          | No                                     | -                 | Service Not Available |\n| No        | Inside           | -                                      | Yes               | Service Available |\n| No        | Outside          | -                                      | Yes               | Service Available |\n\nDecision Table for Requirement VIRTUA-3-2:\n| Condition | Patient Pincode Match | Zone Eligibility | Action |\n|-----------|-----------------------|------------------|--------|\n| Yes       | Yes                   | Yes              | Registration Allowed |\n| Yes       | No                    | No               | Registration Denied |\n| No        | Yes                   | No               | Registration Denied |\n| No        | No                    | Yes              | Registration Denied |\n\nDecision Table for Requirement VIRTUA-3-3:\n| Condition | Pincode Match | Authorized Chemist per Pincode | Action |\n|-----------|---------------|-------------------------------|--------|\n| Yes       | Yes           | 1                             | Chemist Assigned |\n| Yes       | No            | -                             | Error: No Chemist |\n| No        | Yes           | -                             | Error: Pincode Mismatch |\n| No        | No            | -                             | Error: No Chemist |\n\nDecision Table for Requirement VIRTUA-3-4:\n| Condition | Patient Pincode | Chemist Pincode Match | Action |\n|-----------|-----------------|-----------------------|--------|\n| Yes       | Yes             | Yes                   | Prescription Routed |\n| Yes       | No              | No                    | Error: Prescription Not Routed |\n| No        | Yes             | No                    | Error: Prescription Not Routed |\n| No        | No              | Yes                   | Error: Prescription Not Routed |\n\nDecision Table for Requirement VIRTUA-3-5:\n| Condition | Delivery Mode | Payment Collection | Action |\n|-----------|---------------|--------------------|--------|\n| Yes       | Offline       | Yes                | Medicines Delivered |\n| Yes       | Online        | No                 | Error: Payment Not Collected |\n| No        | Offline       | -                  | Error: Delivery Failed |\n| No        | Online        | -                  | Error: Delivery Failed |\n\nDecision Table for Requirement VIRTUA-3-6:\n| Condition | Delivery Completion | Prescription Marking | Action |\n|-----------|---------------------|----------------------|--------|\n| Yes       | Yes                 | Yes                  | Prescription Marked |\n| Yes       | No                  | No                   | Error: Prescription Not Marked |\n| No        | Yes                 | No                   | Error: Prescription Not Marked |\n| No        | No                  | Yes                  | Error: Prescription Not Marked |\n\nDecision Table for Requirement VIRTUA-3-7:\n| Condition | Systemic Matching | Action |\n|-----------|-------------------|--------|\n| -         | No                | No Matching Performed |\n| -         | Yes               | Error: Systemic Matching Not Allowed |\n\nDecision Table for Requirement VIRTUA-3-8:\n| Condition | Laboratory per Pincode | Laboratory for Zone | Action |\n|-----------|------------------------|---------------------|--------|\n| Yes       | 1                      | -                   | Lab Assigned |\n| Yes       | -                      | 1                   | Lab Assigned |\n| No        | 1                      | -                   | Lab Assigned |\n| No        | -                      | 1                   | Lab Assigned |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test VIRTUA-3-1: Service Availability Within 25 sqkm",
+      "req_ids": [
+        "VIRTUA-3-1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "Patient Location": "Inside",
+        "Within 25 sqkm of Padmavathi Hospital": "Yes"
+      },
+      "steps": [
+        "Verify patient location is inside the 25 sqkm radius",
+        "Check service availability"
+      ],
+      "expected": [
+        "Service Available"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test VIRTUA-3-1: Service Availability Outside 25 sqkm",
+      "req_ids": [
+        "VIRTUA-3-1"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "Patient Location": "Outside",
+        "Within 25 sqkm of Padmavathi Hospital": "No"
+      },
+      "steps": [
+        "Verify patient location is outside the 25 sqkm radius",
+        "Check service availability"
+      ],
+      "expected": [
+        "Service Not Available"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test VIRTUA-3-2: Registration Eligibility",
+      "req_ids": [
+        "VIRTUA-3-2"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "Patient Pincode Match": "Yes",
+        "Zone Eligibility": "Yes"
+      },
+      "steps": [
+        "Attempt patient registration",
+        "Verify registration outcome"
+      ],
+      "expected": [
+        "Registration Allowed"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test VIRTUA-3-2: Registration Denial for Mismatched Pincode",
+      "req_ids": [
+        "VIRTUA-3-2"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "Patient Pincode Match": "No",
+        "Zone Eligibility": "No"
+      },
+      "steps": [
+        "Attempt patient registration",
+        "Verify registration outcome"
+      ],
+      "expected": [
+        "Registration Denied"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test VIRTUA-3-3: Authorized Chemist Assignment",
+      "req_ids": [
+        "VIRTUA-3-3"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "Pincode Match": "Yes",
+        "Authorized Chemist per Pincode": "1"
+      },
+      "steps": [
+        "Match patient pincode to chemist pincode",
+        "Verify chemist assignment"
+      ],
+      "expected": [
+        "Chemist Assigned"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Test VIRTUA-3-4: Prescription Routing",
+      "req_ids": [
+        "VIRTUA-3-4"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "Patient Pincode": "Yes",
+        "Chemist Pincode Match": "Yes"
+      },
+      "steps": [
+        "Route prescription to chemist",
+        "Verify routing success"
+      ],
+      "expected": [
+        "Prescription Routed"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Test VIRTUA-3-5: Offline Delivery and Payment Collection",
+      "req_ids": [
+        "VIRTUA-3-5"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "Delivery Mode": "Offline",
+        "Payment Collection": "Yes"
+      },
+      "steps": [
+        "Initiate offline delivery",
+        "Collect payment",
+        "Verify delivery completion"
+      ],
+      "expected": [
+        "Medicines Delivered"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Test VIRTUA-3-6: Prescription Marking on Delivery Completion",
+      "req_ids": [
+        "VIRTUA-3-6"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "Delivery Completion": "Yes",
+        "Prescription Marking": "Yes"
+      },
+      "steps": [
+        "Mark prescription upon delivery completion",
+        "Verify marking status"
+      ],
+      "expected": [
+        "Prescription Marked"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Test VIRTUA-3-7: No Systemic Matching Performed",
+      "req_ids": [
+        "VIRTUA-3-7"
+      ],
+      "kind": "constraint",
+      "preconditions": [],
+      "inputs": {
+        "Systemic Matching": "No"
+      },
+      "steps": [
+        "Attempt systemic matching",
+        "Verify outcome"
+      ],
+      "expected": [
+        "No Matching Performed"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Test VIRTUA-3-8: Laboratory Assignment per Pincode or Zone",
+      "req_ids": [
+        "VIRTUA-3-8"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "Laboratory per Pincode": "1",
+        "Laboratory for Zone": "-"
+      },
+      "steps": [
+        "Assign laboratory based on pincode",
+        "Verify assignment"
+      ],
+      "expected": [
+        "Lab Assigned"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Decision Table for Requirement VIRTUA-3-1:\n| Condition | Patient Location | Within 25 sqkm of Padmavathi Hospital | Specified PinCodes | Action |\n|-----------|------------------|----------------------------------------|-------------------|--------|\n| Yes       | Inside           | Yes                                    | -                 | Service Available |\n| Yes       | Outside          | No                                     | -                 | Service Not Available |\n| No        | Inside           | -                                      | Yes               | Service Available |\n| No        | Outside          | -                                      | Yes               | Service Available |\n\nDecision Table for Requirement VIRTUA-3-2:\n| Condition | Patient Pincode Match | Zone Eligibility | Action |\n|-----------|-----------------------|------------------|--------|\n| Yes       | Yes                   | Yes              | Registration Allowed |\n| Yes       | No                    | No               | Registration Denied |\n| No        | Yes                   | No               | Registration Denied |\n| No        | No                    | Yes              | Registration Denied |\n\nDecision Table for Requirement VIRTUA-3-3:\n| Condition | Pincode Match | Authorized Chemist per Pincode | Action |\n|-----------|---------------|-------------------------------|--------|\n| Yes       | Yes           | 1                             | Chemist Assigned |\n| Yes       | No            | -                             | Error: No Chemist |\n| No        | Yes           | -                             | Error: Pincode Mismatch |\n| No        | No            | -                             | Error: No Chemist |\n\nDecision Table for Requirement VIRTUA-3-4:\n| Condition | Patient Pincode | Chemist Pincode Match | Action |\n|-----------|-----------------|-----------------------|--------|\n| Yes       | Yes             | Yes                   | Prescription Routed |\n| Yes       | No              | No                    | Error: Prescription Not Routed |\n| No        | Yes             | No                    | Error: Prescription Not Routed |\n| No        | No              | Yes                   | Error: Prescription Not Routed |\n\nDecision Table for Requirement VIRTUA-3-5:\n| Condition | Delivery Mode | Payment Collection | Action |\n|-----------|---------------|--------------------|--------|\n| Yes       | Offline       | Yes                | Medicines Delivered |\n| Yes       | Online        | No                 | Error: Payment Not Collected |\n| No        | Offline       | -                  | Error: Delivery Failed |\n| No        | Online        | -                  | Error: Delivery Failed |\n\nDecision Table for Requirement VIRTUA-3-6:\n| Condition | Delivery Completion | Prescription Marking | Action |\n|-----------|---------------------|----------------------|--------|\n| Yes       | Yes                 | Yes                  | Prescription Marked |\n| Yes       | No                  | No                   | Error: Prescription Not Marked |\n| No        | Yes                 | No                   | Error: Prescription Not Marked |\n| No        | No                  | Yes                  | Error: Prescription Not Marked |\n\nDecision Table for Requirement VIRTUA-3-7:\n| Condition | Systemic Matching | Action |\n|-----------|-------------------|--------|\n| -         | No                | No Matching Performed |\n| -         | Yes               | Error: Systemic Matching Not Allowed |\n\nDecision Table for Requirement VIRTUA-3-8:\n| Condition | Laboratory per Pincode | Laboratory for Zone | Action |\n|-----------|------------------------|---------------------|--------|\n| Yes       | 1                      | -                   | Lab Assigned |\n| Yes       | -                      | 1                   | Lab Assigned |\n| No        | 1                      | -                   | Lab Assigned |\n| No        | -                      | 1                   | Lab Assigned |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test VIRTUA-3-1: Service Availability Within 25 sqkm",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Patient Location": "Inside",
+            "Within 25 sqkm of Padmavathi Hospital": "Yes"
+          },
+          "steps": [
+            "Verify patient location is inside the 25 sqkm radius",
+            "Check service availability"
+          ],
+          "expected": [
+            "Service Available"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test VIRTUA-3-1: Service Availability Outside 25 sqkm",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Patient Location": "Outside",
+            "Within 25 sqkm of Padmavathi Hospital": "No"
+          },
+          "steps": [
+            "Verify patient location is outside the 25 sqkm radius",
+            "Check service availability"
+          ],
+          "expected": [
+            "Service Not Available"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test VIRTUA-3-2: Registration Eligibility",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Patient Pincode Match": "Yes",
+            "Zone Eligibility": "Yes"
+          },
+          "steps": [
+            "Attempt patient registration",
+            "Verify registration outcome"
+          ],
+          "expected": [
+            "Registration Allowed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test VIRTUA-3-2: Registration Denial for Mismatched Pincode",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Patient Pincode Match": "No",
+            "Zone Eligibility": "No"
+          },
+          "steps": [
+            "Attempt patient registration",
+            "Verify registration outcome"
+          ],
+          "expected": [
+            "Registration Denied"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test VIRTUA-3-3: Authorized Chemist Assignment",
+          "req_ids": [
+            "VIRTUA-3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Pincode Match": "Yes",
+            "Authorized Chemist per Pincode": "1"
+          },
+          "steps": [
+            "Match patient pincode to chemist pincode",
+            "Verify chemist assignment"
+          ],
+          "expected": [
+            "Chemist Assigned"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test VIRTUA-3-4: Prescription Routing",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Patient Pincode": "Yes",
+            "Chemist Pincode Match": "Yes"
+          },
+          "steps": [
+            "Route prescription to chemist",
+            "Verify routing success"
+          ],
+          "expected": [
+            "Prescription Routed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test VIRTUA-3-5: Offline Delivery and Payment Collection",
+          "req_ids": [
+            "VIRTUA-3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Delivery Mode": "Offline",
+            "Payment Collection": "Yes"
+          },
+          "steps": [
+            "Initiate offline delivery",
+            "Collect payment",
+            "Verify delivery completion"
+          ],
+          "expected": [
+            "Medicines Delivered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test VIRTUA-3-6: Prescription Marking on Delivery Completion",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Delivery Completion": "Yes",
+            "Prescription Marking": "Yes"
+          },
+          "steps": [
+            "Mark prescription upon delivery completion",
+            "Verify marking status"
+          ],
+          "expected": [
+            "Prescription Marked"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test VIRTUA-3-7: No Systemic Matching Performed",
+          "req_ids": [
+            "VIRTUA-3-7"
+          ],
+          "kind": "constraint",
+          "preconditions": [],
+          "inputs": {
+            "Systemic Matching": "No"
+          },
+          "steps": [
+            "Attempt systemic matching",
+            "Verify outcome"
+          ],
+          "expected": [
+            "No Matching Performed"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test VIRTUA-3-8: Laboratory Assignment per Pincode or Zone",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Laboratory per Pincode": "1",
+            "Laboratory for Zone": "-"
+          },
+          "steps": [
+            "Assign laboratory based on pincode",
+            "Verify assignment"
+          ],
+          "expected": [
+            "Lab Assigned"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.9,
+        "representation_score": 0.6667,
+        "sfv_score": 0.7833,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #9 (TC-009): 'constraint' is not one of ['positive', 'negative', 'boundary']",
+          "Table syntax is inconsistent."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.78). Fix these problems and output the full corrected suite:\n- test case #9 (TC-009): 'constraint' is not one of ['positive', 'negative', 'boundary']\n- Table syntax is inconsistent.",
+      "artifact": "Decision Table for Requirement VIRTUA-3-1:\n| Condition | Patient Address Pincode | Within 25 sqkm of Padmavathi Hospital | Specified Pincode Set | Action |\n|-----------|------------------------|--------------------------------------|----------------------|--------|\n| Yes       | Yes                    | Yes                                  | -                    | Service offered |\n| Yes       | Yes                    | No                                   | -                    | Service not offered |\n| Yes       | No                     | -                                    | Yes                  | Service offered |\n| No        | -                      | -                                    | Yes                  | Service not offered |\n\nDecision Table for Requirement VIRTUA-3-2:\n| Condition | Patient Address Pincode | Within Service Zone | Action |\n|-----------|------------------------|---------------------|--------|\n| Yes       | Yes                    | Yes                 | Patient can register |\n| Yes       | Yes                    | No                  | Patient cannot register |\n| No        | -                      | -                   | Patient cannot register |\n\nDecision Table for Requirement VIRTUA-3-3:\n| Condition | Pincode | Authorized Chemist per Pincode | Action |\n|-----------|---------|--------------------------------|--------|\n| Yes       | Yes     | 1                              | Chemist operational 24/7 |\n| No        | -       | -                              | Invalid scenario |\n\nDecision Table for Requirement VIRTUA-3-4:\n| Condition | Patient Pincode | Chemist Pincode Match | Action |\n|-----------|-----------------|-----------------------|--------|\n| Yes       | Yes             | Yes                   | Prescription routed |\n| Yes       | No              | -                     | Prescription not routed |\n| No        | -               | -                     | Prescription not routed |\n\nDecision Table for Requirement VIRTUA-3-5:\n| Condition | Prescription Status | Delivery Method | Payment Collected | Action |\n|-----------|---------------------|-----------------|-------------------|--------|\n| Yes       | Completed           | Offline         | Yes               | Medicines delivered |\n| Yes       | Incomplete          | -               | -                 | Delivery pending |\n| No        | -                   | -               | -                 | No delivery |\n\nDecision Table for Requirement VIRTUA-3-6:\n| Condition | Prescription Status | Delivery Completion | Action |\n|-----------|---------------------|---------------------|--------|\n| Yes       | Completed           | Yes                 | Prescription marked |\n| Yes       | Completed           | No                 | Prescription not marked |\n| No        | -                   | -                   | No marking |\n\nDecision Table for Requirement VIRTUA-3-7:\n| Condition | Systemic Matching | Action |\n|-----------|-------------------|--------|\n| -         | No                | No matching performed |\n\nDecision Table for Requirement VIRTUA-3-8:\n| Condition | Pincode | Authorized Laboratory per Pincode | Zone Laboratory | Action |\n|-----------|---------|-----------------------------------|-----------------|--------|\n| Yes       | Yes     | 1                                 | -               | Lab operational |\n| Yes       | No      | -                                 | 1               | Lab operational |\n| No        | -       | -                                 | -               | No lab |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test VIRTUA-3-1: Service within 25 sqkm",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "12345",
+            "within_25_sqkm": true
+          },
+          "steps": [
+            "Verify patient address pincode",
+            "Check if within 25 sqkm of Padmavathi Hospital"
+          ],
+          "expected": [
+            "Service offered"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test VIRTUA-3-1: Service outside 25 sqkm",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "67890",
+            "within_25_sqkm": false
+          },
+          "steps": [
+            "Verify patient address pincode",
+            "Check if within 25 sqkm of Padmavathi Hospital"
+          ],
+          "expected": [
+            "Service not offered"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test VIRTUA-3-2: Patient registration within zone",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "12345",
+            "within_service_zone": true
+          },
+          "steps": [
+            "Attempt patient registration",
+            "Check registration status"
+          ],
+          "expected": [
+            "Patient can register"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test VIRTUA-3-2: Patient registration outside zone",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "67890",
+            "within_service_zone": false
+          },
+          "steps": [
+            "Attempt patient registration",
+            "Check registration status"
+          ],
+          "expected": [
+            "Patient cannot register"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test VIRTUA-3-3: Authorized chemist per pincode",
+          "req_ids": [
+            "VIRTUA-3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pincode": "12345",
+            "authorized_chemist_per_pincode": true
+          },
+          "steps": [
+            "Verify pincode",
+            "Check chemist availability"
+          ],
+          "expected": [
+            "Chemist operational 24/7"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test VIRTUA-3-4: Prescription routing by pincode match",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_pincode": "12345",
+            "chemist_pincode_match": true
+          },
+          "steps": [
+            "Route prescription",
+            "Verify routing"
+          ],
+          "expected": [
+            "Prescription routed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test VIRTUA-3-5: Offline delivery and payment collection",
+          "req_ids": [
+            "VIRTUA-3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "prescription_status": "completed",
+            "delivery_method": "offline",
+            "payment_collected": true
+          },
+          "steps": [
+            "Initiate delivery",
+            "Collect payment"
+          ],
+          "expected": [
+            "Medicines delivered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test VIRTUA-3-6: Mark prescription on delivery completion",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "prescription_status": "completed",
+            "delivery_completion": true
+          },
+          "steps": [
+            "Mark prescription",
+            "Verify marking"
+          ],
+          "expected": [
+            "Prescription marked"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test VIRTUA-3-7: No systemic matching for chemist efficiency",
+          "req_ids": [
+            "VIRTUA-3-7"
+          ],
+          "kind": "constraint",
+          "preconditions": [],
+          "inputs": {
+            "systemic_matching": false
+          },
+          "steps": [
+            "Attempt systemic matching",
+            "Check matching result"
+          ],
+          "expected": [
+            "No matching performed"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test VIRTUA-3-8: Authorized laboratory per pincode or zone",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pincode": "12345",
+            "authorized_lab_per_pincode": true
+          },
+          "steps": [
+            "Verify laboratory availability"
+          ],
+          "expected": [
+            "Laboratory operational"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.9,
+        "representation_score": 0.6667,
+        "sfv_score": 0.7833,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #9 (TC-009): 'constraint' is not one of ['positive', 'negative', 'boundary']",
+          "Table syntax is inconsistent."
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.78). Fix these problems and output the full corrected suite:\n- test case #9 (TC-009): 'constraint' is not one of ['positive', 'negative', 'boundary']\n- Table syntax is inconsistent.",
+      "artifact": "Decision Table for Requirement VIRTUA-3-1:\n| Condition | Patient Address Pincode | Within 25 sqkm of Padmavathi Hospital | Specified Pincode Set | Action |\n|-----------|------------------------|--------------------------------------|----------------------|--------|\n| Yes       | Yes                    | Yes                                  | -                    | Service offered |\n| Yes       | Yes                    | No                                   | -                    | Service not offered |\n| Yes       | No                     | -                                    | Yes                  | Service offered |\n| No        | -                      | -                                    | Yes                  | Service not offered |\n\nDecision Table for Requirement VIRTUA-3-2:\n| Condition | Patient Address Pincode | Within Service Zone | Action |\n|-----------|------------------------|---------------------|--------|\n| Yes       | Yes                    | Yes                 | Patient can register |\n| Yes       | Yes                    | No                  | Patient cannot register |\n| No        | -                      | -                   | Patient cannot register |\n\nDecision Table for Requirement VIRTUA-3-3:\n| Condition | Pincode | Authorized Chemist per Pincode | Action |\n|-----------|---------|--------------------------------|--------|\n| Yes       | Yes     | 1                              | Chemist operational 24/7 |\n| No        | -       | -                              | Invalid scenario |\n\nDecision Table for Requirement VIRTUA-3-4:\n| Condition | Patient Pincode | Chemist Pincode Match | Action |\n|-----------|-----------------|-----------------------|--------|\n| Yes       | Yes             | Yes                   | Prescription routed |\n| Yes       | No              | -                     | Prescription not routed |\n| No        | -               | -                     | Prescription not routed |\n\nDecision Table for Requirement VIRTUA-3-5:\n| Condition | Prescription Status | Delivery Method | Payment Collected | Action |\n|-----------|---------------------|-----------------|-------------------|--------|\n| Yes       | Completed           | Offline         | Yes               | Medicines delivered |\n| Yes       | Incomplete          | -               | -                 | Delivery pending |\n| No        | -                   | -               | -                 | No delivery |\n\nDecision Table for Requirement VIRTUA-3-6:\n| Condition | Prescription Status | Delivery Completion | Action |\n|-----------|---------------------|---------------------|--------|\n| Yes       | Completed           | Yes                 | Prescription marked |\n| Yes       | Completed           | No                 | Prescription not marked |\n| No        | -                   | -                   | No marking |\n\nDecision Table for Requirement VIRTUA-3-7:\n| Condition | Systemic Matching | Action |\n|-----------|-------------------|--------|\n| -         | No                | No matching performed |\n\nDecision Table for Requirement VIRTUA-3-8:\n| Condition | Pincode | Authorized Laboratory per Pincode | Zone Laboratory | Action |\n|-----------|---------|-----------------------------------|-----------------|--------|\n| Yes       | Yes     | 1                                 | -               | Lab operational |\n| Yes       | No      | -                                 | 1               | Lab operational |\n| No        | -       | -                                 | -               | No lab |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test VIRTUA-3-1: Service within 25 sqkm",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "12345",
+            "within_25_sqkm": true
+          },
+          "steps": [
+            "Verify patient address pincode",
+            "Check if within 25 sqkm of Padmavathi Hospital"
+          ],
+          "expected": [
+            "Service offered"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test VIRTUA-3-1: Service outside 25 sqkm",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "67890",
+            "within_25_sqkm": false
+          },
+          "steps": [
+            "Verify patient address pincode",
+            "Check if within 25 sqkm of Padmavathi Hospital"
+          ],
+          "expected": [
+            "Service not offered"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test VIRTUA-3-2: Patient registration within zone",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "12345",
+            "within_service_zone": true
+          },
+          "steps": [
+            "Attempt patient registration",
+            "Check registration status"
+          ],
+          "expected": [
+            "Patient can register"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test VIRTUA-3-2: Patient registration outside zone",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "67890",
+            "within_service_zone": false
+          },
+          "steps": [
+            "Attempt patient registration",
+            "Check registration status"
+          ],
+          "expected": [
+            "Patient cannot register"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test VIRTUA-3-3: Authorized chemist per pincode",
+          "req_ids": [
+            "VIRTUA-3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pincode": "12345",
+            "authorized_chemist_per_pincode": true
+          },
+          "steps": [
+            "Verify pincode",
+            "Check chemist availability"
+          ],
+          "expected": [
+            "Chemist operational 24/7"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test VIRTUA-3-4: Prescription routing by pincode match",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_pincode": "12345",
+            "chemist_pincode_match": true
+          },
+          "steps": [
+            "Route prescription",
+            "Verify routing"
+          ],
+          "expected": [
+            "Prescription routed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test VIRTUA-3-5: Offline delivery and payment collection",
+          "req_ids": [
+            "VIRTUA-3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "prescription_status": "completed",
+            "delivery_method": "offline",
+            "payment_collected": true
+          },
+          "steps": [
+            "Initiate delivery",
+            "Collect payment"
+          ],
+          "expected": [
+            "Medicines delivered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test VIRTUA-3-6: Mark prescription on delivery completion",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "prescription_status": "completed",
+            "delivery_completion": true
+          },
+          "steps": [
+            "Mark prescription",
+            "Verify marking"
+          ],
+          "expected": [
+            "Prescription marked"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test VIRTUA-3-7: No systemic matching for chemist efficiency",
+          "req_ids": [
+            "VIRTUA-3-7"
+          ],
+          "kind": "constraint",
+          "preconditions": [],
+          "inputs": {
+            "systemic_matching": false
+          },
+          "steps": [
+            "Attempt systemic matching",
+            "Check matching result"
+          ],
+          "expected": [
+            "No matching performed"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test VIRTUA-3-8: Authorized laboratory per pincode or zone",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pincode": "12345",
+            "authorized_lab_per_pincode": true
+          },
+          "steps": [
+            "Verify laboratory availability"
+          ],
+          "expected": [
+            "Laboratory operational"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.9,
+        "representation_score": 0.6667,
+        "sfv_score": 0.7833,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #9 (TC-009): 'constraint' is not one of ['positive', 'negative', 'boundary']",
+          "Table syntax is inconsistent."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.78). Fix these problems and output the full corrected suite:\n- test case #9 (TC-009): 'constraint' is not one of ['positive', 'negative', 'boundary']\n- Table syntax is inconsistent.",
+      "artifact": "Decision Table for Requirement VIRTUA-3-1:\n| Condition | Patient Address Pincode | Within 25 sqkm of Padmavathi Hospital | Specified Pincode Set | Action |\n|-----------|------------------------|--------------------------------------|----------------------|--------|\n| Yes       | Yes                    | Yes                                  | -                    | Service offered |\n| Yes       | Yes                    | No                                   | -                    | Service not offered |\n| Yes       | No                     | -                                    | Yes                  | Service offered |\n| No        | -                      | -                                    | Yes                  | Service not offered |\n\nDecision Table for Requirement VIRTUA-3-2:\n| Condition | Patient Address Pincode | Within Service Zone | Action |\n|-----------|------------------------|---------------------|--------|\n| Yes       | Yes                    | Yes                 | Patient can register |\n| Yes       | Yes                    | No                  | Patient cannot register |\n| No        | -                      | -                   | Patient cannot register |\n\nDecision Table for Requirement VIRTUA-3-3:\n| Condition | Pincode | Authorized Chemist per Pincode | Action |\n|-----------|---------|--------------------------------|--------|\n| Yes       | Yes     | 1                              | Chemist operational 24/7 |\n| No        | -       | -                              | Invalid scenario |\n\nDecision Table for Requirement VIRTUA-3-4:\n| Condition | Patient Pincode | Chemist Pincode Match | Action |\n|-----------|-----------------|-----------------------|--------|\n| Yes       | Yes             | Yes                   | Prescription routed |\n| Yes       | No              | -                     | Prescription not routed |\n| No        | -               | -                     | Prescription not routed |\n\nDecision Table for Requirement VIRTUA-3-5:\n| Condition | Prescription Status | Delivery Method | Payment Collected | Action |\n|-----------|---------------------|-----------------|-------------------|--------|\n| Yes       | Completed           | Offline         | Yes               | Medicines delivered |\n| Yes       | Incomplete          | -               | -                 | Delivery pending |\n| No        | -                   | -               | -                 | No delivery |\n\nDecision Table for Requirement VIRTUA-3-6:\n| Condition | Prescription Status | Delivery Completion | Action |\n|-----------|---------------------|---------------------|--------|\n| Yes       | Completed           | Yes                 | Prescription marked |\n| Yes       | Completed           | No                 | Prescription not marked |\n| No        | -                   | -                   | No marking |\n\nDecision Table for Requirement VIRTUA-3-7:\n| Condition | Systemic Matching | Action |\n|-----------|-------------------|--------|\n| -         | No                | No matching performed |\n\nDecision Table for Requirement VIRTUA-3-8:\n| Condition | Pincode | Authorized Laboratory per Pincode | Zone Laboratory | Action |\n|-----------|---------|-----------------------------------|-----------------|--------|\n| Yes       | Yes     | 1                                 | -               | Lab operational |\n| Yes       | No      | -                                 | 1               | Lab operational |\n| No        | -       | -                                 | -               | No lab |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test VIRTUA-3-1: Service within 25 sqkm",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "12345",
+            "within_25_sqkm": true
+          },
+          "steps": [
+            "Verify patient address pincode",
+            "Check if within 25 sqkm of Padmavathi Hospital"
+          ],
+          "expected": [
+            "Service offered"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test VIRTUA-3-1: Service outside 25 sqkm",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "67890",
+            "within_25_sqkm": false
+          },
+          "steps": [
+            "Verify patient address pincode",
+            "Check if within 25 sqkm of Padmavathi Hospital"
+          ],
+          "expected": [
+            "Service not offered"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test VIRTUA-3-2: Patient registration within zone",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "12345",
+            "within_service_zone": true
+          },
+          "steps": [
+            "Attempt patient registration",
+            "Check registration status"
+          ],
+          "expected": [
+            "Patient can register"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test VIRTUA-3-2: Patient registration outside zone",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "patient_address_pincode": "67890",
+            "within_service_zone": false
+          },
+          "steps": [
+            "Attempt patient registration",
+            "Check registration status"
+          ],
+          "expected": [
+            "Patient cannot register"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test VIRTUA-3-3: Authorized chemist per pincode",
+          "req_ids": [
+            "VIRTUA-3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pincode": "12345",
+            "authorized_chemist_per_pincode": true
+          },
+          "steps": [
+            "Verify pincode",
+            "Check chemist availability"
+          ],
+          "expected": [
+            "Chemist operational 24/7"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test VIRTUA-3-4: Prescription routing by pincode match",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "patient_pincode": "12345",
+            "chemist_pincode_match": true
+          },
+          "steps": [
+            "Route prescription",
+            "Verify routing"
+          ],
+          "expected": [
+            "Prescription routed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test VIRTUA-3-5: Offline delivery and payment collection",
+          "req_ids": [
+            "VIRTUA-3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "prescription_status": "completed",
+            "delivery_method": "offline",
+            "payment_collected": true
+          },
+          "steps": [
+            "Initiate delivery",
+            "Collect payment"
+          ],
+          "expected": [
+            "Medicines delivered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test VIRTUA-3-6: Mark prescription on delivery completion",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "prescription_status": "completed",
+            "delivery_completion": true
+          },
+          "steps": [
+            "Mark prescription",
+            "Verify marking"
+          ],
+          "expected": [
+            "Prescription marked"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test VIRTUA-3-7: No systemic matching for chemist efficiency",
+          "req_ids": [
+            "VIRTUA-3-7"
+          ],
+          "kind": "constraint",
+          "preconditions": [],
+          "inputs": {
+            "systemic_matching": false
+          },
+          "steps": [
+            "Attempt systemic matching",
+            "Check matching result"
+          ],
+          "expected": [
+            "No matching performed"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test VIRTUA-3-8: Authorized laboratory per pincode or zone",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pincode": "12345",
+            "authorized_lab_per_pincode": true
+          },
+          "steps": [
+            "Verify laboratory availability"
+          ],
+          "expected": [
+            "Laboratory operational"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.9,
+        "representation_score": 0.6667,
+        "sfv_score": 0.7833,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #9 (TC-009): 'constraint' is not one of ['positive', 'negative', 'boundary']",
+          "Table syntax is inconsistent."
+        ]
+      }
+    }
+  ]
+}

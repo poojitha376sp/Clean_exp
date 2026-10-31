@@ -1,0 +1,835 @@
+{
+  "unit_id": "U16_5",
+  "representation": "Use-Cases & User Stories",
+  "generator": "ollama:codegemma:7b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Use-Cases & User Stories",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 0.75,
+    "sfv_score": 0.875,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": [
+      "missing: numbered steps"
+    ]
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.44999999999999996,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.0
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 0.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "John Doe",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": 30,
+        "context": "patient age",
+        "grounded": false
+      },
+      {
+        "value": "New Address",
+        "context": "patient address",
+        "grounded": false
+      },
+      {
+        "value": 1,
+        "context": "rollback months",
+        "grounded": false
+      },
+      {
+        "value": "patient cannot be deleted due to active consultations",
+        "context": "error message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 5,
+    "uncovered_clauses": [
+      "VIRTUA-5-17",
+      "VIRTUA-5.5-4"
+    ],
+    "weaknesses": [
+      "Add tests for medicine delivery requirement VIRTUA-5-17.",
+      "Include test for restoring corrupted or incomplete backup as per exception flow.",
+      "Assert concrete expected values such as IDs, status codes, and exact error messages.",
+      "Test boundary condition for deletion constraint (consultation exactly 3 years old).",
+      "Verify backup storage location to satisfy VIRTUA-5.5-4."
+    ],
+    "traceability": 0.75,
+    "untraced_reqs": [
+      "VIRTUA-5-17",
+      "VIRTUA-5.5-4"
+    ],
+    "fsa_score": 0.68,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "## Use-Cases & User Stories\n\n**Actor:** Patient\n\n**Primary Flow:**\n\n* Register a new patient.\n* View and update the details of an existing patient.\n* Delete the patient details.\n\n**Alternative Flow:**\n\n* Rollback patient data by a month.\n\n**Exception Flow:**\n\n* Attempt to delete a patient with an active consultation request within the last 3 years.\n\n**Actor:** System Administrator\n\n**Primary Flow:**\n\n* Restore a patient data backup.\n\n**Alternative Flow:**\n\n* Purge the dummy production database.\n\n**Exception Flow:**\n\n* Restore a corrupted or incomplete backup.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Register a new patient",
+      "req_ids": [
+        "Req-5/1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "name": "John Doe",
+        "age": 30
+      },
+      "steps": [
+        "Register a new patient with the given name and age."
+      ],
+      "expected": [
+        "The patient is successfully registered."
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "View and update patient details",
+      "req_ids": [
+        "Req-5/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A patient with the given name exists."
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "address": "New Address"
+      },
+      "steps": [
+        "View the patient details and update the address."
+      ],
+      "expected": [
+        "The patient details are updated successfully."
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Delete patient with no active consultations",
+      "req_ids": [
+        "Req-5/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A patient with the given name exists and has no active consultations."
+      ],
+      "inputs": {
+        "name": "John Doe"
+      },
+      "steps": [
+        "Delete the patient."
+      ],
+      "expected": [
+        "The patient is deleted successfully."
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Rollback patient data by a month",
+      "req_ids": [
+        "VIRTUA-5.5-1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "months": 1
+      },
+      "steps": [
+        "Rollback patient data by the specified number of months."
+      ],
+      "expected": [
+        "Patient data is rolled back successfully."
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Restore patient data backup",
+      "req_ids": [
+        "VIRTUA-5.5-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A valid patient data backup exists."
+      ],
+      "inputs": {},
+      "steps": [
+        "Restore the patient data backup."
+      ],
+      "expected": [
+        "Patient data is restored successfully."
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Purge dummy production database",
+      "req_ids": [
+        "VIRTUA-5.5-3"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Purge the dummy production database."
+      ],
+      "expected": [
+        "Dummy production database is purged successfully."
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Attempt to delete patient with active consultation",
+      "req_ids": [
+        "Req-5/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "A patient with the given name exists and has an active consultation."
+      ],
+      "inputs": {
+        "name": "John Doe"
+      },
+      "steps": [
+        "Attempt to delete the patient."
+      ],
+      "expected": [
+        "An error message is displayed indicating that the patient cannot be deleted due to active consultations."
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "## Use-Cases & User Stories\n\n**Actor:** System Administrator\n\n**Primary Flow:**\n\n* Register a new patient.\n* View and update the details of an existing patient.\n* Delete a patient (only if there are no consultation requests in the last 3 years).\n\n**Alternative Flow:**\n\n* Attempt to delete a patient with consultation requests in the last 3 years.\n\n**Exception Flow:**\n\n* Register a new patient with invalid data.\n* View and update a patient with invalid data.\n\n**Rollback by Month:**\n\n* Restore a backup from a month ago.\n* Verify that the restored data is complete and correct.\n\n**Backup Verification:**\n\n* Restore the backup on a dummy production system.\n* Verify that the dummy production database is purged.\n* Verify that the dummy production database is fireproof and located 25 km away from the hospital.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Register a new patient",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "John Doe",
+            "age": 30
+          },
+          "steps": [
+            "Register a new patient with the given name and age."
+          ],
+          "expected": [
+            "The patient is successfully registered with the given name and age."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and update patient details",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient with the given name exists."
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": 31
+          },
+          "steps": [
+            "View the patient details for the given name.",
+            "Update the patient's age to 31."
+          ],
+          "expected": [
+            "The patient details are displayed correctly.",
+            "The patient's age is updated to 31."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete a patient",
+          "req_ids": [
+            "Req-5/3",
+            "VIRTUA-5.5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient with the given name exists and has no consultation requests in the last 3 years."
+          ],
+          "inputs": {
+            "name": "John Doe"
+          },
+          "steps": [
+            "Delete the patient with the given name."
+          ],
+          "expected": [
+            "The patient is successfully deleted.",
+            "The patient's data is stored in a fireproof cabinet 25 km away from the hospital."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete a patient with consultation requests",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient with the given name exists and has consultation requests in the last 3 years."
+          ],
+          "inputs": {
+            "name": "John Doe"
+          },
+          "steps": [
+            "Attempt to delete the patient with the given name."
+          ],
+          "expected": [
+            "An error message is displayed indicating that the patient cannot be deleted due to consultation requests in the last 3 years."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Register a new patient with invalid data",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "",
+            "age": ""
+          },
+          "steps": [
+            "Attempt to register a new patient with the given invalid data."
+          ],
+          "expected": [
+            "An error message is displayed indicating that the name and age fields are required."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "View and update a patient with invalid data",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient with the given name exists."
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": ""
+          },
+          "steps": [
+            "Attempt to view and update the patient's details with the given invalid data."
+          ],
+          "expected": [
+            "An error message is displayed indicating that the age field is required."
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Rollback by month",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A backup from a month ago exists."
+          ],
+          "inputs": {},
+          "steps": [
+            "Restore the backup from a month ago."
+          ],
+          "expected": [
+            "The system is restored to the state it was in a month ago."
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Backup verification",
+          "req_ids": [
+            "VIRTUA-5.5-2",
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A backup exists."
+          ],
+          "inputs": {},
+          "steps": [
+            "Restore the backup on a dummy production system.",
+            "Verify that the dummy production database is purged."
+          ],
+          "expected": [
+            "The dummy production database is restored correctly.",
+            "The dummy production database is purged successfully."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.75,
+        "sfv_score": 0.875,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": [
+          "missing: numbered steps"
+        ]
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.44999999999999996,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.0
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.4,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": 30,
+            "context": "patient age",
+            "grounded": false
+          },
+          {
+            "value": 31,
+            "context": "patient age",
+            "grounded": false
+          },
+          {
+            "value": "25 km",
+            "context": "distance to hospital",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 4,
+        "uncovered_clauses": [
+          "VIRTUA-5-17"
+        ],
+        "weaknesses": [
+          "No test covers the medicine delivery requirement (VIRTUA-5-17).",
+          "Boundary conditions for age limits and the 3‑year consultation rule are not exercised.",
+          "Expected results are vague; concrete status codes or error messages should be asserted.",
+          "Backup restoration completeness and correctness are not verified.",
+          "Fireproof cabinet location is only checked by distance; actual location verification is missing."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "VIRTUA-5-17"
+        ],
+        "fsa_score": 0.6538,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.6538; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.4, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-5-17'] (add at least one each)\n- uncovered clause: VIRTUA-5-17\n- ungrounded value 'John Doe' (patient name): remove or use the SRS value\n- ungrounded value '30' (patient age): remove or use the SRS value\n- ungrounded value '31' (patient age): remove or use the SRS value\n- ungrounded value '25 km' (distance to hospital): remove or use the SRS value\n- No test covers the medicine delivery requirement (VIRTUA-5-17).\n- Boundary conditions for age limits and the 3‑year consultation rule are not exercised.\n- Expected results are vague; concrete status codes or error messages should be asserted.\n- Backup restoration completeness and correctness are not verified.\n- Fireproof cabinet location is only checked by distance; actual location verification is missing.",
+      "artifact": "## Use-Cases & User Stories\n\n**User Stories:**\n\n**As a Patient, I want to:**\n\n* Register a new account (Req-5/1)\n* View and update my profile (Req-5/2)\n* Delete my account (Req-5/3)\n\n**As a System Administrator, I want to:**\n\n* Restore a backup of the patient data (VIRTUA-5.5-1)\n* Verify the completeness and correctness of the restored data (VIRTUA-5.5-2)\n* Purge the dummy production database (VIRTUA-5.5-3)\n\n**As a System Security Officer, I want to:**\n\n* Ensure the fireproof cabinet storing the backup is located at least 25 km away from the hospital (VIRTUA-5.5-4)\n\n**Use-Cases:**\n\n**UC-001: Register a New Patient**\n\n* **Goal:** Register a new patient with valid information.\n* **Primary Flow:**\n    * Patient enters their name, age, and other required details.\n    * System validates the input and creates a new patient account.\n    * Patient receives a confirmation message.\n* **Alternative Flow:**\n    * Patient enters invalid information (e.g., missing required fields).\n    * System displays an error message.\n* **Exception Flow:**\n    * System encounters an unexpected error during registration.\n    * Patient receives an error message and can retry or contact support.\n\n**UC-002: View and Update Patient Profile**\n\n* **Goal:** View and update patient information.\n* **Primary Flow:**\n    * Patient logs in to their account.\n    * Patient navigates to their profile page.\n    * Patient can view and update their information.\n    * System saves the updated information.\n    * Patient receives a confirmation message.\n* **Alternative Flow:**\n    * Patient attempts to update information with invalid data.\n    * System displays an error message.\n* **Exception Flow:**\n    * System encounters an unexpected error during profile update.\n    * Patient receives an error message and can retry or contact support.\n\n**UC-003: Delete Patient Account**\n\n* **Goal:** Delete a patient account.\n* **Primary Flow:**\n    * Patient logs in to their account.\n    * Patient navigates to their account settings.\n    * Patient confirms their desire to delete their account.\n    * System deletes the patient account.\n    * Patient receives a confirmation message.\n* **Alternative Flow:**\n    * Patient changes their mind and does not want to delete their account.\n    * System does not delete the account.\n* **Exception Flow:**\n    * System encounters an unexpected error during account deletion.\n    * Patient receives an error message and can retry or contact support.\n\n**UC-004: Restore Patient Data Backup**\n\n* **Goal:** Restore a patient data backup.\n* **Primary Flow:**\n    * System administrator selects the desired backup file.\n    * System restores the backup data to the dummy production database.\n    * System verifies the completeness and correctness of the restored data.\n    * System administrator receives a confirmation message.\n* **Alternative Flow:**\n    * System administrator selects an invalid backup file.\n    * System displays an error message.\n* **Exception Flow:**\n    * System encounters an unexpected error during backup restoration.\n    * System administrator receives an error message and can retry or contact support.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Register a new patient with valid information",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "John Doe",
+            "age": 30
+          },
+          "steps": [
+            "Register a new account"
+          ],
+          "expected": [
+            "Confirmation message"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Register a new patient with missing required fields",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "",
+            "age": ""
+          },
+          "steps": [
+            "Register a new account"
+          ],
+          "expected": [
+            "Error message"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "View and update patient profile with valid information",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient account exists"
+          ],
+          "inputs": {
+            "name": "Jane Doe",
+            "age": 31
+          },
+          "steps": [
+            "View and update profile"
+          ],
+          "expected": [
+            "Confirmation message"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "View and update patient profile with invalid information",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient account exists"
+          ],
+          "inputs": {
+            "name": "",
+            "age": ""
+          },
+          "steps": [
+            "View and update profile"
+          ],
+          "expected": [
+            "Error message"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete patient account",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient account exists"
+          ],
+          "inputs": [],
+          "steps": [
+            "Delete account"
+          ],
+          "expected": [
+            "Confirmation message"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Restore patient data backup",
+          "req_ids": [
+            "VIRTUA-5.5-1",
+            "VIRTUA-5.5-2",
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": [
+            "Backup file"
+          ],
+          "steps": [
+            "Restore backup",
+            "Verify data completeness and correctness"
+          ],
+          "expected": [
+            "Confirmation message"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.6667,
+        "representation_score": 0.75,
+        "sfv_score": 0.7083,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #5 (TC-005): [] is not of type 'object'",
+          "test case #6 (TC-006): ['Backup file'] is not of type 'object'",
+          "missing: numbered steps"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.71). Fix these problems and output the full corrected suite:\n- test case #5 (TC-005): [] is not of type 'object'\n- test case #6 (TC-006): ['Backup file'] is not of type 'object'\n- missing: numbered steps",
+      "artifact": "## Use-Cases & User Stories\n\n**As a** System Administrator\n**I want** to register, view, and update patient details.\n**So that** patients can receive the prescribed medicines.\n\n**As a** System Administrator\n**I want** to restore the patient data from a backup.\n**So that** the system can be recovered in case of data loss.\n\n**Use Case 1: Register a New Patient**\n\n* **Goal:** Register a new patient with required details.\n* **Steps:**\n    1. Navigate to the patient registration page.\n    2. Enter patient name, age, address, phone number, and email address.\n    3. Click the \"Register\" button.\n* **Expected:**\n    * A confirmation message is displayed indicating successful registration.\n    * The newly created patient is added to the patient list.\n\n**Use Case 2: View Patient Details**\n\n* **Goal:** View the details of a registered patient.\n* **Steps:**\n    1. Navigate to the patient list page.\n    2. Select the patient from the list.\n    3. Click the \"View Details\" button.\n* **Expected:**\n    * The patient details are displayed in a detailed view.\n\n**Use Case 3: Update Patient Details**\n\n* **Goal:** Update the details of an existing patient.\n* **Steps:**\n    1. Navigate to the patient list page.\n    2. Select the patient from the list.\n    3. Click the \"Edit Details\" button.\n    4. Update the patient details as needed.\n    5. Click the \"Save Changes\" button.\n* **Expected:**\n    * A confirmation message is displayed indicating successful update.\n    * The patient details are updated in the patient list.\n\n**Use Case 4: Restore Patient Data from Backup**\n\n* **Goal:** Restore patient data from a backup.\n* **Steps:**\n    1. Navigate to the backup management page.\n    2. Select the desired backup file.\n    3. Click the \"Restore Backup\" button.\n* **Expected:**\n    * A confirmation message is displayed indicating successful restoration.\n    * The patient data is restored to the system.\n\n**Use Case 5: Delete Patient**\n\n* **Goal:** Delete a patient account.\n* **Steps:**\n    1. Navigate to the patient list page.\n    2. Select the patient from the list.\n    3. Click the \"Delete Patient\" button.\n* **Expected:**\n    * A confirmation message is displayed indicating successful deletion.\n    * The patient account is deleted from the system.",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.75,
+        "sfv_score": 0.375,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: alternative/exception flow"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.38). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- missing: alternative/exception flow",
+      "artifact": "## Use-Cases & User Stories\n\n**Actor:** Patient\n\n**Primary Flow:**\n\n* Register a new patient.\n* View and update the details of an existing patient.\n* Delete the patient details.\n\n**Alternative Flow:**\n\n* Rollback patient data by a month.\n\n**Exception Flow:**\n\n* Attempt to delete a patient with an active consultation request within the last 3 years.\n\n**Actor:** System Administrator\n\n**Primary Flow:**\n\n* Restore a patient data backup.\n\n**Alternative Flow:**\n\n* Purge the dummy production database.\n\n**Exception Flow:**\n\n* Restore a corrupted or incomplete backup.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Register a new patient",
+          "req_ids": [
+            "Req-5/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "John Doe",
+            "age": 30
+          },
+          "steps": [
+            "Register a new patient with the given name and age."
+          ],
+          "expected": [
+            "The patient is successfully registered."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and update patient details",
+          "req_ids": [
+            "Req-5/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient with the given name exists."
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "address": "New Address"
+          },
+          "steps": [
+            "View the patient details and update the address."
+          ],
+          "expected": [
+            "The patient details are updated successfully."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete patient with no active consultations",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient with the given name exists and has no active consultations."
+          ],
+          "inputs": {
+            "name": "John Doe"
+          },
+          "steps": [
+            "Delete the patient."
+          ],
+          "expected": [
+            "The patient is deleted successfully."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Rollback patient data by a month",
+          "req_ids": [
+            "VIRTUA-5.5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "months": 1
+          },
+          "steps": [
+            "Rollback patient data by the specified number of months."
+          ],
+          "expected": [
+            "Patient data is rolled back successfully."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Restore patient data backup",
+          "req_ids": [
+            "VIRTUA-5.5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A valid patient data backup exists."
+          ],
+          "inputs": {},
+          "steps": [
+            "Restore the patient data backup."
+          ],
+          "expected": [
+            "Patient data is restored successfully."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Purge dummy production database",
+          "req_ids": [
+            "VIRTUA-5.5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Purge the dummy production database."
+          ],
+          "expected": [
+            "Dummy production database is purged successfully."
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Attempt to delete patient with active consultation",
+          "req_ids": [
+            "Req-5/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient with the given name exists and has an active consultation."
+          ],
+          "inputs": {
+            "name": "John Doe"
+          },
+          "steps": [
+            "Attempt to delete the patient."
+          ],
+          "expected": [
+            "An error message is displayed indicating that the patient cannot be deleted due to active consultations."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.75,
+        "sfv_score": 0.875,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": [
+          "missing: numbered steps"
+        ]
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.44999999999999996,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.0
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": 30,
+            "context": "patient age",
+            "grounded": false
+          },
+          {
+            "value": "New Address",
+            "context": "patient address",
+            "grounded": false
+          },
+          {
+            "value": 1,
+            "context": "rollback months",
+            "grounded": false
+          },
+          {
+            "value": "patient cannot be deleted due to active consultations",
+            "context": "error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 5,
+        "uncovered_clauses": [
+          "VIRTUA-5-17",
+          "VIRTUA-5.5-4"
+        ],
+        "weaknesses": [
+          "Add tests for medicine delivery requirement VIRTUA-5-17.",
+          "Include test for restoring corrupted or incomplete backup as per exception flow.",
+          "Assert concrete expected values such as IDs, status codes, and exact error messages.",
+          "Test boundary condition for deletion constraint (consultation exactly 3 years old).",
+          "Verify backup storage location to satisfy VIRTUA-5.5-4."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VIRTUA-5-17",
+          "VIRTUA-5.5-4"
+        ],
+        "fsa_score": 0.68,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

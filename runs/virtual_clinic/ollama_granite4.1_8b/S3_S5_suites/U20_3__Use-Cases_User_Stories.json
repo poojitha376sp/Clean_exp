@@ -1,0 +1,1798 @@
+{
+  "unit_id": "U20_3",
+  "representation": "Use-Cases & User Stories",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Use-Cases & User Stories",
+    "group": 1,
+    "schema_score": 0.8333,
+    "representation_score": 1.0,
+    "sfv_score": 0.9167,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']"
+    ]
+  },
+  "fsa": null,
+  "artifact": "**Use-Case: Route Lab Requests to Laboratory**\n- **Actor:** System (Automated Process)\n- **Goal:** Ensure all lab requests are routed to the Laboratory after matching the Patient Pincode.\n- **Preconditions:** Patient has a valid Pincode; Lab request is initiated.\n- **Primary Success Flow:**\n  1. System receives a Lab request.\n  2. System matches the Patient Pincode with the stored Pincode database.\n  3. System routes the request to the Laboratory.\n- **Alternative Flow:** If the Pincode does not match any record, the system logs an error and notifies the administrator.\n- **Exception Flow:** If the Laboratory is unavailable, the system queues the request and sends a notification to the patient.\n\n**Use-Case: Schedule and Conduct Home Collection of Specimen**\n- **Actor:** Lab Personnel\n- **Goal:** Schedule and perform home collection of specimen for patients.\n- **Preconditions:** Patient has an active appointment; Specimen type is approved.\n- **Primary Success Flow:**\n  1. Lab Personnel schedules an appointment via the system.\n  2. System confirms the appointment and sends a notification to the patient.\n  3. On the scheduled date, personnel arrives at the patient's location and collects the specimen.\n- **Alternative Flow:** If the patient is unavailable, personnel reschedules the appointment.\n- **Exception Flow:** If the patient declines the collection, the system marks the appointment as canceled and notifies the patient.\n\n**Use-Case: Offline Operations and Direct Report Delivery**\n- **Actor:** System\n- **Goal:** Ensure operations are offline and reports are sent directly to patients.\n- **Preconditions:** No active internet connection; Patient has provided an email address.\n- **Primary Success Flow:**\n  1. System processes the request offline.\n  2. Once processing is complete, system emails the report to the patient.\n- **Alternative Flow:** If email fails, system attempts to send via SMS.\n- **Exception Flow:** If both email and SMS fail, system logs the failure and alerts the administrator.\n\n**Use-Case: Upload Patient Reports**\n- **Actor:** Patient\n- **Goal:** Allow patients to upload up to 5 reports per consultation, each not exceeding 1 MB.\n- **Preconditions:** Patient is logged into the system; Consultation is active.\n- **Primary Success Flow:**\n  1. Patient selects the upload option within the consultation interface.\n  2. System prompts for report selection, allowing up to 5 files, each ≤ 1 MB.\n  3. System uploads the reports and confirms successful upload.\n- **Alternative Flow:** If the patient attempts to upload more than 5 files, system rejects additional uploads.\n- **Exception Flow:** If a file exceeds 1 MB, system rejects that file and prompts for a valid file.\n\n**Use-Case: Route Patient Consultation to Specialist Doctor**\n- **Actor:** System\n- **Goal:** Route each patient consultation request to a single doctor of the specified specialty.\n- **Preconditions:** Patient consultation request is initiated; Doctor availability is checked.\n- **Primary Success Flow:**\n  1. System receives the consultation request.\n  2. System matches the patient's condition to a specialist doctor.\n  3. System routes the request to the selected doctor.\n- **Alternative Flow:** If no specialist is available, system assigns the request to the next available doctor of a related specialty.\n- **Exception Flow:** If the doctor declines the request, system notifies the patient and reassigns the request.\n\n**Use-Case: Machine Learning Assistance for Disease Prediction**\n- **Actor:** System\n- **Goal:** Implement a machine learning algorithm to assist doctors in predicting diseases based on symptoms.\n- **Preconditions:** Patient symptoms are entered into the system; ML model is trained and validated.\n- **Primary Success Flow:**\n  1. System receives symptom data from the patient.\n  2. System runs the symptom data through the ML model.\n  3. System presents the predicted diseases to the doctor for review.\n- **Alternative Flow:** If the ML model confidence is below a threshold, system prompts the doctor for manual input.\n- **Exception Flow:** If the ML model fails to predict, system logs the failure and alerts the administrator.\n\n**Use-Case: Doctor Acceptance or Modification of Diagnosis**\n- **Actor:** Doctor\n- **Goal:** Allow doctors to accept or modify the diagnosis provided by the system or ML model.\n- **Preconditions:** Diagnosis is presented to the doctor; Doctor has access to the consultation.\n- **Primary Success Flow:**\n  1. System presents the diagnosis to the doctor.\n  2. Doctor reviews the diagnosis and either accepts it or modifies it.\n  3. System records the doctor's decision and updates the consultation record.\n- **Alternative Flow:** If the doctor modifies the diagnosis, system prompts for additional notes.\n- **Exception Flow:** If the doctor encounters an error while modifying, system provides a reset option and logs the incident.\n\n**Use-Case: Doctor Responsibility for Diagnosis**\n- **Actor:** Doctor\n- **Goal:** Ensure the responsibility for performing the diagnosis lies with the doctor.\n- **Preconditions:** Consultation is active; Doctor is assigned.\n- **Primary Success Flow:**\n  1. System assigns the consultation to the doctor.\n  2. Doctor conducts the diagnosis based on patient data and ML suggestions.\n  3. System records the doctor's diagnosis as final.\n- **Alternative Flow:** If the doctor requests additional tests, system facilitates the process.\n- **Exception Flow:** If the doctor is unavailable, system reassigns the consultation to the next available doctor.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Route Lab Requests to Laboratory",
+      "req_ids": [
+        "VIRTUA-3-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient has a valid Pincode; Lab request is initiated."
+      ],
+      "inputs": {
+        "pincode": "123456",
+        "lab_request": "Blood Test"
+      },
+      "steps": [
+        "System receives a Lab request.",
+        "System matches the Patient Pincode.",
+        "System routes the request to the Laboratory."
+      ],
+      "expected": [
+        "Lab request successfully routed to Laboratory."
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Schedule and Conduct Home Collection of Specimen",
+      "req_ids": [
+        "VIRTUA-3-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient has an active appointment; Specimen type is approved."
+      ],
+      "inputs": {
+        "appointment_time": "2023-10-01T10:00",
+        "specimen_type": "Blood"
+      },
+      "steps": [
+        "Lab Personnel schedules an appointment.",
+        "System confirms the appointment.",
+        "Personnel collects the specimen."
+      ],
+      "expected": [
+        "Specimen collected successfully."
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Offline Operations and Direct Report Delivery",
+      "req_ids": [
+        "VIRTUA-3-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "No active internet connection; Patient has provided an email address."
+      ],
+      "inputs": {
+        "email": "patient@example.com",
+        "report": "Lab Report.pdf"
+      },
+      "steps": [
+        "System processes the request offline.",
+        "System emails the report to the patient."
+      ],
+      "expected": [
+        "Report successfully emailed to patient."
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Upload Patient Reports",
+      "req_ids": [
+        "VIRTUA-3-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient is logged into the system; Consultation is active."
+      ],
+      "inputs": {
+        "files": [
+          "report1.pdf",
+          "report2.pdf",
+          "report3.pdf",
+          "report4.pdf",
+          "report5.pdf"
+        ]
+      },
+      "steps": [
+        "Patient selects the upload option.",
+        "System prompts for report selection.",
+        "System uploads the reports."
+      ],
+      "expected": [
+        "Reports successfully uploaded."
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Route Patient Consultation to Specialist Doctor",
+      "req_ids": [
+        "VIRTUA-3-13"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient consultation request is initiated; Doctor availability is checked."
+      ],
+      "inputs": {
+        "patient_condition": "Diabetes",
+        "specialty": "Endocrinology"
+      },
+      "steps": [
+        "System receives the consultation request.",
+        "System matches the condition to a specialist doctor.",
+        "System routes the request to the doctor."
+      ],
+      "expected": [
+        "Consultation successfully routed to specialist doctor."
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Machine Learning Assistance for Disease Prediction",
+      "req_ids": [
+        "VIRTUA-3-14"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient symptoms are entered into the system; ML model is trained and validated."
+      ],
+      "inputs": {
+        "symptoms": [
+          "Fever",
+          "Cough",
+          "Fatigue"
+        ]
+      },
+      "steps": [
+        "System receives symptom data.",
+        "System runs data through the ML model.",
+        "System presents predicted diseases to the doctor."
+      ],
+      "expected": [
+        "Predicted diseases displayed to the doctor."
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Doctor Acceptance or Modification of Diagnosis",
+      "req_ids": [
+        "VIRTUA-3-15"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Diagnosis is presented to the doctor; Doctor has access to the consultation."
+      ],
+      "inputs": {
+        "diagnosis": "Influenza",
+        "doctor_decision": "Accept"
+      },
+      "steps": [
+        "System presents the diagnosis to the doctor.",
+        "Doctor accepts the diagnosis.",
+        "System records the decision."
+      ],
+      "expected": [
+        "Diagnosis accepted and recorded."
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Doctor Responsibility for Diagnosis",
+      "req_ids": [
+        "VIRTUA-3-16"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Consultation is active; Doctor is assigned."
+      ],
+      "inputs": {
+        "doctor": "Dr. Smith",
+        "diagnosis": "Hypertension"
+      },
+      "steps": [
+        "System assigns the consultation to the doctor.",
+        "Doctor conducts the diagnosis.",
+        "System records the diagnosis as final."
+      ],
+      "expected": [
+        "Doctor's diagnosis recorded as final."
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Boundary Test: Upload Maximum Reports",
+      "req_ids": [
+        "VIRTUA-3-12"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Patient is logged into the system; Consultation is active."
+      ],
+      "inputs": {
+        "files": [
+          "report1.pdf",
+          "report2.pdf",
+          "report3.pdf",
+          "report4.pdf",
+          "report5.pdf"
+        ]
+      },
+      "steps": [
+        "Patient attempts to upload 5 reports.",
+        "System checks file count and size."
+      ],
+      "expected": [
+        "All 5 reports uploaded successfully."
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Boundary Test: File Size Limit",
+      "req_ids": [
+        "VIRTUA-3-12"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Patient is logged into the system; Consultation is active."
+      ],
+      "inputs": {
+        "files": [
+          "large_report.pdf"
+        ]
+      },
+      "steps": [
+        "Patient attempts to upload a report of 1.1 MB.",
+        "System checks file size."
+      ],
+      "expected": [
+        "Report rejected due to exceeding 1 MB limit."
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Exception: Laboratory Unavailable",
+      "req_ids": [
+        "VIRTUA-3-9"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "Patient has a valid Pincode; Lab request is initiated."
+      ],
+      "inputs": {
+        "pincode": "123456",
+        "lab_request": "Blood Test"
+      },
+      "steps": [
+        "System receives a Lab request.",
+        "System attempts to route to Laboratory.",
+        "Laboratory is unavailable."
+      ],
+      "expected": [
+        "Request queued; Administrator notified."
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Exception: Email Delivery Failure",
+      "req_ids": [
+        "VIRTUA-3-11"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "No active internet connection; Patient has provided an email address."
+      ],
+      "inputs": {
+        "email": "patient@example.com",
+        "report": "Lab Report.pdf"
+      },
+      "steps": [
+        "System processes the request offline.",
+        "System attempts to email the report.",
+        "Email fails."
+      ],
+      "expected": [
+        "System attempts SMS notification; Administrator alerted."
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "**Use-Case: Route Lab Requests to Laboratory**\n- **Actor:** System (Automated Process)\n- **Goal:** Ensure all lab requests are routed to the Laboratory after matching the Patient Pincode.\n- **Preconditions:** Patient has a valid Pincode; Lab request is initiated.\n- **Primary Success Flow:**\n  1. System receives a Lab request.\n  2. System matches the Patient Pincode with the stored Pincode database.\n  3. System routes the request to the Laboratory.\n- **Alternative Flow:** If the Pincode does not match any record, the system logs an error and notifies the administrator.\n- **Exception Flow:** If the Laboratory is unavailable, the system queues the request and sends a notification to the patient.\n\n**Use-Case: Schedule and Conduct Home Collection of Specimen**\n- **Actor:** Lab Personnel\n- **Goal:** Schedule and perform home collection of specimen for patients.\n- **Preconditions:** Patient has an active appointment; Specimen type is approved.\n- **Primary Success Flow:**\n  1. Lab Personnel schedules an appointment via the system.\n  2. System confirms the appointment and sends a notification to the patient.\n  3. On the scheduled date, personnel arrives at the patient's location and collects the specimen.\n- **Alternative Flow:** If the patient is unavailable, personnel reschedules the appointment.\n- **Exception Flow:** If the patient declines the collection, the system marks the appointment as canceled and notifies the patient.\n\n**Use-Case: Offline Operations and Direct Report Delivery**\n- **Actor:** System\n- **Goal:** Ensure operations are offline and reports are sent directly to patients.\n- **Preconditions:** No active internet connection; Patient has provided an email address.\n- **Primary Success Flow:**\n  1. System processes the request offline.\n  2. Once processing is complete, system emails the report to the patient.\n- **Alternative Flow:** If email fails, system attempts to send via SMS.\n- **Exception Flow:** If both email and SMS fail, system logs the failure and alerts the administrator.\n\n**Use-Case: Upload Patient Reports**\n- **Actor:** Patient\n- **Goal:** Allow patients to upload up to 5 reports per consultation, each not exceeding 1 MB.\n- **Preconditions:** Patient is logged into the system; Consultation is active.\n- **Primary Success Flow:**\n  1. Patient selects the upload option within the consultation interface.\n  2. System prompts for report selection, allowing up to 5 files, each ≤ 1 MB.\n  3. System uploads the reports and confirms successful upload.\n- **Alternative Flow:** If the patient attempts to upload more than 5 files, system rejects additional uploads.\n- **Exception Flow:** If a file exceeds 1 MB, system rejects that file and prompts for a valid file.\n\n**Use-Case: Route Patient Consultation to Specialist Doctor**\n- **Actor:** System\n- **Goal:** Route each patient consultation request to a single doctor of the specified specialty.\n- **Preconditions:** Patient consultation request is initiated; Doctor availability is checked.\n- **Primary Success Flow:**\n  1. System receives the consultation request.\n  2. System matches the patient's condition to a specialist doctor.\n  3. System routes the request to the selected doctor.\n- **Alternative Flow:** If no specialist is available, system assigns the request to the next available doctor of a related specialty.\n- **Exception Flow:** If the doctor declines the request, system notifies the patient and reassigns the request.\n\n**Use-Case: Machine Learning Assistance for Disease Prediction**\n- **Actor:** System\n- **Goal:** Implement a machine learning algorithm to assist doctors in predicting diseases based on symptoms.\n- **Preconditions:** Patient symptoms are entered into the system; ML model is trained and validated.\n- **Primary Success Flow:**\n  1. System receives symptom data from the patient.\n  2. System runs the symptom data through the ML model.\n  3. System presents the predicted diseases to the doctor for review.\n- **Alternative Flow:** If the ML model confidence is below a threshold, system prompts the doctor for manual input.\n- **Exception Flow:** If the ML model fails to predict, system logs the failure and alerts the administrator.\n\n**Use-Case: Doctor Acceptance or Modification of Diagnosis**\n- **Actor:** Doctor\n- **Goal:** Allow doctors to accept or modify the diagnosis provided by the system or ML model.\n- **Preconditions:** Diagnosis is presented to the doctor; Doctor has access to the consultation.\n- **Primary Success Flow:**\n  1. System presents the diagnosis to the doctor.\n  2. Doctor reviews the diagnosis and either accepts it or modifies it.\n  3. System records the doctor's decision and updates the consultation record.\n- **Alternative Flow:** If the doctor modifies the diagnosis, system prompts for additional notes.\n- **Exception Flow:** If the doctor encounters an error while modifying, system provides a reset option and logs the incident.\n\n**Use-Case: Doctor Responsibility for Diagnosis**\n- **Actor:** Doctor\n- **Goal:** Ensure the responsibility for performing the diagnosis lies with the doctor.\n- **Preconditions:** Consultation is active; Doctor is assigned.\n- **Primary Success Flow:**\n  1. System assigns the consultation to the doctor.\n  2. Doctor conducts the diagnosis based on patient data and ML suggestions.\n  3. System records the doctor's diagnosis as final.\n- **Alternative Flow:** If the doctor requests additional tests, system facilitates the process.\n- **Exception Flow:** If the doctor is unavailable, system reassigns the consultation to the next available doctor.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Route Lab Requests to Laboratory",
+          "req_ids": [
+            "VIRTUA-3-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has a valid Pincode; Lab request is initiated."
+          ],
+          "inputs": {
+            "pincode": "123456",
+            "lab_request": "Blood Test"
+          },
+          "steps": [
+            "System receives a Lab request.",
+            "System matches the Patient Pincode.",
+            "System routes the request to the Laboratory."
+          ],
+          "expected": [
+            "Lab request successfully routed to Laboratory."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Schedule and Conduct Home Collection of Specimen",
+          "req_ids": [
+            "VIRTUA-3-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has an active appointment; Specimen type is approved."
+          ],
+          "inputs": {
+            "appointment_time": "2023-10-01T10:00",
+            "specimen_type": "Blood"
+          },
+          "steps": [
+            "Lab Personnel schedules an appointment.",
+            "System confirms the appointment.",
+            "Personnel collects the specimen."
+          ],
+          "expected": [
+            "Specimen collected successfully."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Offline Operations and Direct Report Delivery",
+          "req_ids": [
+            "VIRTUA-3-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No active internet connection; Patient has provided an email address."
+          ],
+          "inputs": {
+            "email": "patient@example.com",
+            "report": "Lab Report.pdf"
+          },
+          "steps": [
+            "System processes the request offline.",
+            "System emails the report to the patient."
+          ],
+          "expected": [
+            "Report successfully emailed to patient."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Upload Patient Reports",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is logged into the system; Consultation is active."
+          ],
+          "inputs": {
+            "files": [
+              "report1.pdf",
+              "report2.pdf",
+              "report3.pdf",
+              "report4.pdf",
+              "report5.pdf"
+            ]
+          },
+          "steps": [
+            "Patient selects the upload option.",
+            "System prompts for report selection.",
+            "System uploads the reports."
+          ],
+          "expected": [
+            "Reports successfully uploaded."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Route Patient Consultation to Specialist Doctor",
+          "req_ids": [
+            "VIRTUA-3-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient consultation request is initiated; Doctor availability is checked."
+          ],
+          "inputs": {
+            "patient_condition": "Diabetes",
+            "specialty": "Endocrinology"
+          },
+          "steps": [
+            "System receives the consultation request.",
+            "System matches the condition to a specialist doctor.",
+            "System routes the request to the doctor."
+          ],
+          "expected": [
+            "Consultation successfully routed to specialist doctor."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Machine Learning Assistance for Disease Prediction",
+          "req_ids": [
+            "VIRTUA-3-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient symptoms are entered into the system; ML model is trained and validated."
+          ],
+          "inputs": {
+            "symptoms": [
+              "Fever",
+              "Cough",
+              "Fatigue"
+            ]
+          },
+          "steps": [
+            "System receives symptom data.",
+            "System runs data through the ML model.",
+            "System presents predicted diseases to the doctor."
+          ],
+          "expected": [
+            "Predicted diseases displayed to the doctor."
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Doctor Acceptance or Modification of Diagnosis",
+          "req_ids": [
+            "VIRTUA-3-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Diagnosis is presented to the doctor; Doctor has access to the consultation."
+          ],
+          "inputs": {
+            "diagnosis": "Influenza",
+            "doctor_decision": "Accept"
+          },
+          "steps": [
+            "System presents the diagnosis to the doctor.",
+            "Doctor accepts the diagnosis.",
+            "System records the decision."
+          ],
+          "expected": [
+            "Diagnosis accepted and recorded."
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Doctor Responsibility for Diagnosis",
+          "req_ids": [
+            "VIRTUA-3-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation is active; Doctor is assigned."
+          ],
+          "inputs": {
+            "doctor": "Dr. Smith",
+            "diagnosis": "Hypertension"
+          },
+          "steps": [
+            "System assigns the consultation to the doctor.",
+            "Doctor conducts the diagnosis.",
+            "System records the diagnosis as final."
+          ],
+          "expected": [
+            "Doctor's diagnosis recorded as final."
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Boundary Test: Upload Maximum Reports",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Patient is logged into the system; Consultation is active."
+          ],
+          "inputs": {
+            "files": [
+              "report1.pdf",
+              "report2.pdf",
+              "report3.pdf",
+              "report4.pdf",
+              "report5.pdf"
+            ]
+          },
+          "steps": [
+            "Patient attempts to upload 5 reports.",
+            "System checks file count and size."
+          ],
+          "expected": [
+            "All 5 reports uploaded successfully."
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Boundary Test: File Size Limit",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Patient is logged into the system; Consultation is active."
+          ],
+          "inputs": {
+            "files": [
+              "large_report.pdf"
+            ]
+          },
+          "steps": [
+            "Patient attempts to upload a report of 1.1 MB.",
+            "System checks file size."
+          ],
+          "expected": [
+            "Report rejected due to exceeding 1 MB limit."
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Exception: Laboratory Unavailable",
+          "req_ids": [
+            "VIRTUA-3-9"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient has a valid Pincode; Lab request is initiated."
+          ],
+          "inputs": {
+            "pincode": "123456",
+            "lab_request": "Blood Test"
+          },
+          "steps": [
+            "System receives a Lab request.",
+            "System attempts to route to Laboratory.",
+            "Laboratory is unavailable."
+          ],
+          "expected": [
+            "Request queued; Administrator notified."
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Exception: Email Delivery Failure",
+          "req_ids": [
+            "VIRTUA-3-11"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "No active internet connection; Patient has provided an email address."
+          ],
+          "inputs": {
+            "email": "patient@example.com",
+            "report": "Lab Report.pdf"
+          },
+          "steps": [
+            "System processes the request offline.",
+            "System attempts to email the report.",
+            "Email fails."
+          ],
+          "expected": [
+            "System attempts SMS notification; Administrator alerted."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.8333,
+        "representation_score": 1.0,
+        "sfv_score": 0.9167,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.92). Fix these problems and output the full corrected suite:\n- test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Case: Route Lab Requests to Laboratory**\n- **Actor:** System (Automated Process)\n- **Goal:** Ensure all lab requests are routed to the Laboratory after matching the Patient Pincode.\n- **Preconditions:** Patient Pincode is valid and registered.\n- **Main Flow:**\n  1. System receives a lab request.\n  2. System matches the request with the Patient Pincode.\n  3. System routes the request to the Laboratory.\n- **Alternative Flow:** If the Pincode does not match any registered patient, the system rejects the request.\n- **Exception Flow:** If the Laboratory is unavailable, the system queues the request for later processing.\n\n**Use-Case: Schedule and Conduct Home Collection of Specimen**\n- **Actor:** Lab Personnel\n- **Goal:** Schedule appointments and perform home collection of specimen.\n- **Preconditions:** Patient has a valid appointment slot.\n- **Main Flow:**\n  1. Lab Personnel schedules an appointment via the system.\n  2. System confirms the appointment.\n  3. Lab Personnel visits the patient's location for specimen collection.\n- **Alternative Flow:** If the patient cancels the appointment, the system updates the schedule.\n- **Exception Flow:** If the patient is unreachable, the system sends a reminder and reschedules.\n\n**Use-Case: Email or Send Reports to Patients**\n- **Actor:** System (Automated Process)\n- **Goal:** Deliver lab reports to patients via email or direct send.\n- **Preconditions:** Report is finalized and patient contact details are available.\n- **Main Flow:**\n  1. System generates the report.\n  2. System sends the report to the patient's email or preferred communication channel.\n- **Alternative Flow:** If email fails, the system attempts an SMS or phone call.\n- **Exception Flow:** If the patient's contact details are missing, the system prompts for update.\n\n**Use-Case: Upload Patient Reports**\n- **Actor:** Patient\n- **Goal:** Upload up to 5 reports (each up to 1 MB) per consultation.\n- **Preconditions:** Patient is logged into the system and within a consultation session.\n- **Main Flow:**\n  1. Patient selects the upload option within the consultation interface.\n  2. System allows selection of up to 5 files, each ≤ 1 MB.\n  3. System confirms successful upload.\n- **Alternative Flow:** If fewer than 5 reports are uploaded, the system completes the upload without error.\n- **Exception Flow:** If a file exceeds 1 MB, the system rejects the upload and prompts for a smaller file.\n\n**Use-Case: Route Consultation Request to Doctor**\n- **Actor:** System (Automated Process)\n- **Goal:** Direct each patient consultation request to a doctor of the specified specialty.\n- **Preconditions:** Doctor is available and registered for the specialty.\n- **Main Flow:**\n  1. System receives a consultation request.\n  2. System matches the request with the appropriate doctor based on specialty.\n  3. System routes the request to the selected doctor.\n- **Alternative Flow:** If no doctor is available, the system schedules the request for the next available slot.\n- **Exception Flow:** If the specialty is not registered, the system returns an error to the requester.\n\n**Use-Case: Assist Doctors with Disease Prediction**\n- **Actor:** System (Machine Learning Algorithm)\n- **Goal:** Predict diseases based on symptoms to assist doctors.\n- **Preconditions:** Symptom data is entered by the doctor.\n- **Main Flow:**\n  1. Doctor inputs symptoms into the consultation interface.\n  2. System processes the symptoms through the ML algorithm.\n  3. System presents disease predictions to the doctor.\n- **Alternative Flow:** If the algorithm predicts multiple conditions, the system lists them for doctor review.\n- **Exception Flow:** If the algorithm fails to predict (e.g., insufficient data), the system prompts the doctor for manual input.\n\n**Use-Case: Doctor Accept or Modify Diagnosis**\n- **Actor:** Doctor\n- **Goal:** Accept or modify the diagnosis provided by the system or ML algorithm.\n- **Preconditions:** Diagnosis is presented by the system.\n- **Main Flow:**\n  1. Doctor reviews the diagnosis.\n  2. Doctor accepts the diagnosis or modifies it as needed.\n  3. System records the doctor's decision.\n- **Alternative Flow:** If the doctor modifies the diagnosis, the system updates the consultation record.\n- **Exception Flow:** If the system fails to present a diagnosis, the doctor must manually enter one.\n\n**Use-Case: Doctor Performs Diagnosis**\n- **Actor:** Doctor\n- **Goal:** Take responsibility for performing the diagnosis.\n- **Preconditions:** Patient consultation data is available.\n- **Main Flow:**\n  1. Doctor accesses the consultation details.\n  2. Doctor analyzes symptoms and test results.\n  3. Doctor provides a diagnosis.\n- **Alternative Flow:** If additional tests are needed, the doctor orders them within the system.\n- **Exception Flow:** If the consultation data is incomplete, the doctor must request additional information from the patient.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Route Lab Requests to Laboratory",
+          "req_ids": [
+            "VIRTUA-3-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Pincode is valid"
+          ],
+          "inputs": {
+            "pincode": "123456"
+          },
+          "steps": [
+            "Receive lab request",
+            "Match request with Pincode",
+            "Route to Laboratory"
+          ],
+          "expected": [
+            "Request successfully routed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Schedule and Conduct Home Collection of Specimen",
+          "req_ids": [
+            "VIRTUA-3-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Valid appointment slot"
+          ],
+          "inputs": {
+            "appointment_id": "AP123"
+          },
+          "steps": [
+            "Schedule appointment",
+            "Confirm appointment",
+            "Conduct home collection"
+          ],
+          "expected": [
+            "Specimen collected successfully"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Email or Send Reports to Patients",
+          "req_ids": [
+            "VIRTUA-3-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Report finalized",
+            "Patient contact details available"
+          ],
+          "inputs": {
+            "patient_email": "patient@example.com"
+          },
+          "steps": [
+            "Generate report",
+            "Send report via email"
+          ],
+          "expected": [
+            "Report delivered to patient"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Upload Patient Reports",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient logged in",
+            "Consultation session active"
+          ],
+          "inputs": {
+            "file_paths": [
+              "report1.pdf",
+              "report2.pdf"
+            ]
+          },
+          "steps": [
+            "Select upload option",
+            "Choose files (≤5, ≤1 MB each)",
+            "Confirm upload"
+          ],
+          "expected": [
+            "Files uploaded successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Route Consultation Request to Doctor",
+          "req_ids": [
+            "VIRTUA-3-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor available for specialty"
+          ],
+          "inputs": {
+            "specialty": "Cardiology"
+          },
+          "steps": [
+            "Receive consultation request",
+            "Match with doctor",
+            "Route to doctor"
+          ],
+          "expected": [
+            "Request routed to Cardiology doctor"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Assist Doctors with Disease Prediction",
+          "req_ids": [
+            "VIRTUA-3-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom data entered"
+          ],
+          "inputs": {
+            "symptoms": [
+              "fever",
+              "cough"
+            ]
+          },
+          "steps": [
+            "Input symptoms",
+            "Process through ML algorithm",
+            "Present predictions"
+          ],
+          "expected": [
+            "Disease predictions displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Doctor Accept or Modify Diagnosis",
+          "req_ids": [
+            "VIRTUA-3-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Diagnosis presented"
+          ],
+          "inputs": {
+            "diagnosis": "Flu"
+          },
+          "steps": [
+            "Review diagnosis",
+            "Accept or modify",
+            "Record decision"
+          ],
+          "expected": [
+            "Diagnosis accepted or modified"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Doctor Performs Diagnosis",
+          "req_ids": [
+            "VIRTUA-3-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation data available"
+          ],
+          "inputs": {
+            "symptoms": [
+              "headache",
+              "fatigue"
+            ]
+          },
+          "steps": [
+            "Access consultation details",
+            "Analyze data",
+            "Provide diagnosis"
+          ],
+          "expected": [
+            "Diagnosis provided"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Exception: Invalid Pincode Routing",
+          "req_ids": [
+            "VIRTUA-3-9"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Invalid Pincode"
+          ],
+          "inputs": {
+            "pincode": "999999"
+          },
+          "steps": [
+            "Receive lab request",
+            "Attempt Pincode match",
+            "Fail match"
+          ],
+          "expected": [
+            "Request rejected"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Exception: Laboratory Unavailable",
+          "req_ids": [
+            "VIRTUA-3-9"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Laboratory offline"
+          ],
+          "inputs": {},
+          "steps": [
+            "Route request",
+            "Laboratory unavailable"
+          ],
+          "expected": [
+            "Request queued"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Exception: Email Delivery Failure",
+          "req_ids": [
+            "VIRTUA-3-11"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Email system down"
+          ],
+          "inputs": {
+            "patient_email": "patient@example.com"
+          },
+          "steps": [
+            "Generate report",
+            "Attempt email send",
+            "Email fails"
+          ],
+          "expected": [
+            "System retries or notifies admin"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Exception: File Size Exceeds Limit",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "File > 1 MB"
+          ],
+          "inputs": {
+            "file_path": "large_report.pdf"
+          },
+          "steps": [
+            "Select upload option",
+            "Choose file (>1 MB)",
+            "Attempt upload"
+          ],
+          "expected": [
+            "Upload rejected, prompt for smaller file"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.6667,
+        "representation_score": 1.0,
+        "sfv_score": 0.8333,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.83). Fix these problems and output the full corrected suite:\n- test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories for Virtual Health Service (Unit U20_3)**\n\n---\n\n### Use-Case: Route Lab Requests to Laboratory\n**Primary Actor:** System  \n**Goal:** Ensure all lab requests are directed to the laboratory after verifying the patient's pincode.\n\n**Preconditions:**  \n- Patient has a valid pincode.  \n- Lab request is initiated.\n\n**Main Success Scenario:**  \n1. Patient submits a lab request with a valid pincode.  \n2. System matches the pincode to the patient's record.  \n3. System routes the request to the laboratory.\n\n**Alternative Scenarios:**  \n- **A1:** Pincode does not match any patient record.  \n  1. System returns an error indicating invalid pincode.  \n  2. Request is not routed.  \n- **A2:** Pincode matches but the patient is not registered for lab services.  \n  1. System returns an error indicating service restriction.  \n  2. Request is not routed.\n\n**Exception Scenarios:**  \n- **E1:** System fails to match pincode due to database error.  \n  1. System logs the error.  \n  2. Request is queued for manual review.  \n\n---\n\n### Use-Case: Schedule and Conduct Home Collection\n**Primary Actor:** Lab Personnel  \n**Goal:** Schedule appointments and perform home specimen collection for patients.\n\n**Preconditions:**  \n- Patient has an active lab request.  \n- Lab personnel are logged in.\n\n**Main Success Scenario:**  \n1. Lab personnel view the patient's lab request.  \n2. Personnel schedule a home collection appointment.  \n3. Home collection is performed, and the specimen is collected.\n\n**Alternative Scenarios:**  \n- **A1:** Patient declines home collection.  \n  1. Personnel offer alternative collection methods.  \n  2. Request status is updated accordingly.  \n- **A2:** Home collection is delayed due to unforeseen circumstances.  \n  1. Personnel notify the patient of the delay.  \n  2. Request status is updated with new timing.\n\n**Exception Scenarios:**  \n- **E1:** Home collection fails due to patient unavailability.  \n  1. Personnel mark the request as failed.  \n  2. System sends a notification to the patient and doctor.  \n\n---\n\n### Use-Case: Email or Send Reports to Patients\n**Primary Actor:** System  \n**Goal:** Directly email or send reports to patients after lab processing.\n\n**Preconditions:**  \n- Lab results are processed and available.  \n- Patient has provided a valid email address.\n\n**Main Success Scenario:**  \n1. System retrieves processed lab reports.  \n2. System sends the reports to the patient's email address.  \n3. Patient receives the reports.\n\n**Alternative Scenarios:**  \n- **A1:** Patient email address is invalid.  \n  1. System logs the error.  \n  2. Reports are sent via alternative contact method.  \n- **A2:** Email service is temporarily unavailable.  \n  1. System queues the report for retry.  \n  2. Notification is sent to the patient.\n\n**Exception Scenarios:**  \n- **E1:** System fails to send reports due to server error.  \n  1. System retries sending after a delay.  \n  2. If still unsuccessful, manual intervention is required.  \n\n---\n\n### Use-Case: Upload Patient Reports\n**Primary Actor:** Patient  \n**Goal:** Allow patients to upload up to 5 reports per consultation, each not exceeding 1 MB.\n\n**Preconditions:**  \n- Patient is logged into the system.  \n- A consultation session is active.\n\n**Main Success Scenario:**  \n1. Patient selects the upload option within the consultation interface.  \n2. Patient uploads up to 5 reports, each ≤ 1 MB.  \n3. System confirms successful upload.\n\n**Alternative Scenarios:**  \n- **A1:** Patient attempts to upload more than 5 reports.  \n  1. System displays an error message.  \n  2. Only 5 reports are allowed.  \n- **A2:** Patient uploads a report exceeding 1 MB.  \n  1. System rejects the file.  \n  2. Patient is prompted to compress or reduce file size.\n\n**Exception Scenarios:**  \n- **E1:** System fails to process an upload due to file corruption.  \n  1. System logs the error.  \n  2. Patient is notified and prompted to retry.  \n\n---\n\n### Use-Case: Route Patient Consultation to Doctor\n**Primary Actor:** System  \n**Goal:** Direct each patient consultation request to a single doctor of the specified specialty.\n\n**Preconditions:**  \n- Patient consultation request is initiated.  \n- Doctor availability is checked.\n\n**Main Success Scenario:**  \n1. System matches the consultation request to a doctor of the required specialty.  \n2. System routes the request to the selected doctor.  \n3. Doctor receives the consultation request.\n\n**Alternative Scenarios:**  \n- **A1:** No doctor available for the specified specialty.  \n  1. System assigns the request to the next available doctor with a related specialty.  \n  2. Notification is sent to the patient.  \n- **A2:** Doctor declines the consultation.  \n  1. System assigns the request to another available doctor.  \n  2. Patient is informed of the change.\n\n**Exception Scenarios:**  \n- **E1:** System fails to route due to internal error.  \n  1. System logs the error.  \n  2. Request is queued for manual review.  \n\n---\n\n### Use-Case: Assist Doctors with Disease Prediction\n**Primary Actor:** Machine Learning Algorithm  \n**Goal:** Provide doctors with disease predictions based on patient symptoms using a machine learning model.\n\n**Preconditions:**  \n- Patient symptoms are entered into the system.  \n- Machine learning model is trained and available.\n\n**Main Success Scenario:**  \n1. System receives patient symptoms.  \n2. Machine learning algorithm processes the symptoms.  \n3. System presents disease predictions to the doctor.  \n4. Doctor reviews and accepts or modifies the diagnosis.\n\n**Alternative Scenarios:**  \n- **A1:** Predictions are below confidence threshold.  \n  1. System prompts doctor for manual input.  \n  2. Predictions are not automatically accepted.  \n- **A2:** Doctor modifies predictions significantly.  \n  1. System records the doctor's modifications.  \n  2. Final diagnosis is updated accordingly.\n\n**Exception Scenarios:**  \n- **E1:** Algorithm fails to provide predictions due to data error.  \n  1. System logs the error.  \n  2. Doctor is prompted to enter symptoms manually.  \n\n---\n\n### Use-Case: Doctor Accepts or Modifies Diagnosis\n**Primary Actor:** Doctor  \n**Goal:** Enable doctors to accept machine learning predictions or modify them based on their expertise.\n\n**Preconditions:**  \n- Diagnosis predictions are presented to the doctor.  \n- Doctor is logged into the system.\n\n**Main Success Scenario:**  \n1. Doctor reviews the machine learning predictions.  \n2. Doctor accepts the diagnosis as is.  \n3. System records the accepted diagnosis.  \n4. Patient receives the final diagnosis.\n\n**Alternative Scenarios:**  \n- **A1:** Doctor modifies the diagnosis.  \n  1. System records the modification.  \n  2. Final diagnosis reflects the doctor's input.  \n- **A2:** Doctor requests additional tests.  \n  1. System updates the consultation request.  \n  2. Patient is informed of the additional steps.\n\n**Exception Scenarios:**  \n- **E1:** System fails to record doctor's acceptance.  \n  1. System logs the error.  \n  2. Manual confirmation is required from the doctor.  \n\n---\n\n### Use-Case: Doctor Performs Diagnosis\n**Primary Actor:** Doctor  \n**Goal:** Ensure the responsibility of performing the final diagnosis rests with the doctor.\n\n**Preconditions:**  \n- Consultation request is active.  \n- Doctor is assigned to the consultation.\n\n**Main Success Scenario:**  \n1. Doctor reviews all available data (symptoms, lab reports, predictions).  \n2. Doctor performs the final diagnosis.  \n3. System records the doctor's diagnosis.  \n4. Patient receives the final diagnosis.\n\n**Alternative Scenarios:**  \n- **A1:** Doctor requests further consultation with a specialist.  \n  1. System routes the request to the specialist.  \n  2. Patient is informed of the additional consultation.  \n- **A2:** Doctor identifies a critical condition requiring immediate action.  \n  1. System triggers an emergency protocol.  \n  2. Patient is notified of urgent care.\n\n**Exception Scenarios:**  \n- **E1:** System fails to log the doctor's diagnosis.  \n  1. System logs the error.  \n  2. Doctor must re-enter the diagnosis manually.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Route Lab Requests to Laboratory",
+          "req_ids": [
+            "VIRTUA-3-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has a valid pincode",
+            "Lab request is initiated"
+          ],
+          "inputs": {
+            "pincode": "123456"
+          },
+          "steps": [
+            "System matches pincode to patient record",
+            "System routes request to laboratory"
+          ],
+          "expected": [
+            "Request successfully routed to laboratory"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Route Lab Requests to Laboratory - Invalid Pincode",
+          "req_ids": [
+            "VIRTUA-3-9"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient has an invalid pincode",
+            "Lab request is initiated"
+          ],
+          "inputs": {
+            "pincode": "999999"
+          },
+          "steps": [
+            "System attempts to match pincode",
+            "System returns error"
+          ],
+          "expected": [
+            "Error message indicating invalid pincode"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Schedule and Conduct Home Collection",
+          "req_ids": [
+            "VIRTUA-3-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has an active lab request",
+            "Lab personnel are logged in"
+          ],
+          "inputs": {
+            "patient_id": "P001",
+            "time": "10:00 AM"
+          },
+          "steps": [
+            "Lab personnel view lab request",
+            "Schedule home collection",
+            "Perform home collection"
+          ],
+          "expected": [
+            "Home collection scheduled and performed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Schedule and Conduct Home Collection - Patient Declines",
+          "req_ids": [
+            "VIRTUA-3-10"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Patient has an active lab request",
+            "Lab personnel are logged in"
+          ],
+          "inputs": {
+            "patient_id": "P001",
+            "decline": true
+          },
+          "steps": [
+            "Lab personnel offer alternative methods",
+            "Update request status"
+          ],
+          "expected": [
+            "Alternative collection method selected"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Email or Send Reports to Patients",
+          "req_ids": [
+            "VIRTUA-3-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab results are processed",
+            "Patient has a valid email"
+          ],
+          "inputs": {
+            "email": "patient@example.com",
+            "reports": [
+              "Report1.pdf",
+              "Report2.pdf"
+            ]
+          },
+          "steps": [
+            "System retrieves processed reports",
+            "Send reports to email",
+            "Confirm delivery"
+          ],
+          "expected": [
+            "Reports successfully emailed to patient"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Email or Send Reports to Patients - Invalid Email",
+          "req_ids": [
+            "VIRTUA-3-11"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Lab results are processed",
+            "Patient has an invalid email"
+          ],
+          "inputs": {
+            "email": "invalid-email",
+            "reports": [
+              "Report1.pdf"
+            ]
+          },
+          "steps": [
+            "System attempts to send reports",
+            "System logs error"
+          ],
+          "expected": [
+            "Error logged, reports sent via alternative method"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Upload Patient Reports",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is logged in",
+            "Consultation session is active"
+          ],
+          "inputs": {
+            "reports": [
+              "Report1.pdf",
+              "Report2.pdf",
+              "Report3.pdf",
+              "Report4.pdf",
+              "Report5.pdf"
+            ]
+          },
+          "steps": [
+            "Patient selects upload option",
+            "Upload up to 5 reports each ≤ 1 MB",
+            "System confirms upload"
+          ],
+          "expected": [
+            "Reports successfully uploaded"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Upload Patient Reports - Exceeds Limit",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient is logged in",
+            "Consultation session is active"
+          ],
+          "inputs": {
+            "reports": [
+              "Report1.pdf",
+              "Report2.pdf",
+              "Report3.pdf",
+              "Report4.pdf",
+              "Report5.pdf",
+              "Report6.pdf"
+            ]
+          },
+          "steps": [
+            "Patient attempts to upload 6 reports",
+            "System displays error message"
+          ],
+          "expected": [
+            "Error message indicating limit of 5 reports"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Route Patient Consultation to Doctor",
+          "req_ids": [
+            "VIRTUA-3-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation request is initiated",
+            "Doctor availability is checked"
+          ],
+          "inputs": {
+            "patient_id": "P001",
+            "specialty": "Cardiology"
+          },
+          "steps": [
+            "System matches request to doctor of specified specialty",
+            "Route request to doctor",
+            "Doctor receives consultation"
+          ],
+          "expected": [
+            "Consultation successfully routed to doctor"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Route Patient Consultation to Doctor - No Doctor Available",
+          "req_ids": [
+            "VIRTUA-3-13"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Consultation request is initiated",
+            "No doctor available for specified specialty"
+          ],
+          "inputs": {
+            "patient_id": "P001",
+            "specialty": "Neurology"
+          },
+          "steps": [
+            "System assigns request to next available doctor",
+            "Notify patient of change"
+          ],
+          "expected": [
+            "Request routed to available doctor, patient notified"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Assist Doctors with Disease Prediction",
+          "req_ids": [
+            "VIRTUA-3-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient symptoms are entered",
+            "Machine learning model is trained"
+          ],
+          "inputs": {
+            "symptoms": [
+              "fever",
+              "cough"
+            ],
+            "patient_id": "P001"
+          },
+          "steps": [
+            "System processes symptoms",
+            "Machine learning algorithm predicts diseases",
+            "Present predictions to doctor"
+          ],
+          "expected": [
+            "Disease predictions accurately presented to doctor"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Assist Doctors with Disease Prediction - Low Confidence",
+          "req_ids": [
+            "VIRTUA-3-14"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Patient symptoms are entered",
+            "Machine learning model has low confidence"
+          ],
+          "inputs": {
+            "symptoms": [
+              "headache"
+            ],
+            "patient_id": "P001"
+          },
+          "steps": [
+            "System presents low-confidence predictions",
+            "Prompt doctor for manual input"
+          ],
+          "expected": [
+            "Doctor prompted to enter symptoms manually"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Doctor Accepts or Modifies Diagnosis",
+          "req_ids": [
+            "VIRTUA-3-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Diagnosis predictions are presented",
+            "Doctor is logged in"
+          ],
+          "inputs": {
+            "prediction": "flu",
+            "doctor_decision": "accept"
+          },
+          "steps": [
+            "Doctor reviews predictions",
+            "Accepts diagnosis",
+            "System records acceptance"
+          ],
+          "expected": [
+            "Diagnosis accepted and recorded"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Doctor Accepts or Modifies Diagnosis - Modification",
+          "req_ids": [
+            "VIRTUA-3-15"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Diagnosis predictions are presented",
+            "Doctor is logged in"
+          ],
+          "inputs": {
+            "prediction": "flu",
+            "doctor_decision": "modify",
+            "new_diagnosis": "influenza"
+          },
+          "steps": [
+            "Doctor modifies diagnosis",
+            "System records modification",
+            "Final diagnosis updated"
+          ],
+          "expected": [
+            "Modified diagnosis recorded and communicated to patient"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Doctor Performs Diagnosis",
+          "req_ids": [
+            "VIRTUA-3-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation request is active",
+            "Doctor is assigned"
+          ],
+          "inputs": {
+            "patient_id": "P001",
+            "diagnosis": "bronchitis"
+          },
+          "steps": [
+            "Doctor reviews data",
+            "Performs final diagnosis",
+            "System records diagnosis"
+          ],
+          "expected": [
+            "Final diagnosis recorded and communicated to patient"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Doctor Performs Diagnosis - System Failure",
+          "req_ids": [
+            "VIRTUA-3-16"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Consultation request is active",
+            "System fails to log diagnosis"
+          ],
+          "inputs": {
+            "patient_id": "P001",
+            "diagnosis": "bronchitis"
+          },
+          "steps": [
+            "Doctor attempts to record diagnosis",
+            "System logs error",
+            "Manual confirmation required"
+          ],
+          "expected": [
+            "Error logged, doctor must re-enter diagnosis manually"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.6875,
+        "representation_score": 1.0,
+        "sfv_score": 0.8438,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #4 (TC-004): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #12 (TC-012): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #14 (TC-014): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #16 (TC-016): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.84). Fix these problems and output the full corrected suite:\n- test case #4 (TC-004): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #12 (TC-012): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #14 (TC-014): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #16 (TC-016): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories for Virtual Health Service (Unit U20_3)**\n\n---\n\n### Use-Case: Route Lab Requests to Laboratory\n**Primary Actor:** System  \n**Goal:** Ensure all lab requests are directed to the laboratory after validating the patient's pincode.\n\n**Preconditions:**  \n- Patient has a registered pincode.  \n- Lab request is initiated.\n\n**Main Success Scenario (Positive):**  \n1. Patient submits a lab request with a valid pincode.  \n2. System matches the pincode to the corresponding laboratory region.  \n3. Request is routed to the appropriate laboratory.  \n\n**Alternative Scenarios:**  \n- **Invalid Pincode (Boundary):**  \n  1. Patient submits a lab request with an invalid or missing pincode.  \n  2. System returns an error indicating pincode validation failure.  \n\n**Exception Scenarios:**  \n- **System Unavailability (Exception):**  \n  1. Laboratory system is down.  \n  2. System queues the request and notifies the patient of delayed processing.  \n\n---\n\n### Use-Case: Schedule and Conduct Home Specimen Collection\n**Primary Actor:** Lab Personnel  \n**Goal:** Schedule appointments and perform home collection of specimens for patients.\n\n**Preconditions:**  \n- Patient has an active consultation.  \n- Specimen type is approved for home collection.\n\n**Main Success Scenario (Positive):**  \n1. Lab personnel schedule a home collection appointment via the system.  \n2. A collection agent visits the patient at the scheduled time.  \n3. Specimen is collected and logged in the system.  \n\n**Alternative Scenarios:**  \n- **Patient No-Show (Boundary):**  \n  1. Patient does not appear at the scheduled time.  \n  2. System marks the appointment as missed and allows rescheduling.  \n\n**Exception Scenarios:**  \n- **Agent Unavailability (Exception):**  \n  1. Collection agent is unavailable at the scheduled time.  \n  2. System automatically reassigns the appointment to the next available agent.  \n\n---\n\n### Use-Case: Direct Email or Send Reports to Patients\n**Primary Actor:** System  \n**Goal:** Email or send digital reports directly to patients post-laboratory processing.\n\n**Preconditions:**  \n- Laboratory processing is complete.  \n- Patient has provided a valid email address.\n\n**Main Success Scenario (Positive):**  \n1. System retrieves the processed lab report.  \n2. Report is emailed to the patient's registered email address.  \n\n**Alternative Scenarios:**  \n- **Email Delivery Failure (Boundary):**  \n  1. Email service is temporarily unavailable.  \n  2. System retries delivery after a configurable interval or notifies the patient via SMS.  \n\n**Exception Scenarios:**  \n- **Invalid Email Address (Exception):**  \n  1. Patient provides an invalid email address.  \n  2. System logs an error and prompts the patient to update their contact information.  \n\n---\n\n### Use-Case: Upload Patient Reports per Consultation\n**Primary Actor:** Patient  \n**Goal:** Allow patients to upload up to 5 reports, each not exceeding 1 MB, per consultation.\n\n**Preconditions:**  \n- Patient is logged into the system.  \n- Consultation session is active.\n\n**Main Success Scenario (Positive):**  \n1. Patient selects the upload option within the consultation interface.  \n2. Patient uploads up to 5 reports, each ≤ 1 MB.  \n3. System confirms successful upload and associates reports with the consultation.  \n\n**Alternative Scenarios:**  \n- **Exceeding Report Limit (Boundary):**  \n  1. Patient attempts to upload a 6th report.  \n  2. System rejects the additional upload and informs the patient of the limit.  \n\n**Exception Scenarios:**  \n- **File Size Exceeds Limit (Exception):**  \n  1. Patient uploads a report larger than 1 MB.  \n  2. System rejects the file and prompts the patient to compress or reduce the file size.  \n\n---\n\n### Use-Case: Route Patient Consultation to Specialist Doctor\n**Primary Actor:** System  \n**Goal:** Direct each patient consultation request to a single doctor specializing in the relevant field.\n\n**Preconditions:**  \n- Consultation request is initiated.  \n- Patient's condition requires a specialist.\n\n**Main Success Scenario (Positive):**  \n1. System analyzes the consultation request based on symptoms and patient history.  \n2. Appropriate specialist doctor is identified.  \n3. Consultation is routed to the specialist for review.  \n\n**Alternative Scenarios:**  \n- **Multiple Specialists Available (Boundary):**  \n  1. More than one specialist matches the criteria.  \n  2. System selects the specialist with the highest availability or based on predefined rules.  \n\n**Exception Scenarios:**  \n- **Specialist Unavailable (Exception):**  \n  1. Identified specialist is offline.  \n  2. System routes the request to the next available specialist or schedules an appointment.  \n\n---\n\n### Use-Case: Machine Learning Assistance for Disease Prediction\n**Primary Actor:** System  \n**Goal:** Implement a machine learning algorithm to assist doctors in predicting diseases based on patient symptoms.\n\n**Preconditions:**  \n- Patient symptoms are entered into the system.  \n- Machine learning model is trained and deployed.\n\n**Main Success Scenario (Positive):**  \n1. System receives symptom data from the patient.  \n2. Machine learning algorithm processes the data and predicts potential diseases.  \n3. Predictions are presented to the doctor for review.  \n\n**Alternative Scenarios:**  \n- **Symptom Ambiguity (Boundary):**  \n  1. Symptoms are ambiguous or non-specific.  \n  2. System provides a range of possible diagnoses with confidence scores.  \n\n**Exception Scenarios:**  \n- **Model Failure (Exception):**  \n  1. Machine learning model encounters an error during processing.  \n  2. System logs the error and defaults to a manual review process by the doctor.  \n\n---\n\n### Use-Case: Doctor Acceptance or Modification of Diagnosis\n**Primary Actor:** Doctor  \n**Goal:** Enable doctors to accept or modify diagnoses provided by the system or other specialists.\n\n**Preconditions:**  \n- Diagnosis recommendation is available.  \n- Doctor is logged into the system.\n\n**Main Success Scenario (Positive):**  \n1. Doctor reviews the diagnosis recommendation.  \n2. Doctor accepts the diagnosis or modifies it based on additional insights.  \n3. System updates the consultation record with the doctor's final diagnosis.  \n\n**Alternative Scenarios:**  \n- **Partial Acceptance (Boundary):**  \n  1. Doctor accepts part of the recommendation but modifies another aspect.  \n  2. System records the partial acceptance and notes the modifications.  \n\n**Exception Scenarios:**  \n- **Doctor Absence (Exception):**  \n  1. Doctor is unavailable when the recommendation is presented.  \n  2. System delays acceptance until the doctor returns or assigns the task to a backup doctor.  \n\n---\n\n### Use-Case: Doctor Responsibility for Diagnosis\n**Primary Actor:** Doctor  \n**Goal:** Ensure the responsibility for performing the diagnosis lies solely with the doctor.\n\n**Preconditions:**  \n- Consultation request is initiated.  \n- Doctor is assigned to the consultation.\n\n**Main Success Scenario (Positive):**  \n1. Doctor reviews all available patient data.  \n2. Doctor performs the diagnosis independently.  \n3. System records the doctor's diagnosis as the final decision.  \n\n**Alternative Scenarios:**  \n- **Automated Suggestion (Boundary):**  \n  1. System provides an automated diagnosis suggestion.  \n  2. Doctor can choose to accept or override the suggestion.  \n\n**Exception Scenarios:**  \n- **Doctor Conflict (Exception):**  \n  1. Multiple doctors are assigned to the same consultation.  \n  2. System escalates the conflict to a senior manager for resolution.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Route Lab Requests to Laboratory",
+          "req_ids": [
+            "VIRTUA-3-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has a registered pincode."
+          ],
+          "inputs": {
+            "pincode": "123456"
+          },
+          "steps": [
+            "System matches pincode to laboratory region.",
+            "Request is routed to the laboratory."
+          ],
+          "expected": [
+            "Request successfully routed to the correct laboratory."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Invalid Pincode Boundary",
+          "req_ids": [
+            "VIRTUA-3-9"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Patient attempts to submit a lab request with an invalid pincode."
+          ],
+          "inputs": {
+            "pincode": "999999"
+          },
+          "steps": [
+            "System validates pincode.",
+            "System returns pincode validation error."
+          ],
+          "expected": [
+            "Error message indicating invalid pincode."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Schedule and Conduct Home Specimen Collection",
+          "req_ids": [
+            "VIRTUA-3-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has an active consultation."
+          ],
+          "inputs": {
+            "appointment_time": "2023-10-01T10:00:00Z"
+          },
+          "steps": [
+            "Lab personnel schedule home collection.",
+            "Collection agent visits patient.",
+            "Specimen is collected and logged."
+          ],
+          "expected": [
+            "Specimen logged successfully."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Patient No-Show Boundary",
+          "req_ids": [
+            "VIRTUA-3-10"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Patient does not appear at scheduled time."
+          ],
+          "inputs": {},
+          "steps": [
+            "System marks appointment as missed.",
+            "Rescheduling option is presented."
+          ],
+          "expected": [
+            "Appointment marked missed and rescheduling option shown."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Collection Agent Unavailability Exception",
+          "req_ids": [
+            "VIRTUA-3-10"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Collection agent is unavailable at scheduled time."
+          ],
+          "inputs": {},
+          "steps": [
+            "System reassigns appointment.",
+            "Next available agent is notified."
+          ],
+          "expected": [
+            "Appointment reassigned successfully."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Email Delivery Failure Boundary",
+          "req_ids": [
+            "VIRTUA-3-11"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Email service is temporarily unavailable."
+          ],
+          "inputs": {
+            "email": "patient@example.com"
+          },
+          "steps": [
+            "System attempts email delivery.",
+            "Retry mechanism is triggered.",
+            "Notification sent via SMS."
+          ],
+          "expected": [
+            "Email delivery retried or SMS notification sent."
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Invalid Email Address Exception",
+          "req_ids": [
+            "VIRTUA-3-11"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient provides an invalid email address."
+          ],
+          "inputs": {
+            "email": "invalid-email"
+          },
+          "steps": [
+            "System validates email.",
+            "Error logged.",
+            "Prompt to update contact information."
+          ],
+          "expected": [
+            "Error message and prompt to update email."
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Upload Patient Reports per Consultation",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is logged in and consultation is active."
+          ],
+          "inputs": {
+            "report_files": [
+              "report1.pdf",
+              "report2.pdf",
+              "report3.pdf",
+              "report4.pdf",
+              "report5.pdf"
+            ]
+          },
+          "steps": [
+            "Patient selects upload option.",
+            "Up to 5 reports are uploaded.",
+            "System confirms successful upload."
+          ],
+          "expected": [
+            "Reports associated with consultation."
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Exceeding Report Limit Boundary",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Patient attempts to upload a 6th report."
+          ],
+          "inputs": {
+            "report_files": [
+              "report1.pdf",
+              "report2.pdf",
+              "report3.pdf",
+              "report4.pdf",
+              "report5.pdf",
+              "report6.pdf"
+            ]
+          },
+          "steps": [
+            "System checks report count.",
+            "Rejects additional upload.",
+            "Informs patient of limit."
+          ],
+          "expected": [
+            "Upload rejected with limit notification."
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "File Size Exceeds Limit Exception",
+          "req_ids": [
+            "VIRTUA-3-12"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient uploads a report larger than 1 MB."
+          ],
+          "inputs": {
+            "report_file": "large_report.pdf"
+          },
+          "steps": [
+            "System validates file size.",
+            "Rejects file.",
+            "Prompts patient to compress."
+          ],
+          "expected": [
+            "File rejected with compression prompt."
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Route Patient Consultation to Specialist Doctor",
+          "req_ids": [
+            "VIRTUA-3-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation request is initiated."
+          ],
+          "inputs": {
+            "symptoms": "fever, cough"
+          },
+          "steps": [
+            "System analyzes symptoms.",
+            "Identifies appropriate specialist.",
+            "Routes consultation to specialist."
+          ],
+          "expected": [
+            "Consultation routed to specialist."
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Multiple Specialists Available Boundary",
+          "req_ids": [
+            "VIRTUA-3-13"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "More than one specialist matches the criteria."
+          ],
+          "inputs": {
+            "symptoms": "rare_condition"
+          },
+          "steps": [
+            "System selects specialist based on availability.",
+            "Consultation routed accordingly."
+          ],
+          "expected": [
+            "Consultation routed to the most available specialist."
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Specialist Unavailable Exception",
+          "req_ids": [
+            "VIRTUA-3-13"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Identified specialist is offline."
+          ],
+          "inputs": {},
+          "steps": [
+            "System routes request to next available specialist.",
+            "Schedules appointment if necessary."
+          ],
+          "expected": [
+            "Request routed to next available specialist."
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Machine Learning Assistance for Disease Prediction",
+          "req_ids": [
+            "VIRTUA-3-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom data is entered."
+          ],
+          "inputs": {
+            "symptoms": "headache, fatigue"
+          },
+          "steps": [
+            "System processes symptom data.",
+            "ML algorithm predicts potential diseases.",
+            "Predictions presented to doctor."
+          ],
+          "expected": [
+            "Predictions displayed to doctor."
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Symptom Ambiguity Boundary",
+          "req_ids": [
+            "VIRTUA-3-14"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Symptoms are ambiguous."
+          ],
+          "inputs": {
+            "symptoms": "non-specific"
+          },
+          "steps": [
+            "System provides range of possible diagnoses.",
+            "Confidence scores included."
+          ],
+          "expected": [
+            "Range of diagnoses with confidence scores shown."
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Model Failure Exception",
+          "req_ids": [
+            "VIRTUA-3-14"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "ML model encounters an error."
+          ],
+          "inputs": {},
+          "steps": [
+            "System logs error.",
+            "Manual review process initiated."
+          ],
+          "expected": [
+            "Error logged and manual review triggered."
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Doctor Acceptance or Modification of Diagnosis",
+          "req_ids": [
+            "VIRTUA-3-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Diagnosis recommendation is available."
+          ],
+          "inputs": {
+            "diagnosis": "flu"
+          },
+          "steps": [
+            "Doctor reviews recommendation.",
+            "Accepts or modifies diagnosis.",
+            "System records final diagnosis."
+          ],
+          "expected": [
+            "Final diagnosis recorded."
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Partial Acceptance Boundary",
+          "req_ids": [
+            "VIRTUA-3-15"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Doctor accepts part of the recommendation."
+          ],
+          "inputs": {
+            "diagnosis": "flu, modified_by_doctor"
+          },
+          "steps": [
+            "System records partial acceptance.",
+            "Notes modifications."
+          ],
+          "expected": [
+            "Partial acceptance recorded with modifications."
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Doctor Absence Exception",
+          "req_ids": [
+            "VIRTUA-3-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Doctor is unavailable when recommendation is presented."
+          ],
+          "inputs": {},
+          "steps": [
+            "System delays acceptance.",
+            "Assigns task to backup doctor."
+          ],
+          "expected": [
+            "Task reassigned to backup doctor."
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Doctor Responsibility for Diagnosis",
+          "req_ids": [
+            "VIRTUA-3-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation request is initiated."
+          ],
+          "inputs": {
+            "doctor": "Dr. Smith"
+          },
+          "steps": [
+            "Doctor reviews patient data.",
+            "Performs independent diagnosis.",
+            "System records doctor's diagnosis."
+          ],
+          "expected": [
+            "Doctor's diagnosis recorded as final."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.7,
+        "representation_score": 1.0,
+        "sfv_score": 0.85,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #5 (TC-005): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #7 (TC-007): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #13 (TC-013): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #16 (TC-016): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #19 (TC-019): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    }
+  ]
+}

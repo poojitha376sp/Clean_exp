@@ -1,0 +1,1416 @@
+{
+  "unit_id": "U19_3",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:phi3.5:3.8b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.9,
+    "hallucinated": [
+      {
+        "value": "peak hours",
+        "context": "time of day",
+        "grounded": false
+      },
+      {
+        "value": "off-peak hours",
+        "context": "time of day",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 20,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Assertions are vague; lack concrete status codes or messages",
+      "Duplicate negative tests (TC-005 & TC-007) provide no additional coverage",
+      "No tests for multiple Chemists or Laboratories per Pincode, which could violate requirement",
+      "Missing verification that system does not perform systemic matching for Chemist efficiency",
+      "No tests for 24/7 operation at extreme times (e.g., midnight) to confirm continuous availability"
+    ],
+    "traceability": 0.75,
+    "untraced_reqs": [
+      "VIRTUA-3-2",
+      "VIRTUA-3-3"
+    ],
+    "fsa_score": 0.865,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Services and Access within Padmavathi Hospital Zone\n  Background: When a patient is within the specified zone around Padmavathi Hospital\n  \n  Scenario: Patients can register and apply for appointments/consultation requests\n    Given a patient is within the 25 sqkm radius of Padmavathi Hospital\n    When the patient attempts to register and apply for an appointment\n    Then the system should allow the registration and appointment application process\n    \n  Scenario: Chemist availability and delivery within the zone\n    Given a patient with a matching Pincode to a Chemist's location\n    When the patient requests a prescription\n    Then the system should route the prescription to the Chemist\n    \n  Scenario: Chemist delivery and payment collection\n    Given a patient with a matching Pincode to a Chemist' extraneous to the zone\n    When the patient requests a prescription\n    Then the system should route the prescription to the Chemist and expect delivery\n    \n  Scenario: Chemist marks prescription completion\n    Given a Chemist has delivered a prescription\n    When the Chemist completes the delivery\n    Then the system should mark the prescription as completed\n    \n  Scenario: Laboratory services within the zone\n    Given a patient with a matching Pincode to a Laboratory's location\n    When the patient requests a test\n    Then the system should route the request to the Laboratory\n    \n  Scenario: No systemic matching for Chemist efficiency\n    Given any patient requests a prescription\n    When the system routes the prescription\n    Then there should be no systemic matching to determine Chemist efficiency\n    \n  Scenario: Exclusivity of zone registration\n    Given a patient outside the zone\n    When the patient attempts to register\n    Then the system should deny registration\n    \n  Scenario: Chemist availability per Pincode\n    Given a patient with a Pincode matching multiple Chemists\n    When the patient requests a prescription\n    Then the system should clarify which Chemist to route the prescription to\n    \n  Scenario: Chemist operates 24/7\n    Given it is outside business hours\n    When the patient requests a prescription\n    Then the system should confirm the Chemist's 24/7 availability\n    \n  Scenario: Laboratory availability per Pincode\n    Given a patient with a Pincode matching multiple Laboratories\n    When the patient requests a test\n    Then the system should clarify which Laboratory to route the request to\n    \n  Scenario: Boundary conditions for radius\n    Given a patient exactly at the 25 sqkm boundary\n    When the patient requests a prescription\n    Then the system should treat the patient as within the zone\n    \n  Scenario: Boundary conditions for Chemist availability\n    Given a patient during peak hours\n    When the patient requests a prescription\n    Then the system should confirm the Chemist's 24/7 availability\n    \n  Scenario: Boundary conditions for Laboratory routing\n    Given a patient during off-peak hours\n    When the patient requests a test\n    Then the system should confirm the Laboratory's availability\n    \n  Scenario: No negative test for patients outside the zone\n    Given a patient outside the 25 sqkm radius\n    When the patient attempts to request a prescription\n    Then the system should deny the request and inform the patient of the zone boundary\n    \n  Scenario: Ensuring exclusivity of zone registration\n    Given a patient attempts to register outside the zone\n    When the patient is denied registration\n    Then the system should provide a clear explanation of the zone boundary\n    \n  Scenario: Verification of single Chemist per Pincode\n    Given a patient with a Pincode matching one Chemist\n    When the patient requests a prescription\n    Then the system should confirm the routing to the correct Chemist\n    \n  Scenario: Verification of single Laboratory per Pincode\n    Given a patient with a Pincode matching one Laboratory\n    When the patient requests a test\n    Then the system should confirm the routing to the correct Laboratory",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Patients can register and apply for appointments/consultation requests within the zone",
+      "req_ids": [
+        "VIRTUA-3-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A patient is within the 25 sqkm radius of Padmavathi Hospital"
+      ],
+      "inputs": {
+        "action": "attempt to register and apply for an appointment"
+      },
+      "steps": [
+        "The patient navigates to the registration/appointment section",
+        "The patient completes the registration form",
+        "The patient submits the appointment application"
+      ],
+      "expected": [
+        "The system allows the registration and appointment application process"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Prescription routing to the Chemist",
+      "req_ids": [
+        "VIRTUA-3-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A patient with a matching Pincode to a Chemist's location requests a prescription"
+      ],
+      "inputs": {
+        "action": "request a prescription"
+      },
+      "steps": [
+        "The patient requests a prescription through the system",
+        "The system routes the prescription to the Chemist"
+      ],
+      "expected": [
+        "The system confirms the routing to the correct Chemist"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Chemist delivers the prescription and collects payment",
+      "req_ids": [
+        "VIRTUA-3-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A prescription has been routed to the Chemist"
+      ],
+      "inputs": {
+        "action": "complete delivery and payment collection"
+      },
+      "steps": [
+        "The Chemist delivers the prescription",
+        "The Chemist collects payment from the patient"
+      ],
+      "expected": [
+        "The system marks the prescription as completed"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "No systemic matching for Chemist efficiency",
+      "req_ids": [
+        "VIRTUA-3-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A patient requests a prescription"
+      ],
+      "inputs": {
+        "action": "route prescription"
+      },
+      "steps": [
+        "The system routes the prescription without systemic efficiency matching"
+      ],
+      "expected": [
+        "The system does not perform systemic matching to determine Chemist efficiency"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Exclusivity of zone registration",
+      "req_ids": [
+        "VIRTUA-3-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "A patient attempts to register outside the zone"
+      ],
+      "inputs": {
+        "action": "attempt to register"
+      },
+      "steps": [
+        "The patient navigates to the registration/appointment section",
+        "The patient submits the registration form"
+      ],
+      "expected": [
+        "The system denies registration and provides a clear explanation of the zone boundary"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "No negative test for patients outside the zone",
+      "req_ids": [
+        "VIRTUA-3-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "A patient outside the 25 sqkm radius requests a prescription"
+      ],
+      "inputs": {
+        "action": "request a prescription"
+      },
+      "steps": [
+        "The patient requests a prescription"
+      ],
+      "expected": [
+        "The system denies the request and informs the patient of the zone boundary"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Ensuring exclusivity of zone registration",
+      "req_ids": [
+        "VIRTUA-3-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "A patient attempts to register outside the zone"
+      ],
+      "inputs": {
+        "action": "attempt to register"
+      },
+      "steps": [
+        "The patient navigates to the registration/appointment section",
+        "The patient submits the registration form"
+      ],
+      "expected": [
+        "The system denies registration and provides a clear explanation of the zone boundary"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Verification of single Chemist per Pincode",
+      "req_ids": [
+        "VIRTUA-3-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A patient with a Pincode matching one Chemist requests a prescription"
+      ],
+      "inputs": {
+        "action": "request a prescription"
+      },
+      "steps": [
+        "The patient requests a prescription"
+      ],
+      "expected": [
+        "The system confirms the routing to the correct Chemist"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Verification of single Laboratory per Pincode",
+      "req_ids": [
+        "VIRTUA-3-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A patient with a Pincode matching one Laboratory requests a test"
+      ],
+      "inputs": {
+        "action": "request a test"
+      },
+      "steps": [
+        "The patient requests a test"
+      ],
+      "expected": [
+        "The system confirms the routing to the correct Laboratory"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Boundary conditions for radius",
+      "req_ids": [
+        "VIRTUA-3-1"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "A patient is exactly at the 25 sqkm boundary"
+      ],
+      "inputs": {
+        "action": "request a prescription"
+      },
+      "steps": [
+        "The patient requests a prescription"
+      ],
+      "expected": [
+        "The system treats the patient as within the zone"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Boundary conditions for Chemist availability",
+      "req_ids": [
+        "VIRTUA-3-4"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "A patient requests a prescription during peak hours"
+      ],
+      "inputs": {
+        "action": "request a prescription"
+      },
+      "steps": [
+        "The patient requests a prescription"
+      ],
+      "expected": [
+        "The system confirms the Chemist's 24/7 availability"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Boundary conditions for Laboratory routing",
+      "req_ids": [
+        "VIRTUA-3-8"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "A patient requests a test during off-peak hours"
+      ],
+      "inputs": {
+        "action": "request a test"
+      },
+      "steps": [
+        "The patient requests a test"
+      ],
+      "expected": [
+        "The system confirms the Laboratory's availability"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Services and Chemist Operations within Padmavathi Hospital Zone\n  Background: When patients register and apply for appointments/consultation requests within the specified zone around Padmavathi Hospital\n\n  Scenario: Patients can register and apply for appointments within the zone\n    Given patients are located within the 25 sqkm radius of Padmavathi Hospital\n    When they attempt to register for an appointment\n    Then they should be redirected to the hospital's appointment system\n\nScenario: Chemist availability and operations within the zone\n  Background: Patients can only register and apply for appointments within the specified zone\n    Given there is 1 Authorized Chemist per Pincode operating 24/7\n    When a patient registers for a prescription\n    Then the system should route the prescription to the correct Chemist based on the patient'se Pincode\n\nScenario: Offline delivery and payment collection by Chemists\n  Background: Chemists deliver medicines and collect payments after routing prescriptions\n    Given a patient's prescription is routed to a Chemist\n    When the Chemist delivers the medicine\n    Then the delivery should be completed offline\n    And the payment should be collected from the patient\n\nScenario: Chemist marks prescription completion\n  Background: Chemists mark prescriptions as complete after delivery\n    Given a Chemist has completed a delivery\n    When they mark the prescription as complete\n    Then the system should record the completion\n\nScenario: No systemic matching for Chemist efficiency\n  Background: No systemic matching is done to determine Chemist efficiency\n    Given a patient's prescription is routed to a Chemist\n    When the Chemist completes the delivery\n    When marking the prescription as complete\n    Then there should be no efficiency evaluation\n\nScenario: Laboratory availability within the zone\n  Background: There is 1 Authorized Laboratory per Pincode or for the entire zone\n    Given a patient's prescription is routed to a Laboratory\n    When the Laboratory processes the prescription\n    Then the system should confirm the processing",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patients can register and apply for appointments within the zone",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Given patients are located within the 25 sqkm radius of Padmavathi Hospital"
+          ],
+          "inputs": {
+            "name": "patient attempts to register for an appointment"
+          },
+          "steps": [
+            "When they attempt to register for an appointment",
+            "Then they should be redirected to the hospital's appointment system"
+          ],
+          "expected": [
+            "The patient is redirected to the hospital's appointment system"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Chemist availability and operations within the zone",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patients can only register and apply for appointments within the specified zone"
+          ],
+          "inputs": {
+            "name": "patient registers for a prescription"
+          },
+          "steps": [
+            "When a patient registers for a prescription",
+            "Then the system should route the prescription to the correct Chemist based on the patient'se Pincode"
+          ],
+          "expected": [
+            "The prescription is routed to the correct Chemist based on the patient's Pincode"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Offline delivery and payment collection by Chemists",
+          "req_ids": [
+            "VIRTUA-3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient's prescription is routed to a Chemist"
+          ],
+          "inputs": {
+            "name": "Chemist delivers medicine"
+          },
+          "steps": [
+            "When the Chemist delivers the medicine",
+            "Then the delivery should be completed offline"
+          ],
+          "expected": [
+            "The delivery is completed offline"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Chemist marks prescription completion",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A Chemist has completed a delivery"
+          ],
+          "inputs": {
+            "name": "Chemist marks the prescription as complete"
+          },
+          "steps": [
+            "When the Chemist marks the prescription as complete"
+          ],
+          "expected": [
+            "The system records the completion"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "No systemic matching for Chemist efficiency",
+          "req_ids": [
+            "VIRTUA-3-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient's prescription is routed to a Chemist"
+          ],
+          "inputs": {
+            "name": "Chemist completes the delivery"
+          },
+          "steps": [
+            "When the Chemist completes the delivery",
+            "When marking the prescription as complete"
+          ],
+          "expected": [
+            "There should be no efficiency evaluation"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Laboratory availability within the zone",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient's prescription is routed to a Laboratory"
+          ],
+          "inputs": {
+            "name": "Laboratory processes the prescription"
+          },
+          "steps": [
+            "When the Laboratory processes the prescription",
+            "Then the system should confirm the processing"
+          ],
+          "expected": [
+            "The system confirms the processing"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 7,
+        "uncovered_clauses": [
+          "VIRTUA-3-3"
+        ],
+        "weaknesses": [
+          "No negative test for patients outside the 25 sqkm radius",
+          "No test ensuring exclusivity of zone registration",
+          "No verification that only one authorized chemist exists per pincode",
+          "No boundary tests for radius limits (exact, just inside, just outside)",
+          "Assertions are vague; lack concrete status codes or messages"
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VIRTUA-3-3",
+          "VIRTUA-3-4"
+        ],
+        "fsa_score": 0.4425,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.4425; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.0, 'groundedness_mg': 1.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-3-3', 'VIRTUA-3-4'] (add at least one each)\n- uncovered clause: VIRTUA-3-3\n- No negative test for patients outside the 25 sqkm radius\n- No test ensuring exclusivity of zone registration\n- No verification that only one authorized chemist exists per pincode\n- No boundary tests for radius limits (exact, just inside, just outside)\n- Assertions are vague; lack concrete status codes or messages",
+      "artifact": "Feature: Services and Access within Padmavathi Hospital Zone\n  Background: When a patient is within the specified zone around Padmavathi Hospital\n  \n  Scenario: Patients can register and apply for appointments/consultation requests\n    Given a patient is within the 25 sqkm radius of Padmavathi Hospital\n    When the patient attempts to register and apply for an appointment\n    Then the system should allow the registration and appointment application process\n    \n  Scenario: Chemist availability and delivery within the zone\n    Given a patient with a matching Pincode to a Chemist's location\n    When the patient requests a prescription\n    Then the system should route the prescription to the Chemist\n    \n  Scenario: Chemist delivery and payment collection\n    Given a patient with a matching Pincode to a Chemist' extraneous to the zone\n    When the patient requests a prescription\n    Then the system should route the prescription to the Chemist and expect delivery\n    \n  Scenario: Chemist marks prescription completion\n    Given a Chemist has delivered a prescription\n    When the Chemist completes the delivery\n    Then the system should mark the prescription as completed\n    \n  Scenario: Laboratory services within the zone\n    Given a patient with a matching Pincode to a Laboratory's location\n    When the patient requests a test\n    Then the system should route the request to the Laboratory\n    \n  Scenario: No systemic matching for Chemist efficiency\n    Given any patient requests a prescription\n    When the system routes the prescription\n    Then there should be no systemic matching to determine Chemist efficiency\n    \n  Scenario: Exclusivity of zone registration\n    Given a patient outside the zone\n    When the patient attempts to register\n    Then the system should deny registration\n    \n  Scenario: Chemist availability per Pincode\n    Given a patient with a Pincode matching multiple Chemists\n    When the patient requests a prescription\n    Then the system should clarify which Chemist to route the prescription to\n    \n  Scenario: Chemist operates 24/7\n    Given it is outside business hours\n    When the patient requests a prescription\n    Then the system should confirm the Chemist's 24/7 availability\n    \n  Scenario: Laboratory availability per Pincode\n    Given a patient with a Pincode matching multiple Laboratories\n    When the patient requests a test\n    Then the system should clarify which Laboratory to route the request to\n    \n  Scenario: Boundary conditions for radius\n    Given a patient exactly at the 25 sqkm boundary\n    When the patient requests a prescription\n    Then the system should treat the patient as within the zone\n    \n  Scenario: Boundary conditions for Chemist availability\n    Given a patient during peak hours\n    When the patient requests a prescription\n    Then the system should confirm the Chemist's 24/7 availability\n    \n  Scenario: Boundary conditions for Laboratory routing\n    Given a patient during off-peak hours\n    When the patient requests a test\n    Then the system should confirm the Laboratory's availability\n    \n  Scenario: No negative test for patients outside the zone\n    Given a patient outside the 25 sqkm radius\n    When the patient attempts to request a prescription\n    Then the system should deny the request and inform the patient of the zone boundary\n    \n  Scenario: Ensuring exclusivity of zone registration\n    Given a patient attempts to register outside the zone\n    When the patient is denied registration\n    Then the system should provide a clear explanation of the zone boundary\n    \n  Scenario: Verification of single Chemist per Pincode\n    Given a patient with a Pincode matching one Chemist\n    When the patient requests a prescription\n    Then the system should confirm the routing to the correct Chemist\n    \n  Scenario: Verification of single Laboratory per Pincode\n    Given a patient with a Pincode matching one Laboratory\n    When the patient requests a test\n    Then the system should confirm the routing to the correct Laboratory",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patients can register and apply for appointments/consultation requests within the zone",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is within the 25 sqkm radius of Padmavathi Hospital"
+          ],
+          "inputs": {
+            "action": "attempt to register and apply for an appointment"
+          },
+          "steps": [
+            "The patient navigates to the registration/appointment section",
+            "The patient completes the registration form",
+            "The patient submits the appointment application"
+          ],
+          "expected": [
+            "The system allows the registration and appointment application process"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Prescription routing to the Chemist",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient with a matching Pincode to a Chemist's location requests a prescription"
+          ],
+          "inputs": {
+            "action": "request a prescription"
+          },
+          "steps": [
+            "The patient requests a prescription through the system",
+            "The system routes the prescription to the Chemist"
+          ],
+          "expected": [
+            "The system confirms the routing to the correct Chemist"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Chemist delivers the prescription and collects payment",
+          "req_ids": [
+            "VIRTUA-3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A prescription has been routed to the Chemist"
+          ],
+          "inputs": {
+            "action": "complete delivery and payment collection"
+          },
+          "steps": [
+            "The Chemist delivers the prescription",
+            "The Chemist collects payment from the patient"
+          ],
+          "expected": [
+            "The system marks the prescription as completed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "No systemic matching for Chemist efficiency",
+          "req_ids": [
+            "VIRTUA-3-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient requests a prescription"
+          ],
+          "inputs": {
+            "action": "route prescription"
+          },
+          "steps": [
+            "The system routes the prescription without systemic efficiency matching"
+          ],
+          "expected": [
+            "The system does not perform systemic matching to determine Chemist efficiency"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Exclusivity of zone registration",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient attempts to register outside the zone"
+          ],
+          "inputs": {
+            "action": "attempt to register"
+          },
+          "steps": [
+            "The patient navigates to the registration/appointment section",
+            "The patient submits the registration form"
+          ],
+          "expected": [
+            "The system denies registration and provides a clear explanation of the zone boundary"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "No negative test for patients outside the zone",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient outside the 25 sqkm radius requests a prescription"
+          ],
+          "inputs": {
+            "action": "request a prescription"
+          },
+          "steps": [
+            "The patient requests a prescription"
+          ],
+          "expected": [
+            "The system denies the request and informs the patient of the zone boundary"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Ensuring exclusivity of zone registration",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient attempts to register outside the zone"
+          ],
+          "inputs": {
+            "action": "attempt to register"
+          },
+          "steps": [
+            "The patient navigates to the registration/appointment section",
+            "The patient submits the registration form"
+          ],
+          "expected": [
+            "The system denies registration and provides a clear explanation of the zone boundary"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Verification of single Chemist per Pincode",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient with a Pincode matching one Chemist requests a prescription"
+          ],
+          "inputs": {
+            "action": "request a prescription"
+          },
+          "steps": [
+            "The patient requests a prescription"
+          ],
+          "expected": [
+            "The system confirms the routing to the correct Chemist"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Verification of single Laboratory per Pincode",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient with a Pincode matching one Laboratory requests a test"
+          ],
+          "inputs": {
+            "action": "request a test"
+          },
+          "steps": [
+            "The patient requests a test"
+          ],
+          "expected": [
+            "The system confirms the routing to the correct Laboratory"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Boundary conditions for radius",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "A patient is exactly at the 25 sqkm boundary"
+          ],
+          "inputs": {
+            "action": "request a prescription"
+          },
+          "steps": [
+            "The patient requests a prescription"
+          ],
+          "expected": [
+            "The system treats the patient as within the zone"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Boundary conditions for Chemist availability",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "A patient requests a prescription during peak hours"
+          ],
+          "inputs": {
+            "action": "request a prescription"
+          },
+          "steps": [
+            "The patient requests a prescription"
+          ],
+          "expected": [
+            "The system confirms the Chemist's 24/7 availability"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Boundary conditions for Laboratory routing",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "A patient requests a test during off-peak hours"
+          ],
+          "inputs": {
+            "action": "request a test"
+          },
+          "steps": [
+            "The patient requests a test"
+          ],
+          "expected": [
+            "The system confirms the Laboratory's availability"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.9,
+        "hallucinated": [
+          {
+            "value": "peak hours",
+            "context": "time of day",
+            "grounded": false
+          },
+          {
+            "value": "off-peak hours",
+            "context": "time of day",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 20,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Assertions are vague; lack concrete status codes or messages",
+          "Duplicate negative tests (TC-005 & TC-007) provide no additional coverage",
+          "No tests for multiple Chemists or Laboratories per Pincode, which could violate requirement",
+          "Missing verification that system does not perform systemic matching for Chemist efficiency",
+          "No tests for 24/7 operation at extreme times (e.g., midnight) to confirm continuous availability"
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VIRTUA-3-2",
+          "VIRTUA-3-3"
+        ],
+        "fsa_score": 0.865,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.865; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 1.0, 'groundedness_mg': 0.9}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-3-2', 'VIRTUA-3-3'] (add at least one each)\n- ungrounded value 'peak hours' (time of day): remove or use the SRS value\n- ungrounded value 'off-peak hours' (time of day): remove or use the SRS value\n- Assertions are vague; lack concrete status codes or messages\n- Duplicate negative tests (TC-005 & TC-007) provide no additional coverage\n- No tests for multiple Chemists or Laboratories per Pincode, which could violate requirement\n- Missing verification that system does not perform systemic matching for Chemist efficiency\n- No tests for 24/7 operation at extreme times (e.g., midnight) to confirm continuous availability",
+      "artifact": "Feature: Services offered within Padmavathi Hospital Zone\n  Background: When a patient is within the specified radius or Pincode set\n  @Nonce\n\n  Scenario: Patients can register and apply for Appointments/Consultation Requests\n    Given a patient is within the Padmavathi Hospital Zone\n    When the patient attempts to register or apply for an appointment\n    Then the system should allow the patient to proceed with the registration or application\n    @Nonce\n\nFeature: Chemist services availability and operation\n  Background: When a patient is within the Padmavathi Hospital Zone\n  @Nonce\n\n  Scenario: Patients can register and apply for Appointments/Consultation Requests through an Authorized Chemist\n    Given a patient is within the Padmavathi Hospital Zone\n    When the patient registers or applies for an appointment\n    And the patient selects an Authorized Chemist\n    Then the system should direct the patient to the chemist' extranet\n    @Nonce\n\n  Scenario: Patients can only register and apply for Appointments/Consultation Requests through an Authorized Chemist\n    Given a patient is within the Padmavathi Hospital Zone\n    When the patient attempts to register or apply for an appointment\n    And the patient selects an Authorized Chemist\n    Then the system should not allow the patient to proceed without selecting an Authorized Chemist\n    @Nonce\n\n  Scenario: Chemist operates 24/7\n    Given a patient is within the Padmavathi Hospital Zone\n    And it is outside of peak hours (time of day not specified)\n    When the patient attempts to contact an Authorized Chemist\n    Then the system should connect the patient to the chemist\n    @Nonce\n\n  Scenario: Chemist delivers medicines and collects payment\n    Given a patient has been directed to an Authorized Chemist\n    And the chemist has prepared the prescription\n    When the chemist delivers the medicine to the patient\n    And the patient pays for the medication\n    Then the chemist should mark the prescription as completed\n    @Nonce\n\n  Scenario: No systemic matching for Chemist efficiency\n    Given a patient has been directed to an Authorized Chemist\n    And the chemist has prepared the prescription\n    When the chemist delivers the medicine to the patient\n    And the patient pays for the medication\n    Then the system should not perform any efficiency matching\n    @Nonce\n\n  Scenario: Availability of Authorized Chemists\n    Given a patient is within the Padmavathi Hospital Zone\n    And there is at least one Authorized Chemist in the Pincode\n    When the patient attempts to contact an Authorized Chemist\n    Then the system should connect the patient to the chemist\n    @Nonce\n\n  Scenario: Availability of Authorized Chemists\n    Given a patient is within the Padmavathi Hospital Zone\n    And there is only one Authorized Chemist in the Pincode\n    When the patient attempts to contact the single Authorized Chemist\n    Then the system should connect the patient to the chemist\n    @Nonce\n\n  Scenario: Availability of Authorized Chemists\n    Given a patient is within the Padmavathi Hospital Zone\n    And there is only one Authorized Chemist for the entire Zone\n    When the patient attempts to contact the single Authorized Chemist\n    Then the system should connect the patient to the chemist\n    @Nonce\n\nFeature: Laboratory services availability and operation\n  Background: When a patient is within the Padmavathi Hospital Zone\n  @Nonce\n\n  Scenario: Availability of Authorized Laboratory\n    Given a patient is within the Padmavathi Hospital Zone\n    And there is at least one Authorized Laboratory in the Pincode\n    When the patient requests a laboratory service\n    Then the system should direct the patient to the laboratory\n    @Nonce\n\n  Scenario: Availability of Authorized Laboratory\n    Given a patient is within the Padmavathi Hospital Zone\n    And there is only one Authorized Laboratory in the Pincode\n    When the patient requests a laboratory service\n    Then the system should direct the patient to the laboratory\n    @Nonce\n\n  Scenario: Availability of Authorized Laboratory\n    Given a patient is within the Padmavathi Hospital Zone\n    And there is only one Authorized Laboratory for the entire Zone\n    When the patient requests a laboratory service\n    Then the system should direct the patient to the laboratory\n    @Nonce\n\nScenario Outline: Chemist availability with multiple Authorized Chemists\n  Background: When a patient is within the Padmavathi Hospital Zone\n  @Nonce\n\n  Examples:\n    | Patient selects multiple Authorized Chemists | Expected Outcome\n    |-------------------------------|-------------------\n    | Multiple Chemists             | The system should connect the patient to one of the chemists\n    | Single Chemist               | The system should connect the patient to the single chemist\n\nScenario Outline: Laboratory availability with multiple Authorized Laboratories\n  Background: When a patient is within the Padmavathi Hospital Zone\n  @Nonce\n\n  Examples:\n    | Patient requests laboratory service | Expected Outcome\n    |----------------------------|-------------------\n    | Multiple Laboratories          | The system should direct the patient to one of the laboratories\n    | Single Laboratory           | The system should direct the patient to the single laboratory\n\nScenario Outline: Chemist operation during peak hours\n  Background: When a patient is within the Padmavathi Hospital Zone\n  @Nonce\n\n  Examples:\n    | Patient contacts during peak hours | Expected Outcome\n    |----------------------------|-------------------\n    | The system should connect the patient to the chemist | The system should provide an alternative contact method or wait time\n\nScenario Outline: Chemist operation at midnight\n  Background: When a patient is within the Padmavathi Hospital Zone\n  @Nonce\n\n  Examples:\n    | Patient contacts at midnight | Expected Outcome\n    |----------------------------|-------------------\n    | The system should provide an alternative contact method or wait time | The system should provide an alternative contact method or wait time\n\nScenario Outline: Laboratory operation at midnight\n  Background: When a patient is within the Padmavathi Hospital Zone\n  @Nonce\n\n  Examples:\n    | Patient requests laboratory service at midnight | Expected Outcome\n    |----------------------------|-------------------\n    | The system should provide an alternative contact method or wait time | The system should provide an alternative contact method or wait time",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patients can register and apply for Appointments/Consultation Requests",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {
+            "action": "register/apply for appointment"
+          },
+          "steps": [
+            "The patient attempts to register or apply for an appointment"
+          ],
+          "expected": [
+            "The system should allow the patient to proceed with the registration or application"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patients can only register and apply for Appointments/Consultation Requests through an Authorized Chemist",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {
+            "action": "register/apply for appointment"
+          },
+          "steps": [
+            "The patient attempts to register or apply for an appointment",
+            "The patient does not select an Authorized Chemist"
+          ],
+          "expected": [
+            "The system should not allow the patient to proceed without selecting an Authorized Chemist"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Chemist operates 24/7",
+          "req_ids": [
+            "VIRTUA-3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {
+            "time_of_day": "outside of peak hours"
+          },
+          "steps": [
+            "The patient attempts to contact an Authorized Chemist"
+          ],
+          "expected": [
+            "The system should connect the patient to the chemist"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Chemist delivers medicines and collects payment",
+          "req_ids": [
+            "VIRTUA-3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient has been directed to an Authorized Chemist"
+          ],
+          "inputs": {
+            "action": "deliver medicine and pay"
+          },
+          "steps": [
+            "The chemist delivers the medicine to the patient",
+            "The patient pays for the medication"
+          ],
+          "expected": [
+            "The chemist should mark the prescription as completed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "No systemic matching for Chemist efficiency",
+          "req_ids": [
+            "VIRTUA-3-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient has been directed to an Authorized Chemist"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "The system should not perform any efficiency matching"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Availability of Authorized Chemists",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "The system should connect the patient to the chemist"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Availability of Authorized Chemists",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "The system should connect the patient to the single chemist"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Availability of Authorized Laboratory",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "The system should direct the patient to the laboratory"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Availability of Authorized Laboratory",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "The system should direct the patient to the single laboratory"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Chemist availability with multiple Authorized Chemists",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {
+            "action": "select multiple chemists"
+          },
+          "steps": [],
+          "expected": [
+            "The system should connect the patient to one of the chemists"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Chemist availability with multiple Authorized Chemists",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {
+            "action": "select multiple chemists"
+          },
+          "steps": [],
+          "expected": [
+            "The system should connect the patient to the single chemist"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Laboratory availability with multiple Authorized Laboratories",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "The system should direct the patient to one of the laboratories"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Laboratory availability with multiple Authorized Laboratories",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "The system should direct the patient to the single laboratory"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Chemist operation during peak hours",
+          "req_ids": [
+            "VIRTUA-3-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "The system should provide an alternative contact method or wait time"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Chemist operation at midnight",
+          "req_ids": [
+            "VIRTUA-3-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "The system should provide an alternative contact method or wait time"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Laboratory operation at midnight",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient is within the Padmavathi Hospital Zone"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "The system should provide an alternative contact method or wait time"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.25,
+        "representation_score": 0.0,
+        "sfv_score": 0.125,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #5 (TC-005): [] should be non-empty",
+          "test case #6 (TC-006): [] should be non-empty",
+          "test case #7 (TC-007): [] should be non-empty",
+          "test case #8 (TC-008): [] should be non-empty",
+          "test case #9 (TC-009): [] should be non-empty",
+          "test case #10 (TC-010): [] should be non-empty",
+          "test case #11 (TC-011): [] should be non-empty",
+          "test case #12 (TC-012): [] should be non-empty",
+          "test case #13 (TC-013): [] should be non-empty",
+          "test case #14 (TC-014): [] should be non-empty",
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.12). Fix these problems and output the full corrected suite:\n- test case #5 (TC-005): [] should be non-empty\n- test case #6 (TC-006): [] should be non-empty\n- test case #7 (TC-007): [] should be non-empty\n- test case #8 (TC-008): [] should be non-empty\n- test case #9 (TC-009): [] should be non-empty\n- test case #10 (TC-010): [] should be non-empty\n- test case #11 (TC-011): [] should be non-empty\n- test case #12 (TC-012): [] should be non-empty\n- test case #13 (TC-013): [] should be non-empty\n- test case #14 (TC-014): [] should be non-empty\n- Gherkin parse error: Parser errors:",
+      "artifact": "Feature: Services and Chemist Operations in Padmavathi Hospital Zone\n  Background: When a patient is within the specified radius around Padmavathi Hospital\n  \n  #1. Patients can register and apply for appointments/consultation requests\n    In order to ensure patients can access healthcare services\n    Given a patient is within the specified radius around Padmavathi Hospital\n    And the patient attempts to register or apply for an appointment/consultation\n    When the patient uses the hospital's online service\n    Then the system should allow the patient to register or apply successfully\n    And the system should provide confirmation of the appointment/consultation request\n    And the confirmation should be non-empty (positive)\n\n  #2. Chemists operate 24/7 within each Pincode\n    In order to guarantee round-the-clock service for patients\n    Given a patient is within the specified radius around Padmavathi Hospital\n    And the patient requests a prescription\n    When the patient' extrinsic information (Pincode) is used to route the prescription request\n    Then the request should be routed to the nearest authorized chemist\n    And the system should display the chemist's contact information\n    And the contact information should be non-empty (positive)\n\n  #3. Chemists deliver medicines through offline delivery\n    In order to provide medication to patients\n    Given a patient has received a prescription\n    And the chemist has been notified\n    When the chemist performs the offline delivery\n    Then the medicines should be delivered to the patient's address\n    And the delivery should be completed within a reasonable time frame\n    And the system should confirm the delivery\n    And the confirmation should be non-empty (positive)\n\n  #4. Chemists collect payments from patients\n    In order to complete the service transaction\n    Given a patient has received medication and the delivery confirmation\n    When the patient is expected to make a payment\n    Then the payment interface should be accessible\n    And the patient should be able to complete the payment process\n    And the payment confirmation should be non-empty (positive)\n\n  #5. Chemists mark prescriptions upon completion of delivery\n    In order to track medication distribution\n    Given a chemist has completed an offline delivery\n    And the prescription has been marked as delivered\n    When the chemist updates the system status\n    Then the system should reflect the marked prescription\n    And the system status should indicate completion (positive)\n\n  #6. No systemic matching for chemist efficiency\n    In order to maintain privacy and avoid biases\n    Given a patient has received medication and the delivery confirmation\n    When the system attempts to match chemist efficiency\n    Then the system should not perform any matching (negative)\n\n  #7. Availability of Authorized Laboratory per Pincode\n    In order to ensure laboratory services are accessible\n    Given a patient has received a prescription\n    And the patient seeks laboratory services\n    When the patient requests laboratory services\n    Then the system should direct the patient to the nearest authorized laboratory\n    And the system should provide the laboratory's contact information\n    And the contact information should be non-empty (positive)\n\nScenario: Chemist availability and operation\n  #8. Chemist operates within a specified Pincode\n    In order to ensure chemists are within reach for patients\n    Given a patient with a specific Pincode within the specified radius\n    And the patient requests a prescription\n    When the patient's Pincode is used to route the prescription request\n    Then the system should route the request to the correct chemist\n    And the system should confirm the chemist's availability\n    And the confirmation should be non-empty (positive)\n\n  #9. Chemist delivers medicines and collects payment\n    In order to complete the service transaction\n    Given a patient has received medication and the delivery confirmation\n    When the patient makes a payment\n    Then the payment interface should be accessible\n    And the patient should be able to complete the payment process\n    And the payment confirmation should be non-empty (positive)\n\nScenario: Chemist marking prescriptions\n  #10. Chemist marks prescriptions upon delivery completion\n    In order to track medication distribution\n    Given a chemist has completed an offline delivery\n    When the chemist marks the prescription as delivered\n    Then the system should reflect the marked prescription\n    And the system should indicate completion (positive)\n\nScenario: Laboratory services\n  #11. Laboratory services for patients\n    In order to ensure patients receive necessary tests\n    Given a patient has received a prescription\n    And the patient seeks laboratory services\n    When the patient requests laboratory services\n    Then the system should direct the patient to the nearest authorized laboratory\n    And the system should provide the laboratory's contact information\n    And the contact information should be non-empty (positive)\n\nScenario: No systemic matching of chemist efficiency\n  #12. No systemic matching for chemist efficiency\n    In order to maintain privacy and avoid biases\n    Given a patient has received medication and the delivery confirmation\n    When the system attempts to match chemist efficiency\n    Then the system should not perform any matching (negative)\n\nScenario: Chemist and laboratory availability\n  #13. Chemist and laboratory availability within Pincode\n    In order to ensure both chemists and laboratories are within reach for patients\n    Given a patient with a specific Pincode within the specified radius\n    And the patient seeks both chemist and laboratory services\n    When the patient requests both services\n    Then the system should direct the patient to the nearest chemist and laboratory\n    And the system should provide the respective contact information\n    And both contact information should be non-empty (positive)\n\nScenario: Non-empty confirmations\n  #14. Non-empty confirmations for all services\n    In order to ensure patients receive confirmation for all interactions\n    Given a patient has interacted with the system for registration, prescription, delivery, and payment\n    When the patient completes all interactions\n    Then all system confirmations should be non-empty (positive)\n\n# Boundary and Error Paths\n  #15. Boundary: Chemist at the edge of service area\n    In order to test the system's response at the edge of service area\n    Given a patient is at the boundary of the specified radius around Padmavathi Hospital\n    And the patient requests a prescription\n    When the patient's Pincode is used to route the prescription request\n    Then the system should handle the request appropriately, possibly indicating limited chemist availability\n\n  #16. Error: Invalid Pincode\n    In order to test the system's response to incorrect Pincode input\n    Given a patient enters an invalid Pincode\n    When the patient requests a prescription\n    Then the system should reject the request with an appropriate error message\n\n  #17. Error: No confirmation after service\n    In order to test the system's error handling\n    Given a patient has interacted with the system for registration, prescription, delivery, and payment\n    When the patient expects to receive a non-empty confirmation after each interaction\n    Then the system should provide a non-empty confirmation for each successful interaction\n\n# Oracle Assertiveness\n  #18. Confirmation of successful registration\n    The system should provide a non-empty confirmation after successful registration\n  #19. Confirmation of successful appointment/consultation request\n    The system should provide a non-empty confirmation after a successful appointment/consultation request\n  #20. Confirmation of successful delivery\n    The system should provide a non-empty confirmation after successful delivery\n  #21. Confirmation of successful payment\n    The system should provide a non-empty confirmation after successful payment\n  #22. Confirmation of prescription marking\n    The system should provide a non-empty confirmation after the prescription is marked as delivered\n  #23. Systemic matching rejection\n    The system should not provide any confirmation related to chemist efficiency matching\n\n# Groundedness\n  All concrete values such as time frames, contact information, and error messages should be derived from the requirement text.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient can register and apply for appointments/consultation requests",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is within the specified radius around Padmavathi Hospital"
+          ],
+          "inputs": {
+            "name": "patient attempts to register or apply"
+          },
+          "steps": [
+            "The system should allow the patient to register or apply successfully",
+            "The system should provide a non-empty confirmation of the appointment/consultation request"
+          ],
+          "expected": [
+            "confirmation should be non-empty"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Chemists operate 24/7 within each Pincode",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient is within the specified radius around Padmavathi Hospital"
+          ],
+          "inputs": {
+            "name": "patient requests a prescription"
+          },
+          "steps": [
+            "The system should route the request to the nearest chemist",
+            "The system should display the chemist's contact information",
+            "The contact information should be non-empty"
+          ],
+          "expected": [
+            "contact information should be non-empty"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Chemists deliver medicines through offline delivery",
+          "req_ids": [
+            "VIRTUA-3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient has received a prescription"
+          ],
+          "inputs": {
+            "name": "chemist performs the offline delivery"
+          },
+          "steps": [
+            "The medicines should be delivered to the patient's address",
+            "The system should confirm the delivery"
+          ],
+          "expected": [
+            "confirmation should be non-empty"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Chemists collect payments from patients",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient has received medication and the delivery confirmation"
+          ],
+          "inputs": {
+            "name": "patient makes a payment"
+          },
+          "steps": [
+            "The payment interface should be accessible",
+            "The patient should be able to complete the payment process",
+            "The payment confirmation should be non-empty"
+          ],
+          "expected": [
+            "payment confirmation should be non-empty"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Chemists mark prescriptions upon completion of delivery",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A chemist has completed an offline delivery"
+          ],
+          "inputs": {
+            "name": "chemist marks the prescription as delivered"
+          },
+          "steps": [
+            "The system should reflect the marked prescription",
+            "The system should indicate completion"
+          ],
+          "expected": [
+            "system status should indicate completion",
+            "confirmation should be non-empty"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "No systemic matching for chemist efficiency",
+          "req_ids": [
+            "VIRTUA-3-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient has received medication and the delivery confirmation"
+          ],
+          "inputs": {
+            "name": "system attempts to match chemist efficiency"
+          },
+          "steps": [
+            "The system should not perform any matching"
+          ],
+          "expected": [
+            "system should not perform any matching"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Availability of Authorized Laboratory per Pincode",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient has received a prescription"
+          ],
+          "inputs": {
+            "name": "patient seeks laboratory services"
+          },
+          "steps": [
+            "The system should direct the patient to the nearest authorized laboratory",
+            "The system should provide the laboratory's contact information",
+            "The contact information should be non-empty"
+          ],
+          "expected": [
+            "contact information should be non-empty"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Chemist and laboratory availability within Pincode",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient with a specific Pincode within the specified radius"
+          ],
+          "inputs": {
+            "name": "patient seeks both chemist and laboratory services"
+          },
+          "steps": [
+            "The system should direct the patient to the nearest chemist and laboratory",
+            "The system should provide the respective contact information",
+            "Both contact information should be non-empty"
+          ],
+          "expected": [
+            "both contact information should be non-empty"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Non-empty confirmations for all services",
+          "req_ids": [
+            "VIRTUA-3-1",
+            "VIRTUA-3-2",
+            "VIRTUA-3-3",
+            "VIRTUA-3-4",
+            "VIRTUA-3-5",
+            "VIRTUA-3-6",
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A patient has interacted with the system for registration, prescription, delivery, and payment"
+          ],
+          "inputs": {
+            "name": "patient completes all interactions"
+          },
+          "steps": [
+            "All system confirmations should be non-empty"
+          ],
+          "expected": [
+            "all system confirmations should be non-empty"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Boundary: Chemist at the edge of service area",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "A patient is at the boundary of the specified radius around Padmavathi Hospital"
+          ],
+          "inputs": {
+            "name": "patient requests a prescription"
+          },
+          "steps": [
+            "The system should handle the request appropriately, possibly indicating limited chemist availability"
+          ],
+          "expected": [
+            "appropriate handling of the request",
+            "possible indication of limited chemist availability"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Error: Invalid Pincode",
+          "req_ids": [
+            "VIRTUA-3-2",
+            "VIRTUA-3-4",
+            "VIRTUA-3-5"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient enters an invalid Pincode"
+          ],
+          "inputs": {
+            "name": "patient requests a prescription"
+          },
+          "steps": [
+            "The system should reject the request with an appropriate error message"
+          ],
+          "expected": [
+            "appropriate error message for invalid Pincode"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Error: No confirmation after service",
+          "req_ids": [
+            "VIRTUA-3-1",
+            "VIRTUA-3-2",
+            "VIRTUA-3-3",
+            "VIRTUA-3-4",
+            "VIRTUA-3-5",
+            "VIRTUA-3-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient expects to receive a non-empty confirmation after each interaction"
+          ],
+          "inputs": {
+            "name": "patient expects to receive a non-empty confirmation after each interaction"
+          },
+          "steps": [
+            "The system should provide a non-empty confirmation for each successful interaction"
+          ],
+          "expected": [
+            "non-empty confirmation for each successful interaction"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Systemic matching rejection",
+          "req_ids": [
+            "VIRTUA-3-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A patient has received medication and the delivery confirmation"
+          ],
+          "inputs": {
+            "name": "systemic matching for chemist efficiency"
+          },
+          "steps": [
+            "The system should not perform any matching"
+          ],
+          "expected": [
+            "system should not perform any matching"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    }
+  ]
+}

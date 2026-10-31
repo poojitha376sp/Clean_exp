@@ -1,0 +1,640 @@
+{
+  "unit_id": "U07_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 1.0,
+    "boundary_coverage": 0.0,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 18,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No boundary value tests for frequency, pulse count, pulse duration, pause duration, or breath rate threshold",
+      "No negative or error path tests",
+      "Test suite lacks scenario outlines with examples for normal, edge, and invalid values",
+      "Requirement RW-SW-83 is misinterpreted; test expects alarm when setting to maximum, but requirement only specifies threshold",
+      "No verification of the exact IEC 60417-5576 symbol display beyond presence"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.7,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Alarms\n\n  Scenario: Medium severity alarm indication\n    Given the alarm severity is set to medium\n    When the alarm is triggered\n    Then the alarm indicator should be yellow\n    And the alarm frequency should be 0.5Hz with a 50% duty cycle\n\n  Scenario: High severity alarm auditory signal\n    Given the alarm severity is set to high\n    When the alarm is triggered\n    Then the alarm should produce 10 pulses with each pulse lasting 200ms and a frequency of 500Hz\n\n  Scenario: High severity alarm auditory signal with 4 pulses\n    Given the alarm severity is set to high\n    When the alarm is triggered\n    Then the alarm should produce 4 pulses with each pulse lasting 200ms and a frequency of 500Hz\n\n  Scenario: Audio pause/alarm pause key press\n    Given the audio pause/alarm pause key is pressed\n    When the key press is registered\n    Then all active alarms should be paused for 60 seconds\n    And the alarm activation symbol should be displayed with the IEC 60417-5576 symbol\n\n  Scenario: Apnea alarm\n    Given the apnea time interval has expired\n    When the ventilator is triggered\n    Then a medium priority alarm should be triggered with the display text \"APNEA ALARM\"\n\n  Scenario: Breath rate alarm\n    Given the breath rate has exceeded the breath rate setting\n    When the ventilator is triggered\n    Then a medium level alarm should be triggered with the display text \"HIGH BREATH RATE\"\n\n  Scenario: Maximum breath rate setting\n    Given the breath rate setting is set to the maximum\n    When the ventilator is triggered\n    Then a medium level alarm should be triggered with the display text \"HIGH BREATH RATE\"\n\n  Scenario: Pressure low alarm\n    Given the pressure is low\n    When the ventilator is triggered\n    Then a high severity alarm should be triggered with the display text \"LOW INSP P\"",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Medium severity alarm indication",
+      "req_ids": [
+        "RW-SW-75"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "alarm severity is set to medium"
+      ],
+      "inputs": {
+        "alarm_severity": "medium"
+      },
+      "steps": [
+        "alarm is triggered",
+        "alarm indicator is yellow",
+        "alarm frequency is 0.5Hz with a 50% duty cycle"
+      ],
+      "expected": [
+        "alarm indicator is yellow",
+        "alarm frequency is 0.5Hz with a 50% duty cycle"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "High severity alarm auditory signal",
+      "req_ids": [
+        "RW-SW-76"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "alarm severity is set to high"
+      ],
+      "inputs": {
+        "alarm_severity": "high"
+      },
+      "steps": [
+        "alarm is triggered",
+        "alarm produces 10 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+      ],
+      "expected": [
+        "alarm produces 10 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "High severity alarm auditory signal with 4 pulses",
+      "req_ids": [
+        "RW-SW-77"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "alarm severity is set to high"
+      ],
+      "inputs": {
+        "alarm_severity": "high"
+      },
+      "steps": [
+        "alarm is triggered",
+        "alarm produces 4 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+      ],
+      "expected": [
+        "alarm produces 4 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Audio pause/alarm pause key press",
+      "req_ids": [
+        "RW-SW-78"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "audio pause/alarm pause key is pressed"
+      ],
+      "inputs": {
+        "key_press": "audio pause/alarm pause key"
+      },
+      "steps": [
+        "key press is registered",
+        "all active alarms are paused for 60 seconds",
+        "alarm activation symbol is displayed with the IEC 60417-5576 symbol"
+      ],
+      "expected": [
+        "all active alarms are paused for 60 seconds",
+        "alarm activation symbol is displayed with the IEC 60417-5576 symbol"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Apnea alarm",
+      "req_ids": [
+        "RW-SW-80"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "apnea time interval has expired"
+      ],
+      "inputs": {
+        "apnea_time_interval": "expired"
+      },
+      "steps": [
+        "ventilator is triggered",
+        "medium priority alarm is triggered with the display text 'APNEA ALARM'"
+      ],
+      "expected": [
+        "medium priority alarm is triggered with the display text 'APNEA ALARM'"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Breath rate alarm",
+      "req_ids": [
+        "RW-SW-82"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "breath rate has exceeded the breath rate setting"
+      ],
+      "inputs": {
+        "breath_rate": "exceeded"
+      },
+      "steps": [
+        "ventilator is triggered",
+        "medium level alarm is triggered with the display text 'HIGH BREATH RATE'"
+      ],
+      "expected": [
+        "medium level alarm is triggered with the display text 'HIGH BREATH RATE'"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Maximum breath rate setting",
+      "req_ids": [
+        "RW-SW-83"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "breath rate setting is set to the maximum"
+      ],
+      "inputs": {
+        "breath_rate_setting": "maximum"
+      },
+      "steps": [
+        "ventilator is triggered",
+        "medium level alarm is triggered with the display text 'HIGH BREATH RATE'"
+      ],
+      "expected": [
+        "medium level alarm is triggered with the display text 'HIGH BREATH RATE'"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Pressure low alarm",
+      "req_ids": [
+        "RW-SW-84"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "pressure is low"
+      ],
+      "inputs": {
+        "pressure": "low"
+      },
+      "steps": [
+        "ventilator is triggered",
+        "high severity alarm is triggered with the display text 'LOW INSP P'"
+      ],
+      "expected": [
+        "high severity alarm is triggered with the display text 'LOW INSP P'"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Medium severity alarm indication",
+          "req_ids": [
+            "RW-SW-75"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "alarm severity is set to medium"
+          ],
+          "inputs": {
+            "alarm_severity": "medium"
+          },
+          "steps": [
+            "the alarm is triggered",
+            "the alarm indicator should be yellow",
+            "the alarm frequency should be 0.5Hz with a 50% duty cycle"
+          ],
+          "expected": [
+            "alarm indicator is yellow",
+            "alarm frequency is 0.5Hz with a 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "High severity alarm auditory signal",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "alarm severity is set to high"
+          ],
+          "inputs": {
+            "alarm_severity": "high"
+          },
+          "steps": [
+            "the alarm is triggered",
+            "the alarm should produce 10 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+          ],
+          "expected": [
+            "alarm produces 10 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "High severity alarm auditory signal with 4 pulses",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "alarm severity is set to high"
+          ],
+          "inputs": {
+            "alarm_severity": "high"
+          },
+          "steps": [
+            "the alarm is triggered",
+            "the alarm should produce 4 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+          ],
+          "expected": [
+            "alarm produces 4 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Audio pause/alarm pause key press",
+          "req_ids": [
+            "RW-SW-78"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "audio pause/alarm pause key is pressed"
+          ],
+          "inputs": {
+            "key_pressed": "audio pause/alarm pause key"
+          },
+          "steps": [
+            "the key press is registered",
+            "all active alarms should be paused for 60 seconds",
+            "the alarm activation symbol should be displayed with the symbol IEC 60417-5576"
+          ],
+          "expected": [
+            "all active alarms are paused for 60 seconds",
+            "alarm activation symbol is displayed with the symbol IEC 60417-5576"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Apnea alarm",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "apnea time interval has expired"
+          ],
+          "inputs": {
+            "apnea_time_interval_expired": "true"
+          },
+          "steps": [
+            "the ventilator is triggered",
+            "a medium priority alarm should be triggered with the display text 'APNEA ALARM'"
+          ],
+          "expected": [
+            "medium priority alarm is triggered with the display text 'APNEA ALARM'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Breath rate alarm",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "breath rate has exceeded the breath rate setting"
+          ],
+          "inputs": {
+            "breath_rate_exceeded": "true"
+          },
+          "steps": [
+            "the ventilator is triggered",
+            "a medium level alarm should be triggered with the display text 'HIGH BREATH RATE'"
+          ],
+          "expected": [
+            "medium level alarm is triggered with the display text 'HIGH BREATH RATE'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Maximum breath rate setting",
+          "req_ids": [
+            "RW-SW-83"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "breath rate setting is set to the maximum"
+          ],
+          "inputs": {
+            "breath_rate_setting": "maximum"
+          },
+          "steps": [
+            "the ventilator is triggered",
+            "a medium level alarm should be triggered with the display text 'HIGH BREATH RATE'"
+          ],
+          "expected": [
+            "medium level alarm is triggered with the display text 'HIGH BREATH RATE'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Pressure low alarm",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "pressure is low"
+          ],
+          "inputs": {
+            "pressure": "low"
+          },
+          "steps": [
+            "the ventilator is triggered",
+            "a high severity alarm should be triggered with the display text 'LOW INSP P'"
+          ],
+          "expected": [
+            "high severity alarm is triggered with the display text 'LOW INSP P'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": "```gherkin\nFeature: Alarms\n\n  Scenario: Medium severity alarm indication\n    Given the alarm severity is set to medium\n    When the alarm is triggered\n    Then the alarm indicator should be yellow\n    And the alarm frequency should be 0.5Hz with a 50% duty cycle\n\n  Scenario: High severity alarm auditory signal\n    Given the alarm severity is set to high\n    When the alarm is triggered\n    Then the alarm should produce 10 pulses with each pulse lasting 200ms and a frequency of 500Hz\n\n  Scenario: High severity alarm auditory signal with 4 pulses\n    Given the alarm severity is set to high\n    When the alarm is triggered\n    Then the alarm should produce 4 pulses with each pulse lasting 200ms and a frequency of 500Hz\n\n  Scenario: Audio pause/alarm pause key press\n    Given the audio pause/alarm pause key is pressed\n    When the key press is registered\n    Then all active alarms should be paused for 60 seconds\n    And the alarm activation symbol should be displayed with the symbol IEC 60417-5576\n\n  Scenario: Apnea alarm\n    Given the apnea time interval has expired\n    When the ventilator is triggered\n    Then a medium priority alarm should be triggered with the display text \"APNEA ALARM\"\n\n  Scenario: Breath rate alarm\n    Given the breath rate has exceeded the breath rate setting\n    When the ventilator is triggered\n    Then a medium level alarm should be triggered with the display text \"HIGH BREATH RATE\"\n\n  Scenario: Maximum breath rate setting\n    Given the breath rate setting is set to the maximum\n    When the ventilator is triggered\n    Then a medium level alarm should be triggered with the display text \"HIGH BREATH RATE\"\n\n  Scenario: Pressure low alarm\n    Given the pressure is low\n    When the ventilator is triggered\n    Then a high severity alarm should be triggered with the display text \"LOW INSP P\"\n```\n\n```json\n[\n  {\n    \"id\": \"TC-001\",\n    \"title\": \"Medium severity alarm indication\",\n    \"req_ids\": [\"RW-SW-75\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"alarm severity is set to medium\"],\n    \"inputs\": {\"alarm_severity\": \"medium\"},\n    \"steps\": [\n      \"the alarm is triggered\",\n      \"the alarm indicator should be yellow\",\n      \"the alarm frequency should be 0.5Hz with a 50% duty cycle\"\n    ],\n    \"expected\": [\"alarm indicator is yellow\", \"alarm frequency is 0.5Hz with a 50% duty cycle\"]\n  },\n  {\n    \"id\": \"TC-002\",\n    \"title\": \"High severity alarm auditory signal\",\n    \"req_ids\": [\"RW-SW-76\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"alarm severity is set to high\"],\n    \"inputs\": {\"alarm_severity\": \"high\"},\n    \"steps\": [\n      \"the alarm is triggered\",\n      \"the alarm should produce 10 pulses with each pulse lasting 200ms and a frequency of 500Hz\"\n    ],\n    \"expected\": [\"alarm produces 10 pulses with each pulse lasting 200ms and a frequency of 500Hz\"]\n  },\n  {\n    \"id\": \"TC-003\",\n    \"title\": \"High severity alarm auditory signal with 4 pulses\",\n    \"req_ids\": [\"RW-SW-77\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"alar",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Representation artifact is empty.",
+      "artifact": "Feature: Alarms\n\n  Scenario: Medium severity alarm indication\n    Given the alarm severity is set to medium\n    When the alarm is triggered\n    Then the alarm indicator should be yellow\n    And the alarm frequency should be 0.5Hz with a 50% duty cycle\n\n  Scenario: High severity alarm auditory signal\n    Given the alarm severity is set to high\n    When the alarm is triggered\n    Then the alarm should produce 10 pulses with each pulse lasting 200ms and a frequency of 500Hz\n\n  Scenario: High severity alarm auditory signal with 4 pulses\n    Given the alarm severity is set to high\n    When the alarm is triggered\n    Then the alarm should produce 4 pulses with each pulse lasting 200ms and a frequency of 500Hz\n\n  Scenario: Audio pause/alarm pause key press\n    Given the audio pause/alarm pause key is pressed\n    When the key press is registered\n    Then all active alarms should be paused for 60 seconds\n    And the alarm activation symbol should be displayed with the IEC 60417-5576 symbol\n\n  Scenario: Apnea alarm\n    Given the apnea time interval has expired\n    When the ventilator is triggered\n    Then a medium priority alarm should be triggered with the display text \"APNEA ALARM\"\n\n  Scenario: Breath rate alarm\n    Given the breath rate has exceeded the breath rate setting\n    When the ventilator is triggered\n    Then a medium level alarm should be triggered with the display text \"HIGH BREATH RATE\"\n\n  Scenario: Maximum breath rate setting\n    Given the breath rate setting is set to the maximum\n    When the ventilator is triggered\n    Then a medium level alarm should be triggered with the display text \"HIGH BREATH RATE\"\n\n  Scenario: Pressure low alarm\n    Given the pressure is low\n    When the ventilator is triggered\n    Then a high severity alarm should be triggered with the display text \"LOW INSP P\"",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Medium severity alarm indication",
+          "req_ids": [
+            "RW-SW-75"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "alarm severity is set to medium"
+          ],
+          "inputs": {
+            "alarm_severity": "medium"
+          },
+          "steps": [
+            "alarm is triggered",
+            "alarm indicator is yellow",
+            "alarm frequency is 0.5Hz with a 50% duty cycle"
+          ],
+          "expected": [
+            "alarm indicator is yellow",
+            "alarm frequency is 0.5Hz with a 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "High severity alarm auditory signal",
+          "req_ids": [
+            "RW-SW-76"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "alarm severity is set to high"
+          ],
+          "inputs": {
+            "alarm_severity": "high"
+          },
+          "steps": [
+            "alarm is triggered",
+            "alarm produces 10 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+          ],
+          "expected": [
+            "alarm produces 10 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "High severity alarm auditory signal with 4 pulses",
+          "req_ids": [
+            "RW-SW-77"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "alarm severity is set to high"
+          ],
+          "inputs": {
+            "alarm_severity": "high"
+          },
+          "steps": [
+            "alarm is triggered",
+            "alarm produces 4 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+          ],
+          "expected": [
+            "alarm produces 4 pulses with each pulse lasting 200ms and a frequency of 500Hz"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Audio pause/alarm pause key press",
+          "req_ids": [
+            "RW-SW-78"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "audio pause/alarm pause key is pressed"
+          ],
+          "inputs": {
+            "key_press": "audio pause/alarm pause key"
+          },
+          "steps": [
+            "key press is registered",
+            "all active alarms are paused for 60 seconds",
+            "alarm activation symbol is displayed with the IEC 60417-5576 symbol"
+          ],
+          "expected": [
+            "all active alarms are paused for 60 seconds",
+            "alarm activation symbol is displayed with the IEC 60417-5576 symbol"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Apnea alarm",
+          "req_ids": [
+            "RW-SW-80"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "apnea time interval has expired"
+          ],
+          "inputs": {
+            "apnea_time_interval": "expired"
+          },
+          "steps": [
+            "ventilator is triggered",
+            "medium priority alarm is triggered with the display text 'APNEA ALARM'"
+          ],
+          "expected": [
+            "medium priority alarm is triggered with the display text 'APNEA ALARM'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Breath rate alarm",
+          "req_ids": [
+            "RW-SW-82"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "breath rate has exceeded the breath rate setting"
+          ],
+          "inputs": {
+            "breath_rate": "exceeded"
+          },
+          "steps": [
+            "ventilator is triggered",
+            "medium level alarm is triggered with the display text 'HIGH BREATH RATE'"
+          ],
+          "expected": [
+            "medium level alarm is triggered with the display text 'HIGH BREATH RATE'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Maximum breath rate setting",
+          "req_ids": [
+            "RW-SW-83"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "breath rate setting is set to the maximum"
+          ],
+          "inputs": {
+            "breath_rate_setting": "maximum"
+          },
+          "steps": [
+            "ventilator is triggered",
+            "medium level alarm is triggered with the display text 'HIGH BREATH RATE'"
+          ],
+          "expected": [
+            "medium level alarm is triggered with the display text 'HIGH BREATH RATE'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Pressure low alarm",
+          "req_ids": [
+            "RW-SW-84"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "pressure is low"
+          ],
+          "inputs": {
+            "pressure": "low"
+          },
+          "steps": [
+            "ventilator is triggered",
+            "high severity alarm is triggered with the display text 'LOW INSP P'"
+          ],
+          "expected": [
+            "high severity alarm is triggered with the display text 'LOW INSP P'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 18,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No boundary value tests for frequency, pulse count, pulse duration, pause duration, or breath rate threshold",
+          "No negative or error path tests",
+          "Test suite lacks scenario outlines with examples for normal, edge, and invalid values",
+          "Requirement RW-SW-83 is misinterpreted; test expects alarm when setting to maximum, but requirement only specifies threshold",
+          "No verification of the exact IEC 60417-5576 symbol display beyond presence"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.7,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

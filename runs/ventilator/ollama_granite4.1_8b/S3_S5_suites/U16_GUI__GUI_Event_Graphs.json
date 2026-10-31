@@ -1,0 +1,1157 @@
+{
+  "unit_id": "U16_GUI",
+  "representation": "GUI Event Graphs",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "GUI Event Graphs",
+    "group": 3,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.3,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.75,
+    "hallucinated": [
+      {
+        "value": "Confirm PEEP change?",
+        "context": "Confirmation modal message",
+        "grounded": false
+      },
+      {
+        "value": "0.95",
+        "context": "FiO2 below minimum",
+        "grounded": false
+      },
+      {
+        "value": "expected_leakage",
+        "context": "Leakage expected value",
+        "grounded": false
+      },
+      {
+        "value": "text size",
+        "context": "Readability measurement",
+        "grounded": false
+      },
+      {
+        "value": "contrast",
+        "context": "Readability measurement",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 20,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add negative tests for PEEP, RR, and IER boundaries",
+      "Make oracle assertions explicit with exact expected values",
+      "Verify confirmation modal blocks background interactions",
+      "Test FiO2 increments of 0.1 across full range",
+      "Provide concrete expected leakage values for leakage computation test"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.8575,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "GUI Event Graphs for Unit U16_GUI:\n\n1. **PEEP Adjustment Test**\n   - Event: User selects PEEP widget\n   - Follow-on: Slider/numeric input displayed (0-20 cmH2O, increment 1)\n   - Steps:\n     1. User moves slider to 0 cmH2O → Verify value displayed as 0\n     2. User moves slider to 20 cmH2O → Verify value displayed as 20\n     3. User inputs 10 cmH2O → Verify value updated to 10\n   - Preconditions: GUI initialized\n   - Expected: Values reflect increments of 1, no negative values\n\n2. **RR Adjustment Test**\n   - Event: User selects RR widget\n   - Follow-on: Slider/numeric input displayed (5-30 bpm, increment 1)\n   - Steps:\n     1. User moves slider to 5 bpm → Verify value displayed as 5\n     2. User moves slider to 30 bpm → Verify value displayed as 30\n     3. User inputs 15 bpm → Verify value updated to 15\n   - Preconditions: GUI initialized\n   - Expected: Values reflect increments of 1, no values outside 5-30\n\n3. **IER Adjustment Test**\n   - Event: User selects IER widget\n   - Follow-on: Slider/numeric input displayed (1:1 to 1:4)\n   - Steps:\n     1. User selects 1:1 → Verify value displayed as 1:1\n     2. User selects 1:4 → Verify value displayed as 1:4\n     3. User inputs 1:3 → Verify value updated to 1:3\n   - Preconditions: GUI initialized\n   - Expected: Values reflect valid ratios, no values outside 1:1 to 1:4\n\n4. **Confirmation Requirement Test**\n   - Event: User changes any ventilation/alarm setting\n   - Follow-on: Confirmation modal dialog appears\n   - Steps:\n     1. User changes PEEP to 15 cmH2O → Modal dialog prompts \"Confirm PEEP change?\"\n     2. User clicks \"Confirm\" → Verify setting updated to 15 cmH2O\n     3. User clicks \"Cancel\" → Verify setting remains unchanged\n   - Preconditions: GUI initialized\n   - Expected: Modal blocks background interactions until confirmed\n\n5. **FiO2 Adjustment Test**\n   - Event: User selects FiO2 widget\n   - Follow-on: Slider/numeric input displayed (0.21-0.96 minimum, 0.96-1.0)\n   - Steps:\n     1. User moves slider to 0.21 → Verify value displayed as 0.21\n     2. User moves slider to 0.96 → Verify value displayed as 0.96\n     3. User inputs 0.95 → Verify value not updated (error)\n     4. User inputs 0.99 → Verify value updated to 0.99\n   - Preconditions: GUI initialized\n   - Expected: Values reflect minimum 0.96, no values below 0.96 or above 1.0\n\n6. **HFNC Flow Rate Adjustment Test**\n   - Event: User selects HFNC flow rate widget\n   - Follow-on: Slider/numeric input displayed (0-60 L/min, increment 5)\n   - Steps:\n     1. User moves slider to 0 L/min → Verify value displayed as 0\n     2. User moves slider to 60 L/min → Verify value displayed as 60\n     3. User inputs 30 L/min → Verify value updated to 30\n   - Preconditions: GUI initialized\n   - Expected: Values reflect increments of 5, no values outside 0-60\n\n7. **Leakage Computation Test**\n   - Event: User triggers leakage computation\n   - Follow-on: System computes leakage based on actuation and sensor readings\n   - Steps:\n     1. Simulate controller actuation and sensor readings\n     2. Verify computed leakage value within expected range\n   - Preconditions: Simulation data provided\n   - Expected: Correct leakage computation\n\n8. **Readability at 1m Test**\n   - Event: User views GUI from 1m distance\n   - Follow-on: Parameters and alarms are legible\n   - Steps:\n     1. Measure text size and contrast at 1m\n     2. Verify legibility meets standards\n   - Preconditions: GUI displayed\n   - Expected: All parameters and alarms readable at 1m",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "PEEP Adjustment Test",
+      "req_ids": [
+        "RW-SW-162"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI initialized"
+      ],
+      "inputs": {
+        "name": "value",
+        "value": "0"
+      },
+      "steps": [
+        "User moves slider to 0 cmH2O",
+        "Verify value displayed as 0"
+      ],
+      "expected": [
+        "Value reflects increment of 1, no negative values"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "RR Adjustment Test",
+      "req_ids": [
+        "RW-SW-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI initialized"
+      ],
+      "inputs": {
+        "name": "value",
+        "value": "5"
+      },
+      "steps": [
+        "User moves slider to 5 bpm",
+        "Verify value displayed as 5"
+      ],
+      "expected": [
+        "Values reflect increments of 1, no values outside 5-30"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "IER Adjustment Test",
+      "req_ids": [
+        "RW-SW-13"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI initialized"
+      ],
+      "inputs": {
+        "name": "value",
+        "value": "1:1"
+      },
+      "steps": [
+        "User selects 1:1",
+        "Verify value displayed as 1:1"
+      ],
+      "expected": [
+        "Values reflect valid ratios, no values outside 1:1 to 1:4"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Confirmation Requirement Test",
+      "req_ids": [
+        "RW-SW-24"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "GUI initialized"
+      ],
+      "inputs": {
+        "name": "value",
+        "value": "15"
+      },
+      "steps": [
+        "User changes PEEP to 15 cmH2O",
+        "Modal dialog prompts 'Confirm PEEP change?'",
+        "User clicks 'Cancel'",
+        "Verify setting remains unchanged"
+      ],
+      "expected": [
+        "Modal blocks background interactions until confirmed"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "FiO2 Adjustment Test",
+      "req_ids": [
+        "RW-SW-34"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "GUI initialized"
+      ],
+      "inputs": {
+        "name": "value",
+        "value": "0.96"
+      },
+      "steps": [
+        "User moves slider to 0.96",
+        "Verify value displayed as 0.96"
+      ],
+      "expected": [
+        "Values reflect minimum 0.96, no values below 0.96 or above 1.0"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "HFNC Flow Rate Adjustment Test",
+      "req_ids": [
+        "RW-SW-35"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI initialized"
+      ],
+      "inputs": {
+        "name": "value",
+        "value": "30"
+      },
+      "steps": [
+        "User moves slider to 30 L/min",
+        "Verify value displayed as 30"
+      ],
+      "expected": [
+        "Values reflect increments of 5, no values outside 0-60"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Leakage Computation Test",
+      "req_ids": [
+        "RW-SW-43"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Simulation data provided"
+      ],
+      "inputs": {
+        "name": "value",
+        "value": "expected_leakage"
+      },
+      "steps": [
+        "Simulate controller actuation and sensor readings",
+        "Verify computed leakage value within expected range"
+      ],
+      "expected": [
+        "Correct leakage computation"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Readability at 1m Test",
+      "req_ids": [
+        "RW-SW-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI displayed"
+      ],
+      "inputs": {},
+      "steps": [
+        "Measure text size and contrast at 1m",
+        "Verify legibility meets standards"
+      ],
+      "expected": [
+        "All parameters and alarms readable at 1m"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "// GUI Event Graphs for unit U16_GUI\n\n// Graph 1: Adjust PEEP (RW-SW-162)\nStart -> PEEP_Slider[0-20 cmH2O, step=1] -> Confirm_PEEP[required] -> Display_PEEP[0-20 cmH2O] -> End\n\n// Graph 2: Adjust RR (RW-SW-12)\nStart -> RR_Slider[5-30 bpm, step=1] -> Confirm_RR[required] -> Display_RR[5-30 bpm] -> End\n\n// Graph 3: Adjust IER (RW-SW-13)\nStart -> IER_Slider[1:1 to 1:4] -> Confirm_IER[required] -> Display_IER[1:1 to 1:4] -> End\n\n// Graph 4: Confirm all ventilation and alarm setting changes (RW-SW-24)\nStart -> Change_Ventilation_Alarm -> Confirm_Change[required] -> Display_Changed_Settings -> End\n\n// Graph 5: Adjust FiO2 (RW-SW-34)\nStart -> FiO2_Slider[0.21-0.96 to 1.0, step=0.1] -> Confirm_FiO2[required] -> Display_FiO2[0.21-1.0] -> End\n\n// Graph 6: Adjust HFNC flow rate (RW-SW-35)\nStart -> HFNC_Flow_Slider[0-60 L/min, step=5] -> Confirm_HFNC[required] -> Display_HFNC_Flow[0-60 L/min] -> End\n\n// Graph 7: Compute leakage (RW-SW-43)\nStart -> Input_Controller_Actuation -> Input_Sensor_Readings -> Compute_Leakage -> Display_Leakage -> End",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Adjust PEEP to 10 cmH2O",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "PEEP_Value": 10
+          },
+          "steps": [
+            "Navigate to PEEP adjustment slider",
+            "Set PEEP to 10 cmH2O",
+            "Confirm the change"
+          ],
+          "expected": [
+            "PEEP displayed as 10 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Adjust PEEP to boundary value 0 cmH2O",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "PEEP_Value": 0
+          },
+          "steps": [
+            "Navigate to PEEP adjustment slider",
+            "Set PEEP to 0 cmH2O",
+            "Confirm the change"
+          ],
+          "expected": [
+            "PEEP displayed as 0 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Adjust PEEP to boundary value 20 cmH2O",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "PEEP_Value": 20
+          },
+          "steps": [
+            "Navigate to PEEP adjustment slider",
+            "Set PEEP to 20 cmH2O",
+            "Confirm the change"
+          ],
+          "expected": [
+            "PEEP displayed as 20 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Adjust RR to 5 bpm",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "RR_Value": 5
+          },
+          "steps": [
+            "Navigate to RR adjustment slider",
+            "Set RR to 5 bpm",
+            "Confirm the change"
+          ],
+          "expected": [
+            "RR displayed as 5 bpm"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Adjust RR to 30 bpm",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "RR_Value": 30
+          },
+          "steps": [
+            "Navigate to RR adjustment slider",
+            "Set RR to 30 bpm",
+            "Confirm the change"
+          ],
+          "expected": [
+            "RR displayed as 30 bpm"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Adjust IER to 1:1",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "IER_Ratio": "1:1"
+          },
+          "steps": [
+            "Navigate to IER adjustment slider",
+            "Set IER to 1:1",
+            "Confirm the change"
+          ],
+          "expected": [
+            "IER displayed as 1:1"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Adjust IER to 1:4",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "IER_Ratio": "1:4"
+          },
+          "steps": [
+            "Navigate to IER adjustment slider",
+            "Set IER to 1:4",
+            "Confirm the change"
+          ],
+          "expected": [
+            "IER displayed as 1:4"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Confirm all ventilation and alarm setting changes",
+          "req_ids": [
+            "RW-SW-24"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "ChangeType": "Ventilation_Alarm"
+          },
+          "steps": [
+            "Modify ventilation and alarm settings",
+            "Trigger confirmation dialog",
+            "Select 'Confirm'"
+          ],
+          "expected": [
+            "Settings are applied"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Adjust FiO2 to 0.21",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "FiO2_Value": 0.21
+          },
+          "steps": [
+            "Navigate to FiO2 adjustment slider",
+            "Set FiO2 to 0.21",
+            "Confirm the change"
+          ],
+          "expected": [
+            "FiO2 displayed as 0.21"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Adjust FiO2 to 0.96",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "FiO2_Value": 0.96
+          },
+          "steps": [
+            "Navigate to FiO2 adjustment slider",
+            "Set FiO2 to 0.96",
+            "Confirm the change"
+          ],
+          "expected": [
+            "FiO2 displayed as 0.96"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Adjust FiO2 to 1.0",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "FiO2_Value": 1.0
+          },
+          "steps": [
+            "Navigate to FiO2 adjustment slider",
+            "Set FiO2 to 1.0",
+            "Confirm the change"
+          ],
+          "expected": [
+            "FiO2 displayed as 1.0"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Adjust HFNC flow rate to 0 L/min",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "HFNC_Flow": 0
+          },
+          "steps": [
+            "Navigate to HFNC flow rate slider",
+            "Set HFNC flow to 0 L/min",
+            "Confirm the change"
+          ],
+          "expected": [
+            "HFNC flow displayed as 0 L/min"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Adjust HFNC flow rate to 60 L/min",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "HFNC_Flow": 60
+          },
+          "steps": [
+            "Navigate to HFNC flow rate slider",
+            "Set HFNC flow to 60 L/min",
+            "Confirm the change"
+          ],
+          "expected": [
+            "HFNC flow displayed as 60 L/min"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Compute leakage with valid actuation and sensor readings",
+          "req_ids": [
+            "RW-SW-43"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Controller_Actuation": "valid",
+            "Sensor_Readings": "valid"
+          },
+          "steps": [
+            "Input valid controller actuation",
+            "Input valid sensor readings",
+            "Trigger leakage computation"
+          ],
+          "expected": [
+            "Leakage amount computed and displayed"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Negative path: Attempt to set PEEP below 0 cmH2O",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "PEEP_Value": -1
+          },
+          "steps": [
+            "Navigate to PEEP adjustment slider",
+            "Attempt to set PEEP to -1 cmH2O",
+            "Confirm the change"
+          ],
+          "expected": [
+            "Error message displayed, PEEP remains unchanged"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Negative path: Attempt to set RR below 5 bpm",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "RR_Value": 4
+          },
+          "steps": [
+            "Navigate to RR adjustment slider",
+            "Attempt to set RR to 4 bpm",
+            "Confirm the change"
+          ],
+          "expected": [
+            "Error message displayed, RR remains unchanged"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Negative path: Attempt to set IER outside 1:1 to 1:4",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "IER_Ratio": "1:5"
+          },
+          "steps": [
+            "Navigate to IER adjustment slider",
+            "Attempt to set IER to 1:5",
+            "Confirm the change"
+          ],
+          "expected": [
+            "Error message displayed, IER remains unchanged"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Negative path: Cancel confirmation of ventilation and alarm changes",
+          "req_ids": [
+            "RW-SW-24"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "ChangeType": "Ventilation_Alarm"
+          },
+          "steps": [
+            "Modify ventilation and alarm settings",
+            "Trigger confirmation dialog",
+            "Select 'Cancel'"
+          ],
+          "expected": [
+            "Settings remain unchanged"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Negative path: Attempt to set FiO2 below 0.21",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "FiO2_Value": 0.2
+          },
+          "steps": [
+            "Navigate to FiO2 adjustment slider",
+            "Attempt to set FiO2 to 0.2",
+            "Confirm the change"
+          ],
+          "expected": [
+            "Error message displayed, FiO2 remains unchanged"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Negative path: Attempt to set FiO2 above 1.0",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "FiO2_Value": 1.1
+          },
+          "steps": [
+            "Navigate to FiO2 adjustment slider",
+            "Attempt to set FiO2 to 1.1",
+            "Confirm the change"
+          ],
+          "expected": [
+            "Error message displayed, FiO2 remains unchanged"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "Negative path: Attempt to set HFNC flow rate below 0 L/min",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "HFNC_Flow": -1
+          },
+          "steps": [
+            "Navigate to HFNC flow rate slider",
+            "Attempt to set HFNC flow to -1 L/min",
+            "Confirm the change"
+          ],
+          "expected": [
+            "Error message displayed, HFNC flow remains unchanged"
+          ]
+        },
+        {
+          "id": "TC-022",
+          "title": "Negative path: Attempt to set HFNC flow rate above 60 L/min",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "HFNC_Flow": 61
+          },
+          "steps": [
+            "Navigate to HFNC flow rate slider",
+            "Attempt to set HFNC flow to 61 L/min",
+            "Confirm the change"
+          ],
+          "expected": [
+            "Error message displayed, HFNC flow remains unchanged"
+          ]
+        },
+        {
+          "id": "TC-023",
+          "title": "Negative path: Invalid controller actuation for leakage computation",
+          "req_ids": [
+            "RW-SW-43"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Controller_Actuation": "invalid",
+            "Sensor_Readings": "valid"
+          },
+          "steps": [
+            "Input invalid controller actuation",
+            "Input valid sensor readings",
+            "Trigger leakage computation"
+          ],
+          "expected": [
+            "Error message displayed, leakage not computed"
+          ]
+        },
+        {
+          "id": "TC-024",
+          "title": "Negative path: Invalid sensor readings for leakage computation",
+          "req_ids": [
+            "RW-SW-43"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Controller_Actuation": "valid",
+            "Sensor_Readings": "invalid"
+          },
+          "steps": [
+            "Input valid controller actuation",
+            "Input invalid sensor readings",
+            "Trigger leakage computation"
+          ],
+          "expected": [
+            "Error message displayed, leakage not computed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "GUI Event Graphs",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.75,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.3429,
+        "hallucinated": [
+          {
+            "value": "-1",
+            "context": "PEEP negative",
+            "grounded": false
+          },
+          {
+            "value": "4",
+            "context": "RR negative",
+            "grounded": false
+          },
+          {
+            "value": "1:5",
+            "context": "IER negative",
+            "grounded": false
+          },
+          {
+            "value": "0.2",
+            "context": "FiO2 negative",
+            "grounded": false
+          },
+          {
+            "value": "1.1",
+            "context": "FiO2 negative",
+            "grounded": false
+          },
+          {
+            "value": "-1",
+            "context": "HFNC negative",
+            "grounded": false
+          },
+          {
+            "value": "61",
+            "context": "HFNC negative",
+            "grounded": false
+          },
+          {
+            "value": "PEEP displayed as 10 cmH2O",
+            "context": "PEEP display message",
+            "grounded": false
+          },
+          {
+            "value": "PEEP displayed as 0 cmH2O",
+            "context": "PEEP display message",
+            "grounded": false
+          },
+          {
+            "value": "PEEP displayed as 20 cmH2O",
+            "context": "PEEP display message",
+            "grounded": false
+          },
+          {
+            "value": "RR displayed as 5 bpm",
+            "context": "RR display message",
+            "grounded": false
+          },
+          {
+            "value": "RR displayed as 30 bpm",
+            "context": "RR display message",
+            "grounded": false
+          },
+          {
+            "value": "IER displayed as 1:1",
+            "context": "IER display message",
+            "grounded": false
+          },
+          {
+            "value": "IER displayed as 1:4",
+            "context": "IER display message",
+            "grounded": false
+          },
+          {
+            "value": "Settings are applied",
+            "context": "Confirmation message",
+            "grounded": false
+          },
+          {
+            "value": "Error message displayed, PEEP remains unchanged",
+            "context": "PEEP error message",
+            "grounded": false
+          },
+          {
+            "value": "Error message displayed, RR remains unchanged",
+            "context": "RR error message",
+            "grounded": false
+          },
+          {
+            "value": "Error message displayed, IER remains unchanged",
+            "context": "IER error message",
+            "grounded": false
+          },
+          {
+            "value": "Error message displayed, FiO2 remains unchanged",
+            "context": "FiO2 error message",
+            "grounded": false
+          },
+          {
+            "value": "Error message displayed, HFNC flow remains unchanged",
+            "context": "HFNC error message",
+            "grounded": false
+          },
+          {
+            "value": "Settings remain unchanged",
+            "context": "Cancel confirmation message",
+            "grounded": false
+          },
+          {
+            "value": "Leakage amount computed and displayed",
+            "context": "Leakage success message",
+            "grounded": false
+          },
+          {
+            "value": "Error message displayed, leakage not computed",
+            "context": "Leakage error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 35,
+        "uncovered_clauses": [
+          "RW-SW-11"
+        ],
+        "weaknesses": [
+          "No test for RW-SW-11 (readability at 1m).",
+          "Missing verification that modal dialogs block background interactions.",
+          "No tests for GUI rendering at 1m distance.",
+          "Increment steps (e.g., PEEP increments of 1) not explicitly verified.",
+          "Error messages are generic; specific error codes or messages should be asserted."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-11"
+        ],
+        "fsa_score": 0.8139,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.8139; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.75, 'boundary_coverage': 1.0, 'groundedness_mg': 0.3429}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-11'] (add at least one each)\n- uncovered clause: RW-SW-11\n- ungrounded value '-1' (PEEP negative): remove or use the SRS value\n- ungrounded value '4' (RR negative): remove or use the SRS value\n- ungrounded value '1:5' (IER negative): remove or use the SRS value\n- ungrounded value '0.2' (FiO2 negative): remove or use the SRS value\n- ungrounded value '1.1' (FiO2 negative): remove or use the SRS value\n- ungrounded value '-1' (HFNC negative): remove or use the SRS value\n- No test for RW-SW-11 (readability at 1m).\n- Missing verification that modal dialogs block background interactions.\n- No tests for GUI rendering at 1m distance.\n- Increment steps (e.g., PEEP increments of 1) not explicitly verified.\n- Error messages are generic; specific error codes or messages should be asserted.",
+      "artifact": "GUI Event Graphs for Unit U16_GUI:\n\n1. **PEEP Adjustment Test**\n   - Event: User selects PEEP widget\n   - Follow-on: Slider/numeric input displayed (0-20 cmH2O, increment 1)\n   - Steps:\n     1. User moves slider to 0 cmH2O → Verify value displayed as 0\n     2. User moves slider to 20 cmH2O → Verify value displayed as 20\n     3. User inputs 10 cmH2O → Verify value updated to 10\n   - Preconditions: GUI initialized\n   - Expected: Values reflect increments of 1, no negative values\n\n2. **RR Adjustment Test**\n   - Event: User selects RR widget\n   - Follow-on: Slider/numeric input displayed (5-30 bpm, increment 1)\n   - Steps:\n     1. User moves slider to 5 bpm → Verify value displayed as 5\n     2. User moves slider to 30 bpm → Verify value displayed as 30\n     3. User inputs 15 bpm → Verify value updated to 15\n   - Preconditions: GUI initialized\n   - Expected: Values reflect increments of 1, no values outside 5-30\n\n3. **IER Adjustment Test**\n   - Event: User selects IER widget\n   - Follow-on: Slider/numeric input displayed (1:1 to 1:4)\n   - Steps:\n     1. User selects 1:1 → Verify value displayed as 1:1\n     2. User selects 1:4 → Verify value displayed as 1:4\n     3. User inputs 1:3 → Verify value updated to 1:3\n   - Preconditions: GUI initialized\n   - Expected: Values reflect valid ratios, no values outside 1:1 to 1:4\n\n4. **Confirmation Requirement Test**\n   - Event: User changes any ventilation/alarm setting\n   - Follow-on: Confirmation modal dialog appears\n   - Steps:\n     1. User changes PEEP to 15 cmH2O → Modal dialog prompts \"Confirm PEEP change?\"\n     2. User clicks \"Confirm\" → Verify setting updated to 15 cmH2O\n     3. User clicks \"Cancel\" → Verify setting remains unchanged\n   - Preconditions: GUI initialized\n   - Expected: Modal blocks background interactions until confirmed\n\n5. **FiO2 Adjustment Test**\n   - Event: User selects FiO2 widget\n   - Follow-on: Slider/numeric input displayed (0.21-0.96 minimum, 0.96-1.0)\n   - Steps:\n     1. User moves slider to 0.21 → Verify value displayed as 0.21\n     2. User moves slider to 0.96 → Verify value displayed as 0.96\n     3. User inputs 0.95 → Verify value not updated (error)\n     4. User inputs 0.99 → Verify value updated to 0.99\n   - Preconditions: GUI initialized\n   - Expected: Values reflect minimum 0.96, no values below 0.96 or above 1.0\n\n6. **HFNC Flow Rate Adjustment Test**\n   - Event: User selects HFNC flow rate widget\n   - Follow-on: Slider/numeric input displayed (0-60 L/min, increment 5)\n   - Steps:\n     1. User moves slider to 0 L/min → Verify value displayed as 0\n     2. User moves slider to 60 L/min → Verify value displayed as 60\n     3. User inputs 30 L/min → Verify value updated to 30\n   - Preconditions: GUI initialized\n   - Expected: Values reflect increments of 5, no values outside 0-60\n\n7. **Leakage Computation Test**\n   - Event: User triggers leakage computation\n   - Follow-on: System computes leakage based on actuation and sensor readings\n   - Steps:\n     1. Simulate controller actuation and sensor readings\n     2. Verify computed leakage value within expected range\n   - Preconditions: Simulation data provided\n   - Expected: Correct leakage computation\n\n8. **Readability at 1m Test**\n   - Event: User views GUI from 1m distance\n   - Follow-on: Parameters and alarms are legible\n   - Steps:\n     1. Measure text size and contrast at 1m\n     2. Verify legibility meets standards\n   - Preconditions: GUI displayed\n   - Expected: All parameters and alarms readable at 1m",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "PEEP Adjustment Test",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI initialized"
+          ],
+          "inputs": {
+            "name": "value",
+            "value": "0"
+          },
+          "steps": [
+            "User moves slider to 0 cmH2O",
+            "Verify value displayed as 0"
+          ],
+          "expected": [
+            "Value reflects increment of 1, no negative values"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "RR Adjustment Test",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI initialized"
+          ],
+          "inputs": {
+            "name": "value",
+            "value": "5"
+          },
+          "steps": [
+            "User moves slider to 5 bpm",
+            "Verify value displayed as 5"
+          ],
+          "expected": [
+            "Values reflect increments of 1, no values outside 5-30"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "IER Adjustment Test",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI initialized"
+          ],
+          "inputs": {
+            "name": "value",
+            "value": "1:1"
+          },
+          "steps": [
+            "User selects 1:1",
+            "Verify value displayed as 1:1"
+          ],
+          "expected": [
+            "Values reflect valid ratios, no values outside 1:1 to 1:4"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Confirmation Requirement Test",
+          "req_ids": [
+            "RW-SW-24"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "GUI initialized"
+          ],
+          "inputs": {
+            "name": "value",
+            "value": "15"
+          },
+          "steps": [
+            "User changes PEEP to 15 cmH2O",
+            "Modal dialog prompts 'Confirm PEEP change?'",
+            "User clicks 'Cancel'",
+            "Verify setting remains unchanged"
+          ],
+          "expected": [
+            "Modal blocks background interactions until confirmed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "FiO2 Adjustment Test",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI initialized"
+          ],
+          "inputs": {
+            "name": "value",
+            "value": "0.96"
+          },
+          "steps": [
+            "User moves slider to 0.96",
+            "Verify value displayed as 0.96"
+          ],
+          "expected": [
+            "Values reflect minimum 0.96, no values below 0.96 or above 1.0"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "HFNC Flow Rate Adjustment Test",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI initialized"
+          ],
+          "inputs": {
+            "name": "value",
+            "value": "30"
+          },
+          "steps": [
+            "User moves slider to 30 L/min",
+            "Verify value displayed as 30"
+          ],
+          "expected": [
+            "Values reflect increments of 5, no values outside 0-60"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Leakage Computation Test",
+          "req_ids": [
+            "RW-SW-43"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Simulation data provided"
+          ],
+          "inputs": {
+            "name": "value",
+            "value": "expected_leakage"
+          },
+          "steps": [
+            "Simulate controller actuation and sensor readings",
+            "Verify computed leakage value within expected range"
+          ],
+          "expected": [
+            "Correct leakage computation"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Readability at 1m Test",
+          "req_ids": [
+            "RW-SW-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI displayed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Measure text size and contrast at 1m",
+            "Verify legibility meets standards"
+          ],
+          "expected": [
+            "All parameters and alarms readable at 1m"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "GUI Event Graphs",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.75,
+        "hallucinated": [
+          {
+            "value": "Confirm PEEP change?",
+            "context": "Confirmation modal message",
+            "grounded": false
+          },
+          {
+            "value": "0.95",
+            "context": "FiO2 below minimum",
+            "grounded": false
+          },
+          {
+            "value": "expected_leakage",
+            "context": "Leakage expected value",
+            "grounded": false
+          },
+          {
+            "value": "text size",
+            "context": "Readability measurement",
+            "grounded": false
+          },
+          {
+            "value": "contrast",
+            "context": "Readability measurement",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 20,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative tests for PEEP, RR, and IER boundaries",
+          "Make oracle assertions explicit with exact expected values",
+          "Verify confirmation modal blocks background interactions",
+          "Test FiO2 increments of 0.1 across full range",
+          "Provide concrete expected leakage values for leakage computation test"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.8575,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

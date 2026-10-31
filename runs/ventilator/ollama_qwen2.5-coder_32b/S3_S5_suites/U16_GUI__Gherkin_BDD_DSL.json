@@ -1,0 +1,1400 @@
+{
+  "unit_id": "U16_GUI",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.75,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.6667,
+    "hallucinated": [
+      {
+        "value": "21",
+        "context": "PEEP value",
+        "grounded": false
+      },
+      {
+        "value": "-1",
+        "context": "PEEP value",
+        "grounded": false
+      },
+      {
+        "value": "31",
+        "context": "RR value",
+        "grounded": false
+      },
+      {
+        "value": "4",
+        "context": "RR value",
+        "grounded": false
+      },
+      {
+        "value": "1:5",
+        "context": "IER value",
+        "grounded": false
+      },
+      {
+        "value": "2:1",
+        "context": "IER value",
+        "grounded": false
+      },
+      {
+        "value": "1.1",
+        "context": "FiO2 value",
+        "grounded": false
+      },
+      {
+        "value": "0.20",
+        "context": "FiO2 value",
+        "grounded": false
+      },
+      {
+        "value": "65",
+        "context": "HFNC flow rate",
+        "grounded": false
+      },
+      {
+        "value": "-5",
+        "context": "HFNC flow rate",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 30,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add explicit assertions for confirmation and leakage scenarios (e.g., error codes or messages).",
+      "Include boundary increment tests (e.g., PEEP 1, 19; RR 6, 29).",
+      "Verify that invalid inputs trigger specific error messages rather than defaulting to nearest valid value.",
+      "Add tests for each setting change to ensure confirmation prompt appears consistently.",
+      "Test UI readability at distances other than 1m to confirm scalability."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.9125,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: GUI Ventilation Settings and Alarms\n\n  Scenario Outline: User can adjust PEEP from 0-20 cmH2O with increments of 1\n    Given the GUI is initialized\n    When the user sets the PEEP to <peep_value> cmH2O\n    Then the PEEP value should be set to <peep_value> cmH2O\n\n    Examples:\n      | peep_value |\n      | 0          |\n      | 10         |\n      | 20         |\n      | 21         | # Invalid value\n      | -1         | # Invalid value\n\n  Scenario Outline: GUI renders parameters and alarms readable at a distance of 1m\n    Given the GUI is initialized\n    When the user views the parameters and alarms from a distance of 1m\n    Then the parameters and alarms should be readable\n\n    Examples:\n      | distance |\n      | 1m       |\n\n  Scenario Outline: User can adjust RR from 5-30 bpm with increments of 1\n    Given the GUI is initialized\n    When the user sets the RR to <rr_value> bpm\n    Then the RR value should be set to <rr_value> bpm\n\n    Examples:\n      | rr_value |\n      | 5        |\n      | 15       |\n      | 30       |\n      | 31       | # Invalid value\n      | 4        | # Invalid value\n\n  Scenario Outline: User can adjust IER from 1:1 to 1:4\n    Given the GUI is initialized\n    When the user sets the IER to <ier_value>\n    Then the IER value should be set to <ier_value>\n\n    Examples:\n      | ier_value |\n      | 1:1       |\n      | 1:2       |\n      | 1:3       |\n      | 1:4       |\n      | 1:5       | # Invalid value\n      | 2:1       | # Invalid value\n\n  Scenario: GUI requires all ventilation and alarm setting changes to be confirmed\n    Given the GUI is initialized\n    When the user changes a ventilation or alarm setting\n    Then the GUI should prompt for confirmation\n\n  Scenario Outline: User can adjust O2 infusion (FiO2) from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1\n    Given the GUI is initialized\n    When the user sets the FiO2 to <fio2_value>\n    Then the FiO2 value should be set to <fio2_value>\n\n    Examples:\n      | fio2_value |\n      | 0.21       |\n      | 0.5        |\n      | 0.96       |\n      | 1.0        |\n      | 1.1        | # Invalid value\n      | 0.20       | # Invalid value\n\n  Scenario Outline: User can adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min\n    Given the GUI is initialized\n    When the user sets the HFNC flow rate to <flow_rate> L/min\n    Then the HFNC flow rate should be set to <flow_rate> L/min\n\n    Examples:\n      | flow_rate |\n      | 0         |\n      | 10        |\n      | 60        |\n      | 65        | # Invalid value\n      | -5        | # Invalid value\n\n  Scenario: GUI computes amount of leakage based on controller actuation and sensor readings\n    Given the GUI is initialized\n    And the controller actuation and sensor readings are available\n    When the GUI computes the leakage\n    Then the leakage amount should be calculated based on the controller actuation and sensor readings",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "User can adjust PEEP to valid values",
+      "req_ids": [
+        "RW-SW-162"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "peep_value": "0"
+      },
+      "steps": [
+        "the user sets the PEEP to 0 cmH2O"
+      ],
+      "expected": [
+        "the PEEP value should be set to 0 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "User can adjust PEEP to valid values",
+      "req_ids": [
+        "RW-SW-162"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "peep_value": "10"
+      },
+      "steps": [
+        "the user sets the PEEP to 10 cmH2O"
+      ],
+      "expected": [
+        "the PEEP value should be set to 10 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "User can adjust PEEP to valid values",
+      "req_ids": [
+        "RW-SW-162"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "peep_value": "20"
+      },
+      "steps": [
+        "the user sets the PEEP to 20 cmH2O"
+      ],
+      "expected": [
+        "the PEEP value should be set to 20 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "User cannot adjust PEEP to invalid values",
+      "req_ids": [
+        "RW-SW-162"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "peep_value": "21"
+      },
+      "steps": [
+        "the user sets the PEEP to 21 cmH2O"
+      ],
+      "expected": [
+        "the PEEP value should be set to 20 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "User cannot adjust PEEP to invalid values",
+      "req_ids": [
+        "RW-SW-162"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "peep_value": "-1"
+      },
+      "steps": [
+        "the user sets the PEEP to -1 cmH2O"
+      ],
+      "expected": [
+        "the PEEP value should be set to 0 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "GUI renders parameters and alarms readable at a distance of 1m",
+      "req_ids": [
+        "RW-SW-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "distance": "1m"
+      },
+      "steps": [
+        "the user views the parameters and alarms from a distance of 1m"
+      ],
+      "expected": [
+        "the parameters and alarms should be readable"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "User can adjust RR to valid values",
+      "req_ids": [
+        "RW-SW-12"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "rr_value": "5"
+      },
+      "steps": [
+        "the user sets the RR to 5 bpm"
+      ],
+      "expected": [
+        "the RR value should be set to 5 bpm"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "User can adjust RR to valid values",
+      "req_ids": [
+        "RW-SW-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "rr_value": "15"
+      },
+      "steps": [
+        "the user sets the RR to 15 bpm"
+      ],
+      "expected": [
+        "the RR value should be set to 15 bpm"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "User can adjust RR to valid values",
+      "req_ids": [
+        "RW-SW-12"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "rr_value": "30"
+      },
+      "steps": [
+        "the user sets the RR to 30 bpm"
+      ],
+      "expected": [
+        "the RR value should be set to 30 bpm"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "User cannot adjust RR to invalid values",
+      "req_ids": [
+        "RW-SW-12"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "rr_value": "31"
+      },
+      "steps": [
+        "the user sets the RR to 31 bpm"
+      ],
+      "expected": [
+        "the RR value should be set to 30 bpm"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "User cannot adjust RR to invalid values",
+      "req_ids": [
+        "RW-SW-12"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "rr_value": "4"
+      },
+      "steps": [
+        "the user sets the RR to 4 bpm"
+      ],
+      "expected": [
+        "the RR value should be set to 5 bpm"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "User can adjust IER to valid values",
+      "req_ids": [
+        "RW-SW-13"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "ier_value": "1:1"
+      },
+      "steps": [
+        "the user sets the IER to 1:1"
+      ],
+      "expected": [
+        "the IER value should be set to 1:1"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "User can adjust IER to valid values",
+      "req_ids": [
+        "RW-SW-13"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "ier_value": "1:2"
+      },
+      "steps": [
+        "the user sets the IER to 1:2"
+      ],
+      "expected": [
+        "the IER value should be set to 1:2"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "User can adjust IER to valid values",
+      "req_ids": [
+        "RW-SW-13"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "ier_value": "1:3"
+      },
+      "steps": [
+        "the user sets the IER to 1:3"
+      ],
+      "expected": [
+        "the IER value should be set to 1:3"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "User can adjust IER to valid values",
+      "req_ids": [
+        "RW-SW-13"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "ier_value": "1:4"
+      },
+      "steps": [
+        "the user sets the IER to 1:4"
+      ],
+      "expected": [
+        "the IER value should be set to 1:4"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "User cannot adjust IER to invalid values",
+      "req_ids": [
+        "RW-SW-13"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "ier_value": "1:5"
+      },
+      "steps": [
+        "the user sets the IER to 1:5"
+      ],
+      "expected": [
+        "the IER value should be set to 1:4"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "User cannot adjust IER to invalid values",
+      "req_ids": [
+        "RW-SW-13"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "ier_value": "2:1"
+      },
+      "steps": [
+        "the user sets the IER to 2:1"
+      ],
+      "expected": [
+        "the IER value should be set to 1:1"
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "GUI requires confirmation for ventilation and alarm setting changes",
+      "req_ids": [
+        "RW-SW-24"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "the user changes a ventilation or alarm setting"
+      ],
+      "expected": [
+        "the GUI should prompt for confirmation"
+      ]
+    },
+    {
+      "id": "TC-019",
+      "title": "User can adjust FiO2 to valid values",
+      "req_ids": [
+        "RW-SW-34"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "fio2_value": "0.21"
+      },
+      "steps": [
+        "the user sets the FiO2 to 0.21"
+      ],
+      "expected": [
+        "the FiO2 value should be set to 0.21"
+      ]
+    },
+    {
+      "id": "TC-020",
+      "title": "User can adjust FiO2 to valid values",
+      "req_ids": [
+        "RW-SW-34"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "fio2_value": "0.5"
+      },
+      "steps": [
+        "the user sets the FiO2 to 0.5"
+      ],
+      "expected": [
+        "the FiO2 value should be set to 0.5"
+      ]
+    },
+    {
+      "id": "TC-021",
+      "title": "User can adjust FiO2 to valid values",
+      "req_ids": [
+        "RW-SW-34"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "fio2_value": "0.96"
+      },
+      "steps": [
+        "the user sets the FiO2 to 0.96"
+      ],
+      "expected": [
+        "the FiO2 value should be set to 0.96"
+      ]
+    },
+    {
+      "id": "TC-022",
+      "title": "User can adjust FiO2 to valid values",
+      "req_ids": [
+        "RW-SW-34"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "fio2_value": "1.0"
+      },
+      "steps": [
+        "the user sets the FiO2 to 1.0"
+      ],
+      "expected": [
+        "the FiO2 value should be set to 1.0"
+      ]
+    },
+    {
+      "id": "TC-023",
+      "title": "User cannot adjust FiO2 to invalid values",
+      "req_ids": [
+        "RW-SW-34"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "fio2_value": "1.1"
+      },
+      "steps": [
+        "the user sets the FiO2 to 1.1"
+      ],
+      "expected": [
+        "the FiO2 value should be set to 1.0"
+      ]
+    },
+    {
+      "id": "TC-024",
+      "title": "User cannot adjust FiO2 to invalid values",
+      "req_ids": [
+        "RW-SW-34"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "fio2_value": "0.20"
+      },
+      "steps": [
+        "the user sets the FiO2 to 0.20"
+      ],
+      "expected": [
+        "the FiO2 value should be set to 0.21"
+      ]
+    },
+    {
+      "id": "TC-025",
+      "title": "User can adjust HFNC flow rate to valid values",
+      "req_ids": [
+        "RW-SW-35"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "flow_rate": "0"
+      },
+      "steps": [
+        "the user sets the HFNC flow rate to 0 L/min"
+      ],
+      "expected": [
+        "the HFNC flow rate should be set to 0 L/min"
+      ]
+    },
+    {
+      "id": "TC-026",
+      "title": "User can adjust HFNC flow rate to valid values",
+      "req_ids": [
+        "RW-SW-35"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "flow_rate": "10"
+      },
+      "steps": [
+        "the user sets the HFNC flow rate to 10 L/min"
+      ],
+      "expected": [
+        "the HFNC flow rate should be set to 10 L/min"
+      ]
+    },
+    {
+      "id": "TC-027",
+      "title": "User can adjust HFNC flow rate to valid values",
+      "req_ids": [
+        "RW-SW-35"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "flow_rate": "60"
+      },
+      "steps": [
+        "the user sets the HFNC flow rate to 60 L/min"
+      ],
+      "expected": [
+        "the HFNC flow rate should be set to 60 L/min"
+      ]
+    },
+    {
+      "id": "TC-028",
+      "title": "User cannot adjust HFNC flow rate to invalid values",
+      "req_ids": [
+        "RW-SW-35"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "flow_rate": "65"
+      },
+      "steps": [
+        "the user sets the HFNC flow rate to 65 L/min"
+      ],
+      "expected": [
+        "the HFNC flow rate should be set to 60 L/min"
+      ]
+    },
+    {
+      "id": "TC-029",
+      "title": "User cannot adjust HFNC flow rate to invalid values",
+      "req_ids": [
+        "RW-SW-35"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the GUI is initialized"
+      ],
+      "inputs": {
+        "flow_rate": "-5"
+      },
+      "steps": [
+        "the user sets the HFNC flow rate to -5 L/min"
+      ],
+      "expected": [
+        "the HFNC flow rate should be set to 0 L/min"
+      ]
+    },
+    {
+      "id": "TC-030",
+      "title": "GUI computes leakage based on controller actuation and sensor readings",
+      "req_ids": [
+        "RW-SW-43"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is initialized",
+        "the controller actuation and sensor readings are available"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI computes the leakage"
+      ],
+      "expected": [
+        "the leakage amount should be calculated based on the controller actuation and sensor readings"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: GUI Ventilation Settings and Alarms\n\n  Scenario Outline: User can adjust PEEP from 0-20 cmH2O with increments of 1\n    Given the GUI is initialized\n    When the user sets the PEEP to <peep_value> cmH2O\n    Then the PEEP value should be set to <peep_value> cmH2O\n\n    Examples:\n      | peep_value |\n      | 0          |\n      | 10         |\n      | 20         |\n      | 21         | # Invalid value\n      | -1         | # Invalid value\n\n  Scenario Outline: GUI renders parameters and alarms readable at a distance of 1m\n    Given the GUI is initialized\n    When the user views the parameters and alarms from a distance of 1m\n    Then the parameters and alarms should be readable\n\n    Examples:\n      | distance |\n      | 1m       |\n\n  Scenario Outline: User can adjust RR from 5-30 bpm with increments of 1\n    Given the GUI is initialized\n    When the user sets the RR to <rr_value> bpm\n    Then the RR value should be set to <rr_value> bpm\n\n    Examples:\n      | rr_value |\n      | 5        |\n      | 15       |\n      | 30       |\n      | 31       | # Invalid value\n      | 4        | # Invalid value\n\n  Scenario Outline: User can adjust IER from 1:1 to 1:4\n    Given the GUI is initialized\n    When the user sets the IER to <ier_value>\n    Then the IER value should be set to <ier_value>\n\n    Examples:\n      | ier_value |\n      | 1:1       |\n      | 1:2       |\n      | 1:3       |\n      | 1:4       |\n      | 1:5       | # Invalid value\n      | 2:1       | # Invalid value\n\n  Scenario: GUI requires all ventilation and alarm setting changes to be confirmed\n    Given the GUI is initialized\n    When the user changes a ventilation or alarm setting\n    Then the GUI should prompt for confirmation\n\n  Scenario Outline: User can adjust O2 infusion (FiO2) from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1\n    Given the GUI is initialized\n    When the user sets the FiO2 to <fio2_value>\n    Then the FiO2 value should be set to <fio2_value>\n\n    Examples:\n      | fio2_value |\n      | 0.21       |\n      | 0.5        |\n      | 0.96       |\n      | 1.0        |\n      | 1.1        | # Invalid value\n      | 0.20       | # Invalid value\n\n  Scenario Outline: User can adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min\n    Given the GUI is initialized\n    When the user sets the HFNC flow rate to <flow_rate> L/min\n    Then the HFNC flow rate should be set to <flow_rate> L/min\n\n    Examples:\n      | flow_rate |\n      | 0         |\n      | 10        |\n      | 60        |\n      | 65        | # Invalid value\n      | -5        | # Invalid value\n\n  Scenario: GUI computes amount of leakage based on controller actuation and sensor readings\n    Given the GUI is initialized\n    And the controller actuation and sensor readings are available\n    When the GUI computes the leakage\n    Then the leakage amount should be calculated based on the controller actuation and sensor readings",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "User can adjust PEEP to valid values",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "peep_value": "0"
+          },
+          "steps": [
+            "the user sets the PEEP to 0 cmH2O"
+          ],
+          "expected": [
+            "the PEEP value should be set to 0 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "User can adjust PEEP to valid values",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "peep_value": "10"
+          },
+          "steps": [
+            "the user sets the PEEP to 10 cmH2O"
+          ],
+          "expected": [
+            "the PEEP value should be set to 10 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "User can adjust PEEP to valid values",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "peep_value": "20"
+          },
+          "steps": [
+            "the user sets the PEEP to 20 cmH2O"
+          ],
+          "expected": [
+            "the PEEP value should be set to 20 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "User cannot adjust PEEP to invalid values",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "peep_value": "21"
+          },
+          "steps": [
+            "the user sets the PEEP to 21 cmH2O"
+          ],
+          "expected": [
+            "the PEEP value should be set to 20 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "User cannot adjust PEEP to invalid values",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "peep_value": "-1"
+          },
+          "steps": [
+            "the user sets the PEEP to -1 cmH2O"
+          ],
+          "expected": [
+            "the PEEP value should be set to 0 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI renders parameters and alarms readable at a distance of 1m",
+          "req_ids": [
+            "RW-SW-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "distance": "1m"
+          },
+          "steps": [
+            "the user views the parameters and alarms from a distance of 1m"
+          ],
+          "expected": [
+            "the parameters and alarms should be readable"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "User can adjust RR to valid values",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "rr_value": "5"
+          },
+          "steps": [
+            "the user sets the RR to 5 bpm"
+          ],
+          "expected": [
+            "the RR value should be set to 5 bpm"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "User can adjust RR to valid values",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "rr_value": "15"
+          },
+          "steps": [
+            "the user sets the RR to 15 bpm"
+          ],
+          "expected": [
+            "the RR value should be set to 15 bpm"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "User can adjust RR to valid values",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "rr_value": "30"
+          },
+          "steps": [
+            "the user sets the RR to 30 bpm"
+          ],
+          "expected": [
+            "the RR value should be set to 30 bpm"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "User cannot adjust RR to invalid values",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "rr_value": "31"
+          },
+          "steps": [
+            "the user sets the RR to 31 bpm"
+          ],
+          "expected": [
+            "the RR value should be set to 30 bpm"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "User cannot adjust RR to invalid values",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "rr_value": "4"
+          },
+          "steps": [
+            "the user sets the RR to 4 bpm"
+          ],
+          "expected": [
+            "the RR value should be set to 5 bpm"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "User can adjust IER to valid values",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "ier_value": "1:1"
+          },
+          "steps": [
+            "the user sets the IER to 1:1"
+          ],
+          "expected": [
+            "the IER value should be set to 1:1"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "User can adjust IER to valid values",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "ier_value": "1:2"
+          },
+          "steps": [
+            "the user sets the IER to 1:2"
+          ],
+          "expected": [
+            "the IER value should be set to 1:2"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "User can adjust IER to valid values",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "ier_value": "1:3"
+          },
+          "steps": [
+            "the user sets the IER to 1:3"
+          ],
+          "expected": [
+            "the IER value should be set to 1:3"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "User can adjust IER to valid values",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "ier_value": "1:4"
+          },
+          "steps": [
+            "the user sets the IER to 1:4"
+          ],
+          "expected": [
+            "the IER value should be set to 1:4"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "User cannot adjust IER to invalid values",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "ier_value": "1:5"
+          },
+          "steps": [
+            "the user sets the IER to 1:5"
+          ],
+          "expected": [
+            "the IER value should be set to 1:4"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "User cannot adjust IER to invalid values",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "ier_value": "2:1"
+          },
+          "steps": [
+            "the user sets the IER to 2:1"
+          ],
+          "expected": [
+            "the IER value should be set to 1:1"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "GUI requires confirmation for ventilation and alarm setting changes",
+          "req_ids": [
+            "RW-SW-24"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "the user changes a ventilation or alarm setting"
+          ],
+          "expected": [
+            "the GUI should prompt for confirmation"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "User can adjust FiO2 to valid values",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "fio2_value": "0.21"
+          },
+          "steps": [
+            "the user sets the FiO2 to 0.21"
+          ],
+          "expected": [
+            "the FiO2 value should be set to 0.21"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "User can adjust FiO2 to valid values",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "fio2_value": "0.5"
+          },
+          "steps": [
+            "the user sets the FiO2 to 0.5"
+          ],
+          "expected": [
+            "the FiO2 value should be set to 0.5"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "User can adjust FiO2 to valid values",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "fio2_value": "0.96"
+          },
+          "steps": [
+            "the user sets the FiO2 to 0.96"
+          ],
+          "expected": [
+            "the FiO2 value should be set to 0.96"
+          ]
+        },
+        {
+          "id": "TC-022",
+          "title": "User can adjust FiO2 to valid values",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "fio2_value": "1.0"
+          },
+          "steps": [
+            "the user sets the FiO2 to 1.0"
+          ],
+          "expected": [
+            "the FiO2 value should be set to 1.0"
+          ]
+        },
+        {
+          "id": "TC-023",
+          "title": "User cannot adjust FiO2 to invalid values",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "fio2_value": "1.1"
+          },
+          "steps": [
+            "the user sets the FiO2 to 1.1"
+          ],
+          "expected": [
+            "the FiO2 value should be set to 1.0"
+          ]
+        },
+        {
+          "id": "TC-024",
+          "title": "User cannot adjust FiO2 to invalid values",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "fio2_value": "0.20"
+          },
+          "steps": [
+            "the user sets the FiO2 to 0.20"
+          ],
+          "expected": [
+            "the FiO2 value should be set to 0.21"
+          ]
+        },
+        {
+          "id": "TC-025",
+          "title": "User can adjust HFNC flow rate to valid values",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "flow_rate": "0"
+          },
+          "steps": [
+            "the user sets the HFNC flow rate to 0 L/min"
+          ],
+          "expected": [
+            "the HFNC flow rate should be set to 0 L/min"
+          ]
+        },
+        {
+          "id": "TC-026",
+          "title": "User can adjust HFNC flow rate to valid values",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "flow_rate": "10"
+          },
+          "steps": [
+            "the user sets the HFNC flow rate to 10 L/min"
+          ],
+          "expected": [
+            "the HFNC flow rate should be set to 10 L/min"
+          ]
+        },
+        {
+          "id": "TC-027",
+          "title": "User can adjust HFNC flow rate to valid values",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "flow_rate": "60"
+          },
+          "steps": [
+            "the user sets the HFNC flow rate to 60 L/min"
+          ],
+          "expected": [
+            "the HFNC flow rate should be set to 60 L/min"
+          ]
+        },
+        {
+          "id": "TC-028",
+          "title": "User cannot adjust HFNC flow rate to invalid values",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "flow_rate": "65"
+          },
+          "steps": [
+            "the user sets the HFNC flow rate to 65 L/min"
+          ],
+          "expected": [
+            "the HFNC flow rate should be set to 60 L/min"
+          ]
+        },
+        {
+          "id": "TC-029",
+          "title": "User cannot adjust HFNC flow rate to invalid values",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {
+            "flow_rate": "-5"
+          },
+          "steps": [
+            "the user sets the HFNC flow rate to -5 L/min"
+          ],
+          "expected": [
+            "the HFNC flow rate should be set to 0 L/min"
+          ]
+        },
+        {
+          "id": "TC-030",
+          "title": "GUI computes leakage based on controller actuation and sensor readings",
+          "req_ids": [
+            "RW-SW-43"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized",
+            "the controller actuation and sensor readings are available"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI computes the leakage"
+          ],
+          "expected": [
+            "the leakage amount should be calculated based on the controller actuation and sensor readings"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.75,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.6667,
+        "hallucinated": [
+          {
+            "value": "21",
+            "context": "PEEP value",
+            "grounded": false
+          },
+          {
+            "value": "-1",
+            "context": "PEEP value",
+            "grounded": false
+          },
+          {
+            "value": "31",
+            "context": "RR value",
+            "grounded": false
+          },
+          {
+            "value": "4",
+            "context": "RR value",
+            "grounded": false
+          },
+          {
+            "value": "1:5",
+            "context": "IER value",
+            "grounded": false
+          },
+          {
+            "value": "2:1",
+            "context": "IER value",
+            "grounded": false
+          },
+          {
+            "value": "1.1",
+            "context": "FiO2 value",
+            "grounded": false
+          },
+          {
+            "value": "0.20",
+            "context": "FiO2 value",
+            "grounded": false
+          },
+          {
+            "value": "65",
+            "context": "HFNC flow rate",
+            "grounded": false
+          },
+          {
+            "value": "-5",
+            "context": "HFNC flow rate",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 30,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add explicit assertions for confirmation and leakage scenarios (e.g., error codes or messages).",
+          "Include boundary increment tests (e.g., PEEP 1, 19; RR 6, 29).",
+          "Verify that invalid inputs trigger specific error messages rather than defaulting to nearest valid value.",
+          "Add tests for each setting change to ensure confirmation prompt appears consistently.",
+          "Test UI readability at distances other than 1m to confirm scalability."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.9125,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,929 @@
+{
+  "unit_id": "U11_Alarms",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:phi3.5:3.8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.2,
+    "sfv_score": 0.6,
+    "threshold": 0.7,
+    "sfv_pass": false,
+    "issues": [
+      "missing: transitions (>=2)",
+      "missing: states declared",
+      "missing: initial state",
+      "missing: events/guards"
+    ]
+  },
+  "fsa": null,
+  "artifact": "<the test suite written in Finite State Machines / Statecharts notation>",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Compute Normal Battery ETA",
+      "req_ids": [
+        "RW-SW-120",
+        "RW-SW-121"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI is initialized and connected to battery amount sensor"
+      ],
+      "inputs": {
+        "remainingBatteryAmount": "50%"
+      },
+      "steps": [
+        "Invoke GUI compute ETA function"
+      ],
+      "expected": [
+        "Battery ETA computed correctly based on the remaining battery amount"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Compute Low Battery ETA",
+      "req_ids": [
+        "RW-SW-120",
+        "RW-SW-121",
+        "RW-SW-122"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI is initialized, connected to battery amount sensor, and current time is beyond 30min from now"
+      ],
+      "inputs": {
+        "remainingBatteryAmount": "20%"
+      },
+      "steps": [
+        "Invoke GUI compute ETA function"
+      ],
+      "expected": [
+        "Low battery alarm triggered with ETA less than 30min"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Low Battery Alarm Priority Verification",
+      "req_ids": [
+        "RW-SW-122"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Low battery alarm has been triggered"
+      ],
+      "inputs": {},
+      "steps": [
+        "Invoke GUI check alarm priority function"
+      ],
+      "expected": [
+        "Alarm is confirmed as low priority"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Compute Critically Low Battery ETA",
+      "req_ids": [
+        "RW-SW-120",
+        "RW-SW-121",
+        "RW-SW-124"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI is initialized, connected to battery amount sensor, and current time is beyond 10min from now"
+      ],
+      "inputs": {},
+      "steps": [
+        "Invoke GUI compute ETA function"
+      ],
+      "expected": [
+        "Critically low battery alarm triggered with ETA less than 10min"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Critically Low Battery Alarm Priority Verification",
+      "req_ids": [
+        "RW-SW-124"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Critically low battery alarm has been triggered"
+      ],
+      "inputs": {},
+      "steps": [
+        "Invoke GUI check alarm priority function"
+      ],
+      "expected": [
+        "Alarm is confirmed as high priority"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Read Battery Sensors",
+      "req_ids": [
+        "RW-SW-128"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI is initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "Invoke GUI read battery sensors function"
+      ],
+      "expected": [
+        "Battery presence and chargeability read correctly"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Battery Failure Alarm Trigger",
+      "req_ids": [
+        "RW-SW-129"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Battery is absent, unavailable, or unchargeable"
+      ],
+      "inputs": {},
+      "steps": [
+        "Invoke GUI check battery failure alarm function"
+      ],
+      "expected": [
+        "Battery failure alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Battery Failure Alarm Priority Verification",
+      "req_ids": [
+        "RW-SW-129"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Battery failure alarm has been triggered"
+      ],
+      "inputs": {},
+      "steps": [
+        "Invoke GUI check alarm priority function"
+      ],
+      "expected": [
+        "Alarm is confirmed as high priority"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Boundary Condition for Low Battery ETA",
+      "req_ids": [
+        "RW-SW-122"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Battery is exactly at the 30min threshold"
+      ],
+      "inputs": {},
+      "steps": [
+        "Invoke GUI compute ETA function"
+      ],
+      "expected": [
+        "Low battery alarm triggered with ETA exactly at 30min"
+      ]
+    },
+    {
+      "id": "TC-100",
+      "title": "Boundary Condition for Critically Low Battery ETA",
+      "req_ids": [
+        "RW-SW-124"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Battery is exactly at the 10min threshold"
+      ],
+      "inputs": {},
+      "steps": [
+        "Invoke GUI compute ETA function"
+      ],
+      "expected": [
+        "Critically low battery alarm triggered with ETA exactly at 10min"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "```artifact\n<<Finite State Machine / Statechart Representation>>\n\n[Initial State: Idle]\n    +-->|Enter Battery Monitoring Mode\n    +-->|Check Battery Sensor Connection\n    +-->|[End]\n\n    Enter Battery Monitoring Mode\n        +-->|Battery Sensor Connected\n        +-->|[Idle]\n        +-->|Battery Sensor Disconnected\n            +-->|[Error State: Sensor Disconnected]\n        +-->|Read Battery Level\n            +---------+---------+---------+\n            |           | Low Battery | Full Battery |\n            |           | (<30min ETA) | (>30min ETA) |\n            +---------+---------+---------+\n            |           |          |           |\n            |           |          |           |\n            +===========+===========+===========|\n                    |         +-->|Compute ETA\n                    |         +-->|[Low Battery State]\n                    |         +-->|[Full Battery State]\n                    |\n                    |         +-->|[End]\n                    +-----------┤\n                             |\n                             |\n            +-------------------┤\n            |                  |\n            |                  |\n            +-------------------┤\n                    |\n                    |\n            +-------------------┤\n            |                  |\n            |     +-----------+-----------+\n            |     |           |           |\n            +---->|Compute Critical ETA\n            |     |           |           |\n            +---->|< 10min ETA  | > 10min ETA  |\n            |     |           |           |\n            +---->|           +---------->|[Critical Low Battery State]\n                    |           |\n                    |\n                    |         +-->|Activate Low Battery Alarm\n                    |         +-->|[End]\n                    +-----------┤\n                             |\n                             |\n            +-------------------┤\n            |                  |\n            |     +-----------|----------+\n            |     |           |           |\n            +---->|Compute Non-Critical ETA\n            |     |           |           |\n            +---->|< 30min ETA  | > 30min ETA  |\n            |     |           |           |\n            +---->|           +---------->|[Non-Critical Low Battery State]\n                    |           |\n                    |\n                    |         +-->|Activate Non-Critical Low Battery Alarm\n                    |         +-->|[End]\n                    +-----------┤\n                             |\n                             |\n            +-------------------┤\n            |                  |\n            |     +-----------|----------+\n            |     |           |           |\n            +---->|Read Hardware Sensors\n            |     |           |           |\n            +---->|[End]         +-->|[Error State: Sensor Error]\n                    |\n                    |\n                    |\n                    |\n                    |\n    ",
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": "<the test suite written in Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Compute Normal Battery ETA",
+          "req_ids": [
+            "RW-SW-120",
+            "RW-SW-121"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is initialized and connected to battery amount sensor"
+          ],
+          "inputs": {
+            "remainingBatteryAmount": "50%"
+          },
+          "steps": [
+            "Invoke GUI compute ETA function"
+          ],
+          "expected": [
+            "Battery ETA computed correctly based on the remaining battery amount"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Compute Low Battery ETA",
+          "req_ids": [
+            "RW-SW-120",
+            "RW-SW-121",
+            "RW-SW-122"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is initialized, connected to battery amount sensor, and current time is beyond 30min from now"
+          ],
+          "inputs": {
+            "remainingBatteryAmount": "20%"
+          },
+          "steps": [
+            "Invoke GUI compute ETA function"
+          ],
+          "expected": [
+            "Low battery alarm triggered with ETA less than 30min"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Low Battery Alarm Priority Verification",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Low battery alarm has been triggered"
+          ],
+          "inputs": {},
+          "steps": [
+            "Invoke GUI check alarm priority function"
+          ],
+          "expected": [
+            "Alarm is confirmed as low priority"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Compute Critically Low Battery ETA",
+          "req_ids": [
+            "RW-SW-120",
+            "RW-SW-121",
+            "RW-SW-124"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is initialized, connected to battery amount sensor, and current time is beyond 10min from now"
+          ],
+          "inputs": {},
+          "steps": [
+            "Invoke GUI compute ETA function"
+          ],
+          "expected": [
+            "Critically low battery alarm triggered with ETA less than 10min"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Critically Low Battery Alarm Priority Verification",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Critically low battery alarm has been triggered"
+          ],
+          "inputs": {},
+          "steps": [
+            "Invoke GUI check alarm priority function"
+          ],
+          "expected": [
+            "Alarm is confirmed as high priority"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Read Battery Sensors",
+          "req_ids": [
+            "RW-SW-128"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "Invoke GUI read battery sensors function"
+          ],
+          "expected": [
+            "Battery presence and chargeability read correctly"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Battery Failure Alarm Trigger",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Battery is absent, unavailable, or unchargeable"
+          ],
+          "inputs": {},
+          "steps": [
+            "Invoke GUI check battery failure alarm function"
+          ],
+          "expected": [
+            "Battery failure alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Battery Failure Alarm Priority Verification",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Battery failure alarm has been triggered"
+          ],
+          "inputs": {},
+          "steps": [
+            "Invoke GUI check alarm priority function"
+          ],
+          "expected": [
+            "Alarm is confirmed as high priority"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Boundary Condition for Low Battery ETA",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery is exactly at the 30min threshold"
+          ],
+          "inputs": {},
+          "steps": [
+            "Invoke GUI compute ETA function"
+          ],
+          "expected": [
+            "Low battery alarm triggered with ETA exactly at 30min"
+          ]
+        },
+        {
+          "id": "TC-100",
+          "title": "Boundary Condition for Critically Low Battery ETA",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Battery is exactly at the 10min threshold"
+          ],
+          "inputs": {},
+          "steps": [
+            "Invoke GUI compute ETA function"
+          ],
+          "expected": [
+            "Critically low battery alarm triggered with ETA exactly at 10min"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.60). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<Finite State Machine / Statechart Representation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Case for Computing Battery ETA from Battery History",
+          "req_ids": [
+            "RW-SW-120"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is initialized and connected to battery amount sensor"
+          ],
+          "inputs": {
+            "battery_history": "array of battery amounts"
+          },
+          "steps": [
+            "Trigger the GUI to compute the battery ETA",
+            "Verify the GUI displays the computed ETA"
+          ],
+          "expected": [
+            "The GUI correctly displays the battery ETA based on the provided battery history"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Case for Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_level": "below threshold indicating low battery"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Check if the 'low battery' alarm is triggered",
+            "Verify the alarm is low priority"
+          ],
+          "expected": [
+            "The 'low battery' alarm is triggered and remains low priority when the battery level is below the low battery threshold"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Case for Critically Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_level": "below threshold indicating critically low battery"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Check if the 'critically low battery' alarm is triggered",
+            "Verify the alarm is high priority"
+          ],
+          "expected": [
+            "The 'critically low battery' alarm is triggered and remains high priority when the battery level is below the critically low threshold"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Case for Battery Failure Alarm Activation",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_status": "absent, unavailable, or unchargeable"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Check if the 'battery failure' alarm is triggered",
+            "Verify the alarm is activated"
+          ],
+          "expected": [
+            "The 'battery failure' alarm is triggered when the battery is absent, unavailable, or unchargeable"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Boundary Test Case for Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_level": "at the low battery threshold"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Check if the 'low battery' alarm is triggered",
+            "Verify the alarm is low priority and triggers at the threshold"
+          ],
+          "expected": [
+            "The 'low battery' alarm is triggered at the threshold and remains low priority"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Boundary Test Case for Critically Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_level": "at the critically low threshold"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Check if the 'critically low battery' alarm is triggered",
+            "Verify the alarm is high priority and triggers at the threshold"
+          ],
+          "expected": [
+            "The 'critically low battery' alarm is triggered at the threshold and remains high priority"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Negative Test Case for Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_level": "above low battery threshold"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Verify the 'low battery' alarm is not triggered"
+          ],
+          "expected": [
+            "The 'low battery' alarm is not triggered when the battery level is above the low battery threshold"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Negative Test Case for Critically Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_status": "present, available, and chargeable"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Verify the 'critically low battery' alarm is not triggered"
+          ],
+          "expected": [
+            "The 'critically low battery' alarm is not triggered when the battery is present, available, and chargeable"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test Case for Battery Status Unchanged on No Input",
+          "req_ids": [
+            "RW-SW-120"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "no_input": true
+          },
+          "steps": [
+            "Allow the GUI to remain idle without any input",
+            "Verify the displayed battery ETA does not change"
+          ],
+          "expected": [
+            "The displayed battery ETA remains stable without any new input"
+          ]
+        },
+        {
+          "id": "TC-100",
+          "title": "Test Case for Battery Failure Alarm with False Sensor Data",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_status": "fake unavailable, unchargeable data"
+          },
+          "steps": [
+            "Simulate the GUI receiving false battery sensor data",
+            "Verify the 'battery failure' alarm is not triggered"
+          ],
+          "expected": [
+            "The 'battery failure' alarm is not triggered when the GUI receives false sensor data indicating battery is unavailable or unchargeable"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.60). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<Finite State Machine / Statechart Representation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Case for Computing Battery ETA from Battery History",
+          "req_ids": [
+            "RW-SW-120"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is initialized and connected to battery amount sensor"
+          ],
+          "inputs": {
+            "battery_history": "array of battery amounts"
+          },
+          "steps": [
+            "Trigger the GUI to compute the battery ETA",
+            "Verify the GUI displays the computed ETA"
+          ],
+          "expected": [
+            "The GUI correctly displays the battery ETA based on the provided battery history"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Case for Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_level": "below threshold indicating low battery"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Check if the 'low battery' alarm is triggered",
+            "Verify the alarm is low priority"
+          ],
+          "expected": [
+            "The 'low battery' alarm is triggered and remains low priority when the battery level is below the low battery threshold"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Case for Critically Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_level": "below threshold indicating critically low battery"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Check if the 'critically low battery' alarm is triggered",
+            "Verify the alarm is high priority"
+          ],
+          "expected": [
+            "The 'critically low battery' alarm is triggered and remains high priority when the battery level is below the critically low threshold"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Case for Battery Failure Alarm Activation",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_status": "absent, unavailable, or unchargeable"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Check if the 'battery failure' alarm is triggered",
+            "Verify the alarm is activated"
+          ],
+          "expected": [
+            "The 'battery failure' alarm is triggered when the battery is absent, unavailable, or unchargeable"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Boundary Test Case for Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_level": "at the low battery threshold"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Check if the 'low battery' alarm is triggered",
+            "Verify the alarm is low priority and triggers at the threshold"
+          ],
+          "expected": [
+            "The 'low battery' alarm is triggered at the threshold and remains low priority"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Boundary Test Case for Critically Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_level": "at the critically low threshold"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Check if the 'critically low battery' alarm is triggered",
+            "Verify the alarm is high priority and triggers at the threshold"
+          ],
+          "expected": [
+            "The 'critically low battery' alarm is triggered at the threshold and remains high priority"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Negative Test Case for Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-122"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_level": "above low battery threshold"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Verify the 'low battery' alarm is not triggered"
+          ],
+          "expected": [
+            "The 'low battery' alarm is not triggered when the battery level is above the low battery threshold"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Negative Test Case for Critically Low Battery Alarm Activation",
+          "req_ids": [
+            "RW-SW-124"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_status": "present, available, and chargeable"
+          },
+          "steps": [
+            "Allow the GUI to update the battery status",
+            "Verify the 'critically low battery' alarm is not triggered"
+          ],
+          "expected": [
+            "The 'critically low battery' alarm is not triggered when the battery is present, available, and chargeable"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test Case for Battery Status Unchanged on No Input",
+          "req_ids": [
+            "RW-SW-120"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "no_input": true
+          },
+          "steps": [
+            "Allow the GUI to remain idle without any input",
+            "Verify the displayed battery ETA does not change"
+          ],
+          "expected": [
+            "The displayed battery ETA remains stable without any new input"
+          ]
+        },
+        {
+          "id": "TC-100",
+          "title": "Test Case for Battery Failure Alarm with False Sensor Data",
+          "req_ids": [
+            "RW-SW-129"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "GUI is connected to battery amount sensor and displays current battery status"
+          ],
+          "inputs": {
+            "battery_status": "fake unavailable, unchargeable data"
+          },
+          "steps": [
+            "Simulate the GUI receiving false battery sensor data",
+            "Verify the 'battery failure' alarm is not triggered"
+          ],
+          "expected": [
+            "The 'battery failure' alarm is not triggered when the GUI receives false sensor data indicating battery is unavailable or unchargeable"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    }
+  ]
+}

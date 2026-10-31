@@ -1,0 +1,2213 @@
+{
+  "unit_id": "U12_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "safety_critical",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.375,
+    "oracle_assertiveness": 0.0,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 11,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Oracle assertions are vague; specify concrete priority levels, temperature values, and alarm states.",
+      "Tests lack invalid input scenarios (e.g., negative temperatures, non-numeric values).",
+      "No tests for boundary values at exact threshold for safety actions (only +1).",
+      "No tests for system behavior when multiple alarms trigger simultaneously.",
+      "No tests for system recovery after alarm or safety action."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.6437,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Alarms and Temperature Sensing\n\n  Scenario: Battery failure alarm has high priority\n    Given the system is operational\n    When a battery failure is detected\n    Then the battery failure alarm should have high priority\n\n  Scenario Outline: System can sense the temperature of heating elements\n    Given the system is operational\n    When the temperature of the <element> is measured\n    Then the temperature should be accurately recorded as <temperature> degrees Celsius\n    Examples:\n      | element            | temperature |\n      | blower motor       | as specified|\n      | battery cell       | as specified|\n\n  Scenario Outline: GUI reads temperature sensors\n    Given the system is operational\n    When the GUI reads the temperature of the <element>\n    Then the GUI should display the temperature as <temperature> degrees Celsius\n    Examples:\n      | element            | temperature |\n      | blower motor       | as specified|\n      | blower power mgmt system | as specified|\n      | battery cell       | as specified|\n\n  Scenario Outline: Blower motor temperature too high alarm\n    Given the system is operational\n    And the blower motor temperature threshold is set to <threshold> degrees Celsius\n    When the blower motor temperature reaches <temperature> degrees Celsius\n    Then the \"blower motor temperature too high\" alarm should be triggered\n    Examples:\n      | threshold | temperature |\n      | as specified | as specified |\n      | as specified | as specified + 1 |\n      | as specified | as specified - 1 |\n\n  Scenario Outline: Blower power system temperature too high alarm\n    Given the system is operational\n    And the blower power system temperature threshold is set to <threshold> degrees Celsius\n    When the blower power system temperature reaches <temperature> degrees Celsius\n    Then the \"blower power system temperature too high\" alarm should be triggered\n    Examples:\n      | threshold | temperature |\n      | as specified | as specified |\n      | as specified | as specified + 1 |\n      | as specified | as specified - 1 |\n\n  Scenario Outline: Battery temperature too high alarm\n    Given the system is operational\n    And the battery temperature threshold is set to <threshold> degrees Celsius\n    When the battery temperature reaches <temperature> degrees Celsius\n    Then the \"battery temperature too high\" alarm should be triggered\n    Examples:\n      | threshold | temperature |\n      | as specified | as specified |\n      | as specified | as specified + 1 |\n      | as specified | as specified - 1 |\n\n  Scenario Outline: Safety action invoked for blower power system\n    Given the system is operational\n    And the blower power system temperature threshold is set to <threshold> degrees Celsius\n    When the blower power system temperature reaches <temperature> degrees Celsius\n    Then the safety action should be automatically invoked\n    Examples:\n      | threshold | temperature |\n      | as specified | as specified + 1 |\n\n  Scenario Outline: Safety action invoked for battery\n    Given the system is operational\n    And the battery temperature threshold is set to <threshold> degrees Celsius\n    When the battery temperature reaches <temperature> degrees Celsius\n    Then the safety action should be automatically invoked\n    Examples:\n      | threshold | temperature |\n      | as specified | as specified + 1 |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Battery failure alarm has high priority",
+      "req_ids": [
+        "RW-SW-130"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is operational"
+      ],
+      "inputs": {},
+      "steps": [
+        "a battery failure is detected"
+      ],
+      "expected": [
+        "the battery failure alarm should have high priority"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "System can sense the temperature of blower motor",
+      "req_ids": [
+        "RW-SW-131"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is operational"
+      ],
+      "inputs": {},
+      "steps": [
+        "the temperature of the blower motor is measured"
+      ],
+      "expected": [
+        "the temperature should be accurately recorded as as specified degrees Celsius"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "System can sense the temperature of battery cell",
+      "req_ids": [
+        "RW-SW-131"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is operational"
+      ],
+      "inputs": {},
+      "steps": [
+        "the temperature of the battery cell is measured"
+      ],
+      "expected": [
+        "the temperature should be accurately recorded as as specified degrees Celsius"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "GUI reads temperature of blower motor",
+      "req_ids": [
+        "RW-SW-132"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is operational"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI reads the temperature of the blower motor"
+      ],
+      "expected": [
+        "the GUI should display the temperature as as specified degrees Celsius"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "GUI reads temperature of blower power mgmt system",
+      "req_ids": [
+        "RW-SW-132"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is operational"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI reads the temperature of the blower power mgmt system"
+      ],
+      "expected": [
+        "the GUI should display the temperature as as specified degrees Celsius"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "GUI reads temperature of battery cell",
+      "req_ids": [
+        "RW-SW-132"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is operational"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI reads the temperature of the battery cell"
+      ],
+      "expected": [
+        "the GUI should display the temperature as as specified degrees Celsius"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Blower motor temperature too high alarm triggered",
+      "req_ids": [
+        "RW-SW-133"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is operational",
+        "the blower motor temperature threshold is set to as specified degrees Celsius"
+      ],
+      "inputs": {},
+      "steps": [
+        "the blower motor temperature reaches as specified degrees Celsius"
+      ],
+      "expected": [
+        "the blower motor temperature too high alarm should be triggered"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Blower motor temperature too high alarm triggered at threshold + 1",
+      "req_ids": [
+        "RW-SW-133"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the system is operational",
+        "the blower motor temperature threshold is set to as specified degrees Celsius"
+      ],
+      "inputs": {},
+      "steps": [
+        "the blower motor temperature reaches as specified + 1 degrees Celsius"
+      ],
+      "expected": [
+        "the blower motor temperature too high alarm should be triggered"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Blower motor temperature too high alarm not triggered at threshold - 1",
+      "req_ids": [
+        "RW-SW-133"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the system is operational",
+        "the blower motor temperature threshold is set to as specified degrees Celsius"
+      ],
+      "inputs": {},
+      "steps": [
+        "the blower motor temperature reaches as specified - 1 degrees Celsius"
+      ],
+      "expected": [
+        "the blower motor temperature too high alarm should not be triggered"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Blower power system temperature too high alarm triggered",
+      "req_ids": [
+        "RW-SW-134"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is operational",
+        "the blower power system temperature threshold is set to as specified degrees Celsius"
+      ],
+      "inputs": {},
+      "steps": [
+        "the blower power system temperature reaches as specified degrees Celsius"
+      ],
+      "expected": [
+        "the blower power system temperature too high alarm should be triggered"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Blower power system temperature too high alarm triggered at threshold + 1",
+      "req_ids": [
+        "RW-SW-134"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the system is operational",
+        "the blower power system temperature threshold is set to as specified degrees Celsius"
+      ],
+      "inputs": {},
+      "steps": [
+        "the blower power system temperature reaches as specified + 1 degrees Celsius"
+      ],
+      "expected": [
+        "the blower power system temperature too high alarm should be triggered"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Blower power system temperature too high alarm not triggered at threshold - 1",
+      "req_ids": [
+        "RW-SW-134"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the system is operational",
+        "the blower power system temperature threshold is set to as specified degrees Celsius"
+      ],
+      "inputs": {},
+      "steps": [
+        "the blower power system temperature reaches as specified - 1 degrees Celsius"
+      ],
+      "expected": [
+        "the blower power system temperature too high alarm should not be triggered"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Battery temperature too high alarm triggered",
+      "req_ids": [
+        "RW-SW-135"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is operational",
+        "the battery temperature threshold is set to as specified degrees Celsius"
+      ],
+      "inputs": {},
+      "steps": [
+        "the battery temperature reaches as specified degrees Celsius"
+      ],
+      "expected": [
+        "the battery temperature too high alarm should be triggered"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Battery temperature too high alarm triggered at threshold + 1",
+      "req_ids": [
+        "RW-SW-135"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the system is operational",
+        "the battery temperature threshold is set to as specified degrees Celsius"
+      ],
+      "inputs": {},
+      "steps": [
+        "the battery temperature reaches as specified + 1 degrees Celsius"
+      ],
+      "expected": [
+        "the battery temperature too high alarm should be triggered"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "Battery temperature too high alarm not triggered at threshold - 1",
+      "req_ids": [
+        "RW-SW-135"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the system is operational",
+        "the battery temperature threshold is set to as specified degrees Celsius"
+      ],
+      "inputs": {},
+      "steps": [
+        "the battery temperature reaches as specified - 1 degrees Celsius"
+      ],
+      "expected": [
+        "the battery temperature too high alarm should not be triggered"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "Safety action invoked for blower power system",
+      "req_ids": [
+        "RW-SW-137"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is operational",
+        "the blower power system temperature threshold is set to as specified degrees Celsius"
+      ],
+      "inputs": {},
+      "steps": [
+        "the blower power system temperature reaches as specified + 1 degrees Celsius"
+      ],
+      "expected": [
+        "the safety action should be automatically invoked"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "Safety action invoked for battery",
+      "req_ids": [
+        "RW-SW-138"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is operational",
+        "the battery temperature threshold is set to as specified degrees Celsius"
+      ],
+      "inputs": {},
+      "steps": [
+        "the battery temperature reaches as specified + 1 degrees Celsius"
+      ],
+      "expected": [
+        "the safety action should be automatically invoked"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarms and Temperature Monitoring\n\n  Scenario: Battery failure alarm has high priority\n    Given the system is monitoring battery status\n    When a battery failure is detected\n    Then the battery failure alarm should have high priority\n\n  Scenario Outline: System can sense the temperature of heating elements\n    Given the system is operational\n    When the temperature of the <element> is measured\n    Then the system should accurately read the temperature of the <element>\n    Examples:\n      | element          |\n      | blower motor     |\n      | battery cell     |\n\n  Scenario Outline: GUI can read temperature sensors\n    Given the GUI is initialized\n    When the temperature of the <sensor> is requested\n    Then the GUI should display the temperature of the <sensor>\n    Examples:\n      | sensor                     |\n      | blower motor               |\n      | blower power mgmt system   |\n      | battery cell               |\n\n  Scenario Outline: GUI triggers \"blower motor temperature too high\" alarm\n    Given the GUI is monitoring the blower motor temperature\n    When the blower motor temperature exceeds the user-specified threshold of <threshold> degrees\n    Then the GUI should trigger the \"blower motor temperature too high\" alarm\n    Examples:\n      | threshold |\n      | 100       |  # normal value\n      | 150       |  # edge value\n      | -10       |  # invalid value\n\n  Scenario Outline: GUI triggers \"blower power system temperature too high\" alarm\n    Given the GUI is monitoring the blower power system temperature\n    When the blower power system temperature exceeds the user-specified threshold of <threshold> degrees\n    Then the GUI should trigger the \"blower power system temperature too high\" alarm\n    Examples:\n      | threshold |\n      | 120       |  # normal value\n      | 180       |  # edge value\n      | -20       |  # invalid value\n\n  Scenario Outline: GUI triggers \"battery temperature too high\" alarm\n    Given the GUI is monitoring the battery temperature\n    When the battery temperature exceeds the user-specified threshold of <threshold> degrees\n    Then the GUI should trigger the \"battery temperature too high\" alarm\n    Examples:\n      | threshold |\n      | 50        |  # normal value\n      | 70        |  # edge value\n      | -5        |  # invalid value\n\n  Scenario Outline: GUI automatically invokes safety action for blower power system\n    Given the GUI is monitoring the blower power system temperature\n    When the blower power system temperature exceeds the user-specified threshold of <threshold> degrees\n    Then the GUI should automatically invoke a safety action\n    Examples:\n      | threshold |\n      | 120       |  # normal value\n      | 180       |  # edge value\n      | -20       |  # invalid value\n\n  Scenario Outline: GUI automatically invokes safety action for battery\n    Given the GUI is monitoring the battery temperature\n    When the battery temperature exceeds the user-specified threshold of <threshold> degrees\n    Then the GUI should automatically invoke a safety action\n    Examples:\n      | threshold |\n      | 50        |  # normal value\n      | 70        |  # edge value\n      | -5        |  # invalid value",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Battery failure alarm has high priority",
+          "req_ids": [
+            "RW-SW-130"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is monitoring battery status"
+          ],
+          "inputs": {},
+          "steps": [
+            "a battery failure is detected"
+          ],
+          "expected": [
+            "the battery failure alarm should have high priority"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "System can sense the temperature of blower motor",
+          "req_ids": [
+            "RW-SW-131"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "the temperature of the blower motor is measured"
+          ],
+          "expected": [
+            "the system should accurately read the temperature of the blower motor"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "System can sense the temperature of battery cell",
+          "req_ids": [
+            "RW-SW-131"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "the temperature of the battery cell is measured"
+          ],
+          "expected": [
+            "the system should accurately read the temperature of the battery cell"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI can read temperature of blower motor",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "the temperature of the blower motor is requested"
+          ],
+          "expected": [
+            "the GUI should display the temperature of the blower motor"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI can read temperature of blower power mgmt system",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "the temperature of the blower power mgmt system is requested"
+          ],
+          "expected": [
+            "the GUI should display the temperature of the blower power mgmt system"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI can read temperature of battery cell",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "the temperature of the battery cell is requested"
+          ],
+          "expected": [
+            "the GUI should display the temperature of the battery cell"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI triggers blower motor temperature too high alarm with normal threshold",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is monitoring the blower motor temperature"
+          ],
+          "inputs": {
+            "threshold": "100"
+          },
+          "steps": [
+            "the blower motor temperature exceeds the user-specified threshold of 100 degrees"
+          ],
+          "expected": [
+            "the GUI should trigger the blower motor temperature too high alarm"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI triggers blower motor temperature too high alarm with edge threshold",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is monitoring the blower motor temperature"
+          ],
+          "inputs": {
+            "threshold": "150"
+          },
+          "steps": [
+            "the blower motor temperature exceeds the user-specified threshold of 150 degrees"
+          ],
+          "expected": [
+            "the GUI should trigger the blower motor temperature too high alarm"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI triggers blower motor temperature too high alarm with invalid threshold",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is monitoring the blower motor temperature"
+          ],
+          "inputs": {
+            "threshold": "-10"
+          },
+          "steps": [
+            "the blower motor temperature exceeds the user-specified threshold of -10 degrees"
+          ],
+          "expected": [
+            "the GUI should trigger the blower motor temperature too high alarm"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI triggers blower power system temperature too high alarm with normal threshold",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is monitoring the blower power system temperature"
+          ],
+          "inputs": {
+            "threshold": "120"
+          },
+          "steps": [
+            "the blower power system temperature exceeds the user-specified threshold of 120 degrees"
+          ],
+          "expected": [
+            "the GUI should trigger the blower power system temperature too high alarm"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "GUI triggers blower power system temperature too high alarm with edge threshold",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is monitoring the blower power system temperature"
+          ],
+          "inputs": {
+            "threshold": "180"
+          },
+          "steps": [
+            "the blower power system temperature exceeds the user-specified threshold of 180 degrees"
+          ],
+          "expected": [
+            "the GUI should trigger the blower power system temperature too high alarm"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "GUI triggers blower power system temperature too high alarm with invalid threshold",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is monitoring the blower power system temperature"
+          ],
+          "inputs": {
+            "threshold": "-20"
+          },
+          "steps": [
+            "the blower power system temperature exceeds the user-specified threshold of -20 degrees"
+          ],
+          "expected": [
+            "the GUI should trigger the blower power system temperature too high alarm"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "GUI triggers battery temperature too high alarm with normal threshold",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is monitoring the battery temperature"
+          ],
+          "inputs": {
+            "threshold": "50"
+          },
+          "steps": [
+            "the battery temperature exceeds the user-specified threshold of 50 degrees"
+          ],
+          "expected": [
+            "the GUI should trigger the battery temperature too high alarm"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "GUI triggers battery temperature too high alarm with edge threshold",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is monitoring the battery temperature"
+          ],
+          "inputs": {
+            "threshold": "70"
+          },
+          "steps": [
+            "the battery temperature exceeds the user-specified threshold of 70 degrees"
+          ],
+          "expected": [
+            "the GUI should trigger the battery temperature too high alarm"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "GUI triggers battery temperature too high alarm with invalid threshold",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is monitoring the battery temperature"
+          ],
+          "inputs": {
+            "threshold": "-5"
+          },
+          "steps": [
+            "the battery temperature exceeds the user-specified threshold of -5 degrees"
+          ],
+          "expected": [
+            "the GUI should trigger the battery temperature too high alarm"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "GUI automatically invokes safety action for blower power system with normal threshold",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is monitoring the blower power system temperature"
+          ],
+          "inputs": {
+            "threshold": "120"
+          },
+          "steps": [
+            "the blower power system temperature exceeds the user-specified threshold of 120 degrees"
+          ],
+          "expected": [
+            "the GUI should automatically invoke a safety action"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "GUI automatically invokes safety action for blower power system with edge threshold",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is monitoring the blower power system temperature"
+          ],
+          "inputs": {
+            "threshold": "180"
+          },
+          "steps": [
+            "the blower power system temperature exceeds the user-specified threshold of 180 degrees"
+          ],
+          "expected": [
+            "the GUI should automatically invoke a safety action"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "GUI automatically invokes safety action for blower power system with invalid threshold",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is monitoring the blower power system temperature"
+          ],
+          "inputs": {
+            "threshold": "-20"
+          },
+          "steps": [
+            "the blower power system temperature exceeds the user-specified threshold of -20 degrees"
+          ],
+          "expected": [
+            "the GUI should automatically invoke a safety action"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "GUI automatically invokes safety action for battery with normal threshold",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is monitoring the battery temperature"
+          ],
+          "inputs": {
+            "threshold": "50"
+          },
+          "steps": [
+            "the battery temperature exceeds the user-specified threshold of 50 degrees"
+          ],
+          "expected": [
+            "the GUI should automatically invoke a safety action"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "GUI automatically invokes safety action for battery with edge threshold",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the GUI is monitoring the battery temperature"
+          ],
+          "inputs": {
+            "threshold": "70"
+          },
+          "steps": [
+            "the battery temperature exceeds the user-specified threshold of 70 degrees"
+          ],
+          "expected": [
+            "the GUI should automatically invoke a safety action"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "GUI automatically invokes safety action for battery with invalid threshold",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the GUI is monitoring the battery temperature"
+          ],
+          "inputs": {
+            "threshold": "-5"
+          },
+          "steps": [
+            "the battery temperature exceeds the user-specified threshold of -5 degrees"
+          ],
+          "expected": [
+            "the GUI should automatically invoke a safety action"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.4,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.5263,
+        "hallucinated": [
+          {
+            "value": "100",
+            "context": "blower motor threshold",
+            "grounded": false
+          },
+          {
+            "value": "150",
+            "context": "blower motor threshold",
+            "grounded": false
+          },
+          {
+            "value": "-10",
+            "context": "blower motor threshold",
+            "grounded": false
+          },
+          {
+            "value": "120",
+            "context": "blower power system threshold",
+            "grounded": false
+          },
+          {
+            "value": "180",
+            "context": "blower power system threshold",
+            "grounded": false
+          },
+          {
+            "value": "-20",
+            "context": "blower power system threshold",
+            "grounded": false
+          },
+          {
+            "value": "50",
+            "context": "battery threshold",
+            "grounded": false
+          },
+          {
+            "value": "70",
+            "context": "battery threshold",
+            "grounded": false
+          },
+          {
+            "value": "-5",
+            "context": "battery threshold",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 19,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add explicit numeric priority levels for battery failure alarm to improve oracle assertiveness",
+          "Define and document acceptable threshold ranges to avoid invented values",
+          "Include negative test cases that verify system rejects invalid thresholds instead of triggering alarms",
+          "Assert concrete alarm states or codes rather than generic descriptions",
+          "Provide timing or sequence assertions for safety actions to ensure correct order"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.4826,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.4826; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.4, 'boundary_coverage': 0.5, 'groundedness_mg': 0.5263}). Output the full improved suite addressing:\n- ungrounded value '100' (blower motor threshold): remove or use the SRS value\n- ungrounded value '150' (blower motor threshold): remove or use the SRS value\n- ungrounded value '-10' (blower motor threshold): remove or use the SRS value\n- ungrounded value '120' (blower power system threshold): remove or use the SRS value\n- ungrounded value '180' (blower power system threshold): remove or use the SRS value\n- ungrounded value '-20' (blower power system threshold): remove or use the SRS value\n- Add explicit numeric priority levels for battery failure alarm to improve oracle assertiveness\n- Define and document acceptable threshold ranges to avoid invented values\n- Include negative test cases that verify system rejects invalid thresholds instead of triggering alarms\n- Assert concrete alarm states or codes rather than generic descriptions\n- Provide timing or sequence assertions for safety actions to ensure correct order",
+      "artifact": "Feature: Alarms and Temperature Sensing\n\n  Scenario: Battery failure alarm has high priority\n    Given the system is operational\n    When a battery failure is detected\n    Then the battery failure alarm is triggered with priority level 1\n\n  Scenario Outline: GUI reads temperature sensors for blower motor, blower power management system, and battery cell\n    Given the system is operational\n    When the temperature of the <component> is read\n    Then the GUI displays the temperature of the <component>\n    Examples:\n      | component                |\n      | blower motor             |\n      | blower power mgmt system |\n      | battery cell             |\n\n  Scenario Outline: Blower motor temperature too high alarm triggered by user-specified threshold\n    Given the system is operational\n    And the user sets the blower motor temperature threshold to <threshold>\n    When the blower motor temperature reaches <temperature>\n    Then the \"blower motor temperature too high\" alarm is triggered\n    Examples:\n      | threshold | temperature |\n      | 100       | 100         |  # Normal value\n      | 100       | 101         |  # Edge value\n      | 100       | 99          |  # Below threshold\n      | 100       | -10         |  # Invalid value\n\n  Scenario Outline: Blower power system temperature too high alarm triggered by user-specified threshold\n    Given the system is operational\n    And the user sets the blower power system temperature threshold to <threshold>\n    When the blower power system temperature reaches <temperature>\n    Then the \"blower power system temperature too high\" alarm is triggered\n    Examples:\n      | threshold | temperature |\n      | 120       | 120         |  # Normal value\n      | 120       | 121         |  # Edge value\n      | 120       | 119         |  # Below threshold\n      | 120       | -20         |  # Invalid value\n\n  Scenario Outline: Battery temperature too high alarm triggered by user-specified threshold\n    Given the system is operational\n    And the user sets the battery temperature threshold to <threshold>\n    When the battery temperature reaches <temperature>\n    Then the \"battery temperature too high\" alarm is triggered\n    Examples:\n      | threshold | temperature |\n      | 150       | 150         |  # Normal value\n      | 150       | 151         |  # Edge value\n      | 150       | 149         |  # Below threshold\n      | 150       | -10         |  # Invalid value\n\n  Scenario Outline: Safety action invoked when blower power system temperature is above threshold\n    Given the system is operational\n    And the user sets the blower power system temperature threshold to <threshold>\n    When the blower power system temperature reaches <temperature>\n    Then the safety action is invoked within 1 second\n    Examples:\n      | threshold | temperature |\n      | 120       | 121         |  # Above threshold\n      | 120       | 120         |  # At threshold\n\n  Scenario Outline: Safety action invoked when battery temperature is above threshold\n    Given the system is operational\n    And the user sets the battery temperature threshold to <threshold>\n    When the battery temperature reaches <temperature>\n    Then the safety action is invoked within 1 second\n    Examples:\n      | threshold | temperature |\n      | 150       | 151         |  # Above threshold\n      | 150       | 150         |  # At threshold\n\n  Scenario Outline: System rejects invalid blower motor temperature threshold\n    Given the system is operational\n    When the user sets the blower motor temperature threshold to <threshold>\n    Then the system rejects the threshold and does not trigger an alarm\n    Examples:\n      | threshold |\n      | -10       |  # Invalid value\n\n  Scenario Outline: System rejects invalid blower power system temperature threshold\n    Given the system is operational\n    When the user sets the blower power system temperature threshold to <threshold>\n    Then the system rejects the threshold and does not trigger an alarm\n    Examples:\n      | threshold |\n      | -20       |  # Invalid value\n\n  Scenario Outline: System rejects invalid battery temperature threshold\n    Given the system is operational\n    When the user sets the battery temperature threshold to <threshold>\n    Then the system rejects the threshold and does not trigger an alarm\n    Examples:\n      | threshold |\n      | -10       |  # Invalid value",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Battery failure alarm has high priority",
+          "req_ids": [
+            "RW-SW-130"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "a battery failure is detected"
+          ],
+          "expected": [
+            "the battery failure alarm is triggered with priority level 1"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI reads temperature sensors for blower motor",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "the temperature of the blower motor is read"
+          ],
+          "expected": [
+            "the GUI displays the temperature of the blower motor"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI reads temperature sensors for blower power management system",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "the temperature of the blower power mgmt system is read"
+          ],
+          "expected": [
+            "the GUI displays the temperature of the blower power mgmt system"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI reads temperature sensors for battery cell",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "the temperature of the battery cell is read"
+          ],
+          "expected": [
+            "the GUI displays the temperature of the battery cell"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Blower motor temperature too high alarm triggered by user-specified threshold",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "100",
+            "temperature": "100"
+          },
+          "steps": [
+            "the user sets the blower motor temperature threshold to 100",
+            "the blower motor temperature reaches 100"
+          ],
+          "expected": [
+            "the \"blower motor temperature too high\" alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Blower motor temperature too high alarm triggered by user-specified threshold (edge case)",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "100",
+            "temperature": "101"
+          },
+          "steps": [
+            "the user sets the blower motor temperature threshold to 100",
+            "the blower motor temperature reaches 101"
+          ],
+          "expected": [
+            "the \"blower motor temperature too high\" alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Blower motor temperature too high alarm not triggered below threshold",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "100",
+            "temperature": "99"
+          },
+          "steps": [
+            "the user sets the blower motor temperature threshold to 100",
+            "the blower motor temperature reaches 99"
+          ],
+          "expected": [
+            "the \"blower motor temperature too high\" alarm is not triggered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "System rejects invalid blower motor temperature threshold",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "-10"
+          },
+          "steps": [
+            "the user sets the blower motor temperature threshold to -10"
+          ],
+          "expected": [
+            "the system rejects the threshold and does not trigger an alarm"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Blower power system temperature too high alarm triggered by user-specified threshold",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "120",
+            "temperature": "120"
+          },
+          "steps": [
+            "the user sets the blower power system temperature threshold to 120",
+            "the blower power system temperature reaches 120"
+          ],
+          "expected": [
+            "the \"blower power system temperature too high\" alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Blower power system temperature too high alarm triggered by user-specified threshold (edge case)",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "120",
+            "temperature": "121"
+          },
+          "steps": [
+            "the user sets the blower power system temperature threshold to 120",
+            "the blower power system temperature reaches 121"
+          ],
+          "expected": [
+            "the \"blower power system temperature too high\" alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Blower power system temperature too high alarm not triggered below threshold",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "120",
+            "temperature": "119"
+          },
+          "steps": [
+            "the user sets the blower power system temperature threshold to 120",
+            "the blower power system temperature reaches 119"
+          ],
+          "expected": [
+            "the \"blower power system temperature too high\" alarm is not triggered"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "System rejects invalid blower power system temperature threshold",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "-20"
+          },
+          "steps": [
+            "the user sets the blower power system temperature threshold to -20"
+          ],
+          "expected": [
+            "the system rejects the threshold and does not trigger an alarm"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Battery temperature too high alarm triggered by user-specified threshold",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "150",
+            "temperature": "150"
+          },
+          "steps": [
+            "the user sets the battery temperature threshold to 150",
+            "the battery temperature reaches 150"
+          ],
+          "expected": [
+            "the \"battery temperature too high\" alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Battery temperature too high alarm triggered by user-specified threshold (edge case)",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "150",
+            "temperature": "151"
+          },
+          "steps": [
+            "the user sets the battery temperature threshold to 150",
+            "the battery temperature reaches 151"
+          ],
+          "expected": [
+            "the \"battery temperature too high\" alarm is triggered"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Battery temperature too high alarm not triggered below threshold",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "150",
+            "temperature": "149"
+          },
+          "steps": [
+            "the user sets the battery temperature threshold to 150",
+            "the battery temperature reaches 149"
+          ],
+          "expected": [
+            "the \"battery temperature too high\" alarm is not triggered"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "System rejects invalid battery temperature threshold",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "-10"
+          },
+          "steps": [
+            "the user sets the battery temperature threshold to -10"
+          ],
+          "expected": [
+            "the system rejects the threshold and does not trigger an alarm"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Safety action invoked when blower power system temperature is above threshold",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "120",
+            "temperature": "121"
+          },
+          "steps": [
+            "the user sets the blower power system temperature threshold to 120",
+            "the blower power system temperature reaches 121"
+          ],
+          "expected": [
+            "the safety action is invoked within 1 second"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Safety action invoked when blower power system temperature is at threshold",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "120",
+            "temperature": "120"
+          },
+          "steps": [
+            "the user sets the blower power system temperature threshold to 120",
+            "the blower power system temperature reaches 120"
+          ],
+          "expected": [
+            "the safety action is invoked within 1 second"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Safety action invoked when battery temperature is above threshold",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "150",
+            "temperature": "151"
+          },
+          "steps": [
+            "the user sets the battery temperature threshold to 150",
+            "the battery temperature reaches 151"
+          ],
+          "expected": [
+            "the safety action is invoked within 1 second"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Safety action invoked when battery temperature is at threshold",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "threshold": "150",
+            "temperature": "150"
+          },
+          "steps": [
+            "the user sets the battery temperature threshold to 150",
+            "the battery temperature reaches 150"
+          ],
+          "expected": [
+            "the safety action is invoked within 1 second"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.75,
+        "representation_score": 1.0,
+        "sfv_score": 0.875,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #6 (TC-006): 'edge' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'edge' is not one of ['positive', 'negative', 'boundary']",
+          "test case #14 (TC-014): 'edge' is not one of ['positive', 'negative', 'boundary']",
+          "test case #18 (TC-018): 'edge' is not one of ['positive', 'negative', 'boundary']",
+          "test case #20 (TC-020): 'edge' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.88). Fix these problems and output the full corrected suite:\n- test case #6 (TC-006): 'edge' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'edge' is not one of ['positive', 'negative', 'boundary']\n- test case #14 (TC-014): 'edge' is not one of ['positive', 'negative', 'boundary']\n- test case #18 (TC-018): 'edge' is not one of ['positive', 'negative', 'boundary']\n- test case #20 (TC-020): 'edge' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "Feature: Alarms and Temperature Sensing\n\n  Scenario: Battery failure alarm has high priority\n    Given the system is operational\n    When a battery failure is detected\n    Then the battery failure alarm should have high priority\n\n  Scenario Outline: GUI reads temperature sensors for blower motor, blower power mgmt system, and battery cell\n    Given the system is operational\n    When the temperature of the <component> is read\n    Then the GUI should display the temperature of the <component>\n    Examples:\n      | component             |\n      | blower motor          |\n      | blower power mgmt system |\n      | battery cell          |\n\n  Scenario Outline: Blower motor temperature too high alarm triggered by user-specified threshold\n    Given the system is operational\n    And the user has set the blower motor temperature threshold to <threshold>\n    When the blower motor temperature reaches <temperature>\n    Then the \"blower motor temperature too high\" alarm should be triggered\n    Examples:\n      | threshold | temperature | kind      |\n      | 80        | 85          | positive  |\n      | 80        | 80          | boundary  |\n      | 80        | 79          | negative  |\n\n  Scenario Outline: Blower power system temperature too high alarm triggered by user-specified threshold\n    Given the system is operational\n    And the user has set the blower power system temperature threshold to <threshold>\n    When the blower power system temperature reaches <temperature>\n    Then the \"blower power system temperature too high\" alarm should be triggered\n    Examples:\n      | threshold | temperature | kind      |\n      | 90        | 95          | positive  |\n      | 90        | 90          | boundary  |\n      | 90        | 89          | negative  |\n\n  Scenario Outline: Battery temperature too high alarm triggered by user-specified threshold\n    Given the system is operational\n    And the user has set the battery temperature threshold to <threshold>\n    When the battery temperature reaches <temperature>\n    Then the \"battery temperature too high\" alarm should be triggered\n    Examples:\n      | threshold | temperature | kind      |\n      | 75        | 80          | positive  |\n      | 75        | 75          | boundary  |\n      | 75        | 74          | negative  |\n\n  Scenario Outline: Safety action invoked when blower power system temperature is above threshold\n    Given the system is operational\n    And the user has set the blower power system temperature threshold to <threshold>\n    When the blower power system temperature reaches <temperature>\n    Then the system should automatically invoke a safety action\n    Examples:\n      | threshold | temperature | kind      |\n      | 90        | 95          | positive  |\n      | 90        | 90          | boundary  |\n      | 90        | 89          | negative  |\n\n  Scenario Outline: Safety action invoked when battery temperature is above threshold\n    Given the system is operational\n    And the user has set the battery temperature threshold to <threshold>\n    When the battery temperature reaches <temperature>\n    Then the system should automatically invoke a safety action\n    Examples:\n      | threshold | temperature | kind      |\n      | 75        | 80          | positive  |\n      | 75        | 75          | boundary  |\n      | 75        | 74          | negative  |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Battery failure alarm has high priority",
+          "req_ids": [
+            "RW-SW-130"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "a battery failure is detected"
+          ],
+          "expected": [
+            "the battery failure alarm should have high priority"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI reads temperature sensors for blower motor",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "component": "blower motor"
+          },
+          "steps": [
+            "the temperature of the blower motor is read"
+          ],
+          "expected": [
+            "the GUI should display the temperature of the blower motor"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI reads temperature sensors for blower power mgmt system",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "component": "blower power mgmt system"
+          },
+          "steps": [
+            "the temperature of the blower power mgmt system is read"
+          ],
+          "expected": [
+            "the GUI should display the temperature of the blower power mgmt system"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI reads temperature sensors for battery cell",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {
+            "component": "battery cell"
+          },
+          "steps": [
+            "the temperature of the battery cell is read"
+          ],
+          "expected": [
+            "the GUI should display the temperature of the battery cell"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Blower motor temperature too high alarm triggered by user-specified threshold (positive)",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the blower motor temperature threshold to 80"
+          ],
+          "inputs": {
+            "threshold": 80,
+            "temperature": 85
+          },
+          "steps": [
+            "the blower motor temperature reaches 85"
+          ],
+          "expected": [
+            "the \"blower motor temperature too high\" alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Blower motor temperature too high alarm triggered by user-specified threshold (boundary)",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the blower motor temperature threshold to 80"
+          ],
+          "inputs": {
+            "threshold": 80,
+            "temperature": 80
+          },
+          "steps": [
+            "the blower motor temperature reaches 80"
+          ],
+          "expected": [
+            "the \"blower motor temperature too high\" alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Blower motor temperature too high alarm triggered by user-specified threshold (negative)",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the blower motor temperature threshold to 80"
+          ],
+          "inputs": {
+            "threshold": 80,
+            "temperature": 79
+          },
+          "steps": [
+            "the blower motor temperature reaches 79"
+          ],
+          "expected": [
+            "the \"blower motor temperature too high\" alarm should not be triggered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Blower power system temperature too high alarm triggered by user-specified threshold (positive)",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the blower power system temperature threshold to 90"
+          ],
+          "inputs": {
+            "threshold": 90,
+            "temperature": 95
+          },
+          "steps": [
+            "the blower power system temperature reaches 95"
+          ],
+          "expected": [
+            "the \"blower power system temperature too high\" alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Blower power system temperature too high alarm triggered by user-specified threshold (boundary)",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the blower power system temperature threshold to 90"
+          ],
+          "inputs": {
+            "threshold": 90,
+            "temperature": 90
+          },
+          "steps": [
+            "the blower power system temperature reaches 90"
+          ],
+          "expected": [
+            "the \"blower power system temperature too high\" alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Blower power system temperature too high alarm triggered by user-specified threshold (negative)",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the blower power system temperature threshold to 90"
+          ],
+          "inputs": {
+            "threshold": 90,
+            "temperature": 89
+          },
+          "steps": [
+            "the blower power system temperature reaches 89"
+          ],
+          "expected": [
+            "the \"blower power system temperature too high\" alarm should not be triggered"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Battery temperature too high alarm triggered by user-specified threshold (positive)",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the battery temperature threshold to 75"
+          ],
+          "inputs": {
+            "threshold": 75,
+            "temperature": 80
+          },
+          "steps": [
+            "the battery temperature reaches 80"
+          ],
+          "expected": [
+            "the \"battery temperature too high\" alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Battery temperature too high alarm triggered by user-specified threshold (boundary)",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the battery temperature threshold to 75"
+          ],
+          "inputs": {
+            "threshold": 75,
+            "temperature": 75
+          },
+          "steps": [
+            "the battery temperature reaches 75"
+          ],
+          "expected": [
+            "the \"battery temperature too high\" alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Battery temperature too high alarm triggered by user-specified threshold (negative)",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the battery temperature threshold to 75"
+          ],
+          "inputs": {
+            "threshold": 75,
+            "temperature": 74
+          },
+          "steps": [
+            "the battery temperature reaches 74"
+          ],
+          "expected": [
+            "the \"battery temperature too high\" alarm should not be triggered"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Safety action invoked when blower power system temperature is above threshold (positive)",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the blower power system temperature threshold to 90"
+          ],
+          "inputs": {
+            "threshold": 90,
+            "temperature": 95
+          },
+          "steps": [
+            "the blower power system temperature reaches 95"
+          ],
+          "expected": [
+            "the system should automatically invoke a safety action"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Safety action invoked when blower power system temperature is above threshold (boundary)",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the blower power system temperature threshold to 90"
+          ],
+          "inputs": {
+            "threshold": 90,
+            "temperature": 90
+          },
+          "steps": [
+            "the blower power system temperature reaches 90"
+          ],
+          "expected": [
+            "the system should automatically invoke a safety action"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Safety action invoked when blower power system temperature is above threshold (negative)",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the blower power system temperature threshold to 90"
+          ],
+          "inputs": {
+            "threshold": 90,
+            "temperature": 89
+          },
+          "steps": [
+            "the blower power system temperature reaches 89"
+          ],
+          "expected": [
+            "the system should not automatically invoke a safety action"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Safety action invoked when battery temperature is above threshold (positive)",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the battery temperature threshold to 75"
+          ],
+          "inputs": {
+            "threshold": 75,
+            "temperature": 80
+          },
+          "steps": [
+            "the battery temperature reaches 80"
+          ],
+          "expected": [
+            "the system should automatically invoke a safety action"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Safety action invoked when battery temperature is above threshold (boundary)",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the battery temperature threshold to 75"
+          ],
+          "inputs": {
+            "threshold": 75,
+            "temperature": 75
+          },
+          "steps": [
+            "the battery temperature reaches 75"
+          ],
+          "expected": [
+            "the system should automatically invoke a safety action"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Safety action invoked when battery temperature is above threshold (negative)",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system is operational",
+            "the user has set the battery temperature threshold to 75"
+          ],
+          "inputs": {
+            "threshold": 75,
+            "temperature": 74
+          },
+          "steps": [
+            "the battery temperature reaches 74"
+          ],
+          "expected": [
+            "the system should not automatically invoke a safety action"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.3636,
+        "hallucinated": [
+          {
+            "value": 80,
+            "context": "blower motor threshold",
+            "grounded": false
+          },
+          {
+            "value": 90,
+            "context": "blower power system threshold",
+            "grounded": false
+          },
+          {
+            "value": 75,
+            "context": "battery threshold",
+            "grounded": false
+          },
+          {
+            "value": 85,
+            "context": "blower motor temperature",
+            "grounded": false
+          },
+          {
+            "value": 80,
+            "context": "blower motor temperature",
+            "grounded": false
+          },
+          {
+            "value": 79,
+            "context": "blower motor temperature",
+            "grounded": false
+          },
+          {
+            "value": 95,
+            "context": "blower power system temperature",
+            "grounded": false
+          },
+          {
+            "value": 90,
+            "context": "blower power system temperature",
+            "grounded": false
+          },
+          {
+            "value": 89,
+            "context": "blower power system temperature",
+            "grounded": false
+          },
+          {
+            "value": 80,
+            "context": "battery temperature",
+            "grounded": false
+          },
+          {
+            "value": 75,
+            "context": "battery temperature",
+            "grounded": false
+          },
+          {
+            "value": 74,
+            "context": "battery temperature",
+            "grounded": false
+          },
+          {
+            "value": "operational",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "user has set threshold to X",
+            "context": "user configuration",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 22,
+        "uncovered_clauses": [
+          "RW-SW-131"
+        ],
+        "weaknesses": [
+          "1. No test covers RW-SW-131 (system temperature sensing capability).",
+          "2. Oracle assertions are vague; use concrete values or state checks.",
+          "3. Threshold values are arbitrary; align with real system specs.",
+          "4. No tests for sensor failure or out‑of‑range values.",
+          "5. No tests for safety action timing or sequence."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-131"
+        ],
+        "fsa_score": 0.7451,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.7451; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 1.0, 'groundedness_mg': 0.3636}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-131'] (add at least one each)\n- uncovered clause: RW-SW-131\n- ungrounded value '80' (blower motor threshold): remove or use the SRS value\n- ungrounded value '90' (blower power system threshold): remove or use the SRS value\n- ungrounded value '75' (battery threshold): remove or use the SRS value\n- ungrounded value '85' (blower motor temperature): remove or use the SRS value\n- ungrounded value '80' (blower motor temperature): remove or use the SRS value\n- ungrounded value '79' (blower motor temperature): remove or use the SRS value\n- 1. No test covers RW-SW-131 (system temperature sensing capability).\n- 2. Oracle assertions are vague; use concrete values or state checks.\n- 3. Threshold values are arbitrary; align with real system specs.\n- 4. No tests for sensor failure or out‑of‑range values.\n- 5. No tests for safety action timing or sequence.",
+      "artifact": "Feature: Alarms and Temperature Sensing\n\n  Scenario: Battery failure alarm has high priority\n    Given the system is operational\n    When a battery failure is detected\n    Then the battery failure alarm should have high priority\n\n  Scenario Outline: System can sense the temperature of heating elements\n    Given the system is operational\n    When the temperature of the <element> is measured\n    Then the temperature should be accurately recorded as <temperature> degrees Celsius\n    Examples:\n      | element            | temperature |\n      | blower motor       | as specified|\n      | battery cell       | as specified|\n\n  Scenario Outline: GUI reads temperature sensors\n    Given the system is operational\n    When the GUI reads the temperature of the <element>\n    Then the GUI should display the temperature as <temperature> degrees Celsius\n    Examples:\n      | element            | temperature |\n      | blower motor       | as specified|\n      | blower power mgmt system | as specified|\n      | battery cell       | as specified|\n\n  Scenario Outline: Blower motor temperature too high alarm\n    Given the system is operational\n    And the blower motor temperature threshold is set to <threshold> degrees Celsius\n    When the blower motor temperature reaches <temperature> degrees Celsius\n    Then the \"blower motor temperature too high\" alarm should be triggered\n    Examples:\n      | threshold | temperature |\n      | as specified | as specified |\n      | as specified | as specified + 1 |\n      | as specified | as specified - 1 |\n\n  Scenario Outline: Blower power system temperature too high alarm\n    Given the system is operational\n    And the blower power system temperature threshold is set to <threshold> degrees Celsius\n    When the blower power system temperature reaches <temperature> degrees Celsius\n    Then the \"blower power system temperature too high\" alarm should be triggered\n    Examples:\n      | threshold | temperature |\n      | as specified | as specified |\n      | as specified | as specified + 1 |\n      | as specified | as specified - 1 |\n\n  Scenario Outline: Battery temperature too high alarm\n    Given the system is operational\n    And the battery temperature threshold is set to <threshold> degrees Celsius\n    When the battery temperature reaches <temperature> degrees Celsius\n    Then the \"battery temperature too high\" alarm should be triggered\n    Examples:\n      | threshold | temperature |\n      | as specified | as specified |\n      | as specified | as specified + 1 |\n      | as specified | as specified - 1 |\n\n  Scenario Outline: Safety action invoked for blower power system\n    Given the system is operational\n    And the blower power system temperature threshold is set to <threshold> degrees Celsius\n    When the blower power system temperature reaches <temperature> degrees Celsius\n    Then the safety action should be automatically invoked\n    Examples:\n      | threshold | temperature |\n      | as specified | as specified + 1 |\n\n  Scenario Outline: Safety action invoked for battery\n    Given the system is operational\n    And the battery temperature threshold is set to <threshold> degrees Celsius\n    When the battery temperature reaches <temperature> degrees Celsius\n    Then the safety action should be automatically invoked\n    Examples:\n      | threshold | temperature |\n      | as specified | as specified + 1 |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Battery failure alarm has high priority",
+          "req_ids": [
+            "RW-SW-130"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "a battery failure is detected"
+          ],
+          "expected": [
+            "the battery failure alarm should have high priority"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "System can sense the temperature of blower motor",
+          "req_ids": [
+            "RW-SW-131"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "the temperature of the blower motor is measured"
+          ],
+          "expected": [
+            "the temperature should be accurately recorded as as specified degrees Celsius"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "System can sense the temperature of battery cell",
+          "req_ids": [
+            "RW-SW-131"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "the temperature of the battery cell is measured"
+          ],
+          "expected": [
+            "the temperature should be accurately recorded as as specified degrees Celsius"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI reads temperature of blower motor",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI reads the temperature of the blower motor"
+          ],
+          "expected": [
+            "the GUI should display the temperature as as specified degrees Celsius"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI reads temperature of blower power mgmt system",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI reads the temperature of the blower power mgmt system"
+          ],
+          "expected": [
+            "the GUI should display the temperature as as specified degrees Celsius"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI reads temperature of battery cell",
+          "req_ids": [
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI reads the temperature of the battery cell"
+          ],
+          "expected": [
+            "the GUI should display the temperature as as specified degrees Celsius"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Blower motor temperature too high alarm triggered",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational",
+            "the blower motor temperature threshold is set to as specified degrees Celsius"
+          ],
+          "inputs": {},
+          "steps": [
+            "the blower motor temperature reaches as specified degrees Celsius"
+          ],
+          "expected": [
+            "the blower motor temperature too high alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Blower motor temperature too high alarm triggered at threshold + 1",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is operational",
+            "the blower motor temperature threshold is set to as specified degrees Celsius"
+          ],
+          "inputs": {},
+          "steps": [
+            "the blower motor temperature reaches as specified + 1 degrees Celsius"
+          ],
+          "expected": [
+            "the blower motor temperature too high alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Blower motor temperature too high alarm not triggered at threshold - 1",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is operational",
+            "the blower motor temperature threshold is set to as specified degrees Celsius"
+          ],
+          "inputs": {},
+          "steps": [
+            "the blower motor temperature reaches as specified - 1 degrees Celsius"
+          ],
+          "expected": [
+            "the blower motor temperature too high alarm should not be triggered"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Blower power system temperature too high alarm triggered",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational",
+            "the blower power system temperature threshold is set to as specified degrees Celsius"
+          ],
+          "inputs": {},
+          "steps": [
+            "the blower power system temperature reaches as specified degrees Celsius"
+          ],
+          "expected": [
+            "the blower power system temperature too high alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Blower power system temperature too high alarm triggered at threshold + 1",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is operational",
+            "the blower power system temperature threshold is set to as specified degrees Celsius"
+          ],
+          "inputs": {},
+          "steps": [
+            "the blower power system temperature reaches as specified + 1 degrees Celsius"
+          ],
+          "expected": [
+            "the blower power system temperature too high alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Blower power system temperature too high alarm not triggered at threshold - 1",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is operational",
+            "the blower power system temperature threshold is set to as specified degrees Celsius"
+          ],
+          "inputs": {},
+          "steps": [
+            "the blower power system temperature reaches as specified - 1 degrees Celsius"
+          ],
+          "expected": [
+            "the blower power system temperature too high alarm should not be triggered"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Battery temperature too high alarm triggered",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational",
+            "the battery temperature threshold is set to as specified degrees Celsius"
+          ],
+          "inputs": {},
+          "steps": [
+            "the battery temperature reaches as specified degrees Celsius"
+          ],
+          "expected": [
+            "the battery temperature too high alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Battery temperature too high alarm triggered at threshold + 1",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is operational",
+            "the battery temperature threshold is set to as specified degrees Celsius"
+          ],
+          "inputs": {},
+          "steps": [
+            "the battery temperature reaches as specified + 1 degrees Celsius"
+          ],
+          "expected": [
+            "the battery temperature too high alarm should be triggered"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Battery temperature too high alarm not triggered at threshold - 1",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is operational",
+            "the battery temperature threshold is set to as specified degrees Celsius"
+          ],
+          "inputs": {},
+          "steps": [
+            "the battery temperature reaches as specified - 1 degrees Celsius"
+          ],
+          "expected": [
+            "the battery temperature too high alarm should not be triggered"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Safety action invoked for blower power system",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational",
+            "the blower power system temperature threshold is set to as specified degrees Celsius"
+          ],
+          "inputs": {},
+          "steps": [
+            "the blower power system temperature reaches as specified + 1 degrees Celsius"
+          ],
+          "expected": [
+            "the safety action should be automatically invoked"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Safety action invoked for battery",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is operational",
+            "the battery temperature threshold is set to as specified degrees Celsius"
+          ],
+          "inputs": {},
+          "steps": [
+            "the battery temperature reaches as specified + 1 degrees Celsius"
+          ],
+          "expected": [
+            "the safety action should be automatically invoked"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.375,
+        "oracle_assertiveness": 0.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 11,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Oracle assertions are vague; specify concrete priority levels, temperature values, and alarm states.",
+          "Tests lack invalid input scenarios (e.g., negative temperatures, non-numeric values).",
+          "No tests for boundary values at exact threshold for safety actions (only +1).",
+          "No tests for system behavior when multiple alarms trigger simultaneously.",
+          "No tests for system recovery after alarm or safety action."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.6437,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

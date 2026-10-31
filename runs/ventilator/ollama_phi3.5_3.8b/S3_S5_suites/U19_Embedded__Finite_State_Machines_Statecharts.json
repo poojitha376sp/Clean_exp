@@ -1,0 +1,1294 @@
+{
+  "unit_id": "U19_Embedded",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:phi3.5:3.8b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.2,
+    "sfv_score": 0.6,
+    "threshold": 0.7,
+    "sfv_pass": false,
+    "issues": [
+      "missing: transitions (>=2)",
+      "missing: states declared",
+      "missing: initial state",
+      "missing: events/guards"
+    ]
+  },
+  "fsa": null,
+  "artifact": "<<Finite State Machine / Statechart Representation>>\n\n<<No code block provided, assuming a hypothetical Statechart tool interface>>",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Verify Controller Responds to Prevent Pressure Drop Below -4cm",
+      "req_ids": [
+        "RW-SW-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Pressure is within normal range"
+      ],
+      "inputs": {
+        "trigger": "Pressure drop detected",
+        "value": "-3cm"
+      },
+      "steps": [
+        "Simulate pressure drop",
+        "Trigger controller response"
+      ],
+      "expected": [
+        "Pressure does not drop below -4cm"
+      ],
+      "guard": "Pressure drop <= -3cm"
+    },
+    {
+      "id": "TC-002",
+      "title": "Verify Controller Never Commands Pressure Above 60",
+      "req_ids": [
+        "RW-SW-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Pressure is below 60"
+      ],
+      "inputs": {
+        "trigger": "Request to increase pressure",
+        "value": "51cmH2O"
+      },
+      "steps": [
+        "Simulate command input",
+        "Check controller action"
+      ],
+      "expected": [
+        "Pressure does not increase"
+      ],
+      "guard": "Pressure increase <= 0cmH2O"
+    },
+    {
+      "id": "TC-003",
+      "title": "Verify SW Measures PEEP Over Each Breath",
+      "req_ids": [
+        "RW-SW-52"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Breath cycle initiated"
+      ],
+      "inputs": {
+        "trigger": "End of breath detection",
+        "value": "true"
+      },
+      "steps": [
+        "Detect end of breath",
+        "Measure PEEP"
+      ],
+      "expected": [
+        "PEEP measured"
+      ],
+      "guard": "Detection of end of breath is true"
+    },
+    {
+      "id": "TC-004",
+      "title": "Verify Controller Hits Commanded Values Within 10%",
+      "req_ids": [
+        "RW-SW-55"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Commanded value specified"
+      ],
+      "inputs": {
+        "trigger": "Commanded value received",
+        "value": "55cmH2O",
+        "tolerance": "10%"
+      },
+      "steps": [
+        "Simulate command input",
+        "Check PEEP/pressure value"
+      ],
+      "expected": [
+        "Measured value within 50-60cmH2O range"
+      ],
+      "guard": "Measured value <= 60cmH2O + 10%"
+    },
+    {
+      "id": "TC-005",
+      "title": "Verify Controller Triggers Inspiration Cycle",
+      "req_ids": [
+        "RW-SW-56"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Pressure target met or below"
+      ],
+      "inputs": {
+        "trigger": "Pressure target met",
+        "value": "below target"
+      },
+      "steps": [
+        "Trigger inspiration cycle"
+      ],
+      "expected": [
+        "Inspiration cycle initiated"
+      ],
+      "guard": "Pressure target <= target value"
+    },
+    {
+      "id": "TC-006",
+      "title": "Verify Controller Triggers Expiration Cycle",
+      "req_ids": [
+        "RW-SW-57"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Pressure target met or above"
+      ],
+      "inputs": {
+        "trigger": "Pressure target met",
+        "value": "55cmH2O",
+        "tolerance": "+-5cm"
+      },
+      "steps": [
+        "Trigger expiration cycle"
+      ],
+      "expected": [
+        "Expiration cycle initiated"
+      ],
+      "guard": "Pressure target >= 50cmH2O - 5cm and Pressure target <= 55cmH2O + 5cm"
+    },
+    {
+      "id": "TC-007",
+      "title": "Verify Controller Meets PIP Targets in Range",
+      "req_ids": [
+        "RW-SW-59"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Pressure within range"
+      ],
+      "inputs": {
+        "trigger": "Pressure check",
+        "value": "5cm",
+        "tolerance": "+-5cm"
+      },
+      "steps": [
+        "Check PIP"
+      ],
+      "expected": [
+        "PIP within range"
+      ],
+      "guard": "PIP >= 5cm - 5cm and PIP <= 55cmH2O + 5cm"
+    },
+    {
+      "id": "TC-008",
+      "title": "Verify Controller Meets Commanded Breath Rate Within Tolerance",
+      "req_ids": [
+        "RW-SW-62"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Breath rate command given"
+      ],
+      "inputs": {
+        "trigger": "Breath rate command",
+        "value": "12 breaths per minute",
+        "tolerance": "+-1 breath"
+      },
+      "steps": [
+        "Set breath rate",
+        "Monitor breath rate"
+      ],
+      "expected": [
+        "Rate within 11-13 breaths per minute"
+      ],
+      "guard": "Rate <= 12 breaths per minute + 1 breath"
+    },
+    {
+      "id": "TC-009",
+      "title": "Verify Controller Behavior at Limit of Pressure Increase",
+      "req_ids": [
+        "RW-SW-7"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Pressure below 60"
+      ],
+      "inputs": {
+        "trigger": "Attempt to increase pressure beyond limit",
+        "value": "60cmH2O"
+      },
+      "steps": [
+        "Simulate command input beyond limit",
+        "Check controller action"
+      ],
+      "expected": [
+        "Pressure does not increase"
+      ],
+      "guard": "Pressure increase <= 0cmH2O"
+    },
+    {
+      "id": "TC-101",
+      "title": "Verify Controller Behavior at Limit of PEEP Measurement",
+      "req_ids": [
+        "RW-SW-52"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "PEEP not specified"
+      ],
+      "inputs": {
+        "trigger": "PEEP measurement command",
+        "value": "undefined"
+      },
+      "steps": [
+        "Simulate command input",
+        "Check system response"
+      ],
+      "expected": [
+        "Request for PEEP specification"
+      ],
+      "guard": "PEEP value is undefined"
+    },
+    {
+      "id": "TC-102",
+      "title": "Verify Controller Response at Limit of Inspiration Cycle Trigger",
+      "req_ids": [
+        "RW-SW-56"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Pressure at trigger threshold"
+      ],
+      "inputs": {
+        "trigger": "Trigger inspiration cycle",
+        "value": "threshold value"
+      },
+      "steps": [
+        "Trigger inspiration cycle",
+        "Check system response"
+      ],
+      "expected": [
+        "System requests clarification"
+      ],
+      "guard": "Trigger value is at threshold"
+    },
+    {
+      "id": "TC-103",
+      "title": "Verify Controller Response at Limit of Expiration Cycle Trigger",
+      "req_ids": [
+        "RW-SW-57"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Pressure at trigger threshold"
+      ],
+      "inputs": {
+        "trigger": "Trigger expiration cycle",
+        "value": "threshold value"
+      },
+      "steps": [
+        "Trigger expiration cycle",
+        "Check system response"
+      ],
+      "expected": [
+        "System requests clarification"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "<<Finite State Machine / Statechart Representation>>\n\n<<No code block provided, assuming a hypothetical Statechart tool interface>>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Verify Controller Responds to Prevent Pressure Drop Below -4cm",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure is within normal range"
+          ],
+          "inputs": {
+            "trigger": "Pressure drop detected",
+            "value": "-3cm"
+          },
+          "steps": [
+            "Simulate pressure drop",
+            "Trigger controller response"
+          ],
+          "expected": [
+            "Pressure does not drop below -4cm"
+          ],
+          "guard": "Pressure drop <= -3cm"
+        },
+        {
+          "id": "TC-002",
+          "title": "Verify Controller Never Commands Pressure Above 60",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure is below 60"
+          ],
+          "inputs": {
+            "trigger": "Request to increase pressure",
+            "value": "51cmH2O"
+          },
+          "steps": [
+            "Simulate command input",
+            "Check controller action"
+          ],
+          "expected": [
+            "Pressure does not increase"
+          ],
+          "guard": "Pressure increase <= 0cmH2O"
+        },
+        {
+          "id": "TC-003",
+          "title": "Verify SW Measures PEEP Over Each Breath",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Breath cycle initiated"
+          ],
+          "inputs": {
+            "trigger": "End of breath detection",
+            "value": "true"
+          },
+          "steps": [
+            "Detect end of breath",
+            "Measure PEEP"
+          ],
+          "expected": [
+            "PEEP measured"
+          ],
+          "guard": "Detection of end of breath is true"
+        },
+        {
+          "id": "TC-004",
+          "title": "Verify Controller Hits Commanded Values Within 10%",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Commanded value specified"
+          ],
+          "inputs": {
+            "trigger": "Commanded value received",
+            "value": "55cmH2O",
+            "tolerance": "10%"
+          },
+          "steps": [
+            "Simulate command input",
+            "Check PEEP/pressure value"
+          ],
+          "expected": [
+            "Measured value within 50-60cmH2O range"
+          ],
+          "guard": "Measured value <= 60cmH2O + 10%"
+        },
+        {
+          "id": "TC-005",
+          "title": "Verify Controller Triggers Inspiration Cycle",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure target met or below"
+          ],
+          "inputs": {
+            "trigger": "Pressure target met",
+            "value": "below target"
+          },
+          "steps": [
+            "Trigger inspiration cycle"
+          ],
+          "expected": [
+            "Inspiration cycle initiated"
+          ],
+          "guard": "Pressure target <= target value"
+        },
+        {
+          "id": "TC-006",
+          "title": "Verify Controller Triggers Expiration Cycle",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure target met or above"
+          ],
+          "inputs": {
+            "trigger": "Pressure target met",
+            "value": "55cmH2O",
+            "tolerance": "+-5cm"
+          },
+          "steps": [
+            "Trigger expiration cycle"
+          ],
+          "expected": [
+            "Expiration cycle initiated"
+          ],
+          "guard": "Pressure target >= 50cmH2O - 5cm and Pressure target <= 55cmH2O + 5cm"
+        },
+        {
+          "id": "TC-007",
+          "title": "Verify Controller Meets PIP Targets in Range",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure within range"
+          ],
+          "inputs": {
+            "trigger": "Pressure check",
+            "value": "5cm",
+            "tolerance": "+-5cm"
+          },
+          "steps": [
+            "Check PIP"
+          ],
+          "expected": [
+            "PIP within range"
+          ],
+          "guard": "PIP >= 5cm - 5cm and PIP <= 55cmH2O + 5cm"
+        },
+        {
+          "id": "TC-008",
+          "title": "Verify Controller Meets Commanded Breath Rate Within Tolerance",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Breath rate command given"
+          ],
+          "inputs": {
+            "trigger": "Breath rate command",
+            "value": "12 breaths per minute",
+            "tolerance": "+-1 breath"
+          },
+          "steps": [
+            "Set breath rate",
+            "Monitor breath rate"
+          ],
+          "expected": [
+            "Rate within 11-13 breaths per minute"
+          ],
+          "guard": "Rate <= 12 breaths per minute + 1 breath"
+        },
+        {
+          "id": "TC-009",
+          "title": "Verify Controller Behavior at Limit of Pressure Increase",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Pressure below 60"
+          ],
+          "inputs": {
+            "trigger": "Attempt to increase pressure beyond limit",
+            "value": "60cmH2O"
+          },
+          "steps": [
+            "Simulate command input beyond limit",
+            "Check controller action"
+          ],
+          "expected": [
+            "Pressure does not increase"
+          ],
+          "guard": "Pressure increase <= 0cmH2O"
+        },
+        {
+          "id": "TC-101",
+          "title": "Verify Controller Behavior at Limit of PEEP Measurement",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "PEEP not specified"
+          ],
+          "inputs": {
+            "trigger": "PEEP measurement command",
+            "value": "undefined"
+          },
+          "steps": [
+            "Simulate command input",
+            "Check system response"
+          ],
+          "expected": [
+            "Request for PEEP specification"
+          ],
+          "guard": "PEEP value is undefined"
+        },
+        {
+          "id": "TC-102",
+          "title": "Verify Controller Response at Limit of Inspiration Cycle Trigger",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Pressure at trigger threshold"
+          ],
+          "inputs": {
+            "trigger": "Trigger inspiration cycle",
+            "value": "threshold value"
+          },
+          "steps": [
+            "Trigger inspiration cycle",
+            "Check system response"
+          ],
+          "expected": [
+            "System requests clarification"
+          ],
+          "guard": "Trigger value is at threshold"
+        },
+        {
+          "id": "TC-103",
+          "title": "Verify Controller Response at Limit of Expiration Cycle Trigger",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Pressure at trigger threshold"
+          ],
+          "inputs": {
+            "trigger": "Trigger expiration cycle",
+            "value": "threshold value"
+          },
+          "steps": [
+            "Trigger expiration cycle",
+            "Check system response"
+          ],
+          "expected": [
+            "System requests clarification"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.60). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<the test suite written in Finite State Machines / Statecharts notation>",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.1,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.10). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<the test suite written in Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Verify Controller Responds Fast to Prevent Pressure Dropping Below -4cm",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure is within normal range"
+          ],
+          "inputs": {
+            "trigger": "Pressure drop detected",
+            "value": "rapid"
+          },
+          "steps": [
+            "Simulate pressure drop",
+            "Controller action is initiated"
+          ],
+          "expected": [
+            "Controller action prevents pressure from dropping below -4cm within acceptable time frame"
+          ]
+        },
+        {
+          "id": "TC-0softest",
+          "title": "Verify Controller Never Commands Pressure Above 60",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure is within normal range"
+          ],
+          "inputs": {
+            "trigger": "Request to increase pressure",
+            "value": "high"
+          },
+          "steps": [
+            "Controller receives high pressure command",
+            "Controller action is to maintain or decrease pressure"
+          ],
+          "expected": [
+            "Pressure does not exceed 60cmH2O"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Verify SW Measures PEEP Over Each Breath",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Device is in measurement mode"
+          ],
+          "inputs": {
+            "trigger": "Start/Stop measurement",
+            "value": "start"
+          },
+          "steps": [
+            "Begin measurement",
+            "Measure PEEP at the end of each breath"
+          ],
+          "expected": [
+            "PEEP is measured and recorded for each breath"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Verify Controller Hits Commanded Values within 10% for Unspecified Parameters",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is set to a specific parameter"
+          ],
+          "inputs": {
+            "trigger": "Set new parameter value",
+            "value": "new_value"
+          },
+          "steps": [
+            "Set new parameter value to the controller",
+            "Controller action is to adjust to the new value within 10% range"
+          ],
+          "expected": [
+            "Controller sets parameter within 10% of the commanded value"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Verify Controller Triggers Inspiration Cycle",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Device is in idle state"
+          ],
+          "inputs": {
+            "trigger": "Inspiration command signal",
+            "value": "start"
+          },
+          "steps": [
+            "Send inspiration command signal",
+            "Controller transitions to inspiration cycle state"
+          ],
+          "expected": [
+            "Controller enters inspiration cycle state"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Verify Controller Triggers Expiration Cycle",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Device is in inspiration cycle state"
+          ],
+          "inputs": {
+            "trigger": "End inspiration cycle",
+            "value": "stop"
+          },
+          "steps": [
+            "Send expiration command signal",
+            "Controller transitions to expiration cycle state"
+          ],
+          "expected": [
+            "Controller enters expiration cycle state"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Verify Controller Meets PIP Targets in Range 5-55cmH2O",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Device is in cycle state"
+          ],
+          "inputs": {
+            "trigger": "Check PIP",
+            "value": "5-55"
+          },
+          "steps": [
+            "Check PIP during cycle",
+            "Controller action is to maintain within range"
+          ],
+          "expected": [
+            "PIP is within 5-55cmH2O +/- 5cm"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Verify Controller Meets Commanded Breath Rate Within ±1 Breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Device is in cycle state"
+          ],
+          "inputs": {
+            "trigger": "Adjust breath rate",
+            "value": "desired_rate"
+          },
+          "steps": [
+            "Set desired breath rate",
+            "Controller action is to adjust breath rate to within ±1 breath of the desired rate"
+          ],
+          "expected": [
+            "Breath rate is within ±1 breath of the desired rate"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Negative Test Case: Controller Exceeds Pressure Limit",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Pressure is within normal range"
+          ],
+          "inputs": {
+            "trigger": "Request to increase pressure",
+            "value": "excessive"
+          },
+          "steps": [
+            "Controller receives excessive pressure command",
+            "Controller action is to reject and maintain current pressure"
+          ],
+          "expected": [
+            "Pressure does not exceed 60cmH2O"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Boundary Test Case: Controller at Lower Pressure Limit",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Pressure is at -4cm"
+          ],
+          "inputs": {
+            "trigger": "No additional pressure input",
+            "value": "none"
+          },
+          "steps": [
+            "No additional pressure input",
+            "Controller maintains pressure above -4cm"
+          ],
+          "expected": [
+            "Pressure does not drop below -4cm"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Negative Test Case: Controller Fails to Measure PEEP",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Device is in measurement mode"
+          ],
+          "inputs": {
+            "trigger": "Stop measurement",
+            "value": "improper"
+          },
+          "steps": [
+            "Stop measurement with improper command",
+            "Controller fails to record PEEP"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Boundary Test Case: Controller at Parameter Limit",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller is set to a specific parameter at its limit"
+          ],
+          "inputs": {
+            "trigger": "Set new parameter value",
+            "value": "limit_value"
+          },
+          "steps": [
+            "Set parameter value at its limit",
+            "Controller action is to maintain within 10% of the limit value"
+          ],
+          "expected": [
+            "Controller maintains parameter within 10% of the limit value"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Negative Test Case: Controller Triggers Inspiration Cycle Incorrectly",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Device is in idle state"
+          ],
+          "inputs": {
+            "trigger": "Inspiration command signal",
+            "value": "false"
+          },
+          "steps": [
+            "Send incorrect inspiration command signal",
+            "Controller does not enter inspiration cycle state"
+          ],
+          "expected": [
+            "Controller remains in idle state"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Negative Test Case: Controller Triggers Expiration Cycle Incorrectly",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Device is in inspiration cycle state"
+          ],
+          "inputs": {
+            "trigger": "End inspiration cycle",
+            "value": "false"
+          },
+          "steps": [
+            "Send incorrect end inspiration command signal",
+            "Controller does not enter expiration cycle state"
+          ],
+          "expected": [
+            "Device remains in inspiration cycle state"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Boundary Test Case: Controller at PIP Limit",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Device is in cycle state"
+          ],
+          "inputs": {
+            "trigger": "Check PIP",
+            "value": "55"
+          },
+          "steps": [
+            "Check PIP at its upper limit",
+            "Controller action is to maintain within range"
+          ],
+          "expected": [
+            "PIP is within 5-55cmH2O +/- 5cm"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Negative Test Case: Controller at Breath Rate Limit",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Device is in cycle state"
+          ],
+          "inputs": {
+            "trigger": "Adjust breath rate",
+            "value": "maximum"
+          },
+          "steps": [
+            "Set maximum breath rate",
+            "Controller action is to reject and maintain current rate"
+          ],
+          "expected": [
+            "Breath rate does not exceed the maximum allowed rate"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.9375,
+        "representation_score": 0.2,
+        "sfv_score": 0.5687,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #11 (TC-010): 'expected' is a required property",
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.57). Fix these problems and output the full corrected suite:\n- test case #11 (TC-010): 'expected' is a required property\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<the test suite written in Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Verify Controller Responds Fast to Prevent Pressure Dropping Below -4cm",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure is above -4cm"
+          ],
+          "inputs": {
+            "triggerEvent": "Pressure drop detected",
+            "value": "rapid increase"
+          },
+          "steps": [
+            "Check initial pressure state",
+            "Simulate pressure drop event",
+            "Assert pressure does not fall below -4cm"
+          ],
+          "expected": [
+            "Pressure remains above -4cm"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Verify Controller Never Commands Pressure Above 60",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure is below 60"
+          ],
+          "inputs": {
+            "triggerEvent": "Command to increase pressure",
+            "value": "65"
+          },
+          "steps": [
+            "Check initial pressure state",
+            "Assert pressure does not exceed 60"
+          ],
+          "expected": [
+            "Pressure remains at or below 60"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Verify SW Measures PEEP Over Each Breath",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Breath cycle initiated"
+          ],
+          "inputs": {
+            "triggerEvent": "Start of breath",
+            "value": "Breath cycle start"
+          },
+          "steps": [
+            "Measure PEEP",
+            "Assert PEEP is measured"
+          ],
+          "expected": [
+            "PEEP is recorded correctly"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Verify Controller Can Hit Commanded Values Within 10%",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Commanded value is given"
+          ],
+          "inputs": {
+            "commandedValue": "100",
+            "tolerance": "10%"
+          },
+          "steps": [
+            "Set commanded value",
+            "Measure current value",
+            "Assert current value is within 10% of commanded value"
+          ],
+          "expected": [
+            "Current value is within 90-110"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Verify Controller Triggers Inspiration Cycle",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure target for inspiration is reached"
+          ],
+          "inputs": {
+            "triggerEvent": "Pressure target reached",
+            "value": "Trigger inspiration"
+          },
+          "steps": [
+            "Check if inspiration cycle is initiated",
+            "Assert inspiration cycle starts"
+          ],
+          "expected": [
+            "Inspiration cycle is initiated"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Verify Controller Triggers Expiration Cycle",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure target for expiration is reached"
+          ],
+          "inputs": {
+            "triggerEvent": "Pressure target reached",
+            "value": "Trigger expiration"
+          },
+          "steps": [
+            "Check if expiration cycle is initiated",
+            "Assert expiration cycle starts"
+          ],
+          "expected": [
+            "Expiration cycle is initiated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Verify Controller Meets PIP Targets in Range 5-55cmH2O",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Current PIP is below 5cmH2O"
+          ],
+          "inputs": {
+            "targetPIP": "5cmH2O",
+            "tolerance": "5cm"
+          },
+          "steps": [
+            "Set target PIP",
+            "Measure current PIP",
+            "Assert current PIP is within range"
+          ],
+          "expected": [
+            "Current PIP is between 0cmH2O and 10cmH2O"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Verify Controller Meets Commanded Breath Rate Within ±1 Breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Breath rate command given"
+          ],
+          "inputs": {
+            "commandedRate": "12 breaths per minute",
+            "tolerance": "±1 breath"
+          },
+          "steps": [
+            "Set commanded breath rate",
+            "Measure current breath rate",
+            "Assert current rate is within range"
+          ],
+          "expected": [
+            "Current rate is between 11 and 13 breaths per minute"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Verify Controller Behavior at Limit of Pressure Target for Expiration",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Pressure target for expiration is at or above 55cmH2O"
+          ],
+          "inputs": {
+            "triggerEvent": "Pressure target reached",
+            "value": "Trigger expiration"
+          },
+          "steps": [
+            "Check if expiration cycle is initiated when pressure is at or above target",
+            "Assert expiration cycle does not start"
+          ],
+          "expected": [
+            "Expiration cycle does not start when pressure is at or above target"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Verify Controller Responds to Rapid Pressure Drop",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Pressure is stable"
+          ],
+          "inputs": {
+            "triggerEvent": "Simulate rapid pressure drop",
+            "value": "Significant decrease"
+          },
+          "steps": [
+            "Simulate pressure drop",
+            "Assert pressure does not fall below -4cm"
+          ],
+          "expected": [
+            "Pressure remains above -4cm"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Verify Controller Initial State",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No initial pressure event"
+          ],
+          "inputs": {
+            "triggerEvent": "No initial pressure event",
+            "value": "None"
+          },
+          "steps": [
+            "Assert initial state has a defined pressure state"
+          ],
+          "expected": [
+            "Initial state has a defined pressure state"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Verify Controller States and Transitions",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller has at least two states"
+          ],
+          "inputs": {
+            "triggerEvent": "Transition event",
+            "value": "Any"
+          },
+          "steps": [
+            "Simulate transition event",
+            "Assert all states are declared",
+            "Assert all transitions are valid"
+          ],
+          "expected": [
+            "All states and transitions are declared and valid"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    }
+  ]
+}

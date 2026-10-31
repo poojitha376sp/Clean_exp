@@ -1,0 +1,106 @@
+{
+  "unit_id": "U01_General",
+  "representation": "Temporal Logic (LTL)",
+  "generator": "ollama:qwen3:30b-a3b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Temporal Logic (LTL)",
+    "group": 3,
+    "schema_score": 0.0,
+    "representation_score": 1.0,
+    "sfv_score": 0.5,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "No canonical test cases found (expected a JSON list)."
+    ]
+  },
+  "fsa": null,
+  "artifact": "G (time_elapsed < 2_weeks -> !overflow) ∧\nG (time_elapsed < 2_weeks -> stable) ∧\nG (execution_time < real_time) ∧\nG (time_elapsed < 1_hour -> battery_level > 0) ∧\nG (inspiration_occurred -> F (detection_occurred))",
+  "test_cases": null,
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given several requirements (RW-SW-8 to RW-SW-154) that we must cover with test cases in LTL and then in a JSON test suite.\n\nFirst, note that the requirements are:\n[RW-SW-8] All software clocks must have high enough range to not overflow within 2 weeks.\n[RW-SW-9] Numeric algorithms within the software must not lose stability over 2 weeks.\n[RW-SW-10] Software algorithms must be runnable in faster than real time to allow stress testing of long-term continuous operation.\n[RW-SW-41] Software (both controller and Pi) should be power-efficient enough to continuously work from battery for 1 hour.\n[RW-SW-154] Controller must be able to detect patient inspiration.\n\nWe are to write a test suite in LTL (for the artifact) and then a JSON test suite (with test cases) that corresponds to the LTL properties.\n\nImportant: The LTL artifact must express the requirements as temporal properties (safety and liveness). We are to cover all requirements.\n\nLet's break down each requirement and express it as an LTL property:\n\n1. [RW-SW-8]: Clocks must not overflow within 2 weeks.\n   - This is a safety property: \"It is never the case that a clock overflows within 2 weeks.\"\n   - We can express: G (time < 2 weeks) -> (clock not overflowed)\n   - But note: we are to express over the entire run of 2 weeks? Actually, the requirement says \"within 2 weeks\", meaning during the 2-week period, the clock must not overflow.\n   - So: G (time < 2 weeks) -> (clock not overflowed)   [But note: we don't have a clock variable in the requirement, so we have to abstract]\n\n   However, note: the requirement says \"all software clocks\", so we have multiple clocks? But we can abstract to a single clock for the purpose of the property? Actually, we must cover all clocks. But in LTL, we can write for one clock and then note that it must hold for all clocks? But the requirement is about each clock.\n\n   We'll write for a generic clock: \n   Let `overflow(c)` be a predicate that is true when clock `c` overflows.\n   Then: For all clocks c, G (time < 2 weeks) -> ~overflow(c)\n\n   But note: the requirement says \"within 2 weeks\", meaning the time from start to 2 weeks. So we can write:\n\n   G (time < 2 weeks) -> (for all clocks c, ~overflow(c))\n\n   However, in LTL we don't have quantifiers over clocks. So we have to assume that the system has a set of clocks and we are to check that none of them overflows during the 2 weeks. We can express it as:\n\n   G (time < 2 weeks) -> (no_clock_overflow)\n\n   But note: the requirement is about the clock range being high enough, so we are not testing the clock implementation but the requirement that it doesn't overflow. So the property is: the system must not have a clock overflow in the first 2 weeks.\n\n   We'll write: G (time < 2 weeks) -> ~overflow\n\n   However, note: the requirement says \"must have high enough range\", so we are not testing the clock value but the fact that it doesn't overflow. So the property is: the clock never overflows during the 2 weeks.\n\n   So: G",
+      "sfv": {
+        "representation": "Temporal Logic (LTL)",
+        "group": 3,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": "G (time_elapsed < 2_weeks -> !overflow) ∧\nG (time_elapsed < 2_weeks -> stable) ∧\nG (execution_time < real_time) ∧\nG (time_elapsed < 1_hour -> battery_level > 0) ∧\nG (inspiration_occurred -> F (detection_occurred))",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Temporal Logic (LTL)",
+        "group": 3,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given several requirements (RW-SW-8 to RW-SW-154) and we must write a test suite in LTL and then a JSON representation of the test cases.\n\nHowever, note that the previous attempt failed because it did not have a JSON list of test cases (it was missing the JSON block). We must output exactly two fenced blocks: one for the LTL artifact and one for the JSON.\n\nImportant: The requirements are:\n[RW-SW-8] All software clocks must have high enough range to not overflow within 2 weeks.\n[RW-SW-9] Numeric algorithms within the software must not lose stability over 2 weeks.\n[RW-SW-10] Software algorithms must be runnable in faster than real time to allow stress testing of long-term continuous operation.\n[RW-SW-41] Software (both controller and Pi) should be power-efficient enough to continuously work from battery for 1 hour.\n[RW-SW-154] Controller must be able to detect patient inspiration.\n\nWe are to write LTL properties for these requirements. Note that LTL is a temporal logic for specifying properties over time.\n\nLet's break down each requirement and express it as an LTL property:\n\n1. RW-SW-8: Clocks must not overflow within 2 weeks.\n   - We can model the clock as a counter that increases over time. The requirement says it must not overflow within 2 weeks. So, we require that for all time points within 2 weeks (i.e., 2 weeks * 24*60*60 seconds), the clock value does not exceed its maximum.\n   - However, note: the requirement says \"high enough range\", meaning the clock's maximum value is set such that it won't overflow in 2 weeks. So we are not testing the clock value directly but ensuring that the clock does not reach its maximum within 2 weeks.\n\n   But note: the requirement is about the design (the clock range being high enough). However, for testing, we might simulate the clock running for 2 weeks and check that it doesn't overflow.\n\n   In LTL, we can express: \n      G (time < 2 weeks) -> (clock < max_clock_value)\n   However, note that the requirement is about the clock not overflowing within 2 weeks, meaning that at no point in the first 2 weeks does the clock reach or exceed its maximum.\n\n   But note: the requirement does not specify the clock's maximum, so we cannot write a concrete value. We must rely on the fact that the clock is designed to not overflow. However, for testing, we can simulate the clock running for 2 weeks and check that it hasn't overflowed.\n\n   However, the problem says: \"groundedness: every concrete value ... must come from the requirement text\". The requirement says \"2 weeks\", so we can use 2 weeks as a time bound.\n\n   But note: the requirement does not specify the clock's resolution or the maximum value. So we cannot write a concrete value for the clock. Therefore, we must express the property in terms of the time bound.\n\n   We can say: \n      G (time < 2 weeks) -> (clock < max_clock_value)\n\n   However, note that the clock might be implemented as a counter that wraps around (overflow). We want to avoid that. So the prope",
+      "sfv": {
+        "representation": "Temporal Logic (LTL)",
+        "group": 3,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": "G (time_elapsed < 2_weeks -> !overflow) ∧\nG (time_elapsed < 2_weeks -> stable) ∧\nG (execution_time < real_time) ∧\nG (time_elapsed < 1_hour -> battery_level > 0) ∧\nG (inspiration_occurred -> F (detection_occurred))",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Temporal Logic (LTL)",
+        "group": 3,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    }
+  ]
+}

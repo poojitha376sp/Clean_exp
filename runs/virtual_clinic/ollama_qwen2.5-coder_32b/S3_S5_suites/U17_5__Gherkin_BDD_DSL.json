@@ -1,0 +1,832 @@
+{
+  "unit_id": "U17_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.7,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "Z1",
+        "context": "pincode",
+        "grounded": false
+      },
+      {
+        "value": "Z2",
+        "context": "pincode",
+        "grounded": false
+      },
+      {
+        "value": "Z3",
+        "context": "pincode",
+        "grounded": false
+      },
+      {
+        "value": "Z4",
+        "context": "pincode",
+        "grounded": false
+      },
+      {
+        "value": "user1",
+        "context": "login-id",
+        "grounded": false
+      },
+      {
+        "value": "user2",
+        "context": "login-id",
+        "grounded": false
+      },
+      {
+        "value": "user3",
+        "context": "login-id",
+        "grounded": false
+      },
+      {
+        "value": "pass1",
+        "context": "password",
+        "grounded": false
+      },
+      {
+        "value": "wrong",
+        "context": "password",
+        "grounded": false
+      },
+      {
+        "value": "",
+        "context": "password",
+        "grounded": false
+      },
+      {
+        "value": "allow",
+        "context": "result",
+        "grounded": false
+      },
+      {
+        "value": "deny",
+        "context": "result",
+        "grounded": false
+      },
+      {
+        "value": "Cardiology",
+        "context": "speciality",
+        "grounded": false
+      },
+      {
+        "value": "Doctor1",
+        "context": "doctor",
+        "grounded": false
+      },
+      {
+        "value": "Doctor2",
+        "context": "doctor",
+        "grounded": false
+      },
+      {
+        "value": "Patient1",
+        "context": "patient",
+        "grounded": false
+      },
+      {
+        "value": "Patient2",
+        "context": "patient",
+        "grounded": false
+      },
+      {
+        "value": "John Doe",
+        "context": "patient-name",
+        "grounded": false
+      },
+      {
+        "value": "30",
+        "context": "patient-age",
+        "grounded": false
+      },
+      {
+        "value": "Male",
+        "context": "patient-gender",
+        "grounded": false
+      },
+      {
+        "value": "P001",
+        "context": "patient-id",
+        "grounded": false
+      },
+      {
+        "value": "P002",
+        "context": "patient-id",
+        "grounded": false
+      },
+      {
+        "value": "Dermatology",
+        "context": "speciality",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 23,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add boundary tests for pin code format and length",
+      "Verify password strength and encryption handling",
+      "Assert uniqueness and format of generated patient IDs",
+      "Include negative tests for secure login handling (e.g., insecure storage)",
+      "Validate that each doctor is linked to exactly one speciality (negative case)"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.805,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: System Access and Functionality for U17_5\n\n  Scenario: System is available only on Specified PinCodes\n    Given the Parameter Control File contains PinCodes Z1, Z2, and Z3\n    When a user tries to access the system from PinCode Z1\n    Then the system should allow access\n    And when a user tries to access the system from PinCode Z4\n    Then the system should deny access\n\n  Scenario Outline: User can log in with a login-id and password\n    Given the system has a user with login-id \"<login-id>\" and password \"<password>\"\n    When the user attempts to log in with login-id \"<login-id>\" and password \"<password>\"\n    Then the system should <result> access\n\n    Examples:\n      | login-id | password | result |\n      | user1    | pass1    | allow  |\n      | user2    | wrong    | deny   |\n      | user3    |          | deny   |\n\n  Scenario: Login-id/password is managed in a secured manner\n    Given the system has a user with login-id \"user1\" and password \"pass1\"\n    When the user attempts to log in with login-id \"user1\" and password \"pass1\"\n    Then the system should log the login attempt securely\n\n  Scenario: Each Speciality has one or more Doctors linked to it\n    Given the system has a Speciality \"Cardiology\"\n    When the system is queried for Doctors linked to Speciality \"Cardiology\"\n    Then the system should return a list of Doctors [\"Doctor1\", \"Doctor2\"]\n\n  Scenario: Each Doctor is mapped to ONE and ONLY ONE Speciality\n    Given the system has a Doctor \"Doctor1\"\n    When the system is queried for the Speciality of Doctor \"Doctor1\"\n    Then the system should return \"Cardiology\"\n\n  Scenario: Each Doctor provides Consultation to ONE or More Patients\n    Given the system has a Doctor \"Doctor1\"\n    When the system is queried for Patients consulted by Doctor \"Doctor1\"\n    Then the system should return a list of Patients [\"Patient1\", \"Patient2\"]\n\n  Scenario: Each Patient has to register by filling Patient profile\n    Given a Patient with details \"Name: John Doe, Age: 30, Gender: Male\"\n    When the Patient registers in the system\n    Then the system should generate a unique id for the Patient\n\n  Scenario Outline: Each Patient can request for one or more consultation Requests\n    Given the system has a Patient with unique id \"<patient-id>\"\n    When the Patient requests a consultation for Speciality \"<speciality>\"\n    Then the system should create a consultation request linked to Speciality \"<speciality>\"\n\n    Examples:\n      | patient-id | speciality   |\n      | P001       | Cardiology   |\n      | P002       | Dermatology  |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "System is available only on Specified PinCodes",
+      "req_ids": [
+        "BR-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Parameter Control File contains PinCodes Z1, Z2, and Z3"
+      ],
+      "inputs": {
+        "pincode": "Z1"
+      },
+      "steps": [
+        "user tries to access the system from PinCode Z1"
+      ],
+      "expected": [
+        "the system should allow access"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "System is available only on Specified PinCodes",
+      "req_ids": [
+        "BR-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Parameter Control File contains PinCodes Z1, Z2, and Z3"
+      ],
+      "inputs": {
+        "pincode": "Z4"
+      },
+      "steps": [
+        "user tries to access the system from PinCode Z4"
+      ],
+      "expected": [
+        "the system should deny access"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "User can log in with a valid login-id and password",
+      "req_ids": [
+        "BR-2-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system has a user with login-id 'user1' and password 'pass1'"
+      ],
+      "inputs": {
+        "login-id": "user1",
+        "password": "pass1"
+      },
+      "steps": [
+        "the user attempts to log in with login-id 'user1' and password 'pass1'"
+      ],
+      "expected": [
+        "the system should allow access"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "User cannot log in with an invalid password",
+      "req_ids": [
+        "BR-2-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the system has a user with login-id 'user2' and password 'pass2'"
+      ],
+      "inputs": {
+        "login-id": "user2",
+        "password": "wrong"
+      },
+      "steps": [
+        "the user attempts to log in with login-id 'user2' and password 'wrong'"
+      ],
+      "expected": [
+        "the system should deny access"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "User cannot log in with an empty password",
+      "req_ids": [
+        "BR-2-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the system has a user with login-id 'user3' and password 'pass3'"
+      ],
+      "inputs": {
+        "login-id": "user3",
+        "password": ""
+      },
+      "steps": [
+        "the user attempts to log in with login-id 'user3' and password ''"
+      ],
+      "expected": [
+        "the system should deny access"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Login-id/password is managed in a secured manner",
+      "req_ids": [
+        "BR-2-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system has a user with login-id 'user1' and password 'pass1'"
+      ],
+      "inputs": {
+        "login-id": "user1",
+        "password": "pass1"
+      },
+      "steps": [
+        "the user attempts to log in with login-id 'user1' and password 'pass1'"
+      ],
+      "expected": [
+        "the system should log the login attempt securely"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Each Speciality has one or more Doctors linked to it",
+      "req_ids": [
+        "BR-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system has a Speciality 'Cardiology'"
+      ],
+      "inputs": {
+        "speciality": "Cardiology"
+      },
+      "steps": [
+        "the system is queried for Doctors linked to Speciality 'Cardiology'"
+      ],
+      "expected": [
+        "the system should return a list of Doctors ['Doctor1', 'Doctor2']"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Each Doctor is mapped to ONE and ONLY ONE Speciality",
+      "req_ids": [
+        "BR-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system has a Doctor 'Doctor1'"
+      ],
+      "inputs": {
+        "doctor": "Doctor1"
+      },
+      "steps": [
+        "the system is queried for the Speciality of Doctor 'Doctor1'"
+      ],
+      "expected": [
+        "the system should return 'Cardiology'"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Each Doctor provides Consultation to ONE or More Patients",
+      "req_ids": [
+        "BR-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system has a Doctor 'Doctor1'"
+      ],
+      "inputs": {
+        "doctor": "Doctor1"
+      },
+      "steps": [
+        "the system is queried for Patients consulted by Doctor 'Doctor1'"
+      ],
+      "expected": [
+        "the system should return a list of Patients ['Patient1', 'Patient2']"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Each Patient has to register by filling Patient profile",
+      "req_ids": [
+        "BR-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "a Patient with details 'Name: John Doe, Age: 30, Gender: Male'"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "age": "30",
+        "gender": "Male"
+      },
+      "steps": [
+        "the Patient registers in the system"
+      ],
+      "expected": [
+        "the system should generate a unique id for the Patient"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Each Patient can request for one or more consultation Requests",
+      "req_ids": [
+        "BR-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system has a Patient with unique id 'P001'"
+      ],
+      "inputs": {
+        "patient-id": "P001",
+        "speciality": "Cardiology"
+      },
+      "steps": [
+        "the Patient requests a consultation for Speciality 'Cardiology'"
+      ],
+      "expected": [
+        "the system should create a consultation request linked to Speciality 'Cardiology'"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Each Patient can request for one or more consultation Requests",
+      "req_ids": [
+        "BR-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system has a Patient with unique id 'P002'"
+      ],
+      "inputs": {
+        "patient-id": "P002",
+        "speciality": "Dermatology"
+      },
+      "steps": [
+        "the Patient requests a consultation for Speciality 'Dermatology'"
+      ],
+      "expected": [
+        "the system should create a consultation request linked to Speciality 'Dermatology'"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: System Access and Functionality for U17_5\n\n  Scenario: System is available only on Specified PinCodes\n    Given the Parameter Control File contains PinCodes Z1, Z2, and Z3\n    When a user tries to access the system from PinCode Z1\n    Then the system should allow access\n    And when a user tries to access the system from PinCode Z4\n    Then the system should deny access\n\n  Scenario Outline: User can log in with a login-id and password\n    Given the system has a user with login-id \"<login-id>\" and password \"<password>\"\n    When the user attempts to log in with login-id \"<login-id>\" and password \"<password>\"\n    Then the system should <result> access\n\n    Examples:\n      | login-id | password | result |\n      | user1    | pass1    | allow  |\n      | user2    | wrong    | deny   |\n      | user3    |          | deny   |\n\n  Scenario: Login-id/password is managed in a secured manner\n    Given the system has a user with login-id \"user1\" and password \"pass1\"\n    When the user attempts to log in with login-id \"user1\" and password \"pass1\"\n    Then the system should log the login attempt securely\n\n  Scenario: Each Speciality has one or more Doctors linked to it\n    Given the system has a Speciality \"Cardiology\"\n    When the system is queried for Doctors linked to Speciality \"Cardiology\"\n    Then the system should return a list of Doctors [\"Doctor1\", \"Doctor2\"]\n\n  Scenario: Each Doctor is mapped to ONE and ONLY ONE Speciality\n    Given the system has a Doctor \"Doctor1\"\n    When the system is queried for the Speciality of Doctor \"Doctor1\"\n    Then the system should return \"Cardiology\"\n\n  Scenario: Each Doctor provides Consultation to ONE or More Patients\n    Given the system has a Doctor \"Doctor1\"\n    When the system is queried for Patients consulted by Doctor \"Doctor1\"\n    Then the system should return a list of Patients [\"Patient1\", \"Patient2\"]\n\n  Scenario: Each Patient has to register by filling Patient profile\n    Given a Patient with details \"Name: John Doe, Age: 30, Gender: Male\"\n    When the Patient registers in the system\n    Then the system should generate a unique id for the Patient\n\n  Scenario Outline: Each Patient can request for one or more consultation Requests\n    Given the system has a Patient with unique id \"<patient-id>\"\n    When the Patient requests a consultation for Speciality \"<speciality>\"\n    Then the system should create a consultation request linked to Speciality \"<speciality>\"\n\n    Examples:\n      | patient-id | speciality   |\n      | P001       | Cardiology   |\n      | P002       | Dermatology  |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "System is available only on Specified PinCodes",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Parameter Control File contains PinCodes Z1, Z2, and Z3"
+          ],
+          "inputs": {
+            "pincode": "Z1"
+          },
+          "steps": [
+            "user tries to access the system from PinCode Z1"
+          ],
+          "expected": [
+            "the system should allow access"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "System is available only on Specified PinCodes",
+          "req_ids": [
+            "BR-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Parameter Control File contains PinCodes Z1, Z2, and Z3"
+          ],
+          "inputs": {
+            "pincode": "Z4"
+          },
+          "steps": [
+            "user tries to access the system from PinCode Z4"
+          ],
+          "expected": [
+            "the system should deny access"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "User can log in with a valid login-id and password",
+          "req_ids": [
+            "BR-2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system has a user with login-id 'user1' and password 'pass1'"
+          ],
+          "inputs": {
+            "login-id": "user1",
+            "password": "pass1"
+          },
+          "steps": [
+            "the user attempts to log in with login-id 'user1' and password 'pass1'"
+          ],
+          "expected": [
+            "the system should allow access"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "User cannot log in with an invalid password",
+          "req_ids": [
+            "BR-2-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system has a user with login-id 'user2' and password 'pass2'"
+          ],
+          "inputs": {
+            "login-id": "user2",
+            "password": "wrong"
+          },
+          "steps": [
+            "the user attempts to log in with login-id 'user2' and password 'wrong'"
+          ],
+          "expected": [
+            "the system should deny access"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "User cannot log in with an empty password",
+          "req_ids": [
+            "BR-2-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the system has a user with login-id 'user3' and password 'pass3'"
+          ],
+          "inputs": {
+            "login-id": "user3",
+            "password": ""
+          },
+          "steps": [
+            "the user attempts to log in with login-id 'user3' and password ''"
+          ],
+          "expected": [
+            "the system should deny access"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Login-id/password is managed in a secured manner",
+          "req_ids": [
+            "BR-2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system has a user with login-id 'user1' and password 'pass1'"
+          ],
+          "inputs": {
+            "login-id": "user1",
+            "password": "pass1"
+          },
+          "steps": [
+            "the user attempts to log in with login-id 'user1' and password 'pass1'"
+          ],
+          "expected": [
+            "the system should log the login attempt securely"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Each Speciality has one or more Doctors linked to it",
+          "req_ids": [
+            "BR-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system has a Speciality 'Cardiology'"
+          ],
+          "inputs": {
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "the system is queried for Doctors linked to Speciality 'Cardiology'"
+          ],
+          "expected": [
+            "the system should return a list of Doctors ['Doctor1', 'Doctor2']"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Each Doctor is mapped to ONE and ONLY ONE Speciality",
+          "req_ids": [
+            "BR-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system has a Doctor 'Doctor1'"
+          ],
+          "inputs": {
+            "doctor": "Doctor1"
+          },
+          "steps": [
+            "the system is queried for the Speciality of Doctor 'Doctor1'"
+          ],
+          "expected": [
+            "the system should return 'Cardiology'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Each Doctor provides Consultation to ONE or More Patients",
+          "req_ids": [
+            "BR-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system has a Doctor 'Doctor1'"
+          ],
+          "inputs": {
+            "doctor": "Doctor1"
+          },
+          "steps": [
+            "the system is queried for Patients consulted by Doctor 'Doctor1'"
+          ],
+          "expected": [
+            "the system should return a list of Patients ['Patient1', 'Patient2']"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Each Patient has to register by filling Patient profile",
+          "req_ids": [
+            "BR-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "a Patient with details 'Name: John Doe, Age: 30, Gender: Male'"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "age": "30",
+            "gender": "Male"
+          },
+          "steps": [
+            "the Patient registers in the system"
+          ],
+          "expected": [
+            "the system should generate a unique id for the Patient"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Each Patient can request for one or more consultation Requests",
+          "req_ids": [
+            "BR-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system has a Patient with unique id 'P001'"
+          ],
+          "inputs": {
+            "patient-id": "P001",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "the Patient requests a consultation for Speciality 'Cardiology'"
+          ],
+          "expected": [
+            "the system should create a consultation request linked to Speciality 'Cardiology'"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Each Patient can request for one or more consultation Requests",
+          "req_ids": [
+            "BR-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system has a Patient with unique id 'P002'"
+          ],
+          "inputs": {
+            "patient-id": "P002",
+            "speciality": "Dermatology"
+          },
+          "steps": [
+            "the Patient requests a consultation for Speciality 'Dermatology'"
+          ],
+          "expected": [
+            "the system should create a consultation request linked to Speciality 'Dermatology'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.7,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "Z1",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "Z2",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "Z3",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "Z4",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "user1",
+            "context": "login-id",
+            "grounded": false
+          },
+          {
+            "value": "user2",
+            "context": "login-id",
+            "grounded": false
+          },
+          {
+            "value": "user3",
+            "context": "login-id",
+            "grounded": false
+          },
+          {
+            "value": "pass1",
+            "context": "password",
+            "grounded": false
+          },
+          {
+            "value": "wrong",
+            "context": "password",
+            "grounded": false
+          },
+          {
+            "value": "",
+            "context": "password",
+            "grounded": false
+          },
+          {
+            "value": "allow",
+            "context": "result",
+            "grounded": false
+          },
+          {
+            "value": "deny",
+            "context": "result",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "speciality",
+            "grounded": false
+          },
+          {
+            "value": "Doctor1",
+            "context": "doctor",
+            "grounded": false
+          },
+          {
+            "value": "Doctor2",
+            "context": "doctor",
+            "grounded": false
+          },
+          {
+            "value": "Patient1",
+            "context": "patient",
+            "grounded": false
+          },
+          {
+            "value": "Patient2",
+            "context": "patient",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "patient-name",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "patient-age",
+            "grounded": false
+          },
+          {
+            "value": "Male",
+            "context": "patient-gender",
+            "grounded": false
+          },
+          {
+            "value": "P001",
+            "context": "patient-id",
+            "grounded": false
+          },
+          {
+            "value": "P002",
+            "context": "patient-id",
+            "grounded": false
+          },
+          {
+            "value": "Dermatology",
+            "context": "speciality",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 23,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add boundary tests for pin code format and length",
+          "Verify password strength and encryption handling",
+          "Assert uniqueness and format of generated patient IDs",
+          "Include negative tests for secure login handling (e.g., insecure storage)",
+          "Validate that each doctor is linked to exactly one speciality (negative case)"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.805,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

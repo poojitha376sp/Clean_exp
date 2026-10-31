@@ -1,0 +1,982 @@
+{
+  "unit_id": "U05_Alarms",
+  "representation": "Decision Tables",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.3,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.6471,
+    "hallucinated": [
+      {
+        "value": "Alarm",
+        "context": "Alarm type",
+        "grounded": false
+      },
+      {
+        "value": "Inhibition",
+        "context": "Alarm type",
+        "grounded": false
+      },
+      {
+        "value": "Cancellation",
+        "context": "Alarm type",
+        "grounded": false
+      },
+      {
+        "value": "Acknowledgement",
+        "context": "Alarm type",
+        "grounded": false
+      },
+      {
+        "value": "Reset",
+        "context": "Alarm type",
+        "grounded": false
+      },
+      {
+        "value": "4000 ml",
+        "context": "Tidal volume threshold out of bounds",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 17,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Expected results are vague and do not verify log content or format",
+      "Decision table uses don’t-care values without explicit validation of their neutrality",
+      "Only one tidal volume threshold value is tested; increments of 10 ml are not exercised",
+      "No tests for simultaneous multiple alarms or concurrent actions",
+      "No verification of GUI element existence or state changes beyond action success"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.8421,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Decision Table for Alarm Logging and GUI Actions\n\n| Condition 1 | Condition 2 | Condition 3 | Condition 4 | Condition 5 | Action 1 | Action 2 | Action 3 | Action 4 |\n|--------------|--------------|--------------|--------------|--------------|----------|----------|----------|----------|\n| Alarm Type   | Inhibit?     | Cancel?      | Acknowledge? | Reset?       | Log Alarm | Allow Inhibit | Allow Cancel | Allow Acknowledge |\n| Alarm        | Yes          | -            | -            | -            | Yes      | Yes       | -          | -          |\n| Alarm        | No           | Yes          | -            | -            | Yes      | -         | Yes        | -          |\n| Alarm        | No           | No           | Yes          | -            | Yes      | -         | -          | Yes        |\n| Alarm        | No           | No           | No           | Yes          | Yes      | -         | -          | -          |\n| Inhibition   | Yes          | -            | -            | -            | Yes      | Yes       | -          | -          |\n| Acknowledgement | -        | -            | Yes          | -            | Yes      | -         | -          | Yes        |\n| Reset        | -            | -            | -            | Yes          | Yes      | -         | -          | -          |\n\nNotes:\n- \"Alarm Type\" can be \"Alarm\" or \"Inhibition/Cancellation/Acknowledgement/Reset\".\n- \"-\" denotes a \"don't-care\" condition.\n- Actions are triggered based on the presence of the respective conditions.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Log all alarm occurrences",
+      "req_ids": [
+        "RW-SW-27"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "An alarm is triggered"
+      ],
+      "inputs": {
+        "Alarm Type": "Alarm"
+      },
+      "steps": [
+        "Trigger an alarm"
+      ],
+      "expected": [
+        "Alarm is logged in the event log"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Log all alarm inhibitions",
+      "req_ids": [
+        "RW-SW-28"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "An alarm is inhibited"
+      ],
+      "inputs": {
+        "Alarm Type": "Inhibition"
+      },
+      "steps": [
+        "Inhibit an alarm"
+      ],
+      "expected": [
+        "Inhibition is logged in the event log"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Log all alarm cancellations",
+      "req_ids": [
+        "RW-SW-28"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "An alarm is cancelled"
+      ],
+      "inputs": {
+        "Alarm Type": "Cancellation"
+      },
+      "steps": [
+        "Cancel an alarm"
+      ],
+      "expected": [
+        "Cancellation is logged in the event log"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Log all alarm acknowledgements",
+      "req_ids": [
+        "RW-SW-28"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "An alarm is acknowledged"
+      ],
+      "inputs": {
+        "Alarm Type": "Acknowledgement"
+      },
+      "steps": [
+        "Acknowledge an alarm"
+      ],
+      "expected": [
+        "Acknowledgement is logged in the event log"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Log all alarm resets",
+      "req_ids": [
+        "RW-SW-28"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "An alarm is reset"
+      ],
+      "inputs": {
+        "Alarm Type": "Reset"
+      },
+      "steps": [
+        "Reset an alarm"
+      ],
+      "expected": [
+        "Reset is logged in the event log"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "GUI allows inhibiting alarms",
+      "req_ids": [
+        "RW-SW-31"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "An alarm is active"
+      ],
+      "inputs": {
+        "Action": "Inhibit"
+      },
+      "steps": [
+        "Select inhibit option in GUI"
+      ],
+      "expected": [
+        "Alarm is inhibited"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "GUI allows acknowledging alarms",
+      "req_ids": [
+        "RW-SW-32"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "An alarm is active"
+      ],
+      "inputs": {
+        "Action": "Acknowledge"
+      },
+      "steps": [
+        "Select acknowledge option in GUI"
+      ],
+      "expected": [
+        "Alarm is acknowledged"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "GUI allows cancelling alarms",
+      "req_ids": [
+        "RW-SW-33"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "An alarm is active"
+      ],
+      "inputs": {
+        "Action": "Cancel"
+      },
+      "steps": [
+        "Select cancel option in GUI"
+      ],
+      "expected": [
+        "Alarm is cancelled"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Set alarm on inspiration tidal volume above threshold (80-3000 ml, increments of 10 ml)",
+      "req_ids": [
+        "RW-SW-39"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User specifies tidal volume threshold within bounds"
+      ],
+      "inputs": {
+        "TidalVolumeThreshold": "100 ml"
+      },
+      "steps": [
+        "Configure tidal volume threshold in GUI"
+      ],
+      "expected": [
+        "Alarm triggers when tidal volume exceeds 100 ml"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Alarm fires if PIP > user-specified threshold for 3 consecutive breaths",
+      "req_ids": [
+        "RW-SW-42"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User specifies PIP threshold"
+      ],
+      "inputs": {
+        "PIPThreshold": "30 cmH2O",
+        "ConsecutiveBreaths": "3"
+      },
+      "steps": [
+        "Set PIP threshold in GUI",
+        "Simulate breaths with PIP > threshold for 3 breaths"
+      ],
+      "expected": [
+        "Alarm fires after 3 consecutive breaths exceeding threshold"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Alarm fires if leakage > user-specified threshold (5-150 lpm)",
+      "req_ids": [
+        "RW-SW-44"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "User specifies leakage threshold"
+      ],
+      "inputs": {
+        "LeakageThreshold": "100 lpm"
+      },
+      "steps": [
+        "Set leakage threshold in GUI",
+        "Simulate leakage exceeding 100 lpm"
+      ],
+      "expected": [
+        "Alarm fires when leakage exceeds threshold"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Boundary test for tidal volume threshold at lower limit (80 ml)",
+      "req_ids": [
+        "RW-SW-39"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "User sets tidal volume threshold to 80 ml"
+      ],
+      "inputs": {
+        "TidalVolumeThreshold": "80 ml"
+      },
+      "steps": [
+        "Configure tidal volume threshold to 80 ml",
+        "Simulate tidal volume at 80 ml"
+      ],
+      "expected": [
+        "No alarm triggers at exact lower limit"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Boundary test for tidal volume threshold at upper limit (3000 ml)",
+      "req_ids": [
+        "RW-SW-39"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "User sets tidal volume threshold to 3000 ml"
+      ],
+      "inputs": {
+        "TidalVolumeThreshold": "3000 ml"
+      },
+      "steps": [
+        "Configure tidal volume threshold to 3000 ml",
+        "Simulate tidal volume at 3000 ml"
+      ],
+      "expected": [
+        "No alarm triggers at exact upper limit"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Boundary test for PIP threshold",
+      "req_ids": [
+        "RW-SW-42"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "User specifies PIP threshold"
+      ],
+      "inputs": {
+        "PIPThreshold": "30 cmH2O"
+      },
+      "steps": [
+        "Set PIP threshold to 30 cmH2O",
+        "Simulate PIP at 30 cmH2O for 3 breaths"
+      ],
+      "expected": [
+        "No alarm fires at exact threshold"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "Boundary test for leakage threshold at lower limit (5 lpm)",
+      "req_ids": [
+        "RW-SW-44"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "User sets leakage threshold to 5 lpm"
+      ],
+      "inputs": {
+        "LeakageThreshold": "5 lpm"
+      },
+      "steps": [
+        "Configure leakage threshold to 5 lpm",
+        "Simulate leakage at 5 lpm"
+      ],
+      "expected": [
+        "No alarm triggers at exact lower limit"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "Boundary test for leakage threshold at upper limit (150 lpm)",
+      "req_ids": [
+        "RW-SW-44"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "User sets leakage threshold to 150 lpm"
+      ],
+      "inputs": {
+        "LeakageThreshold": "150 lpm"
+      },
+      "steps": [
+        "Configure leakage threshold to 150 lpm",
+        "Simulate leakage at 150 lpm"
+      ],
+      "expected": [
+        "No alarm triggers at exact upper limit"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "Negative path: Attempt to inhibit non-existent alarm",
+      "req_ids": [
+        "RW-SW-31"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "No active alarms"
+      ],
+      "inputs": {
+        "Action": "Inhibit"
+      },
+      "steps": [
+        "Select inhibit option in GUI"
+      ],
+      "expected": [
+        "Inhibition fails, no alarm logged"
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "Negative path: Attempt to acknowledge non-existent alarm",
+      "req_ids": [
+        "RW-SW-32"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "No active alarms"
+      ],
+      "inputs": {
+        "Action": "Acknowledge"
+      },
+      "steps": [
+        "Select acknowledge option in GUI"
+      ],
+      "expected": [
+        "Acknowledgement fails, no alarm logged"
+      ]
+    },
+    {
+      "id": "TC-019",
+      "title": "Negative path: Attempt to cancel non-existent alarm",
+      "req_ids": [
+        "RW-SW-33"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "No active alarms"
+      ],
+      "inputs": {
+        "Action": "Cancel"
+      },
+      "steps": [
+        "Select cancel option in GUI"
+      ],
+      "expected": [
+        "Cancellation fails, no alarm logged"
+      ]
+    },
+    {
+      "id": "TC-020",
+      "title": "Negative path: Set tidal volume threshold outside specified bounds",
+      "req_ids": [
+        "RW-SW-39"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "User attempts to set threshold outside 80-3000 ml"
+      ],
+      "inputs": {
+        "TidalVolumeThreshold": "4000 ml"
+      },
+      "steps": [
+        "Attempt to configure tidal volume threshold to 4000 ml"
+      ],
+      "expected": [
+        "Configuration fails, threshold not set"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Decision Table for Alarm Logging and GUI Actions\n\n| Condition 1 | Condition 2 | Condition 3 | Condition 4 | Condition 5 | Action 1 | Action 2 | Action 3 | Action 4 |\n|--------------|--------------|--------------|--------------|--------------|----------|----------|----------|----------|\n| Alarm Type   | Inhibit?     | Cancel?      | Acknowledge? | Reset?       | Log Alarm | Allow Inhibit | Allow Cancel | Allow Acknowledge |\n| Alarm        | Yes          | -            | -            | -            | Yes      | Yes       | -          | -          |\n| Alarm        | No           | Yes          | -            | -            | Yes      | -         | Yes        | -          |\n| Alarm        | No           | No           | Yes          | -            | Yes      | -         | -          | Yes        |\n| Alarm        | No           | No           | No           | Yes          | Yes      | -         | -          | -          |\n| Inhibition   | Yes          | -            | -            | -            | Yes      | Yes       | -          | -          |\n| Acknowledgement | -        | -            | Yes          | -            | Yes      | -         | -          | Yes        |\n| Reset        | -            | -            | -            | Yes          | Yes      | -         | -          | -          |\n\nNotes:\n- \"Alarm Type\" can be \"Alarm\" or \"Inhibition/Cancellation/Acknowledgement/Reset\".\n- \"-\" denotes a \"don't-care\" condition.\n- Actions are triggered based on the presence of the respective conditions.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Log all alarm occurrences",
+          "req_ids": [
+            "RW-SW-27"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "An alarm is triggered"
+          ],
+          "inputs": {
+            "Alarm Type": "Alarm"
+          },
+          "steps": [
+            "Trigger an alarm"
+          ],
+          "expected": [
+            "Alarm is logged in the event log"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Log all alarm inhibitions",
+          "req_ids": [
+            "RW-SW-28"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "An alarm is inhibited"
+          ],
+          "inputs": {
+            "Alarm Type": "Inhibition"
+          },
+          "steps": [
+            "Inhibit an alarm"
+          ],
+          "expected": [
+            "Inhibition is logged in the event log"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Log all alarm cancellations",
+          "req_ids": [
+            "RW-SW-28"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "An alarm is cancelled"
+          ],
+          "inputs": {
+            "Alarm Type": "Cancellation"
+          },
+          "steps": [
+            "Cancel an alarm"
+          ],
+          "expected": [
+            "Cancellation is logged in the event log"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Log all alarm acknowledgements",
+          "req_ids": [
+            "RW-SW-28"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "An alarm is acknowledged"
+          ],
+          "inputs": {
+            "Alarm Type": "Acknowledgement"
+          },
+          "steps": [
+            "Acknowledge an alarm"
+          ],
+          "expected": [
+            "Acknowledgement is logged in the event log"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Log all alarm resets",
+          "req_ids": [
+            "RW-SW-28"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "An alarm is reset"
+          ],
+          "inputs": {
+            "Alarm Type": "Reset"
+          },
+          "steps": [
+            "Reset an alarm"
+          ],
+          "expected": [
+            "Reset is logged in the event log"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI allows inhibiting alarms",
+          "req_ids": [
+            "RW-SW-31"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "An alarm is active"
+          ],
+          "inputs": {
+            "Action": "Inhibit"
+          },
+          "steps": [
+            "Select inhibit option in GUI"
+          ],
+          "expected": [
+            "Alarm is inhibited"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI allows acknowledging alarms",
+          "req_ids": [
+            "RW-SW-32"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "An alarm is active"
+          ],
+          "inputs": {
+            "Action": "Acknowledge"
+          },
+          "steps": [
+            "Select acknowledge option in GUI"
+          ],
+          "expected": [
+            "Alarm is acknowledged"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI allows cancelling alarms",
+          "req_ids": [
+            "RW-SW-33"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "An alarm is active"
+          ],
+          "inputs": {
+            "Action": "Cancel"
+          },
+          "steps": [
+            "Select cancel option in GUI"
+          ],
+          "expected": [
+            "Alarm is cancelled"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Set alarm on inspiration tidal volume above threshold (80-3000 ml, increments of 10 ml)",
+          "req_ids": [
+            "RW-SW-39"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User specifies tidal volume threshold within bounds"
+          ],
+          "inputs": {
+            "TidalVolumeThreshold": "100 ml"
+          },
+          "steps": [
+            "Configure tidal volume threshold in GUI"
+          ],
+          "expected": [
+            "Alarm triggers when tidal volume exceeds 100 ml"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Alarm fires if PIP > user-specified threshold for 3 consecutive breaths",
+          "req_ids": [
+            "RW-SW-42"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User specifies PIP threshold"
+          ],
+          "inputs": {
+            "PIPThreshold": "30 cmH2O",
+            "ConsecutiveBreaths": "3"
+          },
+          "steps": [
+            "Set PIP threshold in GUI",
+            "Simulate breaths with PIP > threshold for 3 breaths"
+          ],
+          "expected": [
+            "Alarm fires after 3 consecutive breaths exceeding threshold"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Alarm fires if leakage > user-specified threshold (5-150 lpm)",
+          "req_ids": [
+            "RW-SW-44"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User specifies leakage threshold"
+          ],
+          "inputs": {
+            "LeakageThreshold": "100 lpm"
+          },
+          "steps": [
+            "Set leakage threshold in GUI",
+            "Simulate leakage exceeding 100 lpm"
+          ],
+          "expected": [
+            "Alarm fires when leakage exceeds threshold"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Boundary test for tidal volume threshold at lower limit (80 ml)",
+          "req_ids": [
+            "RW-SW-39"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User sets tidal volume threshold to 80 ml"
+          ],
+          "inputs": {
+            "TidalVolumeThreshold": "80 ml"
+          },
+          "steps": [
+            "Configure tidal volume threshold to 80 ml",
+            "Simulate tidal volume at 80 ml"
+          ],
+          "expected": [
+            "No alarm triggers at exact lower limit"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Boundary test for tidal volume threshold at upper limit (3000 ml)",
+          "req_ids": [
+            "RW-SW-39"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User sets tidal volume threshold to 3000 ml"
+          ],
+          "inputs": {
+            "TidalVolumeThreshold": "3000 ml"
+          },
+          "steps": [
+            "Configure tidal volume threshold to 3000 ml",
+            "Simulate tidal volume at 3000 ml"
+          ],
+          "expected": [
+            "No alarm triggers at exact upper limit"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Boundary test for PIP threshold",
+          "req_ids": [
+            "RW-SW-42"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User specifies PIP threshold"
+          ],
+          "inputs": {
+            "PIPThreshold": "30 cmH2O"
+          },
+          "steps": [
+            "Set PIP threshold to 30 cmH2O",
+            "Simulate PIP at 30 cmH2O for 3 breaths"
+          ],
+          "expected": [
+            "No alarm fires at exact threshold"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Boundary test for leakage threshold at lower limit (5 lpm)",
+          "req_ids": [
+            "RW-SW-44"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User sets leakage threshold to 5 lpm"
+          ],
+          "inputs": {
+            "LeakageThreshold": "5 lpm"
+          },
+          "steps": [
+            "Configure leakage threshold to 5 lpm",
+            "Simulate leakage at 5 lpm"
+          ],
+          "expected": [
+            "No alarm triggers at exact lower limit"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Boundary test for leakage threshold at upper limit (150 lpm)",
+          "req_ids": [
+            "RW-SW-44"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "User sets leakage threshold to 150 lpm"
+          ],
+          "inputs": {
+            "LeakageThreshold": "150 lpm"
+          },
+          "steps": [
+            "Configure leakage threshold to 150 lpm",
+            "Simulate leakage at 150 lpm"
+          ],
+          "expected": [
+            "No alarm triggers at exact upper limit"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Negative path: Attempt to inhibit non-existent alarm",
+          "req_ids": [
+            "RW-SW-31"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No active alarms"
+          ],
+          "inputs": {
+            "Action": "Inhibit"
+          },
+          "steps": [
+            "Select inhibit option in GUI"
+          ],
+          "expected": [
+            "Inhibition fails, no alarm logged"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Negative path: Attempt to acknowledge non-existent alarm",
+          "req_ids": [
+            "RW-SW-32"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No active alarms"
+          ],
+          "inputs": {
+            "Action": "Acknowledge"
+          },
+          "steps": [
+            "Select acknowledge option in GUI"
+          ],
+          "expected": [
+            "Acknowledgement fails, no alarm logged"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Negative path: Attempt to cancel non-existent alarm",
+          "req_ids": [
+            "RW-SW-33"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No active alarms"
+          ],
+          "inputs": {
+            "Action": "Cancel"
+          },
+          "steps": [
+            "Select cancel option in GUI"
+          ],
+          "expected": [
+            "Cancellation fails, no alarm logged"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Negative path: Set tidal volume threshold outside specified bounds",
+          "req_ids": [
+            "RW-SW-39"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "User attempts to set threshold outside 80-3000 ml"
+          ],
+          "inputs": {
+            "TidalVolumeThreshold": "4000 ml"
+          },
+          "steps": [
+            "Attempt to configure tidal volume threshold to 4000 ml"
+          ],
+          "expected": [
+            "Configuration fails, threshold not set"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.6471,
+        "hallucinated": [
+          {
+            "value": "Alarm",
+            "context": "Alarm type",
+            "grounded": false
+          },
+          {
+            "value": "Inhibition",
+            "context": "Alarm type",
+            "grounded": false
+          },
+          {
+            "value": "Cancellation",
+            "context": "Alarm type",
+            "grounded": false
+          },
+          {
+            "value": "Acknowledgement",
+            "context": "Alarm type",
+            "grounded": false
+          },
+          {
+            "value": "Reset",
+            "context": "Alarm type",
+            "grounded": false
+          },
+          {
+            "value": "4000 ml",
+            "context": "Tidal volume threshold out of bounds",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Expected results are vague and do not verify log content or format",
+          "Decision table uses don’t-care values without explicit validation of their neutrality",
+          "Only one tidal volume threshold value is tested; increments of 10 ml are not exercised",
+          "No tests for simultaneous multiple alarms or concurrent actions",
+          "No verification of GUI element existence or state changes beyond action success"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.8421,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

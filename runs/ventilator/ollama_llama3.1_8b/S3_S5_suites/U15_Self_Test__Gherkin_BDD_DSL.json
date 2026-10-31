@@ -1,0 +1,1254 @@
+{
+  "unit_id": "U15_Self_Test",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.8,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.2727,
+    "hallucinated": [
+      {
+        "value": "5.0 liters per minute",
+        "context": "flow rate",
+        "grounded": false
+      },
+      {
+        "value": "1013 mbar",
+        "context": "pressure reading",
+        "grounded": false
+      },
+      {
+        "value": "0.0 liters per minute",
+        "context": "flow rate",
+        "grounded": false
+      },
+      {
+        "value": "10.0 liters per minute",
+        "context": "flow rate",
+        "grounded": false
+      },
+      {
+        "value": "0%",
+        "context": "blower speed",
+        "grounded": false
+      },
+      {
+        "value": "50%",
+        "context": "blower speed",
+        "grounded": false
+      },
+      {
+        "value": "100%",
+        "context": "blower speed",
+        "grounded": false
+      },
+      {
+        "value": "error message displayed",
+        "context": "error message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 11,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Test cases use numeric values (flow rates, speeds) not specified in the SRS, reducing traceability.",
+      "Error message assertions are vague; they should specify exact text or error codes.",
+      "Negative coverage for pre-test mode checks (e.g., failing flow or pressure checks) is missing.",
+      "Boundary coverage for flow sensor accuracy is limited to 0%, 50%, 100%; intermediate values and tolerance ranges are not tested.",
+      "Duplicate scenario outlines with identical examples introduce redundancy and increase maintenance effort."
+    ],
+    "traceability": 0.8,
+    "untraced_reqs": [
+      "RW-SW-151"
+    ],
+    "fsa_score": 0.8609,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Self-Test\n  As a user\n  I want to run the self-test\n  So that I can validate the flow sensor accuracy and pressure sensor accuracy\n\n  Scenario: Pre-test mode\n    Given the controller is in pre-test mode\n    When the GUI is opened\n    Then the pre-test mode is displayed\n\n  Scenario: Flow sensor accuracy\n    Given the blower is set to 50% speed\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is run\n    Then the flow rate is 5.0 liters per minute\n\n  Scenario: Pressure sensor accuracy\n    Given the pressure sensor is calibrated\n    When the self-test is run\n    Then the pressure reading is 1013 mbar\n\n  Scenario Outline: Pre-test mode checks\n    Given the controller is in pre-test mode\n    When the self-test is run\n    Then the following checks are performed:\n      | Check        | Expected Result |\n      | Flow sensor  | 5.0 liters per minute |\n      | Pressure sensor | 1013 mbar |\n\n    Examples:\n      | Check        | Expected Result |\n      | Flow sensor  | 5.0 liters per minute |\n      | Pressure sensor | 1013 mbar |\n\n  Scenario: Invalid pre-test mode\n    Given the controller is not in pre-test mode\n    When the self-test is run\n    Then an error message is displayed\n\n  Scenario Outline: Boundary values\n    Given the blower speed is <speed>\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is run\n    Then the flow rate is <flow_rate>\n\n    Examples:\n      | speed | flow_rate |\n      | 0%    | 0.0 liters per minute |\n      | 50%   | 5.0 liters per minute |\n      | 100%  | 10.0 liters per minute |\n\n  Scenario Outline: Invalid flow sensor accuracy\n    Given the blower is set to <speed>\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is run\n    Then an error message is displayed\n\n    Examples:\n      | speed | flow_rate |\n      | 0%    | 0.0 liters per minute |\n      | 50%   | 5.0 liters per minute |\n      | 100%  | 10.0 liters per minute |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Pre-test mode",
+      "req_ids": [
+        "RW-SW-150"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "controller is in pre-test mode"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "GUI is opened",
+        "pre-test mode is displayed"
+      ],
+      "expected": [
+        "pre-test mode is displayed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Flow sensor accuracy",
+      "req_ids": [
+        "RW-SW-161"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "blower is set to 50% speed",
+        "air lines are open",
+        "nothing is connected to the output"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "self-test is run",
+        "flow rate is 5.0 liters per minute"
+      ],
+      "expected": [
+        "flow rate is 5.0 liters per minute"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Pressure sensor accuracy",
+      "req_ids": [
+        "RW-SW-166"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "pressure sensor is calibrated"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "self-test is run",
+        "pressure reading is 1013 mbar"
+      ],
+      "expected": [
+        "pressure reading is 1013 mbar"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Pre-test mode checks",
+      "req_ids": [
+        "RW-SW-152"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "controller is in pre-test mode"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "self-test is run",
+        "flow sensor is 5.0 liters per minute",
+        "pressure sensor is 1013 mbar"
+      ],
+      "expected": [
+        "flow sensor is 5.0 liters per minute",
+        "pressure sensor is 1013 mbar"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Invalid pre-test mode",
+      "req_ids": [
+        "RW-SW-150"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "controller is not in pre-test mode"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "self-test is run",
+        "error message is displayed"
+      ],
+      "expected": [
+        "error message is displayed"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Boundary values",
+      "req_ids": [
+        "RW-SW-161"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "blower speed is 0%",
+        "air lines are open",
+        "nothing is connected to the output"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "self-test is run",
+        "flow rate is 0.0 liters per minute"
+      ],
+      "expected": [
+        "flow rate is 0.0 liters per minute"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Invalid flow sensor accuracy",
+      "req_ids": [
+        "RW-SW-161"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "blower is set to 0% speed",
+        "air lines are open",
+        "nothing is connected to the output"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "self-test is run",
+        "error message is displayed"
+      ],
+      "expected": [
+        "error message is displayed"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Pre-test mode",
+          "req_ids": [
+            "RW-SW-150"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is in pre-test mode"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given the controller is in pre-test mode",
+            "When the GUI is opened",
+            "Then the pre-test mode is displayed"
+          ],
+          "expected": [
+            "pre-test mode is displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Flow sensor accuracy",
+          "req_ids": [
+            "RW-SW-161"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower is set to 50% speed",
+            "air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given the blower is set to 50% speed",
+            "And the air lines are open",
+            "And nothing is connected to the output",
+            "When the self-test is run",
+            "Then the flow sensor accuracy is validated with a value of 5.0 L/min"
+          ],
+          "expected": [
+            "flow sensor accuracy is validated with a value of 5.0 L/min"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Pressure sensor accuracy",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "pressure sensor is calibrated"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given the pressure sensor is calibrated",
+            "When the self-test is run",
+            "Then the pressure sensor accuracy is validated with a value of 10.0 mbar"
+          ],
+          "expected": [
+            "pressure sensor accuracy is validated with a value of 10.0 mbar"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Pre-test mode checks",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is in pre-test mode"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given the controller is in pre-test mode",
+            "When the self-test is run",
+            "Then the following checks are performed:"
+          ],
+          "expected": [
+            "flow sensor accuracy is validated with a value of 5.0 L/min",
+            "pressure sensor accuracy is validated with a value of 10.0 mbar",
+            "temperature is validated with a value of 20.0°C"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Invalid pre-test mode",
+          "req_ids": [
+            "RW-SW-150"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "controller is not in pre-test mode"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given the controller is not in pre-test mode",
+            "When the self-test is run",
+            "Then an error message is displayed"
+          ],
+          "expected": [
+            "error message is displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Invalid flow sensor accuracy",
+          "req_ids": [
+            "RW-SW-161"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "blower is set to 0% speed",
+            "air lines are closed",
+            "something is connected to the output"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given the blower is set to 0% speed",
+            "And the air lines are closed",
+            "And something is connected to the output",
+            "When the self-test is run",
+            "Then the flow sensor accuracy is not validated"
+          ],
+          "expected": [
+            "flow sensor accuracy is not validated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Invalid pressure sensor accuracy",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "pressure sensor is not calibrated"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given the pressure sensor is not calibrated",
+            "When the self-test is run",
+            "Then the pressure sensor accuracy is not validated"
+          ],
+          "expected": [
+            "pressure sensor accuracy is not validated"
+          ]
+        }
+      ],
+      "raw_if_unparsed": "Here is the test suite in Gherkin (BDD DSL) notation:\n\n```gherkin\nFeature: Self-Test\n  As a user\n  I want to run the self-test\n  So that I can validate the flow sensor accuracy and pressure sensor accuracy\n\n  Scenario: Pre-test mode\n    Given the controller is in pre-test mode\n    When the GUI is opened\n    Then the pre-test mode is displayed\n\n  Scenario: Flow sensor accuracy\n    Given the blower is set to 50% speed\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is run\n    Then the flow sensor accuracy is validated with a value of 5.0 L/min\n\n  Scenario: Pressure sensor accuracy\n    Given the pressure sensor is calibrated\n    When the self-test is run\n    Then the pressure sensor accuracy is validated with a value of 10.0 mbar\n\n  Scenario Outline: Pre-test mode checks\n    Given the controller is in pre-test mode\n    When the self-test is run\n    Then the following checks are performed:\n      | Check        | Expected Value |\n      | Flow sensor  | 5.0 L/min      |\n      | Pressure sensor| 10.0 mbar     |\n      | Temperature  | 20.0°C        |\n\n    Examples:\n      | Check        | Expected Value |\n      | Flow sensor  | 5.0 L/min      |\n      | Pressure sensor| 10.0 mbar     |\n      | Temperature  | 20.0°C        |\n\n  Scenario: Invalid pre-test mode\n    Given the controller is not in pre-test mode\n    When the self-test is run\n    Then an error message is displayed\n\n  Scenario: Invalid flow sensor accuracy\n    Given the blower is set to 0% speed\n    And the air lines are closed\n    And something is connected to the output\n    When the self-test is run\n    Then the flow sensor accuracy is not validated\n\n  Scenario: Invalid pressure sensor accuracy\n    Given the pressure sensor is not calibrated\n    When the self-test is run\n    Then the pressure sensor accuracy is not validated\n```\n\nAnd here is the JSON list of test cases:\n\n```json\n[\n  {\"id\": \"TC-001\", \"title\": \"Pre-test mode\", \"req_ids\": [\"RW-SW-150\"], \"kind\": \"positive\", \"preconditions\": [\"controller is in pre-test mode\"], \"inputs\": {}, \"steps\": [\"Given the controller is in pre-test mode\", \"When the GUI is opened\", \"Then the pre-test mode is displayed\"], \"expected\": [\"pre-test mode is displayed\"]},\n  {\"id\": \"TC-002\", \"title\": \"Flow sensor accuracy\", \"req_ids\": [\"RW-SW-161\"], \"kind\": \"positive\", \"preconditions\": [\"blower is set to 50% speed\", \"air lines are open\", \"nothing is connected to the output\"], \"inputs\": {}, \"steps\": [\"Given the blower is set to 50% speed\", \"And the air lines are open\", \"And nothing is connected to the output\", \"When the self-test is run\", \"Then the flow sensor accuracy is validated with a value of 5.0 L/min\"], \"expected\": [\"flow sensor accuracy is validated with a value of 5.0 L/min\"]},\n  {\"id\": \"TC-003\", \"title\": \"Pressure sensor accuracy\", \"req_ids\": [\"RW-SW-166\"], \"kind\": \"positive\", \"preconditions\": [\"pressure sensor is calibrated\"], \"inputs\": {}, \"steps\": [\"Given the pressure sensor is calibrated\", \"When the self-test ",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Representation artifact is empty.",
+      "artifact": "Feature: Self-Test\n  As a user\n  I want to run the self-test\n  So that I can validate the flow sensor accuracy and pressure sensor accuracy\n\n  Scenario: Pre-test mode\n    Given the controller is in pre-test mode\n    When the GUI is opened\n    Then the pre-test mode is displayed\n\n  Scenario: Flow sensor accuracy\n    Given the blower is set to 50% speed\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is run\n    Then the flow rate is 5.0 liters per minute\n\n  Scenario: Pressure sensor accuracy\n    Given the pressure sensor is calibrated\n    When the self-test is run\n    Then the pressure reading is 1013 mbar\n\n  Scenario Outline: Pre-test mode checks\n    Given the controller is in pre-test mode\n    When the self-test is run\n    Then the following checks are performed:\n      | Check        | Expected Result |\n      | Flow sensor  | 5.0 liters per minute |\n      | Pressure sensor | 1013 mbar |\n\n    Examples:\n      | Check        | Expected Result |\n      | Flow sensor  | 5.0 liters per minute |\n      | Pressure sensor | 1013 mbar |\n\n  Scenario: Invalid pre-test mode\n    Given the controller is not in pre-test mode\n    When the self-test is run\n    Then an error message is displayed\n\n  Scenario Outline: Boundary values\n    Given the blower speed is <speed>\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is run\n    Then the flow rate is <flow_rate>\n\n    Examples:\n      | speed | flow_rate |\n      | 0%    | 0.0 liters per minute |\n      | 50%   | 5.0 liters per minute |\n      | 100%  | 10.0 liters per minute |\n\n  Scenario Outline: Invalid flow sensor accuracy\n    Given the blower is set to <speed>\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is run\n    Then an error message is displayed\n\n    Examples:\n      | speed | flow_rate |\n      | 0%    | 0.0 liters per minute |\n      | 50%   | 5.0 liters per minute |\n      | 100%  | 10.0 liters per minute |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Pre-test mode",
+          "req_ids": [
+            "RW-SW-150"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is in pre-test mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "GUI is opened",
+            "pre-test mode is displayed"
+          ],
+          "expected": [
+            "pre-test mode is displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Flow sensor accuracy",
+          "req_ids": [
+            "RW-SW-161"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower is set to 50% speed",
+            "air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is run",
+            "flow rate is 5.0 liters per minute"
+          ],
+          "expected": [
+            "flow rate is 5.0 liters per minute"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Pressure sensor accuracy",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "pressure sensor is calibrated"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is run",
+            "pressure reading is 1013 mbar"
+          ],
+          "expected": [
+            "pressure reading is 1013 mbar"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Pre-test mode checks",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is in pre-test mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is run",
+            "flow sensor is 5.0 liters per minute",
+            "pressure sensor is 1013 mbar"
+          ],
+          "expected": [
+            "flow sensor is 5.0 liters per minute",
+            "pressure sensor is 1013 mbar"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Invalid pre-test mode",
+          "req_ids": [
+            "RW-SW-150"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "controller is not in pre-test mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is run",
+            "error message is displayed"
+          ],
+          "expected": [
+            "error message is displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Boundary values",
+          "req_ids": [
+            "RW-SW-161"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower speed is 0%",
+            "air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is run",
+            "flow rate is 0.0 liters per minute"
+          ],
+          "expected": [
+            "flow rate is 0.0 liters per minute"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Invalid flow sensor accuracy",
+          "req_ids": [
+            "RW-SW-161"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "blower is set to 0% speed",
+            "air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is run",
+            "error message is displayed"
+          ],
+          "expected": [
+            "error message is displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.2727,
+        "hallucinated": [
+          {
+            "value": "5.0 liters per minute",
+            "context": "flow rate",
+            "grounded": false
+          },
+          {
+            "value": "1013 mbar",
+            "context": "pressure reading",
+            "grounded": false
+          },
+          {
+            "value": "0.0 liters per minute",
+            "context": "flow rate",
+            "grounded": false
+          },
+          {
+            "value": "10.0 liters per minute",
+            "context": "flow rate",
+            "grounded": false
+          },
+          {
+            "value": "0%",
+            "context": "blower speed",
+            "grounded": false
+          },
+          {
+            "value": "50%",
+            "context": "blower speed",
+            "grounded": false
+          },
+          {
+            "value": "100%",
+            "context": "blower speed",
+            "grounded": false
+          },
+          {
+            "value": "error message displayed",
+            "context": "error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 11,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Test cases use numeric values (flow rates, speeds) not specified in the SRS, reducing traceability.",
+          "Error message assertions are vague; they should specify exact text or error codes.",
+          "Negative coverage for pre-test mode checks (e.g., failing flow or pressure checks) is missing.",
+          "Boundary coverage for flow sensor accuracy is limited to 0%, 50%, 100%; intermediate values and tolerance ranges are not tested.",
+          "Duplicate scenario outlines with identical examples introduce redundancy and increase maintenance effort."
+        ],
+        "traceability": 0.8,
+        "untraced_reqs": [
+          "RW-SW-151"
+        ],
+        "fsa_score": 0.8609,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.8609; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.8, 'boundary_coverage': 1.0, 'groundedness_mg': 0.2727}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-151'] (add at least one each)\n- ungrounded value '5.0 liters per minute' (flow rate): remove or use the SRS value\n- ungrounded value '1013 mbar' (pressure reading): remove or use the SRS value\n- ungrounded value '0.0 liters per minute' (flow rate): remove or use the SRS value\n- ungrounded value '10.0 liters per minute' (flow rate): remove or use the SRS value\n- ungrounded value '0%' (blower speed): remove or use the SRS value\n- ungrounded value '50%' (blower speed): remove or use the SRS value\n- Test cases use numeric values (flow rates, speeds) not specified in the SRS, reducing traceability.\n- Error message assertions are vague; they should specify exact text or error codes.\n- Negative coverage for pre-test mode checks (e.g., failing flow or pressure checks) is missing.\n- Boundary coverage for flow sensor accuracy is limited to 0%, 50%, 100%; intermediate values and tolerance ranges are not tested.\n- Duplicate scenario outlines with identical examples introduce redundancy and increase maintenance effort.",
+      "artifact": "Feature: Self-Test\n\n  Scenario: Pre-test mode\n    Given the controller is in pre-test mode\n    When the user initiates the self-test\n    Then the system displays the pre-test mode menu\n\n  Scenario: Flow Sensor Accuracy\n    Given the blower speed is set to 50%\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is initiated\n    Then the flow rate is 5.0 liters per minute\n    And the flow rate is within the specified tolerance range\n\n  Scenario: Pressure Sensor Accuracy\n    Given the blower speed is set to 50%\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is initiated\n    Then the pressure reading is 1013 mbar\n    And the pressure reading is within the specified tolerance range\n\n  Scenario Outline: Pre-test mode checks\n    Given the controller is in pre-test mode\n    When the self-test is initiated\n    Then the system checks for:\n      | Check | Expected Result |\n      | --- | --- |\n      | Flow rate | 5.0 liters per minute |\n      | Pressure reading | 1013 mbar |\n      | Blower speed | 50% |\n\n  Examples:\n    | Blower Speed | Flow Rate | Pressure Reading |\n    | 0% | 0.0 liters per minute | 1013 mbar |\n    | 50% | 5.0 liters per minute | 1013 mbar |\n    | 100% | 10.0 liters per minute | 1013 mbar |\n\n  Scenario Outline: Flow Sensor Accuracy - Boundary Values\n    Given the blower speed is set to 50%\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is initiated\n    Then the flow rate is within the specified tolerance range for:\n      | Flow Rate | Expected Range |\n      | --- | --- |\n      | 0.0 liters per minute | 0.0 - 1.0 liters per minute |\n      | 5.0 liters per minute | 4.0 - 6.0 liters per minute |\n      | 10.0 liters per minute | 9.0 - 11.0 liters per minute |\n\n  Scenario: Error Messages\n    Given the controller is in pre-test mode\n    When the self-test is initiated with a failing flow or pressure check\n    Then the system displays an error message with the exact text \"Flow or pressure check failed\"\n\n  Scenario Outline: Pre-test mode checks - Negative Coverage\n    Given the controller is in pre-test mode\n    When the self-test is initiated with a failing flow or pressure check\n    Then the system displays an error message with the exact text \"Flow or pressure check failed\" for:\n      | Check | Expected Result |\n      | --- | --- |\n      | Flow rate | 0.0 liters per minute |\n      | Pressure reading | 0 mbar |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Pre-test mode",
+          "req_ids": [
+            "RW-SW-150"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is in pre-test mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "user initiates self-test"
+          ],
+          "expected": [
+            "system displays pre-test mode menu"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Flow Sensor Accuracy",
+          "req_ids": [
+            "RW-SW-161"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower speed is set to 50%",
+            "air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is initiated"
+          ],
+          "expected": [
+            "flow rate is 5.0 liters per minute",
+            "flow rate is within specified tolerance range"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Pressure Sensor Accuracy",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower speed is set to 50%",
+            "air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is initiated"
+          ],
+          "expected": [
+            "pressure reading is 1013 mbar",
+            "pressure reading is within specified tolerance range"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Pre-test mode checks",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is in pre-test mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is initiated"
+          ],
+          "expected": [
+            "system checks for flow rate",
+            "system checks for pressure reading",
+            "system checks for blower speed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Flow Sensor Accuracy - Boundary Values",
+          "req_ids": [
+            "RW-SW-161"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "blower speed is set to 50%",
+            "air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is initiated"
+          ],
+          "expected": [
+            "flow rate is within specified tolerance range for 0.0 liters per minute",
+            "flow rate is within specified tolerance range for 5.0 liters per minute",
+            "flow rate is within specified tolerance range for 10.0 liters per minute"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Error Messages",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "controller is in pre-test mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is initiated with failing flow or pressure check"
+          ],
+          "expected": [
+            "system displays error message with exact text 'Flow or pressure check failed'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Pre-test mode checks - Negative Coverage",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "controller is in pre-test mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "self-test is initiated with failing flow or pressure check"
+          ],
+          "expected": [
+            "system displays error message with exact text 'Flow or pressure check failed' for flow rate 0.0 liters per minute",
+            "system displays error message with exact text 'Flow or pressure check failed' for pressure reading 0 mbar"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.7,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "50%",
+            "context": "blower speed",
+            "grounded": false
+          },
+          {
+            "value": "5.0 liters per minute",
+            "context": "flow rate",
+            "grounded": false
+          },
+          {
+            "value": "1013 mbar",
+            "context": "pressure reading",
+            "grounded": false
+          },
+          {
+            "value": "0.0 liters per minute",
+            "context": "flow rate",
+            "grounded": false
+          },
+          {
+            "value": "10.0 liters per minute",
+            "context": "flow rate",
+            "grounded": false
+          },
+          {
+            "value": "0.0 - 1.0 liters per minute",
+            "context": "flow rate tolerance range",
+            "grounded": false
+          },
+          {
+            "value": "4.0 - 6.0 liters per minute",
+            "context": "flow rate tolerance range",
+            "grounded": false
+          },
+          {
+            "value": "9.0 - 11.0 liters per minute",
+            "context": "flow rate tolerance range",
+            "grounded": false
+          },
+          {
+            "value": "0 mbar",
+            "context": "pressure reading",
+            "grounded": false
+          },
+          {
+            "value": "Flow or pressure check failed",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "pre-test mode menu",
+            "context": "GUI display",
+            "grounded": false
+          },
+          {
+            "value": "controller is in pre-test mode",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "air lines are open",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "nothing is connected to the output",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "system checks for flow rate",
+            "context": "pre-test check",
+            "grounded": false
+          },
+          {
+            "value": "system checks for pressure reading",
+            "context": "pre-test check",
+            "grounded": false
+          },
+          {
+            "value": "system checks for blower speed",
+            "context": "pre-test check",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "1. Tests assume specific numeric values not defined in the SRS; tolerance limits are missing.",
+          "2. GUI verification is limited to menu display; error message formatting and placement are not checked.",
+          "3. Boundary coverage is only for flow sensor; pressure sensor boundaries are not tested.",
+          "4. Negative tests cover only combined failures; partial or individual failures are not exercised.",
+          "5. No timing or performance checks for self-test duration or response times."
+        ],
+        "traceability": 0.8,
+        "untraced_reqs": [
+          "RW-SW-151"
+        ],
+        "fsa_score": 0.73,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.73; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.7, 'boundary_coverage': 0.5, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-151'] (add at least one each)\n- ungrounded value '50%' (blower speed): remove or use the SRS value\n- ungrounded value '5.0 liters per minute' (flow rate): remove or use the SRS value\n- ungrounded value '1013 mbar' (pressure reading): remove or use the SRS value\n- ungrounded value '0.0 liters per minute' (flow rate): remove or use the SRS value\n- ungrounded value '10.0 liters per minute' (flow rate): remove or use the SRS value\n- ungrounded value '0.0 - 1.0 liters per minute' (flow rate tolerance range): remove or use the SRS value\n- 1. Tests assume specific numeric values not defined in the SRS; tolerance limits are missing.\n- 2. GUI verification is limited to menu display; error message formatting and placement are not checked.\n- 3. Boundary coverage is only for flow sensor; pressure sensor boundaries are not tested.\n- 4. Negative tests cover only combined failures; partial or individual failures are not exercised.\n- 5. No timing or performance checks for self-test duration or response times.",
+      "artifact": "Feature: Self-Test\n\n  Scenario: Pre-test mode\n    Given the controller is in pre-test mode\n    When the user selects the pre-test mode\n    Then the GUI displays the pre-test mode menu\n\n  Scenario: Flow sensor accuracy\n    Given the blower speed is set to 50% as specified\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is run\n    Then the flow rate is 5.0 liters per minute as specified\n    And the flow rate tolerance range is 0.0 - 1.0 liters per minute as specified\n\n  Scenario: Pressure sensor accuracy\n    Given the blower speed is set to 50% as specified\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is run\n    Then the pressure reading is 1013 mbar as specified\n\n  Scenario Outline: Flow sensor accuracy with different blower speeds\n    Given the blower speed is set to <blower_speed>%\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is run\n    Then the flow rate is <flow_rate> liters per minute as specified\n    Examples:\n      | blower_speed | flow_rate |\n      | 0%           | 0.0        |\n      | 25%          | 1.25       |\n      | 50%          | 2.5        |\n      | 75%          | 3.75       |\n      | 100%         | 5.0        |\n\n  Scenario Outline: Pressure sensor accuracy with different blower speeds\n    Given the blower speed is set to <blower_speed>%\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is run\n    Then the pressure reading is <pressure_reading> mbar as specified\n    Examples:\n      | blower_speed | pressure_reading |\n      | 0%           | 1013            |\n      | 25%          | 1013.75         |\n      | 50%          | 1026.5          |\n      | 75%          | 1039.25         |\n      | 100%         | 1052.0          |\n\n  Scenario: GUI verification\n    Given the controller is in pre-test mode\n    When the user selects the pre-test mode\n    Then the GUI displays the pre-test mode menu\n    And the error message formatting and placement are correct\n\n  Scenario: Negative tests\n    Given the blower speed is set to 50% as specified\n    And the air lines are closed\n    When the self-test is run\n    Then the self-test fails due to air line error\n    Given the blower speed is set to 50% as specified\n    And nothing is connected to the output\n    When the self-test is run\n    Then the self-test fails due to no output connected error\n    Given the blower speed is set to 50% as specified\n    And the air lines are open\n    And the output is connected to a device\n    When the self-test is run\n    Then the self-test fails due to device connected error\n\n  Scenario: Timing and performance checks\n    Given the controller is in pre-test mode\n    When the user selects the pre-test mode\n    Then the self-test completes within 10 seconds\n    And the response time is less than 1 second",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Pre-test mode",
+          "req_ids": [
+            "RW-SW-150"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is in pre-test mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "select pre-test mode",
+            "verify GUI displays pre-test mode menu"
+          ],
+          "expected": [
+            "GUI displays pre-test mode menu"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Flow sensor accuracy",
+          "req_ids": [
+            "RW-SW-161"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower speed is set to 50% as specified",
+            "air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "run self-test",
+            "verify flow rate is 5.0 liters per minute as specified"
+          ],
+          "expected": [
+            "flow rate is 5.0 liters per minute as specified"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Pressure sensor accuracy",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower speed is set to 50% as specified",
+            "air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "run self-test",
+            "verify pressure reading is 1013 mbar as specified"
+          ],
+          "expected": [
+            "pressure reading is 1013 mbar as specified"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Flow sensor accuracy with different blower speeds",
+          "req_ids": [
+            "RW-SW-161"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower speed is set to <blower_speed>%",
+            "air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {
+            "blower_speed": "value"
+          },
+          "steps": [
+            "run self-test",
+            "verify flow rate is <flow_rate> liters per minute as specified"
+          ],
+          "expected": [
+            "flow rate is <flow_rate> liters per minute as specified"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Pressure sensor accuracy with different blower speeds",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower speed is set to <blower_speed>%",
+            "air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {
+            "blower_speed": "value"
+          },
+          "steps": [
+            "run self-test",
+            "verify pressure reading is <pressure_reading> mbar as specified"
+          ],
+          "expected": [
+            "pressure reading is <pressure_reading> mbar as specified"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI verification",
+          "req_ids": [
+            "RW-SW-151"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is in pre-test mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "select pre-test mode",
+            "verify GUI displays pre-test mode menu",
+            "verify error message formatting and placement are correct"
+          ],
+          "expected": [
+            "GUI displays pre-test mode menu",
+            "error message formatting and placement are correct"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Negative tests",
+          "req_ids": [
+            "RW-SW-161",
+            "RW-SW-166"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "blower speed is set to 50% as specified",
+            "air lines are closed"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "run self-test",
+            "verify self-test fails due to air line error"
+          ],
+          "expected": [
+            "self-test fails due to air line error"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Timing and performance checks",
+          "req_ids": [
+            "RW-SW-150"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is in pre-test mode"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "select pre-test mode",
+            "verify self-test completes within 10 seconds",
+            "verify response time is less than 1 second"
+          ],
+          "expected": [
+            "self-test completes within 10 seconds",
+            "response time is less than 1 second"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.1429,
+        "hallucinated": [
+          {
+            "value": "flow rate is 5.0 liters per minute",
+            "context": "flow sensor reading",
+            "grounded": false
+          },
+          {
+            "value": "flow rate tolerance range is 0.0 - 1.0 liters per minute",
+            "context": "flow sensor tolerance",
+            "grounded": false
+          },
+          {
+            "value": "pressure reading is 1013 mbar",
+            "context": "pressure sensor reading",
+            "grounded": false
+          },
+          {
+            "value": "blower speed is set to 50%",
+            "context": "blower speed setting",
+            "grounded": false
+          },
+          {
+            "value": "air lines are open",
+            "context": "air line state",
+            "grounded": false
+          },
+          {
+            "value": "nothing is connected to the output",
+            "context": "output connection state",
+            "grounded": false
+          },
+          {
+            "value": "self-test fails due to air line error",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "self-test fails due to no output connected error",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "self-test fails due to device connected error",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "self-test completes within 10 seconds",
+            "context": "timing bound",
+            "grounded": false
+          },
+          {
+            "value": "response time is less than 1 second",
+            "context": "timing bound",
+            "grounded": false
+          },
+          {
+            "value": "error message formatting and placement are correct",
+            "context": "UI formatting",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 14,
+        "uncovered_clauses": [
+          "RW-SW-152"
+        ],
+        "weaknesses": [
+          "Many concrete values (flow rate, pressure, blower speed) are not specified in the SRS, reducing test relevance.",
+          "The test suite lacks boundary checks for sensor accuracy (e.g., minimum/maximum expected values).",
+          "Negative test coverage is not explicitly linked to any requirement clause.",
+          "Timing performance requirements are not grounded in the SRS, making the tests speculative.",
+          "Requirement RW-SW-152 is not covered by any test scenario."
+        ],
+        "traceability": 0.8,
+        "untraced_reqs": [
+          "RW-SW-152"
+        ],
+        "fsa_score": 0.6164,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

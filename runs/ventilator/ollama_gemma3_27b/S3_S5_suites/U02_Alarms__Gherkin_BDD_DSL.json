@@ -1,0 +1,804 @@
+{
+  "unit_id": "U02_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:gemma3:27b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.13,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.35,
+    "hallucinated": [
+      {
+        "value": "Input air line blocked - low pressure",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Input O2 line blocked - low pressure",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Input O2 line pressure too high",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": -3,
+        "context": "inspiratory pressure",
+        "grounded": false
+      },
+      {
+        "value": 59,
+        "context": "inspiratory pressure",
+        "grounded": false
+      },
+      {
+        "value": 10,
+        "context": "apnea time",
+        "grounded": false
+      },
+      {
+        "value": 20,
+        "context": "apnea time",
+        "grounded": false
+      },
+      {
+        "value": 4,
+        "context": "unresponsive time",
+        "grounded": false
+      },
+      {
+        "value": 5,
+        "context": "unresponsive time",
+        "grounded": false
+      },
+      {
+        "value": 6,
+        "context": "unresponsive time",
+        "grounded": false
+      },
+      {
+        "value": 9,
+        "context": "unresponsive time",
+        "grounded": false
+      },
+      {
+        "value": 10,
+        "context": "unresponsive time",
+        "grounded": false
+      },
+      {
+        "value": 11,
+        "context": "unresponsive time",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 20,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Expected results are often vague; they should assert specific alarm messages, severity, and presence/absence of alarms.",
+      "Negative test cases incorrectly expect alarms; they should assert no alarm for values above thresholds.",
+      "The test suite uses placeholder \"as specified\" for O2 line pressure; a concrete threshold should be defined and tested.",
+      "No tests assert that the GUI remains silent when unresponsive time is below half the apnea time.",
+      "The overpressure alarm tests for the controller at the threshold (60 cmH2O) should assert that no alarm is triggered."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.622,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Alarms - Unit U02_Alarms\n\n  Scenario: Air Line Blocked - Low Pressure Alarm\n    Given the air line is blocked\n    When the device is operating\n    Then a HIGH severity alarm \"Input air line blocked - low pressure\" is triggered in the GUI\n\n  Scenario: O2 Line Blocked - Low Pressure Alarm\n    Given the O2 line is blocked\n    When the device is operating\n    Then a HIGH severity alarm \"Input O2 line blocked - low pressure\" is triggered in the GUI\n\n  Scenario Outline: Inspiratory Pressure Drop Alarm\n    Given the inspiratory pressure is <pressure> cm H2O\n    When the device is operating\n    Then an alarm is triggered if the inspiratory pressure drops below -4 cm H2O\n    Examples:\n      | pressure |\n      | -3      |\n      | -4      |\n      | -5      |\n      | -10     |\n\n  Scenario: O2 Line Pressure Too High Alarm\n    Given the input O2 line pressure is <pressure>\n    When the device is operating\n    Then a HIGH severity alarm \"Input O2 line pressure too high\" is triggered if the pressure exceeds as specified\n\n  Scenario Outline: GUI Unresponsive Alarm - Apnea Time\n    Given the apnea time is <apnea_time> seconds\n    When the GUI is unresponsive for <unresponsive_time> seconds\n    Then an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time\n    Examples:\n      | apnea_time | unresponsive_time |\n      | 10         | 4                |\n      | 10         | 5                |\n      | 10         | 6                |\n      | 20         | 9                |\n      | 20         | 10               |\n      | 20         | 11               |\n\n  Scenario: GUI Displays Overpressure Alarm\n    Given an overpressure condition exists\n    When the device is operating\n    Then the GUI displays an overpressure alarm\n\n  Scenario: Controller Unresponsive Alarm - Apnea Time\n    Given the apnea time is <apnea_time> seconds\n    When the controller is unresponsive for <unresponsive_time> seconds\n    Then an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time\n    Examples:\n      | apnea_time | unresponsive_time |\n      | 10         | 4                |\n      | 10         | 5                |\n      | 10         | 6                |\n      | 20         | 9                |\n      | 20         | 10               |\n      | 20         | 11               |\n\n  Scenario Outline: Controller Overpressure Alarm\n    Given the inspiratory pressure is <pressure> cmH2O\n    When the device is operating\n    Then an overpressure alarm is triggered if the pressure exceeds 60 cmH2O\n    Examples:\n      | pressure |\n      | 59       |\n      | 60       |\n      | 61       |\n      | 70       |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Air Line Blocked - Low Pressure Alarm",
+      "req_ids": [
+        "RW-SW-45"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Given the air line is blocked",
+        "When the device is operating"
+      ],
+      "expected": [
+        "a HIGH severity alarm \"Input air line blocked - low pressure\" is triggered in the GUI"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "O2 Line Blocked - Low Pressure Alarm",
+      "req_ids": [
+        "RW-SW-58"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Given the O2 line is blocked",
+        "When the device is operating"
+      ],
+      "expected": [
+        "a HIGH severity alarm \"Input O2 line blocked - low pressure\" is triggered in the GUI"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Inspiratory Pressure Drop Alarm - Below Threshold",
+      "req_ids": [
+        "RW-SW-60"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "pressure": "-5"
+      },
+      "steps": [
+        "Given the inspiratory pressure is -5 cm H2O",
+        "When the device is operating"
+      ],
+      "expected": [
+        "an alarm is triggered if the inspiratory pressure drops below -4 cm H2O"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Inspiratory Pressure Drop Alarm - At Threshold",
+      "req_ids": [
+        "RW-SW-60"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "pressure": "-4"
+      },
+      "steps": [
+        "Given the inspiratory pressure is -4 cm H2O",
+        "When the device is operating"
+      ],
+      "expected": [
+        "an alarm is triggered if the inspiratory pressure drops below -4 cm H2O"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Inspiratory Pressure Drop Alarm - Above Threshold",
+      "req_ids": [
+        "RW-SW-60"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "pressure": "-3"
+      },
+      "steps": [
+        "Given the inspiratory pressure is -3 cm H2O",
+        "When the device is operating"
+      ],
+      "expected": [
+        "an alarm is triggered if the inspiratory pressure drops below -4 cm H2O"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "O2 Line Pressure Too High Alarm",
+      "req_ids": [
+        "RW-SW-21"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "pressure": "as specified"
+      },
+      "steps": [
+        "Given the input O2 line pressure is as specified",
+        "When the device is operating"
+      ],
+      "expected": [
+        "a HIGH severity alarm \"Input O2 line pressure too high\" is triggered if the pressure exceeds as specified"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "GUI Unresponsive Alarm - Apnea Time - Below Threshold",
+      "req_ids": [
+        "RW-SW-61"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "apnea_time": "10",
+        "unresponsive_time": "4"
+      },
+      "steps": [
+        "Given the apnea time is 10 seconds",
+        "When the GUI is unresponsive for 4 seconds"
+      ],
+      "expected": [
+        "an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "GUI Unresponsive Alarm - Apnea Time - At Threshold",
+      "req_ids": [
+        "RW-SW-61"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "apnea_time": "10",
+        "unresponsive_time": "5"
+      },
+      "steps": [
+        "Given the apnea time is 10 seconds",
+        "When the GUI is unresponsive for 5 seconds"
+      ],
+      "expected": [
+        "an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "GUI Unresponsive Alarm - Apnea Time - Above Threshold",
+      "req_ids": [
+        "RW-SW-61"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "apnea_time": "10",
+        "unresponsive_time": "6"
+      },
+      "steps": [
+        "Given the apnea time is 10 seconds",
+        "When the GUI is unresponsive for 6 seconds"
+      ],
+      "expected": [
+        "an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "GUI Displays Overpressure Alarm",
+      "req_ids": [
+        "RW-SW-5"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Given an overpressure condition exists",
+        "When the device is operating"
+      ],
+      "expected": [
+        "the GUI displays an overpressure alarm"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Controller Unresponsive Alarm - Apnea Time - Below Threshold",
+      "req_ids": [
+        "RW-SW-36"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "apnea_time": "10",
+        "unresponsive_time": "4"
+      },
+      "steps": [
+        "Given the apnea time is 10 seconds",
+        "When the controller is unresponsive for 4 seconds"
+      ],
+      "expected": [
+        "an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Controller Unresponsive Alarm - Apnea Time - At Threshold",
+      "req_ids": [
+        "RW-SW-36"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "apnea_time": "10",
+        "unresponsive_time": "5"
+      },
+      "steps": [
+        "Given the apnea time is 10 seconds",
+        "When the controller is unresponsive for 5 seconds"
+      ],
+      "expected": [
+        "an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Controller Overpressure Alarm - Below Threshold",
+      "req_ids": [
+        "RW-SW-6"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "pressure": "59"
+      },
+      "steps": [
+        "Given the inspiratory pressure is 59 cmH2O",
+        "When the device is operating"
+      ],
+      "expected": [
+        "an overpressure alarm is triggered if the pressure exceeds 60 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Controller Overpressure Alarm - At Threshold",
+      "req_ids": [
+        "RW-SW-6"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "pressure": "60"
+      },
+      "steps": [
+        "Given the inspiratory pressure is 60 cmH2O",
+        "When the device is operating"
+      ],
+      "expected": [
+        "an overpressure alarm is triggered if the pressure exceeds 60 cmH2O"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "Controller Overpressure Alarm - Above Threshold",
+      "req_ids": [
+        "RW-SW-6"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "pressure": "61"
+      },
+      "steps": [
+        "Given the inspiratory pressure is 61 cmH2O",
+        "When the device is operating"
+      ],
+      "expected": [
+        "an overpressure alarm is triggered if the pressure exceeds 60 cmH2O"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarms - Unit U02_Alarms\n\n  Scenario: Air Line Blocked - Low Pressure Alarm\n    Given the air line is blocked\n    When the device is operating\n    Then a HIGH severity alarm \"Input air line blocked - low pressure\" is triggered in the GUI\n\n  Scenario: O2 Line Blocked - Low Pressure Alarm\n    Given the O2 line is blocked\n    When the device is operating\n    Then a HIGH severity alarm \"Input O2 line blocked - low pressure\" is triggered in the GUI\n\n  Scenario Outline: Inspiratory Pressure Drop Alarm\n    Given the inspiratory pressure is <pressure> cm H2O\n    When the device is operating\n    Then an alarm is triggered if the inspiratory pressure drops below -4 cm H2O\n    Examples:\n      | pressure |\n      | -3      |\n      | -4      |\n      | -5      |\n      | -10     |\n\n  Scenario: O2 Line Pressure Too High Alarm\n    Given the input O2 line pressure is <pressure>\n    When the device is operating\n    Then a HIGH severity alarm \"Input O2 line pressure too high\" is triggered if the pressure exceeds as specified\n\n  Scenario Outline: GUI Unresponsive Alarm - Apnea Time\n    Given the apnea time is <apnea_time> seconds\n    When the GUI is unresponsive for <unresponsive_time> seconds\n    Then an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time\n    Examples:\n      | apnea_time | unresponsive_time |\n      | 10         | 4                |\n      | 10         | 5                |\n      | 10         | 6                |\n      | 20         | 9                |\n      | 20         | 10               |\n      | 20         | 11               |\n\n  Scenario: GUI Displays Overpressure Alarm\n    Given an overpressure condition exists\n    When the device is operating\n    Then the GUI displays an overpressure alarm\n\n  Scenario: Controller Unresponsive Alarm - Apnea Time\n    Given the apnea time is <apnea_time> seconds\n    When the controller is unresponsive for <unresponsive_time> seconds\n    Then an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time\n    Examples:\n      | apnea_time | unresponsive_time |\n      | 10         | 4                |\n      | 10         | 5                |\n      | 10         | 6                |\n      | 20         | 9                |\n      | 20         | 10               |\n      | 20         | 11               |\n\n  Scenario Outline: Controller Overpressure Alarm\n    Given the inspiratory pressure is <pressure> cmH2O\n    When the device is operating\n    Then an overpressure alarm is triggered if the pressure exceeds 60 cmH2O\n    Examples:\n      | pressure |\n      | 59       |\n      | 60       |\n      | 61       |\n      | 70       |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Air Line Blocked - Low Pressure Alarm",
+          "req_ids": [
+            "RW-SW-45"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given the air line is blocked",
+            "When the device is operating"
+          ],
+          "expected": [
+            "a HIGH severity alarm \"Input air line blocked - low pressure\" is triggered in the GUI"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "O2 Line Blocked - Low Pressure Alarm",
+          "req_ids": [
+            "RW-SW-58"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given the O2 line is blocked",
+            "When the device is operating"
+          ],
+          "expected": [
+            "a HIGH severity alarm \"Input O2 line blocked - low pressure\" is triggered in the GUI"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Inspiratory Pressure Drop Alarm - Below Threshold",
+          "req_ids": [
+            "RW-SW-60"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pressure": "-5"
+          },
+          "steps": [
+            "Given the inspiratory pressure is -5 cm H2O",
+            "When the device is operating"
+          ],
+          "expected": [
+            "an alarm is triggered if the inspiratory pressure drops below -4 cm H2O"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Inspiratory Pressure Drop Alarm - At Threshold",
+          "req_ids": [
+            "RW-SW-60"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "pressure": "-4"
+          },
+          "steps": [
+            "Given the inspiratory pressure is -4 cm H2O",
+            "When the device is operating"
+          ],
+          "expected": [
+            "an alarm is triggered if the inspiratory pressure drops below -4 cm H2O"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Inspiratory Pressure Drop Alarm - Above Threshold",
+          "req_ids": [
+            "RW-SW-60"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "pressure": "-3"
+          },
+          "steps": [
+            "Given the inspiratory pressure is -3 cm H2O",
+            "When the device is operating"
+          ],
+          "expected": [
+            "an alarm is triggered if the inspiratory pressure drops below -4 cm H2O"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "O2 Line Pressure Too High Alarm",
+          "req_ids": [
+            "RW-SW-21"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pressure": "as specified"
+          },
+          "steps": [
+            "Given the input O2 line pressure is as specified",
+            "When the device is operating"
+          ],
+          "expected": [
+            "a HIGH severity alarm \"Input O2 line pressure too high\" is triggered if the pressure exceeds as specified"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI Unresponsive Alarm - Apnea Time - Below Threshold",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "apnea_time": "10",
+            "unresponsive_time": "4"
+          },
+          "steps": [
+            "Given the apnea time is 10 seconds",
+            "When the GUI is unresponsive for 4 seconds"
+          ],
+          "expected": [
+            "an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI Unresponsive Alarm - Apnea Time - At Threshold",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "apnea_time": "10",
+            "unresponsive_time": "5"
+          },
+          "steps": [
+            "Given the apnea time is 10 seconds",
+            "When the GUI is unresponsive for 5 seconds"
+          ],
+          "expected": [
+            "an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI Unresponsive Alarm - Apnea Time - Above Threshold",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "apnea_time": "10",
+            "unresponsive_time": "6"
+          },
+          "steps": [
+            "Given the apnea time is 10 seconds",
+            "When the GUI is unresponsive for 6 seconds"
+          ],
+          "expected": [
+            "an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI Displays Overpressure Alarm",
+          "req_ids": [
+            "RW-SW-5"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Given an overpressure condition exists",
+            "When the device is operating"
+          ],
+          "expected": [
+            "the GUI displays an overpressure alarm"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Controller Unresponsive Alarm - Apnea Time - Below Threshold",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "apnea_time": "10",
+            "unresponsive_time": "4"
+          },
+          "steps": [
+            "Given the apnea time is 10 seconds",
+            "When the controller is unresponsive for 4 seconds"
+          ],
+          "expected": [
+            "an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Controller Unresponsive Alarm - Apnea Time - At Threshold",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "apnea_time": "10",
+            "unresponsive_time": "5"
+          },
+          "steps": [
+            "Given the apnea time is 10 seconds",
+            "When the controller is unresponsive for 5 seconds"
+          ],
+          "expected": [
+            "an alarm is triggered if the unresponsive time is greater than or equal to 1/2 of the apnea time"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Controller Overpressure Alarm - Below Threshold",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "pressure": "59"
+          },
+          "steps": [
+            "Given the inspiratory pressure is 59 cmH2O",
+            "When the device is operating"
+          ],
+          "expected": [
+            "an overpressure alarm is triggered if the pressure exceeds 60 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Controller Overpressure Alarm - At Threshold",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "pressure": "60"
+          },
+          "steps": [
+            "Given the inspiratory pressure is 60 cmH2O",
+            "When the device is operating"
+          ],
+          "expected": [
+            "an overpressure alarm is triggered if the pressure exceeds 60 cmH2O"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Controller Overpressure Alarm - Above Threshold",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pressure": "61"
+          },
+          "steps": [
+            "Given the inspiratory pressure is 61 cmH2O",
+            "When the device is operating"
+          ],
+          "expected": [
+            "an overpressure alarm is triggered if the pressure exceeds 60 cmH2O"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.13,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.35,
+        "hallucinated": [
+          {
+            "value": "Input air line blocked - low pressure",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 line blocked - low pressure",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 line pressure too high",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": -3,
+            "context": "inspiratory pressure",
+            "grounded": false
+          },
+          {
+            "value": 59,
+            "context": "inspiratory pressure",
+            "grounded": false
+          },
+          {
+            "value": 10,
+            "context": "apnea time",
+            "grounded": false
+          },
+          {
+            "value": 20,
+            "context": "apnea time",
+            "grounded": false
+          },
+          {
+            "value": 4,
+            "context": "unresponsive time",
+            "grounded": false
+          },
+          {
+            "value": 5,
+            "context": "unresponsive time",
+            "grounded": false
+          },
+          {
+            "value": 6,
+            "context": "unresponsive time",
+            "grounded": false
+          },
+          {
+            "value": 9,
+            "context": "unresponsive time",
+            "grounded": false
+          },
+          {
+            "value": 10,
+            "context": "unresponsive time",
+            "grounded": false
+          },
+          {
+            "value": 11,
+            "context": "unresponsive time",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 20,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Expected results are often vague; they should assert specific alarm messages, severity, and presence/absence of alarms.",
+          "Negative test cases incorrectly expect alarms; they should assert no alarm for values above thresholds.",
+          "The test suite uses placeholder \"as specified\" for O2 line pressure; a concrete threshold should be defined and tested.",
+          "No tests assert that the GUI remains silent when unresponsive time is below half the apnea time.",
+          "The overpressure alarm tests for the controller at the threshold (60 cmH2O) should assert that no alarm is triggered."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.622,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

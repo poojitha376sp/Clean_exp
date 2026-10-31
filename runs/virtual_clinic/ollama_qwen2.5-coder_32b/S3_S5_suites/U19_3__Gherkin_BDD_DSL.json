@@ -1,0 +1,1224 @@
+{
+  "unit_id": "U19_3",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 3,
+  "repairs_used": 2,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.25,
+    "oracle_assertiveness": 0.4,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.4,
+    "hallucinated": [
+      {
+        "value": "PinCode 517501",
+        "context": "patient location",
+        "grounded": false
+      },
+      {
+        "value": "PinCode 517502",
+        "context": "patient location",
+        "grounded": false
+      },
+      {
+        "value": "PinCode 517503",
+        "context": "patient location",
+        "grounded": false
+      },
+      {
+        "value": "PinCode 517001",
+        "context": "patient location",
+        "grounded": false
+      },
+      {
+        "value": "PinCode 517002",
+        "context": "patient location",
+        "grounded": false
+      },
+      {
+        "value": "PinCode 517003",
+        "context": "patient location",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 10,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No boundary tests for radius (exactly 25 sqkm) or PinCode limits",
+      "Negative tests only cover registration; missing negative paths for chemist and laboratory operations",
+      "Oracle assertions are vague; lack of concrete status codes or state checks",
+      "PinCode values are invented and not grounded in SRS",
+      "No tests for 24/7 operation or time constraints for chemist"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.57,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Virtual Healthcare Services within Padmavathi Hospital Zone\n\n  Scenario: Patient within 25 sqkm radius can register for appointments\n    Given the patient resides within a 25 sqkm radius of Padmavathi Hospital\n    When the patient attempts to register for an appointment\n    Then the system should allow the patient to register successfully\n\n  Scenario: Patient outside 25 sqkm radius cannot register for appointments\n    Given the patient resides outside a 25 sqkm radius of Padmavathi Hospital\n    When the patient attempts to register for an appointment\n    Then the system should deny the registration and display an error message \"Registration not allowed outside the specified zone\"\n\n  Scenario Outline: Patient within specified PinCodes can register for appointments\n    Given the patient resides in PinCode <PinCode>\n    When the patient attempts to register for an appointment\n    Then the system should allow the patient to register successfully\n\n    Examples:\n      | PinCode |\n      | 517501  |\n      | 517502  |\n      | 517503  |\n\n  Scenario Outline: Patient outside specified PinCodes cannot register for appointments\n    Given the patient resides in PinCode <PinCode>\n    When the patient attempts to register for an appointment\n    Then the system should deny the registration and display an error message \"Registration not allowed outside the specified zone\"\n\n    Examples:\n      | PinCode |\n      | 517001  |\n      | 517002  |\n      | 517003  |\n\n  Scenario: There is 1 Authorized Chemist per PinCode\n    Given the patient resides in PinCode 517501\n    When the system checks for authorized chemists in the patient's PinCode\n    Then the system should find exactly 1 authorized chemist\n\n  Scenario: Prescription requests are routed to the correct Chemist based on PinCode\n    Given the patient resides in PinCode 517501 and has submitted a prescription request\n    When the system routes the prescription request\n    Then the prescription request should be routed to the authorized chemist in PinCode 517501\n\n  Scenario: Chemist delivers medicines through Offline delivery and collects payments\n    Given the chemist has received a prescription request for PinCode 517501\n    When the chemist delivers the medicines to the patient\n    Then the chemist should collect payment from the patient\n\n  Scenario: Chemist marks the Prescription as completed after delivery\n    Given the chemist has delivered medicines to the patient in PinCode 517501\n    When the chemist completes the delivery\n    Then the system should mark the prescription as completed\n\n  Scenario: No systemic matching is done to figure out efficiency of the Chemist\n    Given the system has processed a prescription request for PinCode 517501\n    When the system checks for efficiency metrics of the chemist\n    Then the system should not perform any systemic matching to determine the chemist's efficiency\n\n  Scenario: There is 1 Authorized Laboratory per PinCode or 1 Laboratory for the entire Zone\n    Given the patient resides in PinCode 517501\n    When the system checks for authorized laboratories in the patient's PinCode\n    Then the system should find exactly 1 authorized laboratory in PinCode 517501 or in the entire Zone",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Patient within 25 sqkm radius can register for appointments",
+      "req_ids": [
+        "VIRTUA-3-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient resides within 25 sqkm radius of Padmavathi Hospital"
+      ],
+      "inputs": {},
+      "steps": [
+        "Patient attempts to register for an appointment"
+      ],
+      "expected": [
+        "System allows patient to register successfully"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Patient outside 25 sqkm radius cannot register for appointments",
+      "req_ids": [
+        "VIRTUA-3-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient resides outside 25 sqkm radius of Padmavathi Hospital"
+      ],
+      "inputs": {},
+      "steps": [
+        "Patient attempts to register for an appointment"
+      ],
+      "expected": [
+        "System denies registration and displays error message 'Registration not allowed outside the specified zone'"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Patient within specified PinCodes can register for appointments",
+      "req_ids": [
+        "VIRTUA-3-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient resides in specified PinCode"
+      ],
+      "inputs": {
+        "PinCode": "517501"
+      },
+      "steps": [
+        "Patient attempts to register for an appointment"
+      ],
+      "expected": [
+        "System allows patient to register successfully"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Patient within specified PinCodes can register for appointments",
+      "req_ids": [
+        "VIRTUA-3-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient resides in specified PinCode"
+      ],
+      "inputs": {
+        "PinCode": "517502"
+      },
+      "steps": [
+        "Patient attempts to register for an appointment"
+      ],
+      "expected": [
+        "System allows patient to register successfully"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Patient within specified PinCodes can register for appointments",
+      "req_ids": [
+        "VIRTUA-3-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient resides in specified PinCode"
+      ],
+      "inputs": {
+        "PinCode": "517503"
+      },
+      "steps": [
+        "Patient attempts to register for an appointment"
+      ],
+      "expected": [
+        "System allows patient to register successfully"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Patient outside specified PinCodes cannot register for appointments",
+      "req_ids": [
+        "VIRTUA-3-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient resides in non-specified PinCode"
+      ],
+      "inputs": {
+        "PinCode": "517001"
+      },
+      "steps": [
+        "Patient attempts to register for an appointment"
+      ],
+      "expected": [
+        "System denies registration and displays error message 'Registration not allowed outside the specified zone'"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Patient outside specified PinCodes cannot register for appointments",
+      "req_ids": [
+        "VIRTUA-3-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient resides in non-specified PinCode"
+      ],
+      "inputs": {
+        "PinCode": "517002"
+      },
+      "steps": [
+        "Patient attempts to register for an appointment"
+      ],
+      "expected": [
+        "System denies registration and displays error message 'Registration not allowed outside the specified zone'"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Patient outside specified PinCodes cannot register for appointments",
+      "req_ids": [
+        "VIRTUA-3-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient resides in non-specified PinCode"
+      ],
+      "inputs": {
+        "PinCode": "517003"
+      },
+      "steps": [
+        "Patient attempts to register for an appointment"
+      ],
+      "expected": [
+        "System denies registration and displays error message 'Registration not allowed outside the specified zone'"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "There is 1 Authorized Chemist per PinCode",
+      "req_ids": [
+        "VIRTUA-3-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient resides in PinCode 517501"
+      ],
+      "inputs": {},
+      "steps": [
+        "System checks for authorized chemists in patient's PinCode"
+      ],
+      "expected": [
+        "System finds exactly 1 authorized chemist"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Prescription requests are routed to the correct Chemist based on PinCode",
+      "req_ids": [
+        "VIRTUA-3-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient resides in PinCode 517501 and has submitted a prescription request"
+      ],
+      "inputs": {},
+      "steps": [
+        "System routes the prescription request"
+      ],
+      "expected": [
+        "Prescription request is routed to authorized chemist in PinCode 517501"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Chemist delivers medicines through Offline delivery and collects payments",
+      "req_ids": [
+        "VIRTUA-3-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist has received a prescription request for PinCode 517501"
+      ],
+      "inputs": {},
+      "steps": [
+        "Chemist delivers medicines to patient"
+      ],
+      "expected": [
+        "Chemist collects payment from patient"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Chemist marks the Prescription as completed after delivery",
+      "req_ids": [
+        "VIRTUA-3-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist has delivered medicines to patient in PinCode 517501"
+      ],
+      "inputs": {},
+      "steps": [
+        "Chemist completes the delivery"
+      ],
+      "expected": [
+        "System marks prescription as completed"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "No systemic matching is done to figure out efficiency of the Chemist",
+      "req_ids": [
+        "VIRTUA-3-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System has processed a prescription request for PinCode 517501"
+      ],
+      "inputs": {},
+      "steps": [
+        "System checks for efficiency metrics of the chemist"
+      ],
+      "expected": [
+        "System does not perform any systemic matching to determine chemist's efficiency"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "There is 1 Authorized Laboratory per PinCode or 1 Laboratory for the entire Zone",
+      "req_ids": [
+        "VIRTUA-3-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient resides in PinCode 517501"
+      ],
+      "inputs": {},
+      "steps": [
+        "System checks for authorized laboratories in patient's PinCode"
+      ],
+      "expected": [
+        "System finds exactly 1 authorized laboratory in PinCode 517501 or in the entire Zone"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Virtual Healthcare Services within Padmavathi Hospital Zone\n\n  Scenario: Patient can register and apply for appointments within the specified radius\n    Given the patient resides within a 25 sqkm radius of Padmavathi Hospital\n    When the patient attempts to register and apply for an appointment\n    Then the system should allow the patient to register and apply for the appointment\n\n  Scenario Outline: Patient can only register and apply for appointments within specified PinCodes\n    Given the patient resides in a PinCode <PinCode>\n    When the patient attempts to register and apply for an appointment\n    Then the system should <allow/deny> the patient to register and apply for the appointment\n\n    Examples:\n      | PinCode | allow/deny |\n      | 517501  | allow      |\n      | 517502  | allow      |\n      | 517503  | deny       |\n\n  Scenario: There is 1 Authorized Chemist per PinCode\n    Given the patient resides in a PinCode <PinCode>\n    When the system routes a prescription request\n    Then the system should route the prescription to the authorized chemist in PinCode <PinCode>\n\n    Examples:\n      | PinCode |\n      | 517501  |\n      | 517502  |\n\n  Scenario: Prescription requests are routed based on matching PinCodes\n    Given the patient's address PinCode is <PatientPinCode>\n    And the authorized chemist's PinCode is <ChemistPinCode>\n    When the system routes a prescription request\n    Then the system should route the prescription to the chemist in PinCode <ChemistPinCode>\n\n    Examples:\n      | PatientPinCode | ChemistPinCode |\n      | 517501         | 517501         |\n      | 517502         | 517502         |\n\n  Scenario: Chemist delivers medicines through Offline delivery and collects payments\n    Given the chemist has received a prescription request\n    When the chemist delivers the medicines\n    Then the chemist should collect payment from the patient\n\n  Scenario: Chemist marks the prescription on completion of delivery\n    Given the chemist has delivered the medicines\n    When the chemist completes the delivery\n    Then the system should mark the prescription as delivered\n\n  Scenario: No systemic matching is done to figure out efficiency of the Chemist\n    Given the system has routed a prescription request to a chemist\n    When the chemist completes the delivery\n    Then the system should not perform any efficiency matching on the chemist\n\n  Scenario: There is 1 Authorized Laboratory per PinCode or 1 Laboratory for the entire Zone\n    Given the patient resides in a PinCode <PinCode>\n    When the system routes a test request\n    Then the system should route the test request to the authorized laboratory in PinCode <PinCode> or the Zone laboratory\n\n    Examples:\n      | PinCode |\n      | 517501  |\n      | 517502  |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient can register and apply for appointments within the specified radius",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides within a 25 sqkm radius of Padmavathi Hospital"
+          ],
+          "inputs": {},
+          "steps": [
+            "Patient attempts to register and apply for an appointment"
+          ],
+          "expected": [
+            "System allows the patient to register and apply for the appointment"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient can register and apply for appointments within specified PinCodes",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides in PinCode 517501"
+          ],
+          "inputs": {
+            "PinCode": "517501"
+          },
+          "steps": [
+            "Patient attempts to register and apply for an appointment"
+          ],
+          "expected": [
+            "System allows the patient to register and apply for the appointment"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Patient cannot register and apply for appointments outside specified PinCodes",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient resides in PinCode 517503"
+          ],
+          "inputs": {
+            "PinCode": "517503"
+          },
+          "steps": [
+            "Patient attempts to register and apply for an appointment"
+          ],
+          "expected": [
+            "System denies the patient to register and apply for the appointment"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Prescription requests are routed to the authorized chemist in the same PinCode",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides in PinCode 517501",
+            "Authorized chemist in PinCode 517501"
+          ],
+          "inputs": {
+            "PatientPinCode": "517501",
+            "ChemistPinCode": "517501"
+          },
+          "steps": [
+            "System routes a prescription request"
+          ],
+          "expected": [
+            "System routes the prescription to the chemist in PinCode 517501"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Prescription requests are routed to the authorized chemist in the same PinCode",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides in PinCode 517502",
+            "Authorized chemist in PinCode 517502"
+          ],
+          "inputs": {
+            "PatientPinCode": "517502",
+            "ChemistPinCode": "517502"
+          },
+          "steps": [
+            "System routes a prescription request"
+          ],
+          "expected": [
+            "System routes the prescription to the chemist in PinCode 517502"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Chemist delivers medicines through Offline delivery and collects payments",
+          "req_ids": [
+            "VIRTUA-3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist has received a prescription request"
+          ],
+          "inputs": {},
+          "steps": [
+            "Chemist delivers the medicines"
+          ],
+          "expected": [
+            "Chemist collects payment from the patient"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Chemist marks the prescription on completion of delivery",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist has delivered the medicines"
+          ],
+          "inputs": {},
+          "steps": [
+            "Chemist completes the delivery"
+          ],
+          "expected": [
+            "System marks the prescription as delivered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "No systemic matching is done to figure out efficiency of the Chemist",
+          "req_ids": [
+            "VIRTUA-3-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has routed a prescription request to a chemist"
+          ],
+          "inputs": {},
+          "steps": [
+            "Chemist completes the delivery"
+          ],
+          "expected": [
+            "System does not perform any efficiency matching on the chemist"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Prescription requests are routed to the authorized laboratory in the same PinCode",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides in PinCode 517501",
+            "Authorized laboratory in PinCode 517501"
+          ],
+          "inputs": {
+            "PinCode": "517501"
+          },
+          "steps": [
+            "System routes a test request"
+          ],
+          "expected": [
+            "System routes the test request to the laboratory in PinCode 517501"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Prescription requests are routed to the authorized laboratory in the same PinCode",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides in PinCode 517502",
+            "Authorized laboratory in PinCode 517502"
+          ],
+          "inputs": {
+            "PinCode": "517502"
+          },
+          "steps": [
+            "System routes a test request"
+          ],
+          "expected": [
+            "System routes the test request to the laboratory in PinCode 517502"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.125,
+        "oracle_assertiveness": 0.0,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 1,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add boundary tests for radius (exact 25 sqkm and just over).",
+          "Include negative tests for chemist and laboratory routing (e.g., mismatched pin codes).",
+          "Assert concrete system states (status codes, messages) instead of generic phrases.",
+          "Provide explicit examples for edge pin codes (first and last in the specified set).",
+          "Ensure each requirement has a dedicated scenario outline with both normal and invalid values."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VIRTUA-3-1",
+          "VIRTUA-3-3"
+        ],
+        "fsa_score": 0.475,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.475; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.125, 'oracle_assertiveness': 0.0, 'boundary_coverage': 0.0, 'groundedness_mg': 1.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-3-1', 'VIRTUA-3-3'] (add at least one each)\n- Add boundary tests for radius (exact 25 sqkm and just over).\n- Include negative tests for chemist and laboratory routing (e.g., mismatched pin codes).\n- Assert concrete system states (status codes, messages) instead of generic phrases.\n- Provide explicit examples for edge pin codes (first and last in the specified set).\n- Ensure each requirement has a dedicated scenario outline with both normal and invalid values.",
+      "artifact": "Feature: Services within and around Padmavathi Hospital\n\n  Scenario Outline: Services are offered within a radius of 25 sqkm\n    Given the hospital location is at coordinates (13.0827, 77.5815)\n    And the patient's location is at coordinates <patient_coordinates>\n    When the system checks the patient's eligibility for services\n    Then the system should <result> the patient's eligibility for services\n    Examples:\n      | patient_coordinates | result         |\n      | 13.0827, 77.5815    | confirm        |\n      | 13.0827, 77.5816    | confirm        |\n      | 13.0827, 77.5817    | deny           |\n\n  Scenario Outline: Patients can register and apply for appointments within the specified zone\n    Given the patient's pincode is <patient_pincode>\n    And the system has the following authorized pincodes: <authorized_pincode>\n    When the patient attempts to register for an appointment\n    Then the system should <result> the registration\n    Examples:\n      | patient_pincode | authorized_pincode | result         |\n      | 560029          | 560029, 560030     | confirm        |\n      | 560031          | 560029, 560030     | deny           |\n\n  Scenario Outline: There is 1 Authorized Chemist per Pincode\n    Given the patient's pincode is <patient_pincode>\n    And the system has the following authorized chemists: <authorized_chemist>\n    When the system checks for an authorized chemist\n    Then the system should <result> the availability of an authorized chemist\n    Examples:\n      | patient_pincode | authorized_chemist | result         |\n      | 560029          | 560029:ChemistA    | confirm        |\n      | 560030          | 560029:ChemistA    | deny           |\n\n  Scenario Outline: Prescription requests are routed to the Chemist based on Pincode\n    Given the patient's pincode is <patient_pincode>\n    And the chemist's pincode is <chemist_pincode>\n    When the system routes a prescription request\n    Then the system should <result> the routing of the prescription request\n    Examples:\n      | patient_pincode | chemist_pincode | result         |\n      | 560029          | 560029          | confirm        |\n      | 560029          | 560030          | deny           |\n\n  Scenario Outline: Chemists deliver medicines through Offline delivery and collect payments\n    Given the chemist has received a prescription request\n    And the chemist's pincode matches the patient's pincode\n    When the chemist delivers the medicines\n    Then the system should <result> the delivery status\n    Examples:\n      | result         |\n      | confirm        |\n\n  Scenario Outline: Chemists mark the Prescription on completion of delivery\n    Given the chemist has delivered the medicines\n    When the chemist marks the prescription as delivered\n    Then the system should <result> the prescription status\n    Examples:\n      | result         |\n      | confirm        |\n\n  Scenario Outline: There is 1 Authorized Laboratory per Pincode or for the entire Zone\n    Given the patient's pincode is <patient_pincode>\n    And the system has the following authorized laboratories: <authorized_laboratory>\n    When the system checks for an authorized laboratory\n    Then the system should <result> the availability of an authorized laboratory\n    Examples:\n      | patient_pincode | authorized_laboratory | result         |\n      | 560029          | 560029:LaboratoryA    | confirm        |\n      | 560030          | 560029:LaboratoryA    | deny           |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient within 25 sqkm is eligible for services",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "hospital location at 13.0827, 77.5815"
+          ],
+          "inputs": {
+            "patient_coordinates": "13.0827, 77.5815"
+          },
+          "steps": [
+            "check patient's eligibility"
+          ],
+          "expected": [
+            "confirm the patient's eligibility for services"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient just within 25 sqkm is eligible for services",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "hospital location at 13.0827, 77.5815"
+          ],
+          "inputs": {
+            "patient_coordinates": "13.0827, 77.5816"
+          },
+          "steps": [
+            "check patient's eligibility"
+          ],
+          "expected": [
+            "confirm the patient's eligibility for services"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Patient just outside 25 sqkm is not eligible for services",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "hospital location at 13.0827, 77.5815"
+          ],
+          "inputs": {
+            "patient_coordinates": "13.0827, 77.5817"
+          },
+          "steps": [
+            "check patient's eligibility"
+          ],
+          "expected": [
+            "deny the patient's eligibility for services"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Patient within authorized pincode can register for appointment",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "authorized pincodes: 560029, 560030"
+          ],
+          "inputs": {
+            "patient_pincode": "560029"
+          },
+          "steps": [
+            "attempt to register for appointment"
+          ],
+          "expected": [
+            "confirm the registration"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Patient outside authorized pincode cannot register for appointment",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "authorized pincodes: 560029, 560030"
+          ],
+          "inputs": {
+            "patient_pincode": "560031"
+          },
+          "steps": [
+            "attempt to register for appointment"
+          ],
+          "expected": [
+            "deny the registration"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Authorized chemist is available for patient's pincode",
+          "req_ids": [
+            "VIRTUA-3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "authorized chemists: 560029:ChemistA"
+          ],
+          "inputs": {
+            "patient_pincode": "560029"
+          },
+          "steps": [
+            "check for authorized chemist"
+          ],
+          "expected": [
+            "confirm the availability of an authorized chemist"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "No authorized chemist for patient's pincode",
+          "req_ids": [
+            "VIRTUA-3-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "authorized chemists: 560029:ChemistA"
+          ],
+          "inputs": {
+            "patient_pincode": "560030"
+          },
+          "steps": [
+            "check for authorized chemist"
+          ],
+          "expected": [
+            "deny the availability of an authorized chemist"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Prescription request routed to correct chemist",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "chemist's pincode: 560029"
+          ],
+          "inputs": {
+            "patient_pincode": "560029",
+            "chemist_pincode": "560029"
+          },
+          "steps": [
+            "route prescription request"
+          ],
+          "expected": [
+            "confirm the routing of the prescription request"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Prescription request not routed to incorrect chemist",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "chemist's pincode: 560029"
+          ],
+          "inputs": {
+            "patient_pincode": "560029",
+            "chemist_pincode": "560030"
+          },
+          "steps": [
+            "route prescription request"
+          ],
+          "expected": [
+            "deny the routing of the prescription request"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Chemist delivers medicines and collects payment",
+          "req_ids": [
+            "VIRTUA-3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "chemist's pincode matches patient's pincode"
+          ],
+          "inputs": {},
+          "steps": [
+            "deliver medicines"
+          ],
+          "expected": [
+            "confirm the delivery status"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Chemist marks prescription as delivered",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "chemist has delivered medicines"
+          ],
+          "inputs": {},
+          "steps": [
+            "mark prescription as delivered"
+          ],
+          "expected": [
+            "confirm the prescription status"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Authorized laboratory is available for patient's pincode",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "authorized laboratories: 560029:LaboratoryA"
+          ],
+          "inputs": {
+            "patient_pincode": "560029"
+          },
+          "steps": [
+            "check for authorized laboratory"
+          ],
+          "expected": [
+            "confirm the availability of an authorized laboratory"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "No authorized laboratory for patient's pincode",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "authorized laboratories: 560029:LaboratoryA"
+          ],
+          "inputs": {
+            "patient_pincode": "560030"
+          },
+          "steps": [
+            "check for authorized laboratory"
+          ],
+          "expected": [
+            "deny the availability of an authorized laboratory"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "error": "ollama:gpt-oss:20b returned an empty response",
+        "fsa_pass": false,
+        "fsa_score": 0.0
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.0; sub-scores {'clause_coverage': None, 'negative_coverage': None, 'oracle_assertiveness': None, 'boundary_coverage': None, 'groundedness_mg': None}). Output the full improved suite addressing:",
+      "artifact": "Feature: Virtual Healthcare Services within Padmavathi Hospital Zone\n\n  Scenario: Patient within 25 sqkm radius can register for appointments\n    Given the patient resides within a 25 sqkm radius of Padmavathi Hospital\n    When the patient attempts to register for an appointment\n    Then the system should allow the patient to register successfully\n\n  Scenario: Patient outside 25 sqkm radius cannot register for appointments\n    Given the patient resides outside a 25 sqkm radius of Padmavathi Hospital\n    When the patient attempts to register for an appointment\n    Then the system should deny the registration and display an error message \"Registration not allowed outside the specified zone\"\n\n  Scenario Outline: Patient within specified PinCodes can register for appointments\n    Given the patient resides in PinCode <PinCode>\n    When the patient attempts to register for an appointment\n    Then the system should allow the patient to register successfully\n\n    Examples:\n      | PinCode |\n      | 517501  |\n      | 517502  |\n      | 517503  |\n\n  Scenario Outline: Patient outside specified PinCodes cannot register for appointments\n    Given the patient resides in PinCode <PinCode>\n    When the patient attempts to register for an appointment\n    Then the system should deny the registration and display an error message \"Registration not allowed outside the specified zone\"\n\n    Examples:\n      | PinCode |\n      | 517001  |\n      | 517002  |\n      | 517003  |\n\n  Scenario: There is 1 Authorized Chemist per PinCode\n    Given the patient resides in PinCode 517501\n    When the system checks for authorized chemists in the patient's PinCode\n    Then the system should find exactly 1 authorized chemist\n\n  Scenario: Prescription requests are routed to the correct Chemist based on PinCode\n    Given the patient resides in PinCode 517501 and has submitted a prescription request\n    When the system routes the prescription request\n    Then the prescription request should be routed to the authorized chemist in PinCode 517501\n\n  Scenario: Chemist delivers medicines through Offline delivery and collects payments\n    Given the chemist has received a prescription request for PinCode 517501\n    When the chemist delivers the medicines to the patient\n    Then the chemist should collect payment from the patient\n\n  Scenario: Chemist marks the Prescription as completed after delivery\n    Given the chemist has delivered medicines to the patient in PinCode 517501\n    When the chemist completes the delivery\n    Then the system should mark the prescription as completed\n\n  Scenario: No systemic matching is done to figure out efficiency of the Chemist\n    Given the system has processed a prescription request for PinCode 517501\n    When the system checks for efficiency metrics of the chemist\n    Then the system should not perform any systemic matching to determine the chemist's efficiency\n\n  Scenario: There is 1 Authorized Laboratory per PinCode or 1 Laboratory for the entire Zone\n    Given the patient resides in PinCode 517501\n    When the system checks for authorized laboratories in the patient's PinCode\n    Then the system should find exactly 1 authorized laboratory in PinCode 517501 or in the entire Zone",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient within 25 sqkm radius can register for appointments",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides within 25 sqkm radius of Padmavathi Hospital"
+          ],
+          "inputs": {},
+          "steps": [
+            "Patient attempts to register for an appointment"
+          ],
+          "expected": [
+            "System allows patient to register successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient outside 25 sqkm radius cannot register for appointments",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient resides outside 25 sqkm radius of Padmavathi Hospital"
+          ],
+          "inputs": {},
+          "steps": [
+            "Patient attempts to register for an appointment"
+          ],
+          "expected": [
+            "System denies registration and displays error message 'Registration not allowed outside the specified zone'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Patient within specified PinCodes can register for appointments",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides in specified PinCode"
+          ],
+          "inputs": {
+            "PinCode": "517501"
+          },
+          "steps": [
+            "Patient attempts to register for an appointment"
+          ],
+          "expected": [
+            "System allows patient to register successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Patient within specified PinCodes can register for appointments",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides in specified PinCode"
+          ],
+          "inputs": {
+            "PinCode": "517502"
+          },
+          "steps": [
+            "Patient attempts to register for an appointment"
+          ],
+          "expected": [
+            "System allows patient to register successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Patient within specified PinCodes can register for appointments",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides in specified PinCode"
+          ],
+          "inputs": {
+            "PinCode": "517503"
+          },
+          "steps": [
+            "Patient attempts to register for an appointment"
+          ],
+          "expected": [
+            "System allows patient to register successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient outside specified PinCodes cannot register for appointments",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient resides in non-specified PinCode"
+          ],
+          "inputs": {
+            "PinCode": "517001"
+          },
+          "steps": [
+            "Patient attempts to register for an appointment"
+          ],
+          "expected": [
+            "System denies registration and displays error message 'Registration not allowed outside the specified zone'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient outside specified PinCodes cannot register for appointments",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient resides in non-specified PinCode"
+          ],
+          "inputs": {
+            "PinCode": "517002"
+          },
+          "steps": [
+            "Patient attempts to register for an appointment"
+          ],
+          "expected": [
+            "System denies registration and displays error message 'Registration not allowed outside the specified zone'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient outside specified PinCodes cannot register for appointments",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient resides in non-specified PinCode"
+          ],
+          "inputs": {
+            "PinCode": "517003"
+          },
+          "steps": [
+            "Patient attempts to register for an appointment"
+          ],
+          "expected": [
+            "System denies registration and displays error message 'Registration not allowed outside the specified zone'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "There is 1 Authorized Chemist per PinCode",
+          "req_ids": [
+            "VIRTUA-3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides in PinCode 517501"
+          ],
+          "inputs": {},
+          "steps": [
+            "System checks for authorized chemists in patient's PinCode"
+          ],
+          "expected": [
+            "System finds exactly 1 authorized chemist"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Prescription requests are routed to the correct Chemist based on PinCode",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides in PinCode 517501 and has submitted a prescription request"
+          ],
+          "inputs": {},
+          "steps": [
+            "System routes the prescription request"
+          ],
+          "expected": [
+            "Prescription request is routed to authorized chemist in PinCode 517501"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Chemist delivers medicines through Offline delivery and collects payments",
+          "req_ids": [
+            "VIRTUA-3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist has received a prescription request for PinCode 517501"
+          ],
+          "inputs": {},
+          "steps": [
+            "Chemist delivers medicines to patient"
+          ],
+          "expected": [
+            "Chemist collects payment from patient"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Chemist marks the Prescription as completed after delivery",
+          "req_ids": [
+            "VIRTUA-3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist has delivered medicines to patient in PinCode 517501"
+          ],
+          "inputs": {},
+          "steps": [
+            "Chemist completes the delivery"
+          ],
+          "expected": [
+            "System marks prescription as completed"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "No systemic matching is done to figure out efficiency of the Chemist",
+          "req_ids": [
+            "VIRTUA-3-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System has processed a prescription request for PinCode 517501"
+          ],
+          "inputs": {},
+          "steps": [
+            "System checks for efficiency metrics of the chemist"
+          ],
+          "expected": [
+            "System does not perform any systemic matching to determine chemist's efficiency"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "There is 1 Authorized Laboratory per PinCode or 1 Laboratory for the entire Zone",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient resides in PinCode 517501"
+          ],
+          "inputs": {},
+          "steps": [
+            "System checks for authorized laboratories in patient's PinCode"
+          ],
+          "expected": [
+            "System finds exactly 1 authorized laboratory in PinCode 517501 or in the entire Zone"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.25,
+        "oracle_assertiveness": 0.4,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.4,
+        "hallucinated": [
+          {
+            "value": "PinCode 517501",
+            "context": "patient location",
+            "grounded": false
+          },
+          {
+            "value": "PinCode 517502",
+            "context": "patient location",
+            "grounded": false
+          },
+          {
+            "value": "PinCode 517503",
+            "context": "patient location",
+            "grounded": false
+          },
+          {
+            "value": "PinCode 517001",
+            "context": "patient location",
+            "grounded": false
+          },
+          {
+            "value": "PinCode 517002",
+            "context": "patient location",
+            "grounded": false
+          },
+          {
+            "value": "PinCode 517003",
+            "context": "patient location",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 10,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No boundary tests for radius (exactly 25 sqkm) or PinCode limits",
+          "Negative tests only cover registration; missing negative paths for chemist and laboratory operations",
+          "Oracle assertions are vague; lack of concrete status codes or state checks",
+          "PinCode values are invented and not grounded in SRS",
+          "No tests for 24/7 operation or time constraints for chemist"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.57,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

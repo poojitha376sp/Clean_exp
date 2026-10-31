@@ -1,0 +1,2183 @@
+{
+  "unit_id": "U05_2",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.8,
+    "oracle_assertiveness": 0.7,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "New Lab Name",
+        "context": "lab name update value",
+        "grounded": false
+      },
+      {
+        "value": "New Pharmacy",
+        "context": "pharmacy name update value",
+        "grounded": false
+      },
+      {
+        "value": "",
+        "context": "empty string",
+        "grounded": false
+      },
+      {
+        "value": "lab",
+        "context": "entity name for deletion",
+        "grounded": false
+      },
+      {
+        "value": "pharmacy",
+        "context": "entity name for deletion",
+        "grounded": false
+      },
+      {
+        "value": "John Doe",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": "john.doe@example.com",
+        "context": "patient email",
+        "grounded": false
+      },
+      {
+        "value": "Jane Smith",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": "jane.smith@example.com",
+        "context": "patient email",
+        "grounded": false
+      },
+      {
+        "value": "Dr. Smith",
+        "context": "doctor name",
+        "grounded": false
+      },
+      {
+        "value": "10:00 AM",
+        "context": "appointment time",
+        "grounded": false
+      },
+      {
+        "value": "Dr. Johnson",
+        "context": "doctor name",
+        "grounded": false
+      },
+      {
+        "value": "2:00 PM",
+        "context": "appointment time",
+        "grounded": false
+      },
+      {
+        "value": "prescription",
+        "context": "document type",
+        "grounded": false
+      },
+      {
+        "value": "invoice",
+        "context": "document type",
+        "grounded": false
+      },
+      {
+        "value": "Aspirin",
+        "context": "medicine name",
+        "grounded": false
+      },
+      {
+        "value": "Ibuprofen",
+        "context": "medicine name",
+        "grounded": false
+      },
+      {
+        "value": "Blood Test",
+        "context": "lab test name",
+        "grounded": false
+      },
+      {
+        "value": "Urine Test",
+        "context": "lab test name",
+        "grounded": false
+      },
+      {
+        "value": "New Name",
+        "context": "profile name update value",
+        "grounded": false
+      },
+      {
+        "value": "new.email@example.com",
+        "context": "profile email update value",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 21,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add tests for online consultation request functionality (VIRTUA-2.3-8).",
+      "Include error handling for invalid email formats and duplicate registrations.",
+      "Test boundary conditions for appointment scheduling (e.g., past dates, overlapping appointments).",
+      "Verify that deleted labs/pharmacies cannot be accessed afterward.",
+      "Add assertions for system messages or status codes to increase oracle assertiveness."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.765,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Admin and User Functionalities\n\n  @VIRTUA-2.3-5\n  Scenario Outline: Admin edits labs/pharmacy details\n    Given the admin is logged in\n    When the admin updates the <field> to <value>\n    Then the <field> should be updated to <value>\n    Examples:\n      | field        | value          |\n      | lab_name     | New Lab Name   |\n      | pharmacy_name| New Pharmacy   |\n      | lab_name     |                | # Edge case: empty value\n      | pharmacy_name|                | # Edge case: empty value\n\n  @VIRTUA-2.3-5\n  Scenario Outline: Admin deletes labs/pharmacy details\n    Given the admin is logged in\n    When the admin deletes the <entity>\n    Then the <entity> should no longer exist\n    Examples:\n      | entity        |\n      | lab           |\n      | pharmacy      |\n\n  @VIRTUA-2.3-6\n  Scenario Outline: Patient registers\n    Given the patient is on the registration page\n    When the patient enters <name> and <email>\n    Then the patient should be registered with name <name> and email <email>\n    Examples:\n      | name          | email                  |\n      | John Doe      | john.doe@example.com   |\n      | Jane Smith    | jane.smith@example.com |\n      | John Doe      |                        | # Edge case: empty email\n      |               | jane.smith@example.com | # Edge case: empty name\n\n  @VIRTUA-2.3-7\n  Scenario Outline: Patient updates profile\n    Given the patient is logged in\n    When the patient updates the <field> to <value>\n    Then the <field> should be updated to <value>\n    Examples:\n      | field        | value          |\n      | name         | New Name       |\n      | email        | new.email@example.com |\n      | name         |                | # Edge case: empty value\n      | email        |                | # Edge case: empty value\n\n  @VIRTUA-2.3-8\n  Scenario Outline: Patient makes appointments and submits online consultation requests\n    Given the patient is logged in\n    When the patient makes an appointment with <doctor> at <time>\n    Then the appointment should be scheduled with <doctor> at <time>\n    Examples:\n      | doctor        | time           |\n      | Dr. Smith     | 10:00 AM       |\n      | Dr. Johnson   | 2:00 PM        |\n      | Dr. Smith     |                | # Edge case: empty time\n      |               | 10:00 AM       | # Edge case: empty doctor\n\n  @VIRTUA-2.3-9\n  Scenario Outline: Patient views and generates prescription reports and invoices\n    Given the patient is logged in\n    When the patient views the <document>\n    Then the <document> should be displayed\n    Examples:\n      | document      |\n      | prescription  |\n      | invoice       |\n\n  @VIRTUA-2.3-10\n  Scenario Outline: Doctor provides consultation\n    Given the doctor is logged in\n    When the doctor provides consultation to <patient>\n    Then the consultation should be recorded for <patient>\n    Examples:\n      | patient       |\n      | John Doe      |\n      | Jane Smith    |\n\n  @VIRTUA-2.3-11\n  Scenario Outline: Doctor prescribes medicine\n    Given the doctor is logged in\n    When the doctor prescribes <medicine> to <patient>\n    Then the prescription for <medicine> should be recorded for <patient>\n    Examples:\n      | medicine      | patient        |\n      | Aspirin       | John Doe       |\n      | Ibuprofen     | Jane Smith     |\n      | Aspirin       |                | # Edge case: empty patient\n      |               | John Doe       | # Edge case: empty medicine\n\n  @VIRTUA-2.3-12\n  Scenario Outline: Doctor prescribes lab tests\n    Given the doctor is logged in\n    When the doctor prescribes <test> to <patient>\n    Then the lab test <test> should be recorded for <patient>\n    Examples:\n      | test          | patient        |\n      | Blood Test    | John Doe       |\n      | Urine Test    | Jane Smith     |\n      | Blood Test    |                | # Edge case: empty patient\n      |               | John Doe       | # Edge case: empty test",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Admin updates lab name",
+      "req_ids": [
+        "VIRTUA-2.3-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged in"
+      ],
+      "inputs": {
+        "field": "lab_name",
+        "value": "New Lab Name"
+      },
+      "steps": [
+        "the admin updates the lab_name to New Lab Name"
+      ],
+      "expected": [
+        "the lab_name should be updated to New Lab Name"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Admin updates pharmacy name",
+      "req_ids": [
+        "VIRTUA-2.3-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged in"
+      ],
+      "inputs": {
+        "field": "pharmacy_name",
+        "value": "New Pharmacy"
+      },
+      "steps": [
+        "the admin updates the pharmacy_name to New Pharmacy"
+      ],
+      "expected": [
+        "the pharmacy_name should be updated to New Pharmacy"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Admin updates lab name to empty",
+      "req_ids": [
+        "VIRTUA-2.3-5"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the admin is logged in"
+      ],
+      "inputs": {
+        "field": "lab_name",
+        "value": ""
+      },
+      "steps": [
+        "the admin updates the lab_name to "
+      ],
+      "expected": [
+        "the lab_name should be updated to "
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Admin updates pharmacy name to empty",
+      "req_ids": [
+        "VIRTUA-2.3-5"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the admin is logged in"
+      ],
+      "inputs": {
+        "field": "pharmacy_name",
+        "value": ""
+      },
+      "steps": [
+        "the admin updates the pharmacy_name to "
+      ],
+      "expected": [
+        "the pharmacy_name should be updated to "
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Admin deletes lab",
+      "req_ids": [
+        "VIRTUA-2.3-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged in"
+      ],
+      "inputs": {
+        "entity": "lab"
+      },
+      "steps": [
+        "the admin deletes the lab"
+      ],
+      "expected": [
+        "the lab should no longer exist"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Admin deletes pharmacy",
+      "req_ids": [
+        "VIRTUA-2.3-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged in"
+      ],
+      "inputs": {
+        "entity": "pharmacy"
+      },
+      "steps": [
+        "the admin deletes the pharmacy"
+      ],
+      "expected": [
+        "the pharmacy should no longer exist"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Patient registers with valid details",
+      "req_ids": [
+        "VIRTUA-2.3-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient is on the registration page"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "email": "john.doe@example.com"
+      },
+      "steps": [
+        "the patient enters John Doe and john.doe@example.com"
+      ],
+      "expected": [
+        "the patient should be registered with name John Doe and email john.doe@example.com"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Patient registers with another valid details",
+      "req_ids": [
+        "VIRTUA-2.3-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient is on the registration page"
+      ],
+      "inputs": {
+        "name": "Jane Smith",
+        "email": "jane.smith@example.com"
+      },
+      "steps": [
+        "the patient enters Jane Smith and jane.smith@example.com"
+      ],
+      "expected": [
+        "the patient should be registered with name Jane Smith and email jane.smith@example.com"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Patient registers with empty email",
+      "req_ids": [
+        "VIRTUA-2.3-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the patient is on the registration page"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "email": ""
+      },
+      "steps": [
+        "the patient enters John Doe and "
+      ],
+      "expected": [
+        "the patient should be registered with name John Doe and email "
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Patient registers with empty name",
+      "req_ids": [
+        "VIRTUA-2.3-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the patient is on the registration page"
+      ],
+      "inputs": {
+        "name": "",
+        "email": "jane.smith@example.com"
+      },
+      "steps": [
+        "the patient enters  and jane.smith@example.com"
+      ],
+      "expected": [
+        "the patient should be registered with name  and email jane.smith@example.com"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Patient updates name",
+      "req_ids": [
+        "VIRTUA-2.3-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient is logged in"
+      ],
+      "inputs": {
+        "field": "name",
+        "value": "New Name"
+      },
+      "steps": [
+        "the patient updates the name to New Name"
+      ],
+      "expected": [
+        "the name should be updated to New Name"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Patient updates email",
+      "req_ids": [
+        "VIRTUA-2.3-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient is logged in"
+      ],
+      "inputs": {
+        "field": "email",
+        "value": "new.email@example.com"
+      },
+      "steps": [
+        "the patient updates the email to new.email@example.com"
+      ],
+      "expected": [
+        "the email should be updated to new.email@example.com"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Patient updates name to empty",
+      "req_ids": [
+        "VIRTUA-2.3-7"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the patient is logged in"
+      ],
+      "inputs": {
+        "field": "name",
+        "value": ""
+      },
+      "steps": [
+        "the patient updates the name to "
+      ],
+      "expected": [
+        "the name should be updated to "
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Patient updates email to empty",
+      "req_ids": [
+        "VIRTUA-2.3-7"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the patient is logged in"
+      ],
+      "inputs": {
+        "field": "email",
+        "value": ""
+      },
+      "steps": [
+        "the patient updates the email to "
+      ],
+      "expected": [
+        "the email should be updated to "
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "Patient makes appointment",
+      "req_ids": [
+        "VIRTUA-2.3-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient is logged in"
+      ],
+      "inputs": {
+        "doctor": "Dr. Smith",
+        "time": "10:00 AM"
+      },
+      "steps": [
+        "the patient makes an appointment with Dr. Smith at 10:00 AM"
+      ],
+      "expected": [
+        "the appointment should be scheduled with Dr. Smith at 10:00 AM"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "Patient makes another appointment",
+      "req_ids": [
+        "VIRTUA-2.3-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient is logged in"
+      ],
+      "inputs": {
+        "doctor": "Dr. Johnson",
+        "time": "2:00 PM"
+      },
+      "steps": [
+        "the patient makes an appointment with Dr. Johnson at 2:00 PM"
+      ],
+      "expected": [
+        "the appointment should be scheduled with Dr. Johnson at 2:00 PM"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "Patient makes appointment with empty time",
+      "req_ids": [
+        "VIRTUA-2.3-8"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the patient is logged in"
+      ],
+      "inputs": {
+        "doctor": "Dr. Smith",
+        "time": ""
+      },
+      "steps": [
+        "the patient makes an appointment with Dr. Smith at "
+      ],
+      "expected": [
+        "the appointment should be scheduled with Dr. Smith at "
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "Patient makes appointment with empty doctor",
+      "req_ids": [
+        "VIRTUA-2.3-8"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the patient is logged in"
+      ],
+      "inputs": {
+        "doctor": "",
+        "time": "10:00 AM"
+      },
+      "steps": [
+        "the patient makes an appointment with  at 10:00 AM"
+      ],
+      "expected": [
+        "the appointment should be scheduled with  at 10:00 AM"
+      ]
+    },
+    {
+      "id": "TC-019",
+      "title": "Patient views prescription",
+      "req_ids": [
+        "VIRTUA-2.3-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient is logged in"
+      ],
+      "inputs": {
+        "document": "prescription"
+      },
+      "steps": [
+        "the patient views the prescription"
+      ],
+      "expected": [
+        "the prescription should be displayed"
+      ]
+    },
+    {
+      "id": "TC-020",
+      "title": "Patient views invoice",
+      "req_ids": [
+        "VIRTUA-2.3-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient is logged in"
+      ],
+      "inputs": {
+        "document": "invoice"
+      },
+      "steps": [
+        "the patient views the invoice"
+      ],
+      "expected": [
+        "the invoice should be displayed"
+      ]
+    },
+    {
+      "id": "TC-021",
+      "title": "Doctor provides consultation",
+      "req_ids": [
+        "VIRTUA-2.3-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the doctor is logged in"
+      ],
+      "inputs": {
+        "patient": "John Doe"
+      },
+      "steps": [
+        "the doctor provides consultation to John Doe"
+      ],
+      "expected": [
+        "the consultation should be recorded for John Doe"
+      ]
+    },
+    {
+      "id": "TC-022",
+      "title": "Doctor provides consultation to another patient",
+      "req_ids": [
+        "VIRTUA-2.3-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the doctor is logged in"
+      ],
+      "inputs": {
+        "patient": "Jane Smith"
+      },
+      "steps": [
+        "the doctor provides consultation to Jane Smith"
+      ],
+      "expected": [
+        "the consultation should be recorded for Jane Smith"
+      ]
+    },
+    {
+      "id": "TC-023",
+      "title": "Doctor prescribes medicine",
+      "req_ids": [
+        "VIRTUA-2.3-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the doctor is logged in"
+      ],
+      "inputs": {
+        "medicine": "Aspirin",
+        "patient": "John Doe"
+      },
+      "steps": [
+        "the doctor prescribes Aspirin to John Doe"
+      ],
+      "expected": [
+        "the prescription for Aspirin should be recorded for John Doe"
+      ]
+    },
+    {
+      "id": "TC-024",
+      "title": "Doctor prescribes another medicine",
+      "req_ids": [
+        "VIRTUA-2.3-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the doctor is logged in"
+      ],
+      "inputs": {
+        "medicine": "Ibuprofen",
+        "patient": "Jane Smith"
+      },
+      "steps": [
+        "the doctor prescribes Ibuprofen to Jane Smith"
+      ],
+      "expected": [
+        "the prescription for Ibuprofen should be recorded for Jane Smith"
+      ]
+    },
+    {
+      "id": "TC-025",
+      "title": "Doctor prescribes medicine to empty patient",
+      "req_ids": [
+        "VIRTUA-2.3-11"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the doctor is logged in"
+      ],
+      "inputs": {
+        "medicine": "Aspirin",
+        "patient": ""
+      },
+      "steps": [
+        "the doctor prescribes Aspirin to "
+      ],
+      "expected": [
+        "the prescription for Aspirin should be recorded for "
+      ]
+    },
+    {
+      "id": "TC-026",
+      "title": "Doctor prescribes empty medicine",
+      "req_ids": [
+        "VIRTUA-2.3-11"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the doctor is logged in"
+      ],
+      "inputs": {
+        "medicine": "",
+        "patient": "John Doe"
+      },
+      "steps": [
+        "the doctor prescribes  to John Doe"
+      ],
+      "expected": [
+        "the prescription for  should be recorded for John Doe"
+      ]
+    },
+    {
+      "id": "TC-027",
+      "title": "Doctor prescribes lab test",
+      "req_ids": [
+        "VIRTUA-2.3-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the doctor is logged in"
+      ],
+      "inputs": {
+        "test": "Blood Test",
+        "patient": "John Doe"
+      },
+      "steps": [
+        "the doctor prescribes Blood Test to John Doe"
+      ],
+      "expected": [
+        "the lab test Blood Test should be recorded for John Doe"
+      ]
+    },
+    {
+      "id": "TC-028",
+      "title": "Doctor prescribes another lab test",
+      "req_ids": [
+        "VIRTUA-2.3-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the doctor is logged in"
+      ],
+      "inputs": {
+        "test": "Urine Test",
+        "patient": "Jane Smith"
+      },
+      "steps": [
+        "the doctor prescribes Urine Test to Jane Smith"
+      ],
+      "expected": [
+        "the lab test Urine Test should be recorded for Jane Smith"
+      ]
+    },
+    {
+      "id": "TC-029",
+      "title": "Doctor prescribes lab test to empty patient",
+      "req_ids": [
+        "VIRTUA-2.3-12"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the doctor is logged in"
+      ],
+      "inputs": {
+        "test": "Blood Test",
+        "patient": ""
+      },
+      "steps": [
+        "the doctor prescribes Blood Test to "
+      ],
+      "expected": [
+        "the lab test Blood Test should be recorded for "
+      ]
+    },
+    {
+      "id": "TC-030",
+      "title": "Doctor prescribes empty lab test",
+      "req_ids": [
+        "VIRTUA-2.3-12"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the doctor is logged in"
+      ],
+      "inputs": {
+        "test": "",
+        "patient": "John Doe"
+      },
+      "steps": [
+        "the doctor prescribes  to John Doe"
+      ],
+      "expected": [
+        "the lab test  should be recorded for John Doe"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Admin and User Functionalities\n\n  @VIRTUA-2.3-5\n  Scenario Outline: Admin can edit labs/pharmacy details\n    Given the admin is logged in\n    When the admin updates the <field> to <value>\n    Then the <field> should be updated to <value>\n    Examples:\n      | field        | value          |\n      | lab name     | New Lab Name   |\n      | pharmacy name| New Pharmacy   |\n      | lab name     |                | # Edge case: empty value\n      | pharmacy name|                | # Edge case: empty value\n\n  @VIRTUA-2.3-5\n  Scenario Outline: Admin can delete labs/pharmacy details\n    Given the admin is logged in\n    When the admin deletes the <entity>\n    Then the <entity> should no longer exist\n    Examples:\n      | entity       |\n      | lab          |\n      | pharmacy     |\n\n  @VIRTUA-2.3-6\n  Scenario Outline: Patient can register\n    Given the patient is on the registration page\n    When the patient enters the following details:\n      | field        | value          |\n      | name         | <name>         |\n      | email        | <email>        |\n      | password     | <password>     |\n    And the patient submits the registration form\n    Then the patient should be registered successfully\n    Examples:\n      | name         | email                  | password     |\n      | John Doe     | john.doe@example.com   | Password123  |\n      | Jane Smith   | jane.smith@example.com | Password456  |\n      |              | jane.smith@example.com | Password456  | # Edge case: empty name\n      | Jane Smith   |                        | Password456  | # Edge case: empty email\n      | Jane Smith   | jane.smith@example.com |              | # Edge case: empty password\n\n  @VIRTUA-2.3-7\n  Scenario Outline: Patient can update profile\n    Given the patient is logged in\n    When the patient updates the <field> to <value>\n    Then the <field> should be updated to <value>\n    Examples:\n      | field        | value          |\n      | name         | New Name       |\n      | email        | new.email@example.com |\n      | name         |                | # Edge case: empty value\n      | email        |                | # Edge case: empty value\n\n  @VIRTUA-2.3-8\n  Scenario Outline: Patient can make appointments and submit online consultation requests\n    Given the patient is logged in\n    When the patient makes an appointment with <doctor> on <date>\n    And the patient submits a consultation request with the following details:\n      | field        | value          |\n      | symptoms     | <symptoms>     |\n      | notes        | <notes>        |\n    Then the appointment should be scheduled with <doctor> on <date>\n    And the consultation request should be submitted successfully\n    Examples:\n      | doctor       | date           | symptoms         | notes          |\n      | Dr. Smith    | 2023-12-15     | Fever            | None           |\n      | Dr. Johnson  | 2023-12-16     | Headache         | Severe         |\n      | Dr. Smith    | 2023-12-15     |                  | None           | # Edge case: empty symptoms\n      | Dr. Johnson  | 2023-12-16     | Headache         |                | # Edge case: empty notes\n\n  @VIRTUA-2.3-9\n  Scenario Outline: Patient can view and generate prescription reports and invoices\n    Given the patient is logged in\n    When the patient views the prescription report for <appointment>\n    And the patient generates an invoice for <appointment>\n    Then the prescription report for <appointment> should be displayed\n    And the invoice for <appointment> should be generated\n    Examples:\n      | appointment  |\n      | 2023-12-15   |\n      | 2023-12-16   |\n\n  @VIRTUA-2.3-10\n  Scenario Outline: Doctor can provide consultation\n    Given the doctor is logged in\n    When the doctor provides consultation for <patient> on <date>\n    And the doctor enters the following details:\n      | field        | value          |\n      | diagnosis    | <diagnosis>    |\n      | notes        | <notes>        |\n    Then the consultation for <patient> on <date> should be recorded\n    Examples:\n      | patient      | date           | diagnosis        | notes          |\n      | John Doe     | 2023-12-15     | Cold             | Take rest      |\n      | Jane Smith   | 2023-12-16     | Flu              | Drink fluids   |\n      | John Doe     | 2023-12-15     |                  | Take rest      | # Edge case: empty diagnosis\n      | Jane Smith   | 2023-12-16     | Flu              |                | # Edge case: empty notes\n\n  @VIRTUA-2.3-11\n  Scenario Outline: Doctor can prescribe medicine\n    Given the doctor is logged in\n    When the doctor prescribes <medicine> to <patient> on <date>\n    And the doctor enters the following details:\n      | field        | value          |\n      | dosage       | <dosage>       |\n      | duration     | <duration>     |\n    Then the prescription for <medicine> to <patient> on <date> should be recorded\n    Examples:\n      | medicine     | patient        | date           | dosage         | duration     |\n      | Paracetamol  | John Doe       | 2023-12-15     | 500mg          | 7 days       |\n      | Ibuprofen    | Jane Smith     | 2023-12-16     | 200mg          | 10 days      |\n      | Paracetamol  | John Doe       | 2023-12-15     |                | 7 days       | # Edge case: empty dosage\n      | Ibuprofen    | Jane Smith     | 2023-12-16     | 200mg          |              | # Edge case: empty duration\n\n  @VIRTUA-2.3-12\n  Scenario Outline: Doctor can prescribe lab tests\n    Given the doctor is logged in\n    When the doctor prescribes <test> to <patient> on <date>\n    Then the lab test <test> for <patient> on <date> should be recorded\n    Examples:\n      | test         | patient        | date           |\n      | Blood Test   | John Doe       | 2023-12-15     |\n      | Urine Test   | Jane Smith     | 2023-12-16     |\n      | Blood Test   | John Doe       |                | # Edge case: empty date\n      | Urine Test   |                | 2023-12-16     | # Edge case: empty patient",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Admin updates lab name",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "admin is logged in"
+          ],
+          "inputs": {
+            "field": "lab name",
+            "value": "New Lab Name"
+          },
+          "steps": [
+            "admin updates the lab name to New Lab Name"
+          ],
+          "expected": [
+            "lab name should be updated to New Lab Name"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Admin updates pharmacy name",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "admin is logged in"
+          ],
+          "inputs": {
+            "field": "pharmacy name",
+            "value": "New Pharmacy"
+          },
+          "steps": [
+            "admin updates the pharmacy name to New Pharmacy"
+          ],
+          "expected": [
+            "pharmacy name should be updated to New Pharmacy"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Admin updates lab name to empty",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "admin is logged in"
+          ],
+          "inputs": {
+            "field": "lab name",
+            "value": ""
+          },
+          "steps": [
+            "admin updates the lab name to empty"
+          ],
+          "expected": [
+            "lab name should be updated to empty"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Admin updates pharmacy name to empty",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "admin is logged in"
+          ],
+          "inputs": {
+            "field": "pharmacy name",
+            "value": ""
+          },
+          "steps": [
+            "admin updates the pharmacy name to empty"
+          ],
+          "expected": [
+            "pharmacy name should be updated to empty"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Admin deletes lab",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "admin is logged in"
+          ],
+          "inputs": {
+            "entity": "lab"
+          },
+          "steps": [
+            "admin deletes the lab"
+          ],
+          "expected": [
+            "lab should no longer exist"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin deletes pharmacy",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "admin is logged in"
+          ],
+          "inputs": {
+            "entity": "pharmacy"
+          },
+          "steps": [
+            "admin deletes the pharmacy"
+          ],
+          "expected": [
+            "pharmacy should no longer exist"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient registers successfully",
+          "req_ids": [
+            "VIRTUA-2.3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient is on the registration page"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": "john.doe@example.com",
+            "password": "Password123"
+          },
+          "steps": [
+            "patient enters the details and submits the registration form"
+          ],
+          "expected": [
+            "patient should be registered successfully"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient registers with empty name",
+          "req_ids": [
+            "VIRTUA-2.3-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "patient is on the registration page"
+          ],
+          "inputs": {
+            "name": "",
+            "email": "jane.smith@example.com",
+            "password": "Password456"
+          },
+          "steps": [
+            "patient enters the details and submits the registration form"
+          ],
+          "expected": [
+            "patient should be registered successfully"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Patient registers with empty email",
+          "req_ids": [
+            "VIRTUA-2.3-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "patient is on the registration page"
+          ],
+          "inputs": {
+            "name": "Jane Smith",
+            "email": "",
+            "password": "Password456"
+          },
+          "steps": [
+            "patient enters the details and submits the registration form"
+          ],
+          "expected": [
+            "patient should be registered successfully"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Patient registers with empty password",
+          "req_ids": [
+            "VIRTUA-2.3-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "patient is on the registration page"
+          ],
+          "inputs": {
+            "name": "Jane Smith",
+            "email": "jane.smith@example.com",
+            "password": ""
+          },
+          "steps": [
+            "patient enters the details and submits the registration form"
+          ],
+          "expected": [
+            "patient should be registered successfully"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Patient updates name",
+          "req_ids": [
+            "VIRTUA-2.3-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient is logged in"
+          ],
+          "inputs": {
+            "field": "name",
+            "value": "New Name"
+          },
+          "steps": [
+            "patient updates the name to New Name"
+          ],
+          "expected": [
+            "name should be updated to New Name"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Patient updates email",
+          "req_ids": [
+            "VIRTUA-2.3-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient is logged in"
+          ],
+          "inputs": {
+            "field": "email",
+            "value": "new.email@example.com"
+          },
+          "steps": [
+            "patient updates the email to new.email@example.com"
+          ],
+          "expected": [
+            "email should be updated to new.email@example.com"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Patient updates name to empty",
+          "req_ids": [
+            "VIRTUA-2.3-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "patient is logged in"
+          ],
+          "inputs": {
+            "field": "name",
+            "value": ""
+          },
+          "steps": [
+            "patient updates the name to empty"
+          ],
+          "expected": [
+            "name should be updated to empty"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Patient updates email to empty",
+          "req_ids": [
+            "VIRTUA-2.3-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "patient is logged in"
+          ],
+          "inputs": {
+            "field": "email",
+            "value": ""
+          },
+          "steps": [
+            "patient updates the email to empty"
+          ],
+          "expected": [
+            "email should be updated to empty"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Patient makes appointment and submits consultation request",
+          "req_ids": [
+            "VIRTUA-2.3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient is logged in"
+          ],
+          "inputs": {
+            "doctor": "Dr. Smith",
+            "date": "2023-12-15",
+            "symptoms": "Fever",
+            "notes": "None"
+          },
+          "steps": [
+            "patient makes an appointment with Dr. Smith on 2023-12-15 and submits a consultation request"
+          ],
+          "expected": [
+            "appointment should be scheduled with Dr. Smith on 2023-12-15",
+            "consultation request should be submitted successfully"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Patient makes appointment and submits consultation request with empty symptoms",
+          "req_ids": [
+            "VIRTUA-2.3-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "patient is logged in"
+          ],
+          "inputs": {
+            "doctor": "Dr. Smith",
+            "date": "2023-12-15",
+            "symptoms": "",
+            "notes": "None"
+          },
+          "steps": [
+            "patient makes an appointment with Dr. Smith on 2023-12-15 and submits a consultation request"
+          ],
+          "expected": [
+            "appointment should be scheduled with Dr. Smith on 2023-12-15",
+            "consultation request should be submitted successfully"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Patient makes appointment and submits consultation request with empty notes",
+          "req_ids": [
+            "VIRTUA-2.3-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "patient is logged in"
+          ],
+          "inputs": {
+            "doctor": "Dr. Johnson",
+            "date": "2023-12-16",
+            "symptoms": "Headache",
+            "notes": ""
+          },
+          "steps": [
+            "patient makes an appointment with Dr. Johnson on 2023-12-16 and submits a consultation request"
+          ],
+          "expected": [
+            "appointment should be scheduled with Dr. Johnson on 2023-12-16",
+            "consultation request should be submitted successfully"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Patient views prescription report and generates invoice",
+          "req_ids": [
+            "VIRTUA-2.3-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient is logged in"
+          ],
+          "inputs": {
+            "appointment": "2023-12-15"
+          },
+          "steps": [
+            "patient views the prescription report for 2023-12-15 and generates an invoice"
+          ],
+          "expected": [
+            "prescription report for 2023-12-15 should be displayed",
+            "invoice for 2023-12-15 should be generated"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Doctor provides consultation",
+          "req_ids": [
+            "VIRTUA-2.3-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor is logged in"
+          ],
+          "inputs": {
+            "patient": "John Doe",
+            "date": "2023-12-15",
+            "diagnosis": "Cold",
+            "notes": "Take rest"
+          },
+          "steps": [
+            "doctor provides consultation for John Doe on 2023-12-15 and enters the details"
+          ],
+          "expected": [
+            "consultation for John Doe on 2023-12-15 should be recorded"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Doctor provides consultation with empty diagnosis",
+          "req_ids": [
+            "VIRTUA-2.3-10"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "doctor is logged in"
+          ],
+          "inputs": {
+            "patient": "John Doe",
+            "date": "2023-12-15",
+            "diagnosis": "",
+            "notes": "Take rest"
+          },
+          "steps": [
+            "doctor provides consultation for John Doe on 2023-12-15 and enters the details"
+          ],
+          "expected": [
+            "consultation for John Doe on 2023-12-15 should be recorded"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "Doctor provides consultation with empty notes",
+          "req_ids": [
+            "VIRTUA-2.3-10"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "doctor is logged in"
+          ],
+          "inputs": {
+            "patient": "Jane Smith",
+            "date": "2023-12-16",
+            "diagnosis": "Flu",
+            "notes": ""
+          },
+          "steps": [
+            "doctor provides consultation for Jane Smith on 2023-12-16 and enters the details"
+          ],
+          "expected": [
+            "consultation for Jane Smith on 2023-12-16 should be recorded"
+          ]
+        },
+        {
+          "id": "TC-022",
+          "title": "Doctor prescribes medicine",
+          "req_ids": [
+            "VIRTUA-2.3-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor is logged in"
+          ],
+          "inputs": {
+            "medicine": "Paracetamol",
+            "patient": "John Doe",
+            "date": "2023-12-15",
+            "dosage": "500mg",
+            "duration": "7 days"
+          },
+          "steps": [
+            "doctor prescribes Paracetamol to John Doe on 2023-12-15 and enters the details"
+          ],
+          "expected": [
+            "prescription for Paracetamol to John Doe on 2023-12-15 should be recorded"
+          ]
+        },
+        {
+          "id": "TC-023",
+          "title": "Doctor prescribes medicine with empty dosage",
+          "req_ids": [
+            "VIRTUA-2.3-11"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "doctor is logged in"
+          ],
+          "inputs": {
+            "medicine": "Paracetamol",
+            "patient": "John Doe",
+            "date": "2023-12-15",
+            "dosage": "",
+            "duration": "7 days"
+          },
+          "steps": [
+            "doctor prescribes Paracetamol to John Doe on 2023-12-15 and enters the details"
+          ],
+          "expected": [
+            "prescription for Paracetamol to John Doe on 2023-12-15 should be recorded"
+          ]
+        },
+        {
+          "id": "TC-024",
+          "title": "Doctor prescribes medicine with empty duration",
+          "req_ids": [
+            "VIRTUA-2.3-11"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "doctor is logged in"
+          ],
+          "inputs": {
+            "medicine": "Ibuprofen",
+            "patient": "Jane Smith",
+            "date": "2023-12-16",
+            "dosage": "200mg",
+            "duration": ""
+          },
+          "steps": [
+            "doctor prescribes Ibuprofen to Jane Smith on 2023-12-16 and enters the details"
+          ],
+          "expected": [
+            "prescription for Ibuprofen to Jane Smith on 2023-12-16 should be recorded"
+          ]
+        },
+        {
+          "id": "TC-025",
+          "title": "Doctor prescribes lab test",
+          "req_ids": [
+            "VIRTUA-2.3-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor is logged in"
+          ],
+          "inputs": {
+            "test": "Blood Test",
+            "patient": "John Doe",
+            "date": "2023-12-15"
+          },
+          "steps": [
+            "doctor prescribes Blood Test to John Doe on 2023-12-15"
+          ],
+          "expected": [
+            "lab test Blood Test for John Doe on 2023-12-15 should be recorded"
+          ]
+        },
+        {
+          "id": "TC-026",
+          "title": "Doctor prescribes lab test with empty date",
+          "req_ids": [
+            "VIRTUA-2.3-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "doctor is logged in"
+          ],
+          "inputs": {
+            "test": "Blood Test",
+            "patient": "John Doe",
+            "date": ""
+          },
+          "steps": [
+            "doctor prescribes Blood Test to John Doe on empty"
+          ],
+          "expected": [
+            "lab test Blood Test for John Doe on empty should be recorded"
+          ]
+        },
+        {
+          "id": "TC-027",
+          "title": "Doctor prescribes lab test with empty patient",
+          "req_ids": [
+            "VIRTUA-2.3-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "doctor is logged in"
+          ],
+          "inputs": {
+            "test": "Urine Test",
+            "patient": "",
+            "date": "2023-12-16"
+          },
+          "steps": [
+            "doctor prescribes Urine Test to empty on 2023-12-16"
+          ],
+          "expected": [
+            "lab test Urine Test for empty on 2023-12-16 should be recorded"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "error": "ollama:gpt-oss:20b returned an empty response",
+        "fsa_pass": false,
+        "fsa_score": 0.0
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.0; sub-scores {'clause_coverage': None, 'negative_coverage': None, 'oracle_assertiveness': None, 'boundary_coverage': None, 'groundedness_mg': None}). Output the full improved suite addressing:",
+      "artifact": "Feature: Admin and User Functionalities\n\n  @VIRTUA-2.3-5\n  Scenario Outline: Admin edits labs/pharmacy details\n    Given the admin is logged in\n    When the admin updates the <field> to <value>\n    Then the <field> should be updated to <value>\n    Examples:\n      | field        | value          |\n      | lab_name     | New Lab Name   |\n      | pharmacy_name| New Pharmacy   |\n      | lab_name     |                | # Edge case: empty value\n      | pharmacy_name|                | # Edge case: empty value\n\n  @VIRTUA-2.3-5\n  Scenario Outline: Admin deletes labs/pharmacy details\n    Given the admin is logged in\n    When the admin deletes the <entity>\n    Then the <entity> should no longer exist\n    Examples:\n      | entity        |\n      | lab           |\n      | pharmacy      |\n\n  @VIRTUA-2.3-6\n  Scenario Outline: Patient registers\n    Given the patient is on the registration page\n    When the patient enters <name> and <email>\n    Then the patient should be registered with name <name> and email <email>\n    Examples:\n      | name          | email                  |\n      | John Doe      | john.doe@example.com   |\n      | Jane Smith    | jane.smith@example.com |\n      | John Doe      |                        | # Edge case: empty email\n      |               | jane.smith@example.com | # Edge case: empty name\n\n  @VIRTUA-2.3-7\n  Scenario Outline: Patient updates profile\n    Given the patient is logged in\n    When the patient updates the <field> to <value>\n    Then the <field> should be updated to <value>\n    Examples:\n      | field        | value          |\n      | name         | New Name       |\n      | email        | new.email@example.com |\n      | name         |                | # Edge case: empty value\n      | email        |                | # Edge case: empty value\n\n  @VIRTUA-2.3-8\n  Scenario Outline: Patient makes appointments and submits online consultation requests\n    Given the patient is logged in\n    When the patient makes an appointment with <doctor> at <time>\n    Then the appointment should be scheduled with <doctor> at <time>\n    Examples:\n      | doctor        | time           |\n      | Dr. Smith     | 10:00 AM       |\n      | Dr. Johnson   | 2:00 PM        |\n      | Dr. Smith     |                | # Edge case: empty time\n      |               | 10:00 AM       | # Edge case: empty doctor\n\n  @VIRTUA-2.3-9\n  Scenario Outline: Patient views and generates prescription reports and invoices\n    Given the patient is logged in\n    When the patient views the <document>\n    Then the <document> should be displayed\n    Examples:\n      | document      |\n      | prescription  |\n      | invoice       |\n\n  @VIRTUA-2.3-10\n  Scenario Outline: Doctor provides consultation\n    Given the doctor is logged in\n    When the doctor provides consultation to <patient>\n    Then the consultation should be recorded for <patient>\n    Examples:\n      | patient       |\n      | John Doe      |\n      | Jane Smith    |\n\n  @VIRTUA-2.3-11\n  Scenario Outline: Doctor prescribes medicine\n    Given the doctor is logged in\n    When the doctor prescribes <medicine> to <patient>\n    Then the prescription for <medicine> should be recorded for <patient>\n    Examples:\n      | medicine      | patient        |\n      | Aspirin       | John Doe       |\n      | Ibuprofen     | Jane Smith     |\n      | Aspirin       |                | # Edge case: empty patient\n      |               | John Doe       | # Edge case: empty medicine\n\n  @VIRTUA-2.3-12\n  Scenario Outline: Doctor prescribes lab tests\n    Given the doctor is logged in\n    When the doctor prescribes <test> to <patient>\n    Then the lab test <test> should be recorded for <patient>\n    Examples:\n      | test          | patient        |\n      | Blood Test    | John Doe       |\n      | Urine Test    | Jane Smith     |\n      | Blood Test    |                | # Edge case: empty patient\n      |               | John Doe       | # Edge case: empty test",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Admin updates lab name",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged in"
+          ],
+          "inputs": {
+            "field": "lab_name",
+            "value": "New Lab Name"
+          },
+          "steps": [
+            "the admin updates the lab_name to New Lab Name"
+          ],
+          "expected": [
+            "the lab_name should be updated to New Lab Name"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Admin updates pharmacy name",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged in"
+          ],
+          "inputs": {
+            "field": "pharmacy_name",
+            "value": "New Pharmacy"
+          },
+          "steps": [
+            "the admin updates the pharmacy_name to New Pharmacy"
+          ],
+          "expected": [
+            "the pharmacy_name should be updated to New Pharmacy"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Admin updates lab name to empty",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the admin is logged in"
+          ],
+          "inputs": {
+            "field": "lab_name",
+            "value": ""
+          },
+          "steps": [
+            "the admin updates the lab_name to "
+          ],
+          "expected": [
+            "the lab_name should be updated to "
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Admin updates pharmacy name to empty",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the admin is logged in"
+          ],
+          "inputs": {
+            "field": "pharmacy_name",
+            "value": ""
+          },
+          "steps": [
+            "the admin updates the pharmacy_name to "
+          ],
+          "expected": [
+            "the pharmacy_name should be updated to "
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Admin deletes lab",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged in"
+          ],
+          "inputs": {
+            "entity": "lab"
+          },
+          "steps": [
+            "the admin deletes the lab"
+          ],
+          "expected": [
+            "the lab should no longer exist"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin deletes pharmacy",
+          "req_ids": [
+            "VIRTUA-2.3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged in"
+          ],
+          "inputs": {
+            "entity": "pharmacy"
+          },
+          "steps": [
+            "the admin deletes the pharmacy"
+          ],
+          "expected": [
+            "the pharmacy should no longer exist"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient registers with valid details",
+          "req_ids": [
+            "VIRTUA-2.3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is on the registration page"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": "john.doe@example.com"
+          },
+          "steps": [
+            "the patient enters John Doe and john.doe@example.com"
+          ],
+          "expected": [
+            "the patient should be registered with name John Doe and email john.doe@example.com"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient registers with another valid details",
+          "req_ids": [
+            "VIRTUA-2.3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is on the registration page"
+          ],
+          "inputs": {
+            "name": "Jane Smith",
+            "email": "jane.smith@example.com"
+          },
+          "steps": [
+            "the patient enters Jane Smith and jane.smith@example.com"
+          ],
+          "expected": [
+            "the patient should be registered with name Jane Smith and email jane.smith@example.com"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Patient registers with empty email",
+          "req_ids": [
+            "VIRTUA-2.3-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is on the registration page"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": ""
+          },
+          "steps": [
+            "the patient enters John Doe and "
+          ],
+          "expected": [
+            "the patient should be registered with name John Doe and email "
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Patient registers with empty name",
+          "req_ids": [
+            "VIRTUA-2.3-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is on the registration page"
+          ],
+          "inputs": {
+            "name": "",
+            "email": "jane.smith@example.com"
+          },
+          "steps": [
+            "the patient enters  and jane.smith@example.com"
+          ],
+          "expected": [
+            "the patient should be registered with name  and email jane.smith@example.com"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Patient updates name",
+          "req_ids": [
+            "VIRTUA-2.3-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged in"
+          ],
+          "inputs": {
+            "field": "name",
+            "value": "New Name"
+          },
+          "steps": [
+            "the patient updates the name to New Name"
+          ],
+          "expected": [
+            "the name should be updated to New Name"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Patient updates email",
+          "req_ids": [
+            "VIRTUA-2.3-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged in"
+          ],
+          "inputs": {
+            "field": "email",
+            "value": "new.email@example.com"
+          },
+          "steps": [
+            "the patient updates the email to new.email@example.com"
+          ],
+          "expected": [
+            "the email should be updated to new.email@example.com"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Patient updates name to empty",
+          "req_ids": [
+            "VIRTUA-2.3-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is logged in"
+          ],
+          "inputs": {
+            "field": "name",
+            "value": ""
+          },
+          "steps": [
+            "the patient updates the name to "
+          ],
+          "expected": [
+            "the name should be updated to "
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Patient updates email to empty",
+          "req_ids": [
+            "VIRTUA-2.3-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is logged in"
+          ],
+          "inputs": {
+            "field": "email",
+            "value": ""
+          },
+          "steps": [
+            "the patient updates the email to "
+          ],
+          "expected": [
+            "the email should be updated to "
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Patient makes appointment",
+          "req_ids": [
+            "VIRTUA-2.3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged in"
+          ],
+          "inputs": {
+            "doctor": "Dr. Smith",
+            "time": "10:00 AM"
+          },
+          "steps": [
+            "the patient makes an appointment with Dr. Smith at 10:00 AM"
+          ],
+          "expected": [
+            "the appointment should be scheduled with Dr. Smith at 10:00 AM"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Patient makes another appointment",
+          "req_ids": [
+            "VIRTUA-2.3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged in"
+          ],
+          "inputs": {
+            "doctor": "Dr. Johnson",
+            "time": "2:00 PM"
+          },
+          "steps": [
+            "the patient makes an appointment with Dr. Johnson at 2:00 PM"
+          ],
+          "expected": [
+            "the appointment should be scheduled with Dr. Johnson at 2:00 PM"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Patient makes appointment with empty time",
+          "req_ids": [
+            "VIRTUA-2.3-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is logged in"
+          ],
+          "inputs": {
+            "doctor": "Dr. Smith",
+            "time": ""
+          },
+          "steps": [
+            "the patient makes an appointment with Dr. Smith at "
+          ],
+          "expected": [
+            "the appointment should be scheduled with Dr. Smith at "
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Patient makes appointment with empty doctor",
+          "req_ids": [
+            "VIRTUA-2.3-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is logged in"
+          ],
+          "inputs": {
+            "doctor": "",
+            "time": "10:00 AM"
+          },
+          "steps": [
+            "the patient makes an appointment with  at 10:00 AM"
+          ],
+          "expected": [
+            "the appointment should be scheduled with  at 10:00 AM"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Patient views prescription",
+          "req_ids": [
+            "VIRTUA-2.3-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged in"
+          ],
+          "inputs": {
+            "document": "prescription"
+          },
+          "steps": [
+            "the patient views the prescription"
+          ],
+          "expected": [
+            "the prescription should be displayed"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Patient views invoice",
+          "req_ids": [
+            "VIRTUA-2.3-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged in"
+          ],
+          "inputs": {
+            "document": "invoice"
+          },
+          "steps": [
+            "the patient views the invoice"
+          ],
+          "expected": [
+            "the invoice should be displayed"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "Doctor provides consultation",
+          "req_ids": [
+            "VIRTUA-2.3-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the doctor is logged in"
+          ],
+          "inputs": {
+            "patient": "John Doe"
+          },
+          "steps": [
+            "the doctor provides consultation to John Doe"
+          ],
+          "expected": [
+            "the consultation should be recorded for John Doe"
+          ]
+        },
+        {
+          "id": "TC-022",
+          "title": "Doctor provides consultation to another patient",
+          "req_ids": [
+            "VIRTUA-2.3-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the doctor is logged in"
+          ],
+          "inputs": {
+            "patient": "Jane Smith"
+          },
+          "steps": [
+            "the doctor provides consultation to Jane Smith"
+          ],
+          "expected": [
+            "the consultation should be recorded for Jane Smith"
+          ]
+        },
+        {
+          "id": "TC-023",
+          "title": "Doctor prescribes medicine",
+          "req_ids": [
+            "VIRTUA-2.3-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the doctor is logged in"
+          ],
+          "inputs": {
+            "medicine": "Aspirin",
+            "patient": "John Doe"
+          },
+          "steps": [
+            "the doctor prescribes Aspirin to John Doe"
+          ],
+          "expected": [
+            "the prescription for Aspirin should be recorded for John Doe"
+          ]
+        },
+        {
+          "id": "TC-024",
+          "title": "Doctor prescribes another medicine",
+          "req_ids": [
+            "VIRTUA-2.3-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the doctor is logged in"
+          ],
+          "inputs": {
+            "medicine": "Ibuprofen",
+            "patient": "Jane Smith"
+          },
+          "steps": [
+            "the doctor prescribes Ibuprofen to Jane Smith"
+          ],
+          "expected": [
+            "the prescription for Ibuprofen should be recorded for Jane Smith"
+          ]
+        },
+        {
+          "id": "TC-025",
+          "title": "Doctor prescribes medicine to empty patient",
+          "req_ids": [
+            "VIRTUA-2.3-11"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the doctor is logged in"
+          ],
+          "inputs": {
+            "medicine": "Aspirin",
+            "patient": ""
+          },
+          "steps": [
+            "the doctor prescribes Aspirin to "
+          ],
+          "expected": [
+            "the prescription for Aspirin should be recorded for "
+          ]
+        },
+        {
+          "id": "TC-026",
+          "title": "Doctor prescribes empty medicine",
+          "req_ids": [
+            "VIRTUA-2.3-11"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the doctor is logged in"
+          ],
+          "inputs": {
+            "medicine": "",
+            "patient": "John Doe"
+          },
+          "steps": [
+            "the doctor prescribes  to John Doe"
+          ],
+          "expected": [
+            "the prescription for  should be recorded for John Doe"
+          ]
+        },
+        {
+          "id": "TC-027",
+          "title": "Doctor prescribes lab test",
+          "req_ids": [
+            "VIRTUA-2.3-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the doctor is logged in"
+          ],
+          "inputs": {
+            "test": "Blood Test",
+            "patient": "John Doe"
+          },
+          "steps": [
+            "the doctor prescribes Blood Test to John Doe"
+          ],
+          "expected": [
+            "the lab test Blood Test should be recorded for John Doe"
+          ]
+        },
+        {
+          "id": "TC-028",
+          "title": "Doctor prescribes another lab test",
+          "req_ids": [
+            "VIRTUA-2.3-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the doctor is logged in"
+          ],
+          "inputs": {
+            "test": "Urine Test",
+            "patient": "Jane Smith"
+          },
+          "steps": [
+            "the doctor prescribes Urine Test to Jane Smith"
+          ],
+          "expected": [
+            "the lab test Urine Test should be recorded for Jane Smith"
+          ]
+        },
+        {
+          "id": "TC-029",
+          "title": "Doctor prescribes lab test to empty patient",
+          "req_ids": [
+            "VIRTUA-2.3-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the doctor is logged in"
+          ],
+          "inputs": {
+            "test": "Blood Test",
+            "patient": ""
+          },
+          "steps": [
+            "the doctor prescribes Blood Test to "
+          ],
+          "expected": [
+            "the lab test Blood Test should be recorded for "
+          ]
+        },
+        {
+          "id": "TC-030",
+          "title": "Doctor prescribes empty lab test",
+          "req_ids": [
+            "VIRTUA-2.3-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the doctor is logged in"
+          ],
+          "inputs": {
+            "test": "",
+            "patient": "John Doe"
+          },
+          "steps": [
+            "the doctor prescribes  to John Doe"
+          ],
+          "expected": [
+            "the lab test  should be recorded for John Doe"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.8,
+        "oracle_assertiveness": 0.7,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "New Lab Name",
+            "context": "lab name update value",
+            "grounded": false
+          },
+          {
+            "value": "New Pharmacy",
+            "context": "pharmacy name update value",
+            "grounded": false
+          },
+          {
+            "value": "",
+            "context": "empty string",
+            "grounded": false
+          },
+          {
+            "value": "lab",
+            "context": "entity name for deletion",
+            "grounded": false
+          },
+          {
+            "value": "pharmacy",
+            "context": "entity name for deletion",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "john.doe@example.com",
+            "context": "patient email",
+            "grounded": false
+          },
+          {
+            "value": "Jane Smith",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "jane.smith@example.com",
+            "context": "patient email",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Smith",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "10:00 AM",
+            "context": "appointment time",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Johnson",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "2:00 PM",
+            "context": "appointment time",
+            "grounded": false
+          },
+          {
+            "value": "prescription",
+            "context": "document type",
+            "grounded": false
+          },
+          {
+            "value": "invoice",
+            "context": "document type",
+            "grounded": false
+          },
+          {
+            "value": "Aspirin",
+            "context": "medicine name",
+            "grounded": false
+          },
+          {
+            "value": "Ibuprofen",
+            "context": "medicine name",
+            "grounded": false
+          },
+          {
+            "value": "Blood Test",
+            "context": "lab test name",
+            "grounded": false
+          },
+          {
+            "value": "Urine Test",
+            "context": "lab test name",
+            "grounded": false
+          },
+          {
+            "value": "New Name",
+            "context": "profile name update value",
+            "grounded": false
+          },
+          {
+            "value": "new.email@example.com",
+            "context": "profile email update value",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 21,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add tests for online consultation request functionality (VIRTUA-2.3-8).",
+          "Include error handling for invalid email formats and duplicate registrations.",
+          "Test boundary conditions for appointment scheduling (e.g., past dates, overlapping appointments).",
+          "Verify that deleted labs/pharmacies cannot be accessed afterward.",
+          "Add assertions for system messages or status codes to increase oracle assertiveness."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.765,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

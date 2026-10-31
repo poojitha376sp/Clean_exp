@@ -1,0 +1,1241 @@
+{
+  "unit_id": "U16_GUI",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.625,
+    "oracle_assertiveness": 0.875,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.8276,
+    "hallucinated": [
+      {
+        "value": "-1 cmH2O",
+        "context": "PEEP displayed",
+        "grounded": false
+      },
+      {
+        "value": "31 bpm",
+        "context": "RR displayed",
+        "grounded": false
+      },
+      {
+        "value": "1:5",
+        "context": "IER displayed",
+        "grounded": false
+      },
+      {
+        "value": "0.2",
+        "context": "FiO2 displayed",
+        "grounded": false
+      },
+      {
+        "value": "61 L/min",
+        "context": "HFNC displayed",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 29,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add negative test for unconfirmed changes (RW-SW-24).",
+      "Include readability tests under varied lighting and font sizes.",
+      "Add leakage computation tests with specific sensor edge cases.",
+      "Test FiO2 increments at the boundary 0.96 and 1.0.",
+      "Add scenarios adjusting multiple parameters simultaneously."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.8991,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Ventilation and Alarm Settings\n\n  Scenario: Adjust PEEP from 0-20 cmH2O with increments of 1\n    Given the user is on the ventilation settings page\n    When the user adjusts PEEP to 5 cmH2O\n    Then the PEEP value is displayed as 5 cmH2O\n    And the PEEP value is stored in the system\n\n  Scenario: Render parameters and alarms readable at a distance of 1m\n    Given the user is on the ventilation settings page\n    When the user views the page from a distance of 1m\n    Then the parameters and alarms are readable\n\n  Scenario: Adjust RR from 5-30 bpm with increments of 1\n    Given the user is on the ventilation settings page\n    When the user adjusts RR to 10 bpm\n    Then the RR value is displayed as 10 bpm\n    And the RR value is stored in the system\n\n  Scenario: Adjust IER from 1:1 to 1:4 (Inhale to exhale)\n    Given the user is on the ventilation settings page\n    When the user adjusts IER to 1:2\n    Then the IER value is displayed as 1:2\n    And the IER value is stored in the system\n\n  Scenario: Confirm all ventilation and alarm setting changes\n    Given the user is on the ventilation settings page\n    When the user adjusts PEEP to 5 cmH2O and confirms the change\n    Then the PEEP value is stored in the system\n\n  Scenario: Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1\n    Given the user is on the ventilation settings page\n    When the user adjusts FiO2 to 0.95\n    Then the FiO2 value is displayed as 0.95\n    And the FiO2 value is stored in the system\n\n  Scenario: Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min\n    Given the user is on the ventilation settings page\n    When the user adjusts HFNC flow rate to 30 L/min\n    Then the HFNC flow rate value is displayed as 30 L/min\n    And the HFNC flow rate value is stored in the system\n\n  Scenario: Compute amount of leakage based on controller actuation and sensor readings\n    Given the user is on the ventilation settings page\n    When the controller actuates and sensor readings are available\n    Then the amount of leakage is computed and displayed\n\n  Scenario Outline: Adjust PEEP from 0-20 cmH2O with increments of 1\n    Given the user is on the ventilation settings page\n    When the user adjusts PEEP to <PEEP> cmH2O\n    Then the PEEP value is displayed as <PEEP> cmH2O\n    And the PEEP value is stored in the system\n    Examples:\n      | PEEP |\n      | 0    |\n      | 1    |\n      | 2    |\n      | 3    |\n      | 4    |\n      | 5    |\n      | 6    |\n      | 7    |\n      | 8    |\n      | 9    |\n      | 10   |\n      | 11   |\n      | 12   |\n      | 13   |\n      | 14   |\n      | 15   |\n      | 16   |\n      | 17   |\n      | 18   |\n      | 19   |\n      | 20   |\n\n  Scenario Outline: Adjust RR from 5-30 bpm with increments of 1\n    Given the user is on the ventilation settings page\n    When the user adjusts RR to <RR> bpm\n    Then the RR value is displayed as <RR> bpm\n    And the RR value is stored in the system\n    Examples:\n      | RR |\n      | 5  |\n      | 6  |\n      | 7  |\n      | 8  |\n      | 9  |\n      | 10 |\n      | 11 |\n      | 12 |\n      | 13 |\n      | 14 |\n      | 15 |\n      | 16 |\n      | 17 |\n      | 18 |\n      | 19 |\n      | 20 |\n      | 21 |\n      | 22 |\n      | 23 |\n      | 24 |\n      | 25 |\n      | 26 |\n      | 27 |\n      | 28 |\n      | 29 |\n      | 30 |\n\n  Scenario Outline: Adjust IER from 1:1 to 1:4 (Inhale to exhale)\n    Given the user is on the ventilation settings page\n    When the user adjusts IER to <IER>\n    Then the IER value is displayed as <IER>\n    And the IER value is stored in the system\n    Examples:\n      | IER  |\n      | 1:1  |\n      | 1:2  |\n      | 1:3  |\n      | 1:4  |\n\n  Scenario Outline: Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1\n    Given the user is on the ventilation settings page\n    When the user adjusts FiO2 to <FiO2>\n    Then the FiO2 value is displayed as <FiO2>\n    And the FiO2 value is stored in the system\n    Examples:\n      | FiO2 |\n      | 0.21 |\n      | 0.22 |\n      | 0.23 |\n      | 0.24 |\n      | 0.25 |\n      | 0.26 |\n      | 0.27 |\n      | 0.28 |\n      | 0.29 |\n      | 0.30 |\n      | 0.31 |\n      | 0.32 |\n      | 0.33 |\n      | 0.34 |\n      | 0.35 |\n      | 0.36 |\n      | 0.37 |\n      | 0.38 |\n      | 0.39 |\n      | 0.40 |\n      | 0.41 |\n      | 0.42 |\n      | 0.43 |\n      | 0.44 |\n      | 0.45 |\n      | 0.46 |\n      | 0.47 |\n      | 0.48 |\n      | 0.49 |\n      | 0.50 |\n      | 0.51 |\n      | 0.52 |\n      | 0.53 |\n      | 0.54 |\n      | 0.55 |\n      | 0.56 |\n      | 0.57 |\n      | 0.58 |\n      | 0.59 |\n      | 0.60 |\n      | 0.61 |\n      | 0.62 |\n      | 0.63 |\n      | 0.64 |\n      | 0.65 |\n      | 0.66 |\n      | 0.67 |\n      | 0.68 |\n      | 0.69 |\n      | 0.70 |\n      | 0.71 |\n      | 0.72 |\n      | 0.73 |\n      | 0.74 |\n      | 0.75 |\n      | 0.76 |\n      | 0.77 |\n      | 0.78 |\n      | 0.79 |\n      | 0.80 |\n      | 0.81 |\n      | 0.82 |\n      | 0.83 |\n      | 0.84 |\n      | 0.85 |\n      | 0.86 |\n      | 0.87 |\n      | 0.88 |\n      | 0.89 |\n      | 0.90 |\n      | 0.91 |\n      | 0.92 |\n      | 0.93 |\n      | 0.94 |\n      | 0.95 |\n      | 0.96 |\n      | 0.97 |\n      | 0.98 |\n      | 0.99 |\n      | 1.00 |\n\n  Scenario Outline: Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min\n    Given the user is on the ventilation settings page\n    When the user adjusts HFNC flow rate to <HFNC> L/min\n    Then the HFNC flow rate value is displayed as <HFNC> L/min\n    And the HFNC flow rate value is stored in the system\n    Examples:\n      | HFNC |\n      | 0    |\n      | 5    |\n      | 10   |\n      | 15   |\n      | 20   |\n      | 25   |\n      | 30   |\n      | 35   |\n      | 40   |\n      | 45   |\n      | 50   |\n      | 55   |\n      | 60   |\n\n  Scenario Outline: Compute amount of leakage based on controller actuation and sensor readings\n    Given the user is on the ventilation settings page\n    When the controller actuates and sensor readings are available\n    Then the amount of leakage is computed and displayed\n    Examples:\n      | leakage |\n      | 0       |\n      | 1       |\n      | 2       |\n      | 3       |\n      | 4       |\n      | 5       |\n      | 6       |\n      | 7       |\n      | 8       |\n      | 9       |\n      | 10      |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Adjust PEEP from 0-20 cmH2O with increments of 1",
+      "req_ids": [
+        "RW-SW-162"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "PEEP"
+      },
+      "steps": [
+        "user adjusts PEEP to 5 cmH2O",
+        "PEEP value is displayed as 5 cmH2O",
+        "PEEP value is stored in the system"
+      ],
+      "expected": [
+        "PEEP value is displayed as 5 cmH2O",
+        "PEEP value is stored in the system"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Render parameters and alarms readable at a distance of 1m",
+      "req_ids": [
+        "RW-SW-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "distance"
+      },
+      "steps": [
+        "user views page from a distance of 1m",
+        "parameters and alarms are readable"
+      ],
+      "expected": [
+        "parameters and alarms are readable"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Adjust RR from 5-30 bpm with increments of 1",
+      "req_ids": [
+        "RW-SW-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "RR"
+      },
+      "steps": [
+        "user adjusts RR to 10 bpm",
+        "RR value is displayed as 10 bpm",
+        "RR value is stored in the system"
+      ],
+      "expected": [
+        "RR value is displayed as 10 bpm",
+        "RR value is stored in the system"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Adjust IER from 1:1 to 1:4 (Inhale to exhale)",
+      "req_ids": [
+        "RW-SW-13"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "IER"
+      },
+      "steps": [
+        "user adjusts IER to 1:2",
+        "IER value is displayed as 1:2",
+        "IER value is stored in the system"
+      ],
+      "expected": [
+        "IER value is displayed as 1:2",
+        "IER value is stored in the system"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Confirm all ventilation and alarm setting changes",
+      "req_ids": [
+        "RW-SW-24"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "change"
+      },
+      "steps": [
+        "user adjusts PEEP to 5 cmH2O and confirms the change",
+        "PEEP value is stored in the system"
+      ],
+      "expected": [
+        "PEEP value is stored in the system"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1",
+      "req_ids": [
+        "RW-SW-34"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "FiO2"
+      },
+      "steps": [
+        "user adjusts FiO2 to 0.95",
+        "FiO2 value is displayed as 0.95",
+        "FiO2 value is stored in the system"
+      ],
+      "expected": [
+        "FiO2 value is displayed as 0.95",
+        "FiO2 value is stored in the system"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min",
+      "req_ids": [
+        "RW-SW-35"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "HFNC"
+      },
+      "steps": [
+        "user adjusts HFNC flow rate to 30 L/min",
+        "HFNC flow rate value is displayed as 30 L/min",
+        "HFNC flow rate value is stored in the system"
+      ],
+      "expected": [
+        "HFNC flow rate value is displayed as 30 L/min",
+        "HFNC flow rate value is stored in the system"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Compute amount of leakage based on controller actuation and sensor readings",
+      "req_ids": [
+        "RW-SW-43"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "leakage"
+      },
+      "steps": [
+        "controller actuates and sensor readings are available",
+        "amount of leakage is computed and displayed"
+      ],
+      "expected": [
+        "amount of leakage is computed and displayed"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Adjust PEEP from 0-20 cmH2O with increments of 1 (boundary)",
+      "req_ids": [
+        "RW-SW-162"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "PEEP"
+      },
+      "steps": [
+        "user adjusts PEEP to 0 cmH2O",
+        "PEEP value is displayed as 0 cmH2O",
+        "PEEP value is stored in the system"
+      ],
+      "expected": [
+        "PEEP value is displayed as 0 cmH2O",
+        "PEEP value is stored in the system"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Adjust RR from 5-30 bpm with increments of 1 (boundary)",
+      "req_ids": [
+        "RW-SW-12"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "RR"
+      },
+      "steps": [
+        "user adjusts RR to 5 bpm",
+        "RR value is displayed as 5 bpm",
+        "RR value is stored in the system"
+      ],
+      "expected": [
+        "RR value is displayed as 5 bpm",
+        "RR value is stored in the system"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Adjust IER from 1:1 to 1:4 (Inhale to exhale) (boundary)",
+      "req_ids": [
+        "RW-SW-13"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "IER"
+      },
+      "steps": [
+        "user adjusts IER to 1:1",
+        "IER value is displayed as 1:1",
+        "IER value is stored in the system"
+      ],
+      "expected": [
+        "IER value is displayed as 1:1",
+        "IER value is stored in the system"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1 (boundary)",
+      "req_ids": [
+        "RW-SW-34"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "FiO2"
+      },
+      "steps": [
+        "user adjusts FiO2 to 0.21",
+        "FiO2 value is displayed as 0.21",
+        "FiO2 value is stored in the system"
+      ],
+      "expected": [
+        "FiO2 value is displayed as 0.21",
+        "FiO2 value is stored in the system"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min (boundary)",
+      "req_ids": [
+        "RW-SW-35"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "HFNC"
+      },
+      "steps": [
+        "user adjusts HFNC flow rate to 0 L/min",
+        "HFNC flow rate value is displayed as 0 L/min",
+        "HFNC flow rate value is stored in the system"
+      ],
+      "expected": [
+        "HFNC flow rate value is displayed as 0 L/min",
+        "HFNC flow rate value is stored in the system"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Adjust PEEP from 0-20 cmH2O with increments of 1 (negative)",
+      "req_ids": [
+        "RW-SW-162"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "PEEP"
+      },
+      "steps": [
+        "user adjusts PEEP to -1 cmH2O",
+        "error message is displayed"
+      ],
+      "expected": [
+        "error message is displayed"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "Adjust RR from 5-30 bpm with increments of 1 (negative)",
+      "req_ids": [
+        "RW-SW-12"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "RR"
+      },
+      "steps": [
+        "user adjusts RR to 31 bpm",
+        "error message is displayed"
+      ],
+      "expected": [
+        "error message is displayed"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "Adjust IER from 1:1 to 1:4 (Inhale to exhale) (negative)",
+      "req_ids": [
+        "RW-SW-13"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "IER"
+      },
+      "steps": [
+        "user adjusts IER to 1:5",
+        "error message is displayed"
+      ],
+      "expected": [
+        "error message is displayed"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1 (negative)",
+      "req_ids": [
+        "RW-SW-34"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "FiO2"
+      },
+      "steps": [
+        "user adjusts FiO2 to 0.2",
+        "error message is displayed"
+      ],
+      "expected": [
+        "error message is displayed"
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min (negative)",
+      "req_ids": [
+        "RW-SW-35"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "user is on ventilation settings page"
+      ],
+      "inputs": {
+        "name": "HFNC"
+      },
+      "steps": [
+        "user adjusts HFNC flow rate to 61 L/min",
+        "error message is displayed"
+      ],
+      "expected": [
+        "error message is displayed"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Adjust PEEP from 0-20 cmH2O with increments of 1",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "PEEP": "5"
+          },
+          "steps": [
+            "adjust PEEP to 5 cmH2O",
+            "verify PEEP value is displayed as 5 cmH2O"
+          ],
+          "expected": [
+            "PEEP value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Render parameters and alarms readable at a distance of 1m",
+          "req_ids": [
+            "RW-SW-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {},
+          "steps": [
+            "view page from a distance of 1m",
+            "verify parameters and alarms are readable"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-003",
+          "title": "Adjust RR from 5-30 bpm with increments of 1",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "RR": "10"
+          },
+          "steps": [
+            "adjust RR to 10 bpm",
+            "verify RR value is displayed as 10 bpm"
+          ],
+          "expected": [
+            "RR value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Adjust IER from 1:1 to 1:4 (Inhale to exhale)",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "IER": "1:2"
+          },
+          "steps": [
+            "adjust IER to 1:2",
+            "verify IER value is displayed as 1:2"
+          ],
+          "expected": [
+            "IER value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Confirm all ventilation and alarm setting changes",
+          "req_ids": [
+            "RW-SW-24"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "PEEP": "5"
+          },
+          "steps": [
+            "adjust PEEP to 5 cmH2O",
+            "confirm change",
+            "verify PEEP value is displayed as 5 cmH2O"
+          ],
+          "expected": [
+            "PEEP value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "FiO2": "0.95"
+          },
+          "steps": [
+            "adjust FiO2 to 0.95",
+            "verify FiO2 value is displayed as 0.95"
+          ],
+          "expected": [
+            "FiO2 value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "HFNC": "30"
+          },
+          "steps": [
+            "adjust HFNC flow rate to 30 L/min",
+            "verify HFNC flow rate value is displayed as 30 L/min"
+          ],
+          "expected": [
+            "HFNC flow rate value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Compute amount of leakage based on controller actuation and sensor readings",
+          "req_ids": [
+            "RW-SW-43"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {},
+          "steps": [
+            "controller actuates",
+            "sensor readings are available",
+            "verify amount of leakage is computed and displayed"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-009",
+          "title": "PEEP adjustment with edge and invalid values",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "PEEP": "0"
+          },
+          "steps": [
+            "adjust PEEP to 0 cmH2O",
+            "verify PEEP value is displayed as 0 cmH2O"
+          ],
+          "expected": [
+            "PEEP value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "RR adjustment with edge and invalid values",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "RR": "5"
+          },
+          "steps": [
+            "adjust RR to 5 bpm",
+            "verify RR value is displayed as 5 bpm"
+          ],
+          "expected": [
+            "RR value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "IER adjustment with edge and invalid values",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "IER": "1:1"
+          },
+          "steps": [
+            "adjust IER to 1:1",
+            "verify IER value is displayed as 1:1"
+          ],
+          "expected": [
+            "IER value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "FiO2 adjustment with edge and invalid values",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "FiO2": "0.21"
+          },
+          "steps": [
+            "adjust FiO2 to 0.21",
+            "verify FiO2 value is displayed as 0.21"
+          ],
+          "expected": [
+            "FiO2 value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "HFNC flow rate adjustment with edge and invalid values",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "HFNC": "0"
+          },
+          "steps": [
+            "adjust HFNC flow rate to 0 L/min",
+            "verify HFNC flow rate value is displayed as 0 L/min"
+          ],
+          "expected": [
+            "HFNC flow rate value is stored in the system"
+          ]
+        }
+      ],
+      "raw_if_unparsed": "```gherkin\nFeature: Ventilation and Alarm Settings\n\n  Scenario: Adjust PEEP from 0-20 cmH2O with increments of 1\n    Given the user is on the ventilation settings page\n    When the user adjusts PEEP to 5 cmH2O\n    Then the PEEP value is displayed as 5 cmH2O\n    And the PEEP value is stored in the system\n\n  Scenario: Render parameters and alarms readable at a distance of 1m\n    Given the user is on the ventilation settings page\n    When the user views the page from a distance of 1m\n    Then the parameters and alarms are readable\n\n  Scenario: Adjust RR from 5-30 bpm with increments of 1\n    Given the user is on the ventilation settings page\n    When the user adjusts RR to 10 bpm\n    Then the RR value is displayed as 10 bpm\n    And the RR value is stored in the system\n\n  Scenario: Adjust IER from 1:1 to 1:4 (Inhale to exhale)\n    Given the user is on the ventilation settings page\n    When the user adjusts IER to 1:2\n    Then the IER value is displayed as 1:2\n    And the IER value is stored in the system\n\n  Scenario: Confirm all ventilation and alarm setting changes\n    Given the user is on the ventilation settings page\n    When the user adjusts PEEP to 5 cmH2O and confirms the change\n    Then the PEEP value is displayed as 5 cmH2O\n    And the PEEP value is stored in the system\n\n  Scenario: Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1\n    Given the user is on the ventilation settings page\n    When the user adjusts FiO2 to 0.95\n    Then the FiO2 value is displayed as 0.95\n    And the FiO2 value is stored in the system\n\n  Scenario: Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min\n    Given the user is on the ventilation settings page\n    When the user adjusts HFNC flow rate to 30 L/min\n    Then the HFNC flow rate value is displayed as 30 L/min\n    And the HFNC flow rate value is stored in the system\n\n  Scenario: Compute amount of leakage based on controller actuation and sensor readings\n    Given the user is on the ventilation settings page\n    When the controller actuates and sensor readings are available\n    Then the amount of leakage is computed and displayed\n\n  Scenario Outline: PEEP adjustment with edge and invalid values\n    Given the user is on the ventilation settings page\n    When the user adjusts PEEP to <PEEP>\n    Then the PEEP value is displayed as <PEEP>\n    And the PEEP value is stored in the system\n    Examples:\n      | PEEP  |\n      | 0     |\n      | 20    |\n      | -1    |\n      | 21    |\n\n  Scenario Outline: RR adjustment with edge and invalid values\n    Given the user is on the ventilation settings page\n    When the user adjusts RR to <RR>\n    Then the RR value is displayed as <RR>\n    And the RR value is stored in the system\n    Examples:\n      | RR  |\n      | 5   |\n      | 30  |\n      | -1  |\n      | 31  |\n\n  Scenario Outline: IER adjustment with edge and invalid values\n    Given the user is on the ventilation settings page\n",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.8462,
+        "representation_score": 0.0,
+        "sfv_score": 0.4231,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #2 (TC-002): [] should be non-empty",
+          "test case #8 (TC-008): [] should be non-empty",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.42). Fix these problems and output the full corrected suite:\n- test case #2 (TC-002): [] should be non-empty\n- test case #8 (TC-008): [] should be non-empty\n- Representation artifact is empty.",
+      "artifact": "Feature: Ventilation and Alarm Settings\n\n  Scenario: Adjust PEEP from 0-20 cmH2O with increments of 1\n    Given the user is on the ventilation settings page\n    When the user adjusts PEEP to 5 cmH2O\n    Then the PEEP value is displayed as 5 cmH2O\n    And the PEEP value is stored in the system\n\n  Scenario: Render parameters and alarms readable at a distance of 1m\n    Given the user is on the ventilation settings page\n    When the user views the page from a distance of 1m\n    Then the parameters and alarms are readable\n\n  Scenario: Adjust RR from 5-30 bpm with increments of 1\n    Given the user is on the ventilation settings page\n    When the user adjusts RR to 10 bpm\n    Then the RR value is displayed as 10 bpm\n    And the RR value is stored in the system\n\n  Scenario: Adjust IER from 1:1 to 1:4 (Inhale to exhale)\n    Given the user is on the ventilation settings page\n    When the user adjusts IER to 1:2\n    Then the IER value is displayed as 1:2\n    And the IER value is stored in the system\n\n  Scenario: Confirm all ventilation and alarm setting changes\n    Given the user is on the ventilation settings page\n    When the user adjusts PEEP to 5 cmH2O and confirms the change\n    Then the PEEP value is stored in the system\n\n  Scenario: Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1\n    Given the user is on the ventilation settings page\n    When the user adjusts FiO2 to 0.95\n    Then the FiO2 value is displayed as 0.95\n    And the FiO2 value is stored in the system\n\n  Scenario: Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min\n    Given the user is on the ventilation settings page\n    When the user adjusts HFNC flow rate to 30 L/min\n    Then the HFNC flow rate value is displayed as 30 L/min\n    And the HFNC flow rate value is stored in the system\n\n  Scenario: Compute amount of leakage based on controller actuation and sensor readings\n    Given the user is on the ventilation settings page\n    When the controller actuates and sensor readings are available\n    Then the amount of leakage is computed and displayed\n\n  Scenario Outline: Adjust PEEP from 0-20 cmH2O with increments of 1\n    Given the user is on the ventilation settings page\n    When the user adjusts PEEP to <PEEP> cmH2O\n    Then the PEEP value is displayed as <PEEP> cmH2O\n    And the PEEP value is stored in the system\n    Examples:\n      | PEEP |\n      | 0    |\n      | 1    |\n      | 2    |\n      | 3    |\n      | 4    |\n      | 5    |\n      | 6    |\n      | 7    |\n      | 8    |\n      | 9    |\n      | 10   |\n      | 11   |\n      | 12   |\n      | 13   |\n      | 14   |\n      | 15   |\n      | 16   |\n      | 17   |\n      | 18   |\n      | 19   |\n      | 20   |\n\n  Scenario Outline: Adjust RR from 5-30 bpm with increments of 1\n    Given the user is on the ventilation settings page\n    When the user adjusts RR to <RR> bpm\n    Then the RR value is displayed as <RR> bpm\n    And the RR value is stored in the system\n    Examples:\n      | RR |\n      | 5  |\n      | 6  |\n      | 7  |\n      | 8  |\n      | 9  |\n      | 10 |\n      | 11 |\n      | 12 |\n      | 13 |\n      | 14 |\n      | 15 |\n      | 16 |\n      | 17 |\n      | 18 |\n      | 19 |\n      | 20 |\n      | 21 |\n      | 22 |\n      | 23 |\n      | 24 |\n      | 25 |\n      | 26 |\n      | 27 |\n      | 28 |\n      | 29 |\n      | 30 |\n\n  Scenario Outline: Adjust IER from 1:1 to 1:4 (Inhale to exhale)\n    Given the user is on the ventilation settings page\n    When the user adjusts IER to <IER>\n    Then the IER value is displayed as <IER>\n    And the IER value is stored in the system\n    Examples:\n      | IER  |\n      | 1:1  |\n      | 1:2  |\n      | 1:3  |\n      | 1:4  |\n\n  Scenario Outline: Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1\n    Given the user is on the ventilation settings page\n    When the user adjusts FiO2 to <FiO2>\n    Then the FiO2 value is displayed as <FiO2>\n    And the FiO2 value is stored in the system\n    Examples:\n      | FiO2 |\n      | 0.21 |\n      | 0.22 |\n      | 0.23 |\n      | 0.24 |\n      | 0.25 |\n      | 0.26 |\n      | 0.27 |\n      | 0.28 |\n      | 0.29 |\n      | 0.30 |\n      | 0.31 |\n      | 0.32 |\n      | 0.33 |\n      | 0.34 |\n      | 0.35 |\n      | 0.36 |\n      | 0.37 |\n      | 0.38 |\n      | 0.39 |\n      | 0.40 |\n      | 0.41 |\n      | 0.42 |\n      | 0.43 |\n      | 0.44 |\n      | 0.45 |\n      | 0.46 |\n      | 0.47 |\n      | 0.48 |\n      | 0.49 |\n      | 0.50 |\n      | 0.51 |\n      | 0.52 |\n      | 0.53 |\n      | 0.54 |\n      | 0.55 |\n      | 0.56 |\n      | 0.57 |\n      | 0.58 |\n      | 0.59 |\n      | 0.60 |\n      | 0.61 |\n      | 0.62 |\n      | 0.63 |\n      | 0.64 |\n      | 0.65 |\n      | 0.66 |\n      | 0.67 |\n      | 0.68 |\n      | 0.69 |\n      | 0.70 |\n      | 0.71 |\n      | 0.72 |\n      | 0.73 |\n      | 0.74 |\n      | 0.75 |\n      | 0.76 |\n      | 0.77 |\n      | 0.78 |\n      | 0.79 |\n      | 0.80 |\n      | 0.81 |\n      | 0.82 |\n      | 0.83 |\n      | 0.84 |\n      | 0.85 |\n      | 0.86 |\n      | 0.87 |\n      | 0.88 |\n      | 0.89 |\n      | 0.90 |\n      | 0.91 |\n      | 0.92 |\n      | 0.93 |\n      | 0.94 |\n      | 0.95 |\n      | 0.96 |\n      | 0.97 |\n      | 0.98 |\n      | 0.99 |\n      | 1.00 |\n\n  Scenario Outline: Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min\n    Given the user is on the ventilation settings page\n    When the user adjusts HFNC flow rate to <HFNC> L/min\n    Then the HFNC flow rate value is displayed as <HFNC> L/min\n    And the HFNC flow rate value is stored in the system\n    Examples:\n      | HFNC |\n      | 0    |\n      | 5    |\n      | 10   |\n      | 15   |\n      | 20   |\n      | 25   |\n      | 30   |\n      | 35   |\n      | 40   |\n      | 45   |\n      | 50   |\n      | 55   |\n      | 60   |\n\n  Scenario Outline: Compute amount of leakage based on controller actuation and sensor readings\n    Given the user is on the ventilation settings page\n    When the controller actuates and sensor readings are available\n    Then the amount of leakage is computed and displayed\n    Examples:\n      | leakage |\n      | 0       |\n      | 1       |\n      | 2       |\n      | 3       |\n      | 4       |\n      | 5       |\n      | 6       |\n      | 7       |\n      | 8       |\n      | 9       |\n      | 10      |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Adjust PEEP from 0-20 cmH2O with increments of 1",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "PEEP"
+          },
+          "steps": [
+            "user adjusts PEEP to 5 cmH2O",
+            "PEEP value is displayed as 5 cmH2O",
+            "PEEP value is stored in the system"
+          ],
+          "expected": [
+            "PEEP value is displayed as 5 cmH2O",
+            "PEEP value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Render parameters and alarms readable at a distance of 1m",
+          "req_ids": [
+            "RW-SW-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "distance"
+          },
+          "steps": [
+            "user views page from a distance of 1m",
+            "parameters and alarms are readable"
+          ],
+          "expected": [
+            "parameters and alarms are readable"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Adjust RR from 5-30 bpm with increments of 1",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "RR"
+          },
+          "steps": [
+            "user adjusts RR to 10 bpm",
+            "RR value is displayed as 10 bpm",
+            "RR value is stored in the system"
+          ],
+          "expected": [
+            "RR value is displayed as 10 bpm",
+            "RR value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Adjust IER from 1:1 to 1:4 (Inhale to exhale)",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "IER"
+          },
+          "steps": [
+            "user adjusts IER to 1:2",
+            "IER value is displayed as 1:2",
+            "IER value is stored in the system"
+          ],
+          "expected": [
+            "IER value is displayed as 1:2",
+            "IER value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Confirm all ventilation and alarm setting changes",
+          "req_ids": [
+            "RW-SW-24"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "change"
+          },
+          "steps": [
+            "user adjusts PEEP to 5 cmH2O and confirms the change",
+            "PEEP value is stored in the system"
+          ],
+          "expected": [
+            "PEEP value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "FiO2"
+          },
+          "steps": [
+            "user adjusts FiO2 to 0.95",
+            "FiO2 value is displayed as 0.95",
+            "FiO2 value is stored in the system"
+          ],
+          "expected": [
+            "FiO2 value is displayed as 0.95",
+            "FiO2 value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "HFNC"
+          },
+          "steps": [
+            "user adjusts HFNC flow rate to 30 L/min",
+            "HFNC flow rate value is displayed as 30 L/min",
+            "HFNC flow rate value is stored in the system"
+          ],
+          "expected": [
+            "HFNC flow rate value is displayed as 30 L/min",
+            "HFNC flow rate value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Compute amount of leakage based on controller actuation and sensor readings",
+          "req_ids": [
+            "RW-SW-43"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "leakage"
+          },
+          "steps": [
+            "controller actuates and sensor readings are available",
+            "amount of leakage is computed and displayed"
+          ],
+          "expected": [
+            "amount of leakage is computed and displayed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Adjust PEEP from 0-20 cmH2O with increments of 1 (boundary)",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "PEEP"
+          },
+          "steps": [
+            "user adjusts PEEP to 0 cmH2O",
+            "PEEP value is displayed as 0 cmH2O",
+            "PEEP value is stored in the system"
+          ],
+          "expected": [
+            "PEEP value is displayed as 0 cmH2O",
+            "PEEP value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Adjust RR from 5-30 bpm with increments of 1 (boundary)",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "RR"
+          },
+          "steps": [
+            "user adjusts RR to 5 bpm",
+            "RR value is displayed as 5 bpm",
+            "RR value is stored in the system"
+          ],
+          "expected": [
+            "RR value is displayed as 5 bpm",
+            "RR value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Adjust IER from 1:1 to 1:4 (Inhale to exhale) (boundary)",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "IER"
+          },
+          "steps": [
+            "user adjusts IER to 1:1",
+            "IER value is displayed as 1:1",
+            "IER value is stored in the system"
+          ],
+          "expected": [
+            "IER value is displayed as 1:1",
+            "IER value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1 (boundary)",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "FiO2"
+          },
+          "steps": [
+            "user adjusts FiO2 to 0.21",
+            "FiO2 value is displayed as 0.21",
+            "FiO2 value is stored in the system"
+          ],
+          "expected": [
+            "FiO2 value is displayed as 0.21",
+            "FiO2 value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min (boundary)",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "HFNC"
+          },
+          "steps": [
+            "user adjusts HFNC flow rate to 0 L/min",
+            "HFNC flow rate value is displayed as 0 L/min",
+            "HFNC flow rate value is stored in the system"
+          ],
+          "expected": [
+            "HFNC flow rate value is displayed as 0 L/min",
+            "HFNC flow rate value is stored in the system"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Adjust PEEP from 0-20 cmH2O with increments of 1 (negative)",
+          "req_ids": [
+            "RW-SW-162"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "PEEP"
+          },
+          "steps": [
+            "user adjusts PEEP to -1 cmH2O",
+            "error message is displayed"
+          ],
+          "expected": [
+            "error message is displayed"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Adjust RR from 5-30 bpm with increments of 1 (negative)",
+          "req_ids": [
+            "RW-SW-12"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "RR"
+          },
+          "steps": [
+            "user adjusts RR to 31 bpm",
+            "error message is displayed"
+          ],
+          "expected": [
+            "error message is displayed"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Adjust IER from 1:1 to 1:4 (Inhale to exhale) (negative)",
+          "req_ids": [
+            "RW-SW-13"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "IER"
+          },
+          "steps": [
+            "user adjusts IER to 1:5",
+            "error message is displayed"
+          ],
+          "expected": [
+            "error message is displayed"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Adjust O2 infusion (FiO2) in supplied air from 0.21 to as close to 1 as possible with a minimum of 0.96, adjustable in increments of 0.1 (negative)",
+          "req_ids": [
+            "RW-SW-34"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "FiO2"
+          },
+          "steps": [
+            "user adjusts FiO2 to 0.2",
+            "error message is displayed"
+          ],
+          "expected": [
+            "error message is displayed"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Adjust HFNC flow rate from 0 to 60 L/min in increments of 5 L/min (negative)",
+          "req_ids": [
+            "RW-SW-35"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "user is on ventilation settings page"
+          ],
+          "inputs": {
+            "name": "HFNC"
+          },
+          "steps": [
+            "user adjusts HFNC flow rate to 61 L/min",
+            "error message is displayed"
+          ],
+          "expected": [
+            "error message is displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.625,
+        "oracle_assertiveness": 0.875,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.8276,
+        "hallucinated": [
+          {
+            "value": "-1 cmH2O",
+            "context": "PEEP displayed",
+            "grounded": false
+          },
+          {
+            "value": "31 bpm",
+            "context": "RR displayed",
+            "grounded": false
+          },
+          {
+            "value": "1:5",
+            "context": "IER displayed",
+            "grounded": false
+          },
+          {
+            "value": "0.2",
+            "context": "FiO2 displayed",
+            "grounded": false
+          },
+          {
+            "value": "61 L/min",
+            "context": "HFNC displayed",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 29,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test for unconfirmed changes (RW-SW-24).",
+          "Include readability tests under varied lighting and font sizes.",
+          "Add leakage computation tests with specific sensor edge cases.",
+          "Test FiO2 increments at the boundary 0.96 and 1.0.",
+          "Add scenarios adjusting multiple parameters simultaneously."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.8991,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

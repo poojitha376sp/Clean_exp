@@ -1,0 +1,919 @@
+{
+  "unit_id": "U12_Alarms",
+  "representation": "Decision Tables",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "safety_critical",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 1.0,
+    "representation_score": 0.6667,
+    "sfv_score": 0.8333,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": [
+      "Table syntax is inconsistent."
+    ]
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 22,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add tests for alarms not triggered when temperatures are below thresholds",
+      "Include a test for all three alarms triggered simultaneously to verify safety actions",
+      "Test boundary conditions for blower motor and battery thresholds (equal to threshold)",
+      "Add sensor failure tests for blower motor and battery cell sensors",
+      "Verify alarm priority ordering when multiple alarms are active"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.88,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Decision Table 1: Alarm Priority and Safety Actions\nConditions:\n- blower_motor_temp (°C)\n- blower_power_temp (°C)\n- battery_temp (°C)\n- blower_motor_threshold (°C)\n- blower_power_threshold (°C)\n- battery_threshold (°C)\n\nActions:\n- trigger_blower_motor_alarm\n- trigger_blower_power_alarm\n- trigger_battery_alarm\n- invoke_safety_action_blower_power\n- invoke_safety_action_battery\n\n| blower_motor_temp | blower_power_temp | battery_temp | blower_motor_threshold | blower_power_threshold | battery_threshold | trigger_blower_motor_alarm | trigger_blower_power_alarm | trigger_battery_alarm | invoke_safety_action_blower_power | invoke_safety_action_battery |\n|-------------------|-------------------|--------------|------------------------|------------------------|-------------------|----------------------------|----------------------------|----------------------|------------------------------------|------------------------------|\n| > 90              | > 110             | > 140        | 90                     | 110                    | 140               | Yes                        | Yes                        | Yes                  | Yes                                | Yes                          |\n| <= 90             | <= 110            | <= 140       | 90                     | 110                    | 140               | No                         | No                         | No                   | No                                 | No                          |\n| > 90              | <= 110            | <= 140       | 90                     | 110                    | 140               | Yes                        | No                         | No                   | No                                 | No                          |\n| <= 90             | > 110             | <= 140       | 90                     | 110                    | 140               | No                         | Yes                        | No                   | No                                 | No                          |\n| <= 90             | <= 110            | > 140        | 90                     | 110                    | 140               | No                         | No                         | Yes                  | No                                 | Yes                          |\n| > 90              | > 110             | <= 140       | 90                     | 110                    | 140               | Yes                        | Yes                        | No                   | Yes                                | No                          |\n| > 90              | <= 110            | > 140        | 90                     | 110                    | 140               | Yes                        | No                         | Yes                  | No                                 | Yes                          |\n| <= 90             | > 110             | > 140        | 90                     | 110                    | 140               | No                         | Yes                        | Yes                  | No                                 | Yes                          |\n\nDecision Table 2: Battery Failure Alarm Priority\nConditions:\n- battery_failure_detected\n\nActions:\n- set_alarm_priority\n\n| battery_failure_detected | set_alarm_priority |\n|--------------------------|--------------------|\n| Yes                      | High               |\n| No                       | Normal             |\n\nDecision Table 3: Sensor Reading Capability\nConditions:\n- sensor_type (blower_motor, blower_power_mgm, battery_cell)\n\nActions:\n- read_temperature\n\n| sensor_type | read_temperature |\n|-------------|------------------|\n| blower_motor | Yes              |\n| blower_power_mgm | Yes          |\n| battery_cell | Yes              |\n| other        | No               |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test battery failure alarm priority",
+      "req_ids": [
+        "RW-SW-130"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "battery_failure_detected = true"
+      ],
+      "inputs": {
+        "battery_failure_detected": true
+      },
+      "steps": [
+        "Invoke alarm system"
+      ],
+      "expected": [
+        "Alarm priority set to High"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test temperature sensing capability for blower motor",
+      "req_ids": [
+        "RW-SW-131",
+        "RW-SW-132"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "blower_motor operational"
+      ],
+      "inputs": {
+        "sensor_type": "blower_motor"
+      },
+      "steps": [
+        "Read temperature from sensor"
+      ],
+      "expected": [
+        "Temperature reading successful"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test temperature sensing capability for blower power management system",
+      "req_ids": [
+        "RW-SW-131",
+        "RW-SW-132"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "blower_power_mgm operational"
+      ],
+      "inputs": {
+        "sensor_type": "blower_power_mgm"
+      },
+      "steps": [
+        "Read temperature from sensor"
+      ],
+      "expected": [
+        "Temperature reading successful"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test temperature sensing capability for battery cell",
+      "req_ids": [
+        "RW-SW-131",
+        "RW-SW-132"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "battery_cell operational"
+      ],
+      "inputs": {
+        "sensor_type": "battery_cell"
+      },
+      "steps": [
+        "Read temperature from sensor"
+      ],
+      "expected": [
+        "Temperature reading successful"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test blower motor temperature alarm trigger",
+      "req_ids": [
+        "RW-SW-133"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "blower_motor_temp > blower_motor_threshold"
+      ],
+      "inputs": {
+        "blower_motor_temp": 95,
+        "blower_motor_threshold": 90
+      },
+      "steps": [
+        "Check alarm status"
+      ],
+      "expected": [
+        "Blower motor temperature too high alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Test blower power system temperature alarm trigger",
+      "req_ids": [
+        "RW-SW-134"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "blower_power_temp > blower_power_threshold"
+      ],
+      "inputs": {
+        "blower_power_temp": 115,
+        "blower_power_threshold": 110
+      },
+      "steps": [
+        "Check alarm status"
+      ],
+      "expected": [
+        "Blower power system temperature too high alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Test battery temperature alarm trigger",
+      "req_ids": [
+        "RW-SW-135"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "battery_temp > battery_threshold"
+      ],
+      "inputs": {
+        "battery_temp": 145,
+        "battery_threshold": 140
+      },
+      "steps": [
+        "Check alarm status"
+      ],
+      "expected": [
+        "Battery temperature too high alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Test automatic safety action for high blower power system temperature",
+      "req_ids": [
+        "RW-SW-137"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "blower_power_temp > blower_power_threshold"
+      ],
+      "inputs": {
+        "blower_power_temp": 115,
+        "blower_power_threshold": 110
+      },
+      "steps": [
+        "Invoke safety action"
+      ],
+      "expected": [
+        "Safety action invoked for blower power system"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Test automatic safety action for high battery temperature",
+      "req_ids": [
+        "RW-SW-138"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "battery_temp > battery_threshold"
+      ],
+      "inputs": {
+        "battery_temp": 145,
+        "battery_threshold": 140
+      },
+      "steps": [
+        "Invoke safety action"
+      ],
+      "expected": [
+        "Safety action invoked for battery"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Test boundary condition for blower power threshold (equal to threshold)",
+      "req_ids": [
+        "RW-SW-134"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "blower_power_temp == blower_power_threshold"
+      ],
+      "inputs": {
+        "blower_power_temp": 110,
+        "blower_power_threshold": 110
+      },
+      "steps": [
+        "Check alarm status"
+      ],
+      "expected": [
+        "Blower power system temperature too high alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Test alarm priority ordering",
+      "req_ids": [
+        "RW-SW-130"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "battery_failure_detected = true",
+        "blower_power_temp > blower_power_threshold"
+      ],
+      "inputs": {
+        "battery_failure_detected": true,
+        "blower_power_temp": 115,
+        "blower_power_threshold": 110
+      },
+      "steps": [
+        "Check alarm priority hierarchy"
+      ],
+      "expected": [
+        "Battery failure alarm has higher priority than blower power system alarm"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Test sensor failure scenario",
+      "req_ids": [
+        "RW-SW-131",
+        "RW-SW-132"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "sensor_type = other"
+      ],
+      "inputs": {
+        "sensor_type": "other"
+      },
+      "steps": [
+        "Attempt to read temperature"
+      ],
+      "expected": [
+        "Temperature reading unsuccessful, no alarm triggered"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Decision Table for Alarm and Safety Actions\n\nConditions:\n- blower_motor_temp: temperature of blower motor (°C)\n- blower_power_temp: temperature of blower power management system (°C)\n- battery_temp: temperature of battery cell (°C)\n- blower_motor_threshold: user-specified threshold for blower motor temperature (°C)\n- blower_power_threshold: user-specified threshold for blower power system temperature (°C)\n- battery_threshold: user-specified threshold for battery temperature (°C)\n\nActions:\n- alarm_blower_motor: trigger \"blower motor temperature too high\" alarm\n- alarm_blower_power: trigger \"blower power system temperature too high\" alarm\n- alarm_battery: trigger \"battery temperature too high\" alarm\n- safety_action_blower_power: invoke safety action for blower power system\n- safety_action_battery: invoke safety action for battery\n\nDecision Table:\n\n| blower_motor_temp | blower_power_temp | battery_temp | blower_motor_threshold | blower_power_threshold | battery_threshold | alarm_blower_motor | alarm_blower_power | alarm_battery | safety_action_blower_power | safety_action_battery |\n|-------------------|-------------------|--------------|------------------------|------------------------|-------------------|--------------------|--------------------|---------------|----------------------------|-----------------------|\n| >= blower_motor_threshold | >= blower_power_threshold | >= battery_threshold | >= blower_motor_threshold | >= blower_power_threshold | >= battery_threshold | Yes | Yes | Yes | Yes | Yes |\n| < blower_motor_threshold | < blower_power_threshold | < battery_threshold | >= blower_motor_threshold | >= blower_power_threshold | >= battery_threshold | No | Yes | Yes | Yes | Yes |\n| >= blower_motor_threshold | < blower_power_threshold | < battery_threshold | >= blower_motor_threshold | >= blower_power_threshold | < battery_threshold | Yes | No | No | Yes | No |\n| < blower_motor_threshold | >= blower_power_threshold | < battery_threshold | < blower_motor_threshold | >= blower_power_threshold | < battery_threshold | No | Yes | No | Yes | No |\n| < blower_motor_threshold | < blower_power_threshold | >= battery_threshold | < blower_motor_threshold | < blower_power_threshold | >= battery_threshold | No | No | Yes | No | Yes |\n| >= blower_motor_threshold | >= blower_power_threshold | < battery_threshold | >= blower_motor_threshold | >= blower_power_threshold | < battery_threshold | Yes | Yes | No | Yes | No |\n| < blower_motor_threshold | >= blower_power_threshold | >= battery_threshold | < blower_motor_threshold | >= blower_power_threshold | >= battery_threshold | No | Yes | Yes | Yes | Yes |\n| >= blower_motor_threshold | < blower_power_threshold | >= battery_threshold | >= blower_motor_threshold | < blower_power_threshold | >= battery_threshold | Yes | No | Yes | No | Yes |\n\nNote: \"-\" indicates \"don't care\" or unspecified condition, which has no impact on the outcome.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "All temperatures exceed thresholds",
+          "req_ids": [
+            "RW-SW-130",
+            "RW-SW-131",
+            "RW-SW-133",
+            "RW-SW-134",
+            "RW-SW-135",
+            "RW-SW-137",
+            "RW-SW-138"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower_motor_temp >= blower_motor_threshold",
+            "blower_power_temp >= blower_power_threshold",
+            "battery_temp >= battery_threshold"
+          ],
+          "inputs": {
+            "blower_motor_temp": "100",
+            "blower_power_temp": "120",
+            "battery_temp": "150",
+            "blower_motor_threshold": "90",
+            "blower_power_threshold": "110",
+            "battery_threshold": "140"
+          },
+          "steps": [
+            "Set blower_motor_temp to 100°C, blower_power_temp to 120°C, battery_temp to 150°C.",
+            "Set thresholds to blower_motor_threshold=90°C, blower_power_threshold=110°C, battery_threshold=140°C.",
+            "Trigger GUI temperature readings."
+          ],
+          "expected": [
+            "alarm_blower_motor is triggered.",
+            "alarm_blower_power is triggered.",
+            "alarm_battery is triggered.",
+            "safety_action_blower_power is invoked.",
+            "safety_action_battery is invoked."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Blower motor temperature exceeds threshold, others do not",
+          "req_ids": [
+            "RW-SW-133",
+            "RW-SW-137"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower_motor_temp >= blower_motor_threshold",
+            "blower_power_temp < blower_power_threshold",
+            "battery_temp < battery_threshold"
+          ],
+          "inputs": {
+            "blower_motor_temp": "95",
+            "blower_power_temp": "100",
+            "battery_temp": "130",
+            "blower_motor_threshold": "90",
+            "blower_power_threshold": "110",
+            "battery_threshold": "140"
+          },
+          "steps": [
+            "Set blower_motor_temp to 95°C, blower_power_temp to 100°C, battery_temp to 130°C.",
+            "Set thresholds to blower_motor_threshold=90°C, blower_power_threshold=110°C, battery_threshold=140°C.",
+            "Trigger GUI temperature readings."
+          ],
+          "expected": [
+            "alarm_blower_motor is triggered.",
+            "safety_action_blower_power is not invoked.",
+            "safety_action_battery is not invoked."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Battery temperature exceeds threshold, others do not",
+          "req_ids": [
+            "RW-SW-135",
+            "RW-SW-138"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower_motor_temp < blower_motor_threshold",
+            "blower_power_temp < blower_power_threshold",
+            "battery_temp >= battery_threshold"
+          ],
+          "inputs": {
+            "blower_motor_temp": "80",
+            "blower_power_temp": "90",
+            "battery_temp": "150",
+            "blower_motor_threshold": "90",
+            "blower_power_threshold": "110",
+            "battery_threshold": "140"
+          },
+          "steps": [
+            "Set blower_motor_temp to 80°C, blower_power_temp to 90°C, battery_temp to 150°C.",
+            "Set thresholds to blower_motor_threshold=90°C, blower_power_threshold=110°C, battery_threshold=140°C.",
+            "Trigger GUI temperature readings."
+          ],
+          "expected": [
+            "alarm_battery is triggered.",
+            "safety_action_blower_power is not invoked.",
+            "safety_action_battery is invoked."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "All temperatures below thresholds",
+          "req_ids": [
+            "RW-SW-130",
+            "RW-SW-131",
+            "RW-SW-133",
+            "RW-SW-134",
+            "RW-SW-135"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "blower_motor_temp < blower_motor_threshold",
+            "blower_power_temp < blower_power_threshold",
+            "battery_temp < battery_threshold"
+          ],
+          "inputs": {
+            "blower_motor_temp": "70",
+            "blower_power_temp": "80",
+            "battery_temp": "120",
+            "blower_motor_threshold": "90",
+            "blower_power_threshold": "110",
+            "battery_threshold": "140"
+          },
+          "steps": [
+            "Set blower_motor_temp to 70°C, blower_power_temp to 80°C, battery_temp to 120°C.",
+            "Set thresholds to blower_motor_threshold=90°C, blower_power_threshold=110°C, battery_threshold=140°C.",
+            "Trigger GUI temperature readings."
+          ],
+          "expected": [
+            "No alarms are triggered.",
+            "No safety actions are invoked."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Boundary value for blower motor temperature",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "blower_motor_temp == blower_motor_threshold"
+          ],
+          "inputs": {
+            "blower_motor_temp": "90",
+            "blower_motor_threshold": "90"
+          },
+          "steps": [
+            "Set blower_motor_temp to 90°C.",
+            "Set threshold to blower_motor_threshold=90°C.",
+            "Trigger GUI temperature readings."
+          ],
+          "expected": [
+            "alarm_blower_motor is triggered."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Boundary value for battery temperature",
+          "req_ids": [
+            "RW-SW-135",
+            "RW-SW-138"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "battery_temp == battery_threshold"
+          ],
+          "inputs": {
+            "battery_temp": "140",
+            "battery_threshold": "140"
+          },
+          "steps": [
+            "Set battery_temp to 140°C.",
+            "Set threshold to battery_threshold=140°C.",
+            "Trigger GUI temperature readings."
+          ],
+          "expected": [
+            "alarm_battery is triggered.",
+            "safety_action_battery is invoked."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.625,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 0.6666666666666666,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "100",
+            "context": "blower_motor_temp",
+            "grounded": false
+          },
+          {
+            "value": "120",
+            "context": "blower_power_temp",
+            "grounded": false
+          },
+          {
+            "value": "150",
+            "context": "battery_temp",
+            "grounded": false
+          },
+          {
+            "value": "90",
+            "context": "blower_motor_threshold",
+            "grounded": false
+          },
+          {
+            "value": "110",
+            "context": "blower_power_threshold",
+            "grounded": false
+          },
+          {
+            "value": "140",
+            "context": "battery_threshold",
+            "grounded": false
+          },
+          {
+            "value": "95",
+            "context": "blower_motor_temp",
+            "grounded": false
+          },
+          {
+            "value": "130",
+            "context": "battery_temp",
+            "grounded": false
+          },
+          {
+            "value": "80",
+            "context": "blower_motor_temp",
+            "grounded": false
+          },
+          {
+            "value": "70",
+            "context": "blower_motor_temp",
+            "grounded": false
+          },
+          {
+            "value": "90",
+            "context": "blower_power_temp",
+            "grounded": false
+          },
+          {
+            "value": "120",
+            "context": "battery_temp",
+            "grounded": false
+          },
+          {
+            "value": "140",
+            "context": "battery_temp",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 13,
+        "uncovered_clauses": [
+          "RW-SW-130",
+          "RW-SW-131",
+          "RW-SW-132"
+        ],
+        "weaknesses": [
+          "Add test for RW-SW-130 (battery failure alarm priority).",
+          "Add tests for RW-SW-131 and RW-SW-132 (sensor reading capability).",
+          "Add boundary test for blower power threshold (equal to threshold).",
+          "Add test for alarm priority ordering.",
+          "Add test for sensor failure scenario."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-132"
+        ],
+        "fsa_score": 0.7396,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.7396; sub-scores {'clause_coverage': 0.625, 'negative_coverage': 1.0, 'oracle_assertiveness': 1.0, 'boundary_coverage': 0.6666666666666666, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-132'] (add at least one each)\n- uncovered clause: RW-SW-130\n- uncovered clause: RW-SW-131\n- uncovered clause: RW-SW-132\n- ungrounded value '100' (blower_motor_temp): remove or use the SRS value\n- ungrounded value '120' (blower_power_temp): remove or use the SRS value\n- ungrounded value '150' (battery_temp): remove or use the SRS value\n- ungrounded value '90' (blower_motor_threshold): remove or use the SRS value\n- ungrounded value '110' (blower_power_threshold): remove or use the SRS value\n- ungrounded value '140' (battery_threshold): remove or use the SRS value\n- Add test for RW-SW-130 (battery failure alarm priority).\n- Add tests for RW-SW-131 and RW-SW-132 (sensor reading capability).\n- Add boundary test for blower power threshold (equal to threshold).\n- Add test for alarm priority ordering.\n- Add test for sensor failure scenario.",
+      "artifact": "Decision Table 1: Alarm Priority and Safety Actions\nConditions:\n- blower_motor_temp (°C)\n- blower_power_temp (°C)\n- battery_temp (°C)\n- blower_motor_threshold (°C)\n- blower_power_threshold (°C)\n- battery_threshold (°C)\n\nActions:\n- trigger_blower_motor_alarm\n- trigger_blower_power_alarm\n- trigger_battery_alarm\n- invoke_safety_action_blower_power\n- invoke_safety_action_battery\n\n| blower_motor_temp | blower_power_temp | battery_temp | blower_motor_threshold | blower_power_threshold | battery_threshold | trigger_blower_motor_alarm | trigger_blower_power_alarm | trigger_battery_alarm | invoke_safety_action_blower_power | invoke_safety_action_battery |\n|-------------------|-------------------|--------------|------------------------|------------------------|-------------------|----------------------------|----------------------------|----------------------|------------------------------------|------------------------------|\n| > 90              | > 110             | > 140        | 90                     | 110                    | 140               | Yes                        | Yes                        | Yes                  | Yes                                | Yes                          |\n| <= 90             | <= 110            | <= 140       | 90                     | 110                    | 140               | No                         | No                         | No                   | No                                 | No                          |\n| > 90              | <= 110            | <= 140       | 90                     | 110                    | 140               | Yes                        | No                         | No                   | No                                 | No                          |\n| <= 90             | > 110             | <= 140       | 90                     | 110                    | 140               | No                         | Yes                        | No                   | No                                 | No                          |\n| <= 90             | <= 110            | > 140        | 90                     | 110                    | 140               | No                         | No                         | Yes                  | No                                 | Yes                          |\n| > 90              | > 110             | <= 140       | 90                     | 110                    | 140               | Yes                        | Yes                        | No                   | Yes                                | No                          |\n| > 90              | <= 110            | > 140        | 90                     | 110                    | 140               | Yes                        | No                         | Yes                  | No                                 | Yes                          |\n| <= 90             | > 110             | > 140        | 90                     | 110                    | 140               | No                         | Yes                        | Yes                  | No                                 | Yes                          |\n\nDecision Table 2: Battery Failure Alarm Priority\nConditions:\n- battery_failure_detected\n\nActions:\n- set_alarm_priority\n\n| battery_failure_detected | set_alarm_priority |\n|--------------------------|--------------------|\n| Yes                      | High               |\n| No                       | Normal             |\n\nDecision Table 3: Sensor Reading Capability\nConditions:\n- sensor_type (blower_motor, blower_power_mgm, battery_cell)\n\nActions:\n- read_temperature\n\n| sensor_type | read_temperature |\n|-------------|------------------|\n| blower_motor | Yes              |\n| blower_power_mgm | Yes          |\n| battery_cell | Yes              |\n| other        | No               |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test battery failure alarm priority",
+          "req_ids": [
+            "RW-SW-130"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "battery_failure_detected = true"
+          ],
+          "inputs": {
+            "battery_failure_detected": true
+          },
+          "steps": [
+            "Invoke alarm system"
+          ],
+          "expected": [
+            "Alarm priority set to High"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test temperature sensing capability for blower motor",
+          "req_ids": [
+            "RW-SW-131",
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower_motor operational"
+          ],
+          "inputs": {
+            "sensor_type": "blower_motor"
+          },
+          "steps": [
+            "Read temperature from sensor"
+          ],
+          "expected": [
+            "Temperature reading successful"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test temperature sensing capability for blower power management system",
+          "req_ids": [
+            "RW-SW-131",
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower_power_mgm operational"
+          ],
+          "inputs": {
+            "sensor_type": "blower_power_mgm"
+          },
+          "steps": [
+            "Read temperature from sensor"
+          ],
+          "expected": [
+            "Temperature reading successful"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test temperature sensing capability for battery cell",
+          "req_ids": [
+            "RW-SW-131",
+            "RW-SW-132"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "battery_cell operational"
+          ],
+          "inputs": {
+            "sensor_type": "battery_cell"
+          },
+          "steps": [
+            "Read temperature from sensor"
+          ],
+          "expected": [
+            "Temperature reading successful"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test blower motor temperature alarm trigger",
+          "req_ids": [
+            "RW-SW-133"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower_motor_temp > blower_motor_threshold"
+          ],
+          "inputs": {
+            "blower_motor_temp": 95,
+            "blower_motor_threshold": 90
+          },
+          "steps": [
+            "Check alarm status"
+          ],
+          "expected": [
+            "Blower motor temperature too high alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test blower power system temperature alarm trigger",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower_power_temp > blower_power_threshold"
+          ],
+          "inputs": {
+            "blower_power_temp": 115,
+            "blower_power_threshold": 110
+          },
+          "steps": [
+            "Check alarm status"
+          ],
+          "expected": [
+            "Blower power system temperature too high alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test battery temperature alarm trigger",
+          "req_ids": [
+            "RW-SW-135"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "battery_temp > battery_threshold"
+          ],
+          "inputs": {
+            "battery_temp": 145,
+            "battery_threshold": 140
+          },
+          "steps": [
+            "Check alarm status"
+          ],
+          "expected": [
+            "Battery temperature too high alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test automatic safety action for high blower power system temperature",
+          "req_ids": [
+            "RW-SW-137"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "blower_power_temp > blower_power_threshold"
+          ],
+          "inputs": {
+            "blower_power_temp": 115,
+            "blower_power_threshold": 110
+          },
+          "steps": [
+            "Invoke safety action"
+          ],
+          "expected": [
+            "Safety action invoked for blower power system"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test automatic safety action for high battery temperature",
+          "req_ids": [
+            "RW-SW-138"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "battery_temp > battery_threshold"
+          ],
+          "inputs": {
+            "battery_temp": 145,
+            "battery_threshold": 140
+          },
+          "steps": [
+            "Invoke safety action"
+          ],
+          "expected": [
+            "Safety action invoked for battery"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test boundary condition for blower power threshold (equal to threshold)",
+          "req_ids": [
+            "RW-SW-134"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "blower_power_temp == blower_power_threshold"
+          ],
+          "inputs": {
+            "blower_power_temp": 110,
+            "blower_power_threshold": 110
+          },
+          "steps": [
+            "Check alarm status"
+          ],
+          "expected": [
+            "Blower power system temperature too high alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Test alarm priority ordering",
+          "req_ids": [
+            "RW-SW-130"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "battery_failure_detected = true",
+            "blower_power_temp > blower_power_threshold"
+          ],
+          "inputs": {
+            "battery_failure_detected": true,
+            "blower_power_temp": 115,
+            "blower_power_threshold": 110
+          },
+          "steps": [
+            "Check alarm priority hierarchy"
+          ],
+          "expected": [
+            "Battery failure alarm has higher priority than blower power system alarm"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Test sensor failure scenario",
+          "req_ids": [
+            "RW-SW-131",
+            "RW-SW-132"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "sensor_type = other"
+          ],
+          "inputs": {
+            "sensor_type": "other"
+          },
+          "steps": [
+            "Attempt to read temperature"
+          ],
+          "expected": [
+            "Temperature reading unsuccessful, no alarm triggered"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.6667,
+        "sfv_score": 0.8333,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": [
+          "Table syntax is inconsistent."
+        ]
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 22,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add tests for alarms not triggered when temperatures are below thresholds",
+          "Include a test for all three alarms triggered simultaneously to verify safety actions",
+          "Test boundary conditions for blower motor and battery thresholds (equal to threshold)",
+          "Add sensor failure tests for blower motor and battery cell sensors",
+          "Verify alarm priority ordering when multiple alarms are active"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.88,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

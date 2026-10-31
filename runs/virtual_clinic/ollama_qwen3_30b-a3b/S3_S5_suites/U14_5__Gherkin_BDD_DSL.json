@@ -1,0 +1,691 @@
+{
+  "unit_id": "U14_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen3:30b-a3b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "123",
+        "context": "doctor ID",
+        "grounded": false
+      },
+      {
+        "value": "Dr. Smith",
+        "context": "doctor name update",
+        "grounded": false
+      },
+      {
+        "value": "Dr. Smith",
+        "context": "expected doctor name",
+        "grounded": false
+      },
+      {
+        "value": "",
+        "context": "doctor name empty",
+        "grounded": false
+      },
+      {
+        "value": "error",
+        "context": "expected error message",
+        "grounded": false
+      },
+      {
+        "value": "456",
+        "context": "lab ID",
+        "grounded": false
+      },
+      {
+        "value": "Lab A",
+        "context": "lab name update",
+        "grounded": false
+      },
+      {
+        "value": "Lab A",
+        "context": "expected lab name",
+        "grounded": false
+      },
+      {
+        "value": "",
+        "context": "lab name empty",
+        "grounded": false
+      },
+      {
+        "value": "789",
+        "context": "patient ID",
+        "grounded": false
+      },
+      {
+        "value": "new@example.com",
+        "context": "patient email update",
+        "grounded": false
+      },
+      {
+        "value": "new@example.com",
+        "context": "expected patient email",
+        "grounded": false
+      },
+      {
+        "value": "",
+        "context": "patient email empty",
+        "grounded": false
+      },
+      {
+        "value": "2024-01-01",
+        "context": "appointment date positive",
+        "grounded": false
+      },
+      {
+        "value": "2023-01-01",
+        "context": "appointment date negative",
+        "grounded": false
+      },
+      {
+        "value": "Appointment is created and can be viewed in the appointments tab",
+        "context": "expected appointment success message",
+        "grounded": false
+      },
+      {
+        "value": "System returns an error",
+        "context": "expected error message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 17,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Lacks boundary testing for appointment dates (e.g., today, one day ahead).",
+      "Does not verify specific error codes or messages, only generic 'error'.",
+      "No validation tests for invalid email formats or other field constraints.",
+      "No tests for updating multiple fields simultaneously.",
+      "No persistence checks to confirm updates survive subsequent reads."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.735,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Admin and Patient Profile Management\n\n  Scenario Outline: Admin updates doctor information\n    Given an admin user is logged in\n    And a doctor with ID <doctor_id> exists\n    When the admin updates the doctor's information with <update_data>\n    Then the doctor's information is updated to <expected_data>\n\n    Examples:\n      | doctor_id | update_data | expected_data | kind        |\n      | 123       | { \"name\": \"Dr. Smith\" } | { \"name\": \"Dr. Smith\" } | positive    |\n      | 123       | { \"name\": \"\" } | \"error\" | negative    |\n\n  Scenario Outline: Admin updates lab/chemist information\n    Given an admin user is logged in\n    And a lab with ID <lab_id> exists\n    When the admin updates the lab's information with <update_data>\n    Then the lab's information is updated to <expected_data>\n\n    Examples:\n      | lab_id | update_data | expected_data | kind        |\n      | 456       | { \"name\": \"Lab A\" } | { \"name\": \"Lab A\" } | positive    |\n      | 456       | { \"name\": \"\" } | \"error\" | negative    |\n\n  Scenario Outline: Patient updates personal details\n    Given a patient user is logged in\n    And the patient has an account with ID <patient_id>\n    When the patient updates their personal details with <update_data>\n    Then the patient's personal details are updated to <expected_data>\n\n    Examples:\n      | patient_id | update_data | expected_data | kind        |\n      | 789       | { \"email\": \"new@example.com\" } | { \"email\": \"new@example.com\" } | positive    |\n      | 789       | { \"email\": \"\" } | \"error\" | negative    |\n\n  Scenario Outline: Patient creates appointment\n    Given a patient user is logged in\n    And the patient has an account with ID <patient_id>\n    And a doctor with ID <doctor_id> exists\n    When the patient creates an appointment for <appointment_date>\n    Then the appointment is created and can be viewed in the appointments tab\n\n    Examples:\n      | patient_id | doctor_id | appointment_date | kind        |\n      | 789        | 123       | \"2024-01-01\"     | positive    |\n      | 789        | 123       | \"2023-01-01\"     | negative    |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Admin updates doctor information (positive)",
+      "req_ids": [
+        "VIRTUA-5-1",
+        "VIRTUA-5-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin user is logged in",
+        "Doctor with ID 123 exists"
+      ],
+      "inputs": {
+        "update_data": "{ \"name\": \"Dr. Smith\" }"
+      },
+      "steps": [
+        "Admin updates doctor information with { \"name\": \"Dr. Smith\" }"
+      ],
+      "expected": [
+        "Doctor's information is updated to { \"name\": \"Dr. Smith\" }"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Admin updates doctor information (negative)",
+      "req_ids": [
+        "VIRTUA-5-1",
+        "VIRTUA-5-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Admin user is logged in",
+        "Doctor with ID 123 exists"
+      ],
+      "inputs": {
+        "update_data": "{ \"name\": \"\" }"
+      },
+      "steps": [
+        "Admin updates doctor information with { \"name\": \"\" }"
+      ],
+      "expected": [
+        "System returns an error"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Admin updates lab/chemist information (positive)",
+      "req_ids": [
+        "VIRTUA-5-3",
+        "VIRTUA-5-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin user is logged in",
+        "Lab with ID 456 exists"
+      ],
+      "inputs": {
+        "update_data": "{ \"name\": \"Lab A\" }"
+      },
+      "steps": [
+        "Admin updates lab information with { \"name\": \"Lab A\" }"
+      ],
+      "expected": [
+        "Lab's information is updated to { \"name\": \"Lab A\" }"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Admin updates lab/chemist information (negative)",
+      "req_ids": [
+        "VIRTUA-5-3",
+        "VIRTUA-5-4"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Admin user is logged in",
+        "Lab with ID 456 exists"
+      ],
+      "inputs": {
+        "update_data": "{ \"name\": \"\" }"
+      },
+      "steps": [
+        "Admin updates lab information with { \"name\": \"\" }"
+      ],
+      "expected": [
+        "System returns an error"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Patient updates personal details (positive)",
+      "req_ids": [
+        "VIRTUA-5-5",
+        "VIRTUA-5-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient user is logged in",
+        "Patient with ID 789 exists"
+      ],
+      "inputs": {
+        "update_data": "{ \"email\": \"new@example.com\" }"
+      },
+      "steps": [
+        "Patient updates personal details with { \"email\": \"new@example.com\" }"
+      ],
+      "expected": [
+        "Patient's personal details are updated to { \"email\": \"new@example.com\" }"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Patient updates personal details (negative)",
+      "req_ids": [
+        "VIRTUA-5-5",
+        "VIRTUA-5-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient user is logged in",
+        "Patient with ID 789 exists"
+      ],
+      "inputs": {
+        "update_data": "{ \"email\": \"\" }"
+      },
+      "steps": [
+        "Patient updates personal details with { \"email\": \"\" }"
+      ],
+      "expected": [
+        "System returns an error"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Patient creates appointment (positive)",
+      "req_ids": [
+        "VIRTUA-5-7",
+        "VIRTUA-5-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient user is logged in",
+        "Patient with ID 789 exists",
+        "Doctor with ID 123 exists"
+      ],
+      "inputs": {
+        "appointment_date": "2024-01-01"
+      },
+      "steps": [
+        "Patient creates an appointment for 2024-01-01"
+      ],
+      "expected": [
+        "Appointment is created and can be viewed in the appointments tab"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Patient creates appointment (negative)",
+      "req_ids": [
+        "VIRTUA-5-7",
+        "VIRTUA-5-8"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient user is logged in",
+        "Patient with ID 789 exists",
+        "Doctor with ID 123 exists"
+      ],
+      "inputs": {
+        "appointment_date": "2023-01-01"
+      },
+      "steps": [
+        "Patient creates an appointment for 2023-01-01"
+      ],
+      "expected": [
+        "System returns an error"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": [],
+      "raw_if_unparsed": "We are given 8 requirements (VIRTUA-5-1 to VIRTUA-5-8). We must create a test suite in Gherkin (BDD DSL) that covers each requirement with at least one scenario. Additionally, we must have a Scenario Outline with Examples tables for normal, edge, and invalid values.\n\nHowever, note that the requirements are about different entities (admin updating doctors, labs/chemist, patients updating their own details, and patients creating appointments). We cannot mix all in one scenario. We need to break them down.\n\nLet's map each requirement to a scenario:\n\n- VIRTUA-5-1: Admin updates doctors information -> Scenario: Admin updates doctor's information\n- VIRTUA-5-2: Doctors profile information updated via admin -> This is the same as above, so we don't need a separate scenario for the same action. We'll cover it in the same scenario.\n- VIRTUA-5-3: Admin updates labs and chemist -> Scenario: Admin updates lab or chemist information\n- VIRTUA-5-4: Lab/Chemist information updated successfully -> Covered in the same scenario as VIRTUA-5-3.\n- VIRTUA-5-5: Patient updates their personal details -> Scenario: Patient updates their own personal details\n- VIRTUA-5-6: Patients details updated successfully -> Covered in the same scenario as VIRTUA-5-5.\n- VIRTUA-5-7: Patient creates appointment to visit the doctor (future date) -> Scenario: Patient creates a new appointment for a future date\n- VIRTUA-5-8: Appointment is created and can be viewed in appointments tab -> Covered in the same scenario as VIRTUA-5-7.\n\nBut note: the requirement VIRTUA-5-8 says \"Appointment is created and can be viewed in appointments tab vide Patient Appointment File.\" So we must check that the appointment appears in the appointments tab.\n\nWe have 4 distinct scenarios (each covering two requirements):\n\n1. Admin updates doctor information (covers VIRTUA-5-1 and VIRTUA-5-2)\n2. Admin updates lab or chemist information (covers VIRTUA-5-3 and VIRTUA-5-4)\n3. Patient updates their personal details (covers VIRTUA-5-5 and VIRTUA-5-6)\n4. Patient creates an appointment (covers VIRTUA-5-7 and VIRTUA-5-8)\n\nHowever, note that the requirement VIRTUA-5-7 specifies \"future date\", so we must test with a future date.\n\nWe are also required to have a Scenario Outline with Examples tables for normal, edge, and invalid values. But note: we have multiple scenarios. We cannot put all in one Scenario Outline because they are different actions.\n\nBut the problem says: \"The test set must contain a Scenario Outline with Examples tables containing normal, edge, and invalid values.\"\n\nThis implies that we should have at least one Scenario Outline (with Examples) that covers multiple test cases (for one scenario). However, we have 4 scenarios. We can have multiple Scenario Outlines, but the problem says \"a Scenario Outline\", meaning at least one. But to be safe, we'll create one Scenario Outline for each scenario that has multiple test cases (normal, edge, invalid). However, note that the problem says \"a Scenario Outline\", so we ",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": "[Gherkin content]",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Gherkin parse error: Parser errors:",
+      "artifact": "Feature: System Administration and Patient Management\n\n  Scenario: Admin has option to update doctors information (VIRTUA-5-1)\n    Given the admin is logged in\n    When the admin navigates to the doctors management section\n    Then the admin should see a button or link to update doctors information\n\n  Scenario Outline: Admin updates a doctor's contact information (VIRTUA-5-2)\n    Given the admin is logged in\n    And the admin has navigated to the doctor's profile page\n    When the admin updates the doctor's contact information to <contact_info>\n    Then the system should <result>\n\n    Examples:\n      | contact_info | result                          |\n      | 1234567890   | update successfully             |\n      | \"\"           | display error message           |\n      | abc          | display error message           |\n\n  Scenario: Admin has option to update labs and chemist (VIRTUA-5-3)\n    Given the admin is logged in\n    When the admin navigates to the labs and chemist management section\n    Then the admin should see a button or link to update labs and chemist\n\n  Scenario: Admin updates lab/chemist information successfully (VIRTUA-5-4)\n    Given the admin is logged in\n    And the admin has navigated to the lab/chemist profile page\n    When the admin updates the lab/chemist information with valid data\n    Then the system should update the lab/chemist information\n\n  Scenario: Patient can update their personal details (VIRTUA-5-5)\n    Given the patient is logged in\n    When the patient navigates to their profile page\n    Then the patient should see a button or link to update personal details\n\n  Scenario: Patient updates their personal details successfully (VIRTUA-5-6)\n    Given the patient is logged in\n    And the patient has navigated to their profile page\n    When the patient updates their personal details with valid data\n    Then the system should update the patient's personal details\n\n  Scenario: Patient can create appointment to visit the doctor (future date) (VIRTUA-5-7)\n    Given the patient is logged in\n    And the patient has selected a doctor\n    When the patient selects a future date for the appointment\n    Then the system should allow the appointment to be created\n\n  Scenario: Appointment is created and can be viewed in appointments tab (VIRTUA-5-8)\n    Given the patient is logged in\n    And the patient has created an appointment\n    When the patient navigates to the appointments tab\n    Then the appointment should be listed in the appointments tab",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).",
+      "artifact": "Feature: Admin and Patient Profile Management\n\n  Scenario Outline: Admin updates doctor information\n    Given an admin user is logged in\n    And a doctor with ID <doctor_id> exists\n    When the admin updates the doctor's information with <update_data>\n    Then the doctor's information is updated to <expected_data>\n\n    Examples:\n      | doctor_id | update_data | expected_data | kind        |\n      | 123       | { \"name\": \"Dr. Smith\" } | { \"name\": \"Dr. Smith\" } | positive    |\n      | 123       | { \"name\": \"\" } | \"error\" | negative    |\n\n  Scenario Outline: Admin updates lab/chemist information\n    Given an admin user is logged in\n    And a lab with ID <lab_id> exists\n    When the admin updates the lab's information with <update_data>\n    Then the lab's information is updated to <expected_data>\n\n    Examples:\n      | lab_id | update_data | expected_data | kind        |\n      | 456       | { \"name\": \"Lab A\" } | { \"name\": \"Lab A\" } | positive    |\n      | 456       | { \"name\": \"\" } | \"error\" | negative    |\n\n  Scenario Outline: Patient updates personal details\n    Given a patient user is logged in\n    And the patient has an account with ID <patient_id>\n    When the patient updates their personal details with <update_data>\n    Then the patient's personal details are updated to <expected_data>\n\n    Examples:\n      | patient_id | update_data | expected_data | kind        |\n      | 789       | { \"email\": \"new@example.com\" } | { \"email\": \"new@example.com\" } | positive    |\n      | 789       | { \"email\": \"\" } | \"error\" | negative    |\n\n  Scenario Outline: Patient creates appointment\n    Given a patient user is logged in\n    And the patient has an account with ID <patient_id>\n    And a doctor with ID <doctor_id> exists\n    When the patient creates an appointment for <appointment_date>\n    Then the appointment is created and can be viewed in the appointments tab\n\n    Examples:\n      | patient_id | doctor_id | appointment_date | kind        |\n      | 789        | 123       | \"2024-01-01\"     | positive    |\n      | 789        | 123       | \"2023-01-01\"     | negative    |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Admin updates doctor information (positive)",
+          "req_ids": [
+            "VIRTUA-5-1",
+            "VIRTUA-5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin user is logged in",
+            "Doctor with ID 123 exists"
+          ],
+          "inputs": {
+            "update_data": "{ \"name\": \"Dr. Smith\" }"
+          },
+          "steps": [
+            "Admin updates doctor information with { \"name\": \"Dr. Smith\" }"
+          ],
+          "expected": [
+            "Doctor's information is updated to { \"name\": \"Dr. Smith\" }"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Admin updates doctor information (negative)",
+          "req_ids": [
+            "VIRTUA-5-1",
+            "VIRTUA-5-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Admin user is logged in",
+            "Doctor with ID 123 exists"
+          ],
+          "inputs": {
+            "update_data": "{ \"name\": \"\" }"
+          },
+          "steps": [
+            "Admin updates doctor information with { \"name\": \"\" }"
+          ],
+          "expected": [
+            "System returns an error"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Admin updates lab/chemist information (positive)",
+          "req_ids": [
+            "VIRTUA-5-3",
+            "VIRTUA-5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin user is logged in",
+            "Lab with ID 456 exists"
+          ],
+          "inputs": {
+            "update_data": "{ \"name\": \"Lab A\" }"
+          },
+          "steps": [
+            "Admin updates lab information with { \"name\": \"Lab A\" }"
+          ],
+          "expected": [
+            "Lab's information is updated to { \"name\": \"Lab A\" }"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Admin updates lab/chemist information (negative)",
+          "req_ids": [
+            "VIRTUA-5-3",
+            "VIRTUA-5-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Admin user is logged in",
+            "Lab with ID 456 exists"
+          ],
+          "inputs": {
+            "update_data": "{ \"name\": \"\" }"
+          },
+          "steps": [
+            "Admin updates lab information with { \"name\": \"\" }"
+          ],
+          "expected": [
+            "System returns an error"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Patient updates personal details (positive)",
+          "req_ids": [
+            "VIRTUA-5-5",
+            "VIRTUA-5-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient user is logged in",
+            "Patient with ID 789 exists"
+          ],
+          "inputs": {
+            "update_data": "{ \"email\": \"new@example.com\" }"
+          },
+          "steps": [
+            "Patient updates personal details with { \"email\": \"new@example.com\" }"
+          ],
+          "expected": [
+            "Patient's personal details are updated to { \"email\": \"new@example.com\" }"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient updates personal details (negative)",
+          "req_ids": [
+            "VIRTUA-5-5",
+            "VIRTUA-5-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient user is logged in",
+            "Patient with ID 789 exists"
+          ],
+          "inputs": {
+            "update_data": "{ \"email\": \"\" }"
+          },
+          "steps": [
+            "Patient updates personal details with { \"email\": \"\" }"
+          ],
+          "expected": [
+            "System returns an error"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient creates appointment (positive)",
+          "req_ids": [
+            "VIRTUA-5-7",
+            "VIRTUA-5-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient user is logged in",
+            "Patient with ID 789 exists",
+            "Doctor with ID 123 exists"
+          ],
+          "inputs": {
+            "appointment_date": "2024-01-01"
+          },
+          "steps": [
+            "Patient creates an appointment for 2024-01-01"
+          ],
+          "expected": [
+            "Appointment is created and can be viewed in the appointments tab"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient creates appointment (negative)",
+          "req_ids": [
+            "VIRTUA-5-7",
+            "VIRTUA-5-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient user is logged in",
+            "Patient with ID 789 exists",
+            "Doctor with ID 123 exists"
+          ],
+          "inputs": {
+            "appointment_date": "2023-01-01"
+          },
+          "steps": [
+            "Patient creates an appointment for 2023-01-01"
+          ],
+          "expected": [
+            "System returns an error"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "123",
+            "context": "doctor ID",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Smith",
+            "context": "doctor name update",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Smith",
+            "context": "expected doctor name",
+            "grounded": false
+          },
+          {
+            "value": "",
+            "context": "doctor name empty",
+            "grounded": false
+          },
+          {
+            "value": "error",
+            "context": "expected error message",
+            "grounded": false
+          },
+          {
+            "value": "456",
+            "context": "lab ID",
+            "grounded": false
+          },
+          {
+            "value": "Lab A",
+            "context": "lab name update",
+            "grounded": false
+          },
+          {
+            "value": "Lab A",
+            "context": "expected lab name",
+            "grounded": false
+          },
+          {
+            "value": "",
+            "context": "lab name empty",
+            "grounded": false
+          },
+          {
+            "value": "789",
+            "context": "patient ID",
+            "grounded": false
+          },
+          {
+            "value": "new@example.com",
+            "context": "patient email update",
+            "grounded": false
+          },
+          {
+            "value": "new@example.com",
+            "context": "expected patient email",
+            "grounded": false
+          },
+          {
+            "value": "",
+            "context": "patient email empty",
+            "grounded": false
+          },
+          {
+            "value": "2024-01-01",
+            "context": "appointment date positive",
+            "grounded": false
+          },
+          {
+            "value": "2023-01-01",
+            "context": "appointment date negative",
+            "grounded": false
+          },
+          {
+            "value": "Appointment is created and can be viewed in the appointments tab",
+            "context": "expected appointment success message",
+            "grounded": false
+          },
+          {
+            "value": "System returns an error",
+            "context": "expected error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Lacks boundary testing for appointment dates (e.g., today, one day ahead).",
+          "Does not verify specific error codes or messages, only generic 'error'.",
+          "No validation tests for invalid email formats or other field constraints.",
+          "No tests for updating multiple fields simultaneously.",
+          "No persistence checks to confirm updates survive subsequent reads."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.735,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

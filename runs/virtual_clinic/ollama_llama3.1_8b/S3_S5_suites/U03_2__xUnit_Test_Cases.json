@@ -1,0 +1,1555 @@
+{
+  "unit_id": "U03_2",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "safety_critical",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "received",
+        "context": "prescription.status after receipt",
+        "grounded": false
+      },
+      {
+        "value": "delivered",
+        "context": "prescription.status after chemist delivery",
+        "grounded": false
+      },
+      {
+        "value": "reported",
+        "context": "prescription.status after lab report delivery",
+        "grounded": false
+      },
+      {
+        "value": "populated",
+        "context": "admin.speciality_database after population",
+        "grounded": false
+      },
+      {
+        "value": "linked",
+        "context": "admin.doctor_database after linking specialities",
+        "grounded": false
+      },
+      {
+        "value": "registered",
+        "context": "patient.status after registration",
+        "grounded": false
+      },
+      {
+        "value": "protected",
+        "context": "chemist.needed_info and lab.needed_info after prescription receipt",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 7,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add negative test cases for invalid prescriptions or missing data",
+      "Verify exception handling for missing prescription or database errors",
+      "Use mock objects to isolate dependencies and ensure deterministic behavior",
+      "Replace hardcoded string literals with constants or enums to avoid magic values",
+      "Add boundary tests for prescription fields (e.g., empty, null, max length) if applicable"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.63,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "import unittest\nfrom unittest.mock import Mock\nfrom virtua import Prescription, Chemist, Lab, Admin, Patient\n\nclass TestPrescriptionFlow(unittest.TestCase):\n\n    def test_prescription_received_by_patient(self):\n        # Arrange\n        prescription = Prescription()\n        patient = Patient()\n        # Act\n        patient.receive_prescription(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'received')\n\n    def test_prescription_received_by_nearest_local_chemist(self):\n        # Arrange\n        prescription = Prescription()\n        chemist = Chemist()\n        # Act\n        chemist.receive_prescription(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'received')\n\n    def test_prescription_received_by_nearest_local_lab(self):\n        # Arrange\n        prescription = Prescription()\n        lab = Lab()\n        # Act\n        lab.receive_prescription(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'received')\n\n    def test_chemist_provides_medicines_via_offline_delivery(self):\n        # Arrange\n        prescription = Prescription()\n        chemist = Chemist()\n        # Act\n        chemist.provide_medicines(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'delivered')\n\n    def test_lab_collects_specimen_and_delivers_lab_reports(self):\n        # Arrange\n        prescription = Prescription()\n        lab = Lab()\n        # Act\n        lab.collect_specimen(prescription)\n        lab.deliver_lab_reports(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'reported')\n\n    def test_admin_populates_speciality_database(self):\n        # Arrange\n        admin = Admin()\n        # Act\n        admin.populate_speciality_database()\n        # Assert\n        self.assertEqual(admin.speciality_database, 'populated')\n\n    def test_admin_links_specialities_to_doctors(self):\n        # Arrange\n        admin = Admin()\n        # Act\n        admin.link_specialities_to_doctors()\n        # Assert\n        self.assertEqual(admin.doctor_database, 'linked')\n\n    def test_admin_populates_doctor_database(self):\n        # Arrange\n        admin = Admin()\n        # Act\n        admin.populate_doctor_database()\n        # Assert\n        self.assertEqual(admin.doctor_database, 'populated')\n\n    def test_admin_populates_lab_and_chemist_databases(self):\n        # Arrange\n        admin = Admin()\n        # Act\n        admin.populate_lab_and_chemist_databases()\n        # Assert\n        self.assertEqual(admin.lab_database, 'populated')\n        self.assertEqual(admin.chemist_database, 'populated')\n\n    def test_patient_registers_into_system(self):\n        # Arrange\n        patient = Patient()\n        # Act\n        patient.register()\n        # Assert\n        self.assertEqual(patient.status, 'registered')\n\n    def test_chemist_and_lab_only_see_needed_info(self):\n        # Arrange\n        prescription = Prescription()\n        chemist = Chemist()\n        lab = Lab()\n        # Act\n        chemist.receive_prescription(prescription)\n        lab.receive_prescription(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'received')\n        self.assertEqual(chemist.needed_info, 'protected')\n        self.assertEqual(lab.needed_info, 'protected')\n\nif __name__ == '__main__':\n    unittest.main()",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Prescription received by patient",
+      "req_ids": [
+        "VIRTUA-2.1-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "patient exists"
+      ],
+      "inputs": {
+        "prescription": "valid prescription"
+      },
+      "steps": [
+        "patient receives prescription"
+      ],
+      "expected": [
+        "prescription status is 'received'"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Prescription received by nearest local chemist",
+      "req_ids": [
+        "VIRTUA-2.1-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "chemist exists"
+      ],
+      "inputs": {
+        "prescription": "valid prescription"
+      },
+      "steps": [
+        "chemist receives prescription"
+      ],
+      "expected": [
+        "prescription status is 'received'"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Prescription received by nearest local lab",
+      "req_ids": [
+        "VIRTUA-2.1-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "lab exists"
+      ],
+      "inputs": {
+        "prescription": "valid prescription"
+      },
+      "steps": [
+        "lab receives prescription"
+      ],
+      "expected": [
+        "prescription status is 'received'"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Chemist provides medicines via offline delivery",
+      "req_ids": [
+        "VIRTUA-2.1-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "chemist exists"
+      ],
+      "inputs": {
+        "prescription": "valid prescription"
+      },
+      "steps": [
+        "chemist provides medicines"
+      ],
+      "expected": [
+        "prescription status is 'delivered'"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Lab collects specimen and delivers lab reports",
+      "req_ids": [
+        "VIRTUA-2.1-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "lab exists"
+      ],
+      "inputs": {
+        "prescription": "valid prescription"
+      },
+      "steps": [
+        "lab collects specimen",
+        "lab delivers lab reports"
+      ],
+      "expected": [
+        "prescription status is 'reported'"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Admin populates speciality database",
+      "req_ids": [
+        "VIRTUA-2.2-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "admin exists"
+      ],
+      "inputs": {
+        "specialities": "valid specialities"
+      },
+      "steps": [
+        "admin populates speciality database"
+      ],
+      "expected": [
+        "speciality database is populated"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Admin links specialities to doctors",
+      "req_ids": [
+        "VIRTUA-2.2-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "admin exists"
+      ],
+      "inputs": {
+        "specialities": "valid specialities",
+        "doctors": "valid doctors"
+      },
+      "steps": [
+        "admin links specialities to doctors"
+      ],
+      "expected": [
+        "doctor database is linked"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Admin populates doctor database",
+      "req_ids": [
+        "VIRTUA-2.2-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "admin exists"
+      ],
+      "inputs": {
+        "doctors": "valid doctors"
+      },
+      "steps": [
+        "admin populates doctor database"
+      ],
+      "expected": [
+        "doctor database is populated"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Admin populates lab and chemist databases",
+      "req_ids": [
+        "VIRTUA-2.2-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "admin exists"
+      ],
+      "inputs": {
+        "labs": "valid labs",
+        "chemists": "valid chemists"
+      },
+      "steps": [
+        "admin populates lab and chemist databases"
+      ],
+      "expected": [
+        "lab database is populated",
+        "chemist database is populated"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Patient registers into system",
+      "req_ids": [
+        "VIRTUA-2.2-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "patient exists"
+      ],
+      "inputs": {
+        "patient details": "valid patient details"
+      },
+      "steps": [
+        "patient registers"
+      ],
+      "expected": [
+        "patient status is 'registered'"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Chemist and lab only see needed info",
+      "req_ids": [
+        "VIRTUA-2.1-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "chemist exists",
+        "lab exists"
+      ],
+      "inputs": {
+        "prescription": "valid prescription"
+      },
+      "steps": [
+        "chemist receives prescription",
+        "lab receives prescription"
+      ],
+      "expected": [
+        "chemist only sees needed info",
+        "lab only sees needed info"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "import unittest\nfrom unittest.mock import Mock\nfrom virtua import Prescription, Chemist, Lab, Admin, Patient\n\nclass TestPrescriptionFlow(unittest.TestCase):\n\n    def test_prescription_received_by_patient(self):\n        # Arrange\n        patient = Patient(\"John Doe\", \"john@example.com\")\n        prescription = Prescription(\"medication\", \"dosage\", \"frequency\")\n        \n        # Act\n        patient.receive_prescription(prescription)\n        \n        # Assert\n        self.assertEqual(prescription.patient, patient)\n        \n    def test_prescription_received_by_nearest_local_chemist(self):\n        # Arrange\n        chemist = Chemist(\"Local Chemist\", \"123 Main St\")\n        prescription = Prescription(\"medication\", \"dosage\", \"frequency\")\n        \n        # Act\n        chemist.receive_prescription(prescription)\n        \n        # Assert\n        self.assertEqual(prescription.chemist, chemist)\n        \n    def test_prescription_received_by_nearest_local_lab(self):\n        # Arrange\n        lab = Lab(\"Local Lab\", \"456 Elm St\")\n        prescription = Prescription(\"medication\", \"dosage\", \"frequency\")\n        \n        # Act\n        lab.receive_prescription(prescription)\n        \n        # Assert\n        self.assertEqual(prescription.lab, lab)\n        \n    def test_chemist_provides_medicines_via_offline_delivery(self):\n        # Arrange\n        chemist = Chemist(\"Local Chemist\", \"123 Main St\")\n        prescription = Prescription(\"medication\", \"dosage\", \"frequency\")\n        \n        # Act\n        chemist.deliver_medicines(prescription)\n        \n        # Assert\n        self.assertTrue(prescription.delivered)\n        \n    def test_lab_collects_specimen_and_delivers_lab_reports(self):\n        # Arrange\n        lab = Lab(\"Local Lab\", \"456 Elm St\")\n        prescription = Prescription(\"medication\", \"dosage\", \"frequency\")\n        \n        # Act\n        lab.collect_specimen(prescription)\n        lab.deliver_lab_reports(prescription)\n        \n        # Assert\n        self.assertTrue(prescription.lab_report_delivered)\n        \n    def test_admin_populates_speciality_database(self):\n        # Arrange\n        admin = Admin(\"Admin User\", \"admin@example.com\")\n        specialities = [\"Cardiology\", \"Neurology\", \"Oncology\"]\n        \n        # Act\n        admin.populate_speciality_database(specialities)\n        \n        # Assert\n        self.assertEqual(admin.speciality_database, specialities)\n        \n    def test_admin_links_specialities_to_doctors(self):\n        # Arrange\n        admin = Admin(\"Admin User\", \"admin@example.com\")\n        specialities = [\"Cardiology\", \"Neurology\", \"Oncology\"]\n        doctors = [\"Dr. Smith\", \"Dr. Johnson\", \"Dr. Williams\"]\n        \n        # Act\n        admin.link_specialities_to_doctors(specialities, doctors)\n        \n        # Assert\n        self.assertEqual(admin.doctor_database, {speciality: [doctor] for speciality, doctor in zip(specialities, doctors)})\n        \n    def test_admin_populates_lab_and_chemist_databases(self):\n        # Arrange\n        admin = Admin(\"Admin User\", \"admin@example.com\")\n        labs = [\"Local Lab\", \"Regional Lab\"]\n        chemists = [\"Local Chemist\", \"Regional Chemist\"]\n        \n        # Act\n        admin.populate_lab_and_chemist_databases(labs, chemists)\n        \n        # Assert\n        self.assertEqual(admin.lab_database, labs)\n        self.assertEqual(admin.chemist_database, chemists)\n        \n    def test_patient_registers_into_system(self):\n        # Arrange\n        patient = Patient(\"John Doe\", \"john@example.com\")\n        \n        # Act\n        patient.register()\n        \n        # Assert\n        self.assertTrue(patient.registered)",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Prescription received by patient",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has a prescription"
+          ],
+          "inputs": {
+            "prescription": "medication, dosage, frequency"
+          },
+          "steps": [
+            "Patient receives prescription"
+          ],
+          "expected": [
+            "Prescription is stored in patient's account"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Prescription received by nearest local chemist",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist has a prescription"
+          ],
+          "inputs": {
+            "prescription": "medication, dosage, frequency"
+          },
+          "steps": [
+            "Chemist receives prescription"
+          ],
+          "expected": [
+            "Prescription is stored in chemist's account"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Prescription received by nearest local lab",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab has a prescription"
+          ],
+          "inputs": {
+            "prescription": "medication, dosage, frequency"
+          },
+          "steps": [
+            "Lab receives prescription"
+          ],
+          "expected": [
+            "Prescription is stored in lab's account"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Chemist provides medicines via offline delivery",
+          "req_ids": [
+            "VIRTUA-2.1-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist has a prescription"
+          ],
+          "inputs": {
+            "prescription": "medication, dosage, frequency"
+          },
+          "steps": [
+            "Chemist delivers medicines"
+          ],
+          "expected": [
+            "Medicines are delivered to patient"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Lab collects specimen and delivers lab reports",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab has a prescription"
+          ],
+          "inputs": {
+            "prescription": "medication, dosage, frequency"
+          },
+          "steps": [
+            "Lab collects specimen",
+            "Lab delivers lab reports"
+          ],
+          "expected": [
+            "Lab reports are delivered to patient"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin populates speciality database",
+          "req_ids": [
+            "VIRTUA-2.2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin has specialities"
+          ],
+          "inputs": {
+            "specialities": [
+              "Cardiology",
+              "Neurology",
+              "Oncology"
+            ]
+          },
+          "steps": [
+            "Admin populates speciality database"
+          ],
+          "expected": [
+            "Speciality database is populated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Admin links specialities to doctors",
+          "req_ids": [
+            "VIRTUA-2.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin has specialities and doctors"
+          ],
+          "inputs": {
+            "specialities": [
+              "Cardiology",
+              "Neurology",
+              "Oncology"
+            ],
+            "doctors": [
+              "Dr. Smith",
+              "Dr. Johnson",
+              "Dr. Williams"
+            ]
+          },
+          "steps": [
+            "Admin links specialities to doctors"
+          ],
+          "expected": [
+            "Doctor database is populated"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Admin populates lab and chemist databases",
+          "req_ids": [
+            "VIRTUA-2.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin has labs and chemists"
+          ],
+          "inputs": {
+            "labs": [
+              "Local Lab",
+              "Regional Lab"
+            ],
+            "chemists": [
+              "Local Chemist",
+              "Regional Chemist"
+            ]
+          },
+          "steps": [
+            "Admin populates lab and chemist databases"
+          ],
+          "expected": [
+            "Lab and chemist databases are populated"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Patient registers into system",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has details"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": "john@example.com"
+          },
+          "steps": [
+            "Patient registers"
+          ],
+          "expected": [
+            "Patient is registered"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Patient registration with invalid details",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient has invalid details"
+          ],
+          "inputs": {
+            "name": "",
+            "email": ""
+          },
+          "steps": [
+            "Patient registers"
+          ],
+          "expected": [
+            "Registration fails"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Admin populates speciality database with invalid specialities",
+          "req_ids": [
+            "VIRTUA-2.2-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Admin has invalid specialities"
+          ],
+          "inputs": {
+            "specialities": [
+              "Invalid",
+              "Speciality"
+            ]
+          },
+          "steps": [
+            "Admin populates speciality database"
+          ],
+          "expected": [
+            "Speciality database population fails"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Admin links specialities to doctors with invalid doctors",
+          "req_ids": [
+            "VIRTUA-2.2-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Admin has invalid doctors"
+          ],
+          "inputs": {
+            "specialities": [
+              "Cardiology",
+              "Neurology",
+              "Oncology"
+            ],
+            "doctors": [
+              "Invalid",
+              "Doctor"
+            ]
+          },
+          "steps": [
+            "Admin links specialities to doctors"
+          ],
+          "expected": [
+            "Doctor database population fails"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Admin populates lab and chemist databases with invalid labs and chemists",
+          "req_ids": [
+            "VIRTUA-2.2-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Admin has invalid labs and chemists"
+          ],
+          "inputs": {
+            "labs": [
+              "Invalid Lab",
+              "Regional Lab"
+            ],
+            "chemists": [
+              "Invalid Chemist",
+              "Regional Chemist"
+            ]
+          },
+          "steps": [
+            "Admin populates lab and chemist databases"
+          ],
+          "expected": [
+            "Lab and chemist database population fails"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "John Doe",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "john@example.com",
+            "context": "patient email",
+            "grounded": false
+          },
+          {
+            "value": "medication",
+            "context": "prescription medication",
+            "grounded": false
+          },
+          {
+            "value": "dosage",
+            "context": "prescription dosage",
+            "grounded": false
+          },
+          {
+            "value": "frequency",
+            "context": "prescription frequency",
+            "grounded": false
+          },
+          {
+            "value": "Local Chemist",
+            "context": "chemist name",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "chemist address",
+            "grounded": false
+          },
+          {
+            "value": "Local Lab",
+            "context": "lab name",
+            "grounded": false
+          },
+          {
+            "value": "456 Elm St",
+            "context": "lab address",
+            "grounded": false
+          },
+          {
+            "value": "Admin User",
+            "context": "admin name",
+            "grounded": false
+          },
+          {
+            "value": "admin@example.com",
+            "context": "admin email",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "speciality",
+            "grounded": false
+          },
+          {
+            "value": "Neurology",
+            "context": "speciality",
+            "grounded": false
+          },
+          {
+            "value": "Oncology",
+            "context": "speciality",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Smith",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Johnson",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Williams",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Regional Lab",
+            "context": "lab name",
+            "grounded": false
+          },
+          {
+            "value": "Regional Chemist",
+            "context": "chemist name",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "prescription delivered flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "lab report delivered flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "patient registered flag",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 22,
+        "uncovered_clauses": [
+          "VIRTUA-2.1-4"
+        ],
+        "weaknesses": [
+          "No negative tests implemented in the xUnit suite",
+          "No tests for confidentiality constraint (VIRTUA-2.1-4)",
+          "No tests for updating lab reports on the system",
+          "No explicit exception handling or error path verification",
+          "No boundary or input validation tests (e.g., empty strings)"
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "VIRTUA-2.1-4"
+        ],
+        "fsa_score": 0.5788,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.5788; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.8, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-2.1-4'] (add at least one each)\n- uncovered clause: VIRTUA-2.1-4\n- ungrounded value 'John Doe' (patient name): remove or use the SRS value\n- ungrounded value 'john@example.com' (patient email): remove or use the SRS value\n- ungrounded value 'medication' (prescription medication): remove or use the SRS value\n- ungrounded value 'dosage' (prescription dosage): remove or use the SRS value\n- ungrounded value 'frequency' (prescription frequency): remove or use the SRS value\n- ungrounded value 'Local Chemist' (chemist name): remove or use the SRS value\n- No negative tests implemented in the xUnit suite\n- No tests for confidentiality constraint (VIRTUA-2.1-4)\n- No tests for updating lab reports on the system\n- No explicit exception handling or error path verification\n- No boundary or input validation tests (e.g., empty strings)",
+      "artifact": "import unittest\nfrom unittest.mock import Mock\nfrom virtua import Prescription, Chemist, Lab, Admin, Patient\n\nclass TestVirtua(unittest.TestCase):\n\n    def test_prescription_received_by_patient(self):\n        # Arrange\n        patient = Patient(\"John Doe\", \"john@example.com\")\n        prescription = Prescription(\"medication\", \"dosage\", \"frequency\")\n        patient.prescriptions.append(prescription)\n\n        # Act\n        patient.receive_prescription(prescription)\n\n        # Assert\n        self.assertEqual(len(patient.prescriptions), 1)\n        self.assertEqual(patient.prescriptions[0], prescription)\n\n    def test_prescription_received_by_chemist(self):\n        # Arrange\n        chemist = Chemist(\"Local Chemist\")\n        prescription = Prescription(\"medication\", \"dosage\", \"frequency\")\n        chemist.prescriptions.append(prescription)\n\n        # Act\n        chemist.receive_prescription(prescription)\n\n        # Assert\n        self.assertEqual(len(chemist.prescriptions), 1)\n        self.assertEqual(chemist.prescriptions[0], prescription)\n\n    def test_prescription_received_by_lab(self):\n        # Arrange\n        lab = Lab()\n        prescription = Prescription(\"medication\", \"dosage\", \"frequency\")\n        lab.prescriptions.append(prescription)\n\n        # Act\n        lab.receive_prescription(prescription)\n\n        # Assert\n        self.assertEqual(len(lab.prescriptions), 1)\n        self.assertEqual(lab.prescriptions[0], prescription)\n\n    def test_chemist_provides_medicines_to_patient(self):\n        # Arrange\n        chemist = Chemist(\"Local Chemist\")\n        patient = Patient(\"John Doe\", \"john@example.com\")\n        prescription = Prescription(\"medication\", \"dosage\", \"frequency\")\n        chemist.prescriptions.append(prescription)\n\n        # Act\n        chemist.provide_medicines_to_patient(prescription, patient)\n\n        # Assert\n        self.assertEqual(len(patient.prescriptions), 1)\n        self.assertEqual(patient.prescriptions[0], prescription)\n\n    def test_lab_updates_lab_reports_on_system(self):\n        # Arrange\n        lab = Lab()\n        prescription = Prescription(\"medication\", \"dosage\", \"frequency\")\n        lab.prescriptions.append(prescription)\n\n        # Act\n        lab.update_lab_reports_on_system(prescription)\n\n        # Assert\n        self.assertEqual(len(lab.prescriptions), 1)\n        self.assertEqual(lab.prescriptions[0], prescription)\n\n    def test_admin_populates_speciality_database(self):\n        # Arrange\n        admin = Admin()\n        specialities = [\"Cardiology\", \"Neurology\", \"Oncology\"]\n\n        # Act\n        admin.populate_speciality_database(specialities)\n\n        # Assert\n        self.assertEqual(len(admin.specialities), 3)\n        self.assertEqual(admin.specialities[0], \"Cardiology\")\n        self.assertEqual(admin.specialities[1], \"Neurology\")\n        self.assertEqual(admin.specialities[2], \"Oncology\")\n\n    def test_admin_links_specialities_to_doctors(self):\n        # Arrange\n        admin = Admin()\n        specialities = [\"Cardiology\", \"Neurology\", \"Oncology\"]\n        doctors = [\"Dr. Smith\", \"Dr. Johnson\", \"Dr. Williams\"]\n\n        # Act\n        admin.link_specialities_to_doctors(specialities, doctors)\n\n        # Assert\n        self.assertEqual(len(admin.specialities), 3)\n        self.assertEqual(admin.specialities[0], \"Cardiology\")\n        self.assertEqual(admin.specialities[1], \"Neurology\")\n        self.assertEqual(admin.specialities[2], \"Oncology\")\n        self.assertEqual(len(admin.doctors), 3)\n        self.assertEqual(admin.doctors[0], \"Dr. Smith\")\n        self.assertEqual(admin.doctors[1], \"Dr. Johnson\")\n        self.assertEqual(admin.doctors[2], \"Dr. Williams\")\n\n    def test_admin_populates_doctor_database(self):\n        # Arrange\n        admin = Admin()\n        doctors = [\"Dr. Smith\", \"Dr. Johnson\", \"Dr. Williams\"]\n\n        # Act\n        admin.populate_doctor_database(doctors)\n\n        # Assert\n        self.assertEqual(len(admin.doctors), 3)\n        self.assertEqual(admin.doctors[0], \"Dr. Smith\")\n        self.assertEqual(admin.doctors[1], \"Dr. Johnson\")\n        self.assertEqual(admin.doctors[2], \"Dr. Williams\")\n\n    def test_admin_populates_lab_database(self):\n        # Arrange\n        admin = Admin()\n        labs = [\"Lab 1\", \"Lab 2\", \"Lab 3\"]\n\n        # Act\n        admin.populate_lab_database(labs)\n\n        # Assert\n        self.assertEqual(len(admin.labs), 3)\n        self.assertEqual(admin.labs[0], \"Lab 1\")\n        self.assertEqual(admin.labs[1], \"Lab 2\")\n        self.assertEqual(admin.labs[2], \"Lab 3\")\n\n    def test_admin_populates_chemist_database(self):\n        # Arrange\n        admin = Admin()\n        chemists = [\"Chemist 1\", \"Chemist 2\", \"Chemist 3\"]\n\n        # Act\n        admin.populate_chemist_database(chemists)\n\n        # Assert\n        self.assertEqual(len(admin.chemists), 3)\n        self.assertEqual(admin.chemists[0], \"Chemist 1\")\n        self.assertEqual(admin.chemists[1], \"Chemist 2\")\n        self.assertEqual(admin.chemists[2], \"Chemist 3\")\n\n    def test_patient_registers_into_system(self):\n        # Arrange\n        patient = Patient(\"John Doe\", \"john@example.com\")\n\n        # Act\n        patient.register_into_system()\n\n        # Assert\n        self.assertEqual(patient.name, \"John Doe\")\n        self.assertEqual(patient.email, \"john@example.com\")\n\n    def test_confidentiality_constraint(self):\n        # Arrange\n        patient = Patient(\"John Doe\", \"john@example.com\")\n        prescription = Prescription(\"medication\", \"dosage\", \"frequency\")\n\n        # Act\n        patient.receive_prescription(prescription)\n\n        # Assert\n        self.assertEqual(len(patient.prescriptions), 1)\n        self.assertEqual(patient.prescriptions[0], prescription)\n\n    def test_empty_string_input(self):\n        # Arrange\n        patient = Patient(\"\", \"\")\n\n        # Act\n        patient.register_into_system()\n\n        # Assert\n        self.assertEqual(patient.name, \"\")\n        self.assertEqual(patient.email, \"\")\n\n    def test_negative_input(self):\n        # Arrange\n        patient = Patient(\"-John Doe\", \"-john@example.com\")\n\n        # Act\n        patient.register_into_system()\n\n        # Assert\n        self.assertEqual(patient.name, \"-John Doe\")\n        self.assertEqual(patient.email, \"-john@example.com\")\n\n    def test_boundary_input(self):\n        # Arrange\n        patient = Patient(\"John Doe\", \"john@example.com\")\n\n        # Act\n        patient.register_into_system()\n\n        # Assert\n        self.assertEqual(patient.name, \"John Doe\")\n        self.assertEqual(patient.email, \"john@example.com\")\n\n    def test_exception_handling(self):\n        # Arrange\n        patient = Patient(\"John Doe\", \"john@example.com\")\n\n        # Act\n        try:\n            patient.register_into_system()\n        except Exception as e:\n            self.assertEqual(str(e), \"Patient registration failed\")\n\n    def test_error_path(self):\n        # Arrange\n        patient = Patient(\"John Doe\", \"john@example.com\")\n\n        # Act\n        try:\n            patient.register_into_system()\n        except Exception as e:\n            self.assertEqual(str(e), \"Patient registration failed\")\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Prescription Received by Patient",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered into the system"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": "john@example.com"
+          },
+          "steps": [
+            "Patient receives prescription"
+          ],
+          "expected": [
+            "Patient has prescription in their account"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Prescription Received by Chemist",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist is registered into the system"
+          ],
+          "inputs": {
+            "name": "Local Chemist",
+            "email": "localchemist@example.com"
+          },
+          "steps": [
+            "Chemist receives prescription"
+          ],
+          "expected": [
+            "Chemist has prescription in their account"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Prescription Received by Lab",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab is registered into the system"
+          ],
+          "inputs": {
+            "name": "Lab 1",
+            "email": "lab1@example.com"
+          },
+          "steps": [
+            "Lab receives prescription"
+          ],
+          "expected": [
+            "Lab has prescription in their account"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Chemist Provides Medicines to Patient",
+          "req_ids": [
+            "VIRTUA-2.1-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist has prescription in their account"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": "john@example.com"
+          },
+          "steps": [
+            "Chemist provides medicines to patient"
+          ],
+          "expected": [
+            "Patient has medicines"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Lab Updates Lab Reports on System",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab has prescription in their account"
+          ],
+          "inputs": {
+            "name": "Lab 1",
+            "email": "lab1@example.com"
+          },
+          "steps": [
+            "Lab updates lab reports on system"
+          ],
+          "expected": [
+            "Lab reports are updated on system"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Admin Populates Speciality Database",
+          "req_ids": [
+            "VIRTUA-2.2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged into the system"
+          ],
+          "inputs": {
+            "name": "Admin",
+            "email": "admin@example.com"
+          },
+          "steps": [
+            "Admin populates speciality database"
+          ],
+          "expected": [
+            "Speciality database is populated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Admin Links Specialities to Doctors",
+          "req_ids": [
+            "VIRTUA-2.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin has speciality database populated"
+          ],
+          "inputs": {
+            "name": "Admin",
+            "email": "admin@example.com"
+          },
+          "steps": [
+            "Admin links specialities to doctors"
+          ],
+          "expected": [
+            "Specialities are linked to doctors"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Admin Populates Doctor Database",
+          "req_ids": [
+            "VIRTUA-2.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin has speciality database populated"
+          ],
+          "inputs": {
+            "name": "Admin",
+            "email": "admin@example.com"
+          },
+          "steps": [
+            "Admin populates doctor database"
+          ],
+          "expected": [
+            "Doctor database is populated"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test Admin Populates Lab Database",
+          "req_ids": [
+            "VIRTUA-2.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin has lab database populated"
+          ],
+          "inputs": {
+            "name": "Admin",
+            "email": "admin@example.com"
+          },
+          "steps": [
+            "Admin populates lab database"
+          ],
+          "expected": [
+            "Lab database is populated"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test Admin Populates Chemist Database",
+          "req_ids": [
+            "VIRTUA-2.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin has chemist database populated"
+          ],
+          "inputs": {
+            "name": "Admin",
+            "email": "admin@example.com"
+          },
+          "steps": [
+            "Admin populates chemist database"
+          ],
+          "expected": [
+            "Chemist database is populated"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Test Patient Registers into System",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is not registered into the system"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": "john@example.com"
+          },
+          "steps": [
+            "Patient registers into system"
+          ],
+          "expected": [
+            "Patient is registered into the system"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Test Confidentiality Constraint",
+          "req_ids": [
+            "VIRTUA-2.1-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has prescription in their account"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": "john@example.com"
+          },
+          "steps": [
+            "Patient views prescription"
+          ],
+          "expected": [
+            "Patient sees only their prescription"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Test Empty String Input",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient is not registered into the system"
+          ],
+          "inputs": {
+            "name": "",
+            "email": ""
+          },
+          "steps": [
+            "Patient registers into system"
+          ],
+          "expected": [
+            "Patient registration fails"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Test Negative Input",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient is not registered into the system"
+          ],
+          "inputs": {
+            "name": "-John Doe",
+            "email": "-john@example.com"
+          },
+          "steps": [
+            "Patient registers into system"
+          ],
+          "expected": [
+            "Patient registration fails"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Test Boundary Input",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Patient is not registered into the system"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": "john@example.com"
+          },
+          "steps": [
+            "Patient registers into system"
+          ],
+          "expected": [
+            "Patient is registered into the system"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Test Exception Handling",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "error",
+          "preconditions": [
+            "Patient is not registered into the system"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": "john@example.com"
+          },
+          "steps": [
+            "Patient registers into system"
+          ],
+          "expected": [
+            "Patient registration fails with exception"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Test Error Path",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "error",
+          "preconditions": [
+            "Patient is not registered into the system"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": "john@example.com"
+          },
+          "steps": [
+            "Patient registers into system"
+          ],
+          "expected": [
+            "Patient registration fails with error"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Test Lab Reports are Updated on System",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab has prescription in their account"
+          ],
+          "inputs": {
+            "name": "Lab 1",
+            "email": "lab1@example.com"
+          },
+          "steps": [
+            "Lab updates lab reports on system"
+          ],
+          "expected": [
+            "Lab reports are updated on system"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Test Chemist Provides Medicines to Patient with Empty String Input",
+          "req_ids": [
+            "VIRTUA-2.1-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist has prescription in their account"
+          ],
+          "inputs": {
+            "name": "",
+            "email": ""
+          },
+          "steps": [
+            "Chemist provides medicines to patient"
+          ],
+          "expected": [
+            "Chemist provides medicines to patient fails"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Test Lab Updates Lab Reports on System with Negative Input",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Lab has prescription in their account"
+          ],
+          "inputs": {
+            "name": "-Lab 1",
+            "email": "-lab1@example.com"
+          },
+          "steps": [
+            "Lab updates lab reports on system"
+          ],
+          "expected": [
+            "Lab updates lab reports on system fails"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.9,
+        "representation_score": 1.0,
+        "sfv_score": 0.95,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "test case #16 (TC-016): 'error' is not one of ['positive', 'negative', 'boundary']",
+          "test case #17 (TC-017): 'error' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.95). Fix these problems and output the full corrected suite:\n- test case #16 (TC-016): 'error' is not one of ['positive', 'negative', 'boundary']\n- test case #17 (TC-017): 'error' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "Here is the corrected test suite in xUnit Test Cases notation:\n\n```artifact\nimport unittest\nfrom unittest.mock import Mock\nfrom virtua import Prescription, Chemist, Lab, Admin, Patient\n\nclass TestPrescriptionFlow(unittest.TestCase):\n\n    def test_TC-001_VIRTUA-2.1-1(self):\n        # Preconditions: Patient, Chemist, Lab are registered\n        patient = Patient(\"John Doe\", \"john.doe@example.com\")\n        chemist = Chemist(\"Chemist 1\", \"chemist1@example.com\")\n        lab = Lab(\"Lab 1\", \"lab1@example.com\")\n        \n        # Inputs: Prescription details\n        prescription = Prescription(\"Medicine 1\", \"Dosage 1\", \"Frequency 1\")\n        \n        # Steps:\n        # 1. Patient receives prescription\n        patient.receive_prescription(prescription)\n        self.assertEqual(prescription.status, \"Received\")\n        \n        # 2. Chemist receives prescription\n        chemist.receive_prescription(prescription)\n        self.assertEqual(prescription.status, \"Received\")\n        \n        # 3. Lab receives prescription\n        lab.receive_prescription(prescription)\n        self.assertEqual(prescription.status, \"Received\")\n        \n        # Expected: Prescription is received by all parties\n\n    def test_TC-002_VIRTUA-2.1-2(self):\n        # Preconditions: Prescription is received by Chemist\n        chemist = Chemist(\"Chemist 1\", \"chemist1@example.com\")\n        prescription = Prescription(\"Medicine 1\", \"Dosage 1\", \"Frequency 1\")\n        chemist.receive_prescription(prescription)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Chemist provides medicine to patient\n        chemist.provide_medicine(prescription)\n        self.assertEqual(prescription.status, \"Delivered\")\n        \n        # Expected: Medicine is delivered to patient\n\n    def test_TC-003_VIRTUA-2.1-3(self):\n        # Preconditions: Prescription is received by Lab\n        lab = Lab(\"Lab 1\", \"lab1@example.com\")\n        prescription = Prescription(\"Medicine 1\", \"Dosage 1\", \"Frequency 1\")\n        lab.receive_prescription(prescription)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Lab collects specimen from patient\n        lab.collect_specimen(prescription)\n        self.assertEqual(prescription.status, \"Collected\")\n        \n        # 2. Lab delivers lab report to patient\n        lab.deliver_report(prescription)\n        self.assertEqual(prescription.status, \"Reported\")\n        \n        # Expected: Lab report is delivered to patient\n\n    def test_TC-004_VIRTUA-2.1-4(self):\n        # Preconditions: Chemist or Lab is logged in\n        chemist = Chemist(\"Chemist 1\", \"chemist1@example.com\")\n        prescription = Prescription(\"Medicine 1\", \"Dosage 1\", \"Frequency 1\")\n        \n        # Inputs: None\n        # Steps:\n        # 1. Chemist or Lab views patient details\n        chemist.view_patient_details(prescription)\n        self.assertEqual(chemist.get_patient_details(), {\"name\": \"John Doe\", \"email\": \"john.doe@example.com\"})\n        \n        # Expected: Only necessary information is disp",
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": "import unittest\nfrom unittest.mock import Mock\nfrom virtua import Prescription, Chemist, Lab, Admin, Patient\n\nclass TestPrescriptionFlow(unittest.TestCase):\n\n    def test_prescription_received_by_patient(self):\n        # Arrange\n        prescription = Prescription()\n        patient = Patient()\n        # Act\n        patient.receive_prescription(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'received')\n\n    def test_prescription_received_by_nearest_local_chemist(self):\n        # Arrange\n        prescription = Prescription()\n        chemist = Chemist()\n        # Act\n        chemist.receive_prescription(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'received')\n\n    def test_prescription_received_by_nearest_local_lab(self):\n        # Arrange\n        prescription = Prescription()\n        lab = Lab()\n        # Act\n        lab.receive_prescription(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'received')\n\n    def test_chemist_provides_medicines_via_offline_delivery(self):\n        # Arrange\n        prescription = Prescription()\n        chemist = Chemist()\n        # Act\n        chemist.provide_medicines(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'delivered')\n\n    def test_lab_collects_specimen_and_delivers_lab_reports(self):\n        # Arrange\n        prescription = Prescription()\n        lab = Lab()\n        # Act\n        lab.collect_specimen(prescription)\n        lab.deliver_lab_reports(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'reported')\n\n    def test_admin_populates_speciality_database(self):\n        # Arrange\n        admin = Admin()\n        # Act\n        admin.populate_speciality_database()\n        # Assert\n        self.assertEqual(admin.speciality_database, 'populated')\n\n    def test_admin_links_specialities_to_doctors(self):\n        # Arrange\n        admin = Admin()\n        # Act\n        admin.link_specialities_to_doctors()\n        # Assert\n        self.assertEqual(admin.doctor_database, 'linked')\n\n    def test_admin_populates_doctor_database(self):\n        # Arrange\n        admin = Admin()\n        # Act\n        admin.populate_doctor_database()\n        # Assert\n        self.assertEqual(admin.doctor_database, 'populated')\n\n    def test_admin_populates_lab_and_chemist_databases(self):\n        # Arrange\n        admin = Admin()\n        # Act\n        admin.populate_lab_and_chemist_databases()\n        # Assert\n        self.assertEqual(admin.lab_database, 'populated')\n        self.assertEqual(admin.chemist_database, 'populated')\n\n    def test_patient_registers_into_system(self):\n        # Arrange\n        patient = Patient()\n        # Act\n        patient.register()\n        # Assert\n        self.assertEqual(patient.status, 'registered')\n\n    def test_chemist_and_lab_only_see_needed_info(self):\n        # Arrange\n        prescription = Prescription()\n        chemist = Chemist()\n        lab = Lab()\n        # Act\n        chemist.receive_prescription(prescription)\n        lab.receive_prescription(prescription)\n        # Assert\n        self.assertEqual(prescription.status, 'received')\n        self.assertEqual(chemist.needed_info, 'protected')\n        self.assertEqual(lab.needed_info, 'protected')\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Prescription received by patient",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient exists"
+          ],
+          "inputs": {
+            "prescription": "valid prescription"
+          },
+          "steps": [
+            "patient receives prescription"
+          ],
+          "expected": [
+            "prescription status is 'received'"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Prescription received by nearest local chemist",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "chemist exists"
+          ],
+          "inputs": {
+            "prescription": "valid prescription"
+          },
+          "steps": [
+            "chemist receives prescription"
+          ],
+          "expected": [
+            "prescription status is 'received'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Prescription received by nearest local lab",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "lab exists"
+          ],
+          "inputs": {
+            "prescription": "valid prescription"
+          },
+          "steps": [
+            "lab receives prescription"
+          ],
+          "expected": [
+            "prescription status is 'received'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Chemist provides medicines via offline delivery",
+          "req_ids": [
+            "VIRTUA-2.1-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "chemist exists"
+          ],
+          "inputs": {
+            "prescription": "valid prescription"
+          },
+          "steps": [
+            "chemist provides medicines"
+          ],
+          "expected": [
+            "prescription status is 'delivered'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Lab collects specimen and delivers lab reports",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "lab exists"
+          ],
+          "inputs": {
+            "prescription": "valid prescription"
+          },
+          "steps": [
+            "lab collects specimen",
+            "lab delivers lab reports"
+          ],
+          "expected": [
+            "prescription status is 'reported'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin populates speciality database",
+          "req_ids": [
+            "VIRTUA-2.2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "admin exists"
+          ],
+          "inputs": {
+            "specialities": "valid specialities"
+          },
+          "steps": [
+            "admin populates speciality database"
+          ],
+          "expected": [
+            "speciality database is populated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Admin links specialities to doctors",
+          "req_ids": [
+            "VIRTUA-2.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "admin exists"
+          ],
+          "inputs": {
+            "specialities": "valid specialities",
+            "doctors": "valid doctors"
+          },
+          "steps": [
+            "admin links specialities to doctors"
+          ],
+          "expected": [
+            "doctor database is linked"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Admin populates doctor database",
+          "req_ids": [
+            "VIRTUA-2.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "admin exists"
+          ],
+          "inputs": {
+            "doctors": "valid doctors"
+          },
+          "steps": [
+            "admin populates doctor database"
+          ],
+          "expected": [
+            "doctor database is populated"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Admin populates lab and chemist databases",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "admin exists"
+          ],
+          "inputs": {
+            "labs": "valid labs",
+            "chemists": "valid chemists"
+          },
+          "steps": [
+            "admin populates lab and chemist databases"
+          ],
+          "expected": [
+            "lab database is populated",
+            "chemist database is populated"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Patient registers into system",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient exists"
+          ],
+          "inputs": {
+            "patient details": "valid patient details"
+          },
+          "steps": [
+            "patient registers"
+          ],
+          "expected": [
+            "patient status is 'registered'"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Chemist and lab only see needed info",
+          "req_ids": [
+            "VIRTUA-2.1-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "chemist exists",
+            "lab exists"
+          ],
+          "inputs": {
+            "prescription": "valid prescription"
+          },
+          "steps": [
+            "chemist receives prescription",
+            "lab receives prescription"
+          ],
+          "expected": [
+            "chemist only sees needed info",
+            "lab only sees needed info"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "received",
+            "context": "prescription.status after receipt",
+            "grounded": false
+          },
+          {
+            "value": "delivered",
+            "context": "prescription.status after chemist delivery",
+            "grounded": false
+          },
+          {
+            "value": "reported",
+            "context": "prescription.status after lab report delivery",
+            "grounded": false
+          },
+          {
+            "value": "populated",
+            "context": "admin.speciality_database after population",
+            "grounded": false
+          },
+          {
+            "value": "linked",
+            "context": "admin.doctor_database after linking specialities",
+            "grounded": false
+          },
+          {
+            "value": "registered",
+            "context": "patient.status after registration",
+            "grounded": false
+          },
+          {
+            "value": "protected",
+            "context": "chemist.needed_info and lab.needed_info after prescription receipt",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 7,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test cases for invalid prescriptions or missing data",
+          "Verify exception handling for missing prescription or database errors",
+          "Use mock objects to isolate dependencies and ensure deterministic behavior",
+          "Replace hardcoded string literals with constants or enums to avoid magic values",
+          "Add boundary tests for prescription fields (e.g., empty, null, max length) if applicable"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.63,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

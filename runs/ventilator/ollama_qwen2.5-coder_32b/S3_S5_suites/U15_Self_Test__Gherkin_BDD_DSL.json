@@ -1,0 +1,1125 @@
+{
+  "unit_id": "U15_Self_Test",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.93,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.1905,
+    "hallucinated": [
+      {
+        "value": "100",
+        "context": "pressure sensor input",
+        "grounded": false
+      },
+      {
+        "value": "-10",
+        "context": "pressure sensor input",
+        "grounded": false
+      },
+      {
+        "value": "0",
+        "context": "pressure sensor input",
+        "grounded": false
+      },
+      {
+        "value": "200",
+        "context": "pressure sensor input",
+        "grounded": false
+      },
+      {
+        "value": "100",
+        "context": "flow sensor input",
+        "grounded": false
+      },
+      {
+        "value": "-10",
+        "context": "flow sensor input",
+        "grounded": false
+      },
+      {
+        "value": "0",
+        "context": "flow sensor input",
+        "grounded": false
+      },
+      {
+        "value": "200",
+        "context": "flow sensor input",
+        "grounded": false
+      },
+      {
+        "value": "pass",
+        "context": "check result",
+        "grounded": false
+      },
+      {
+        "value": "fail",
+        "context": "check result",
+        "grounded": false
+      },
+      {
+        "value": "the pressure sensor should read 100",
+        "context": "expected output",
+        "grounded": false
+      },
+      {
+        "value": "the pressure sensor should read 0",
+        "context": "expected output",
+        "grounded": false
+      },
+      {
+        "value": "the pressure sensor should read 200",
+        "context": "expected output",
+        "grounded": false
+      },
+      {
+        "value": "the check flow_sensor should pass with result pass",
+        "context": "expected check result",
+        "grounded": false
+      },
+      {
+        "value": "the check flow_sensor should pass with result fail",
+        "context": "expected check result",
+        "grounded": false
+      },
+      {
+        "value": "the check pressure_sensor should pass with result pass",
+        "context": "expected check result",
+        "grounded": false
+      },
+      {
+        "value": "the check pressure_sensor should pass with result fail",
+        "context": "expected check result",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 21,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "TC-001 uses vague expected flow value; add concrete numeric expectation.",
+      "No boundary values tested for flow sensor accuracy.",
+      "Pass/fail semantics for pre-test mode checks are not defined in SRS; tests assume them.",
+      "Negative pressure values may not be realistic; requirement does not specify handling.",
+      "Test suite does not assert system state transitions or error codes for invalid inputs."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.8681,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Self-Test and Pre-Test Mode Validation\n\n  Scenario: Validate flow sensor accuracy\n    Given the blower is set to a certain speed\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is performed\n    Then the flow sensor should give the expected flow value\n\n  Scenario Outline: Validate pressure sensor accuracy\n    Given the pressure sensor is calibrated\n    When the self-test is performed with pressure <value>\n    Then the pressure sensor should read <expected_value>\n    Examples:\n      | kind     | value | expected_value |\n      | positive | 100   | 100            |\n      | negative | -10   | 0              |\n      | boundary | 0     | 0              |\n      | boundary | 200   | 200            |\n\n  Scenario: Controller supports pre-test mode\n    Given the controller is in normal operation mode\n    When the pre-test mode is activated\n    Then the controller should enter pre-test mode\n\n  Scenario: GUI supports controller's pre-test mode\n    Given the GUI is displayed\n    And the controller is in normal operation mode\n    When the user activates the pre-test mode from the GUI\n    Then the GUI should indicate that the controller is in pre-test mode\n\n  Scenario Outline: Controller's pre-test mode includes checks\n    Given the controller is in pre-test mode\n    When the pre-test mode performs check <check_name> with value <value>\n    Then the check <check_name> should pass with result <expected_result>\n    Examples:\n      | kind     | check_name       | value | expected_result |\n      | positive | flow_sensor      | 100   | pass            |\n      | negative | flow_sensor      | -10   | fail            |\n      | boundary | flow_sensor      | 0     | pass            |\n      | boundary | flow_sensor      | 200   | pass            |\n      | positive | pressure_sensor  | 100   | pass            |\n      | negative | pressure_sensor  | -10   | fail            |\n      | boundary | pressure_sensor  | 0     | pass            |\n      | boundary | pressure_sensor  | 200   | pass            |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Validate flow sensor accuracy",
+      "req_ids": [
+        "RW-SW-161"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the blower is set to a certain speed",
+        "the air lines are open",
+        "nothing is connected to the output"
+      ],
+      "inputs": {},
+      "steps": [
+        "the self-test is performed"
+      ],
+      "expected": [
+        "the flow sensor should give the expected flow value"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Validate pressure sensor accuracy with positive value",
+      "req_ids": [
+        "RW-SW-166"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the pressure sensor is calibrated"
+      ],
+      "inputs": {
+        "value": 100
+      },
+      "steps": [
+        "the self-test is performed with pressure 100"
+      ],
+      "expected": [
+        "the pressure sensor should read 100"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Validate pressure sensor accuracy with negative value",
+      "req_ids": [
+        "RW-SW-166"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the pressure sensor is calibrated"
+      ],
+      "inputs": {
+        "value": -10
+      },
+      "steps": [
+        "the self-test is performed with pressure -10"
+      ],
+      "expected": [
+        "the pressure sensor should read 0"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Validate pressure sensor accuracy with boundary value 0",
+      "req_ids": [
+        "RW-SW-166"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the pressure sensor is calibrated"
+      ],
+      "inputs": {
+        "value": 0
+      },
+      "steps": [
+        "the self-test is performed with pressure 0"
+      ],
+      "expected": [
+        "the pressure sensor should read 0"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Validate pressure sensor accuracy with boundary value 200",
+      "req_ids": [
+        "RW-SW-166"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the pressure sensor is calibrated"
+      ],
+      "inputs": {
+        "value": 200
+      },
+      "steps": [
+        "the self-test is performed with pressure 200"
+      ],
+      "expected": [
+        "the pressure sensor should read 200"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Controller supports pre-test mode",
+      "req_ids": [
+        "RW-SW-150"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is in normal operation mode"
+      ],
+      "inputs": {},
+      "steps": [
+        "the pre-test mode is activated"
+      ],
+      "expected": [
+        "the controller should enter pre-test mode"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "GUI supports controller's pre-test mode",
+      "req_ids": [
+        "RW-SW-151"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the GUI is displayed",
+        "the controller is in normal operation mode"
+      ],
+      "inputs": {},
+      "steps": [
+        "the user activates the pre-test mode from the GUI"
+      ],
+      "expected": [
+        "the GUI should indicate that the controller is in pre-test mode"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Controller's pre-test mode includes flow sensor check with positive value",
+      "req_ids": [
+        "RW-SW-152"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is in pre-test mode"
+      ],
+      "inputs": {
+        "check_name": "flow_sensor",
+        "value": 100
+      },
+      "steps": [
+        "the pre-test mode performs check flow_sensor with value 100"
+      ],
+      "expected": [
+        "the check flow_sensor should pass with result pass"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Controller's pre-test mode includes flow sensor check with negative value",
+      "req_ids": [
+        "RW-SW-152"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller is in pre-test mode"
+      ],
+      "inputs": {
+        "check_name": "flow_sensor",
+        "value": -10
+      },
+      "steps": [
+        "the pre-test mode performs check flow_sensor with value -10"
+      ],
+      "expected": [
+        "the check flow_sensor should pass with result fail"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Controller's pre-test mode includes flow sensor check with boundary value 0",
+      "req_ids": [
+        "RW-SW-152"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the controller is in pre-test mode"
+      ],
+      "inputs": {
+        "check_name": "flow_sensor",
+        "value": 0
+      },
+      "steps": [
+        "the pre-test mode performs check flow_sensor with value 0"
+      ],
+      "expected": [
+        "the check flow_sensor should pass with result pass"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Controller's pre-test mode includes flow sensor check with boundary value 200",
+      "req_ids": [
+        "RW-SW-152"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the controller is in pre-test mode"
+      ],
+      "inputs": {
+        "check_name": "flow_sensor",
+        "value": 200
+      },
+      "steps": [
+        "the pre-test mode performs check flow_sensor with value 200"
+      ],
+      "expected": [
+        "the check flow_sensor should pass with result pass"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Controller's pre-test mode includes pressure sensor check with positive value",
+      "req_ids": [
+        "RW-SW-152"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the controller is in pre-test mode"
+      ],
+      "inputs": {
+        "check_name": "pressure_sensor",
+        "value": 100
+      },
+      "steps": [
+        "the pre-test mode performs check pressure_sensor with value 100"
+      ],
+      "expected": [
+        "the check pressure_sensor should pass with result pass"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Controller's pre-test mode includes pressure sensor check with negative value",
+      "req_ids": [
+        "RW-SW-152"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the controller is in pre-test mode"
+      ],
+      "inputs": {
+        "check_name": "pressure_sensor",
+        "value": -10
+      },
+      "steps": [
+        "the pre-test mode performs check pressure_sensor with value -10"
+      ],
+      "expected": [
+        "the check pressure_sensor should pass with result fail"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Controller's pre-test mode includes pressure sensor check with boundary value 0",
+      "req_ids": [
+        "RW-SW-152"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the controller is in pre-test mode"
+      ],
+      "inputs": {
+        "check_name": "pressure_sensor",
+        "value": 0
+      },
+      "steps": [
+        "the pre-test mode performs check pressure_sensor with value 0"
+      ],
+      "expected": [
+        "the check pressure_sensor should pass with result pass"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "Controller's pre-test mode includes pressure sensor check with boundary value 200",
+      "req_ids": [
+        "RW-SW-152"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the controller is in pre-test mode"
+      ],
+      "inputs": {
+        "check_name": "pressure_sensor",
+        "value": 200
+      },
+      "steps": [
+        "the pre-test mode performs check pressure_sensor with value 200"
+      ],
+      "expected": [
+        "the check pressure_sensor should pass with result pass"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Self-Test and Pre-Test Mode Validation\n\n  Scenario: Validate flow sensor accuracy\n    Given the blower is set to a certain speed\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is performed\n    Then the flow sensor should give the expected flow value\n\n  Scenario Outline: Validate pressure sensor accuracy\n    Given the pressure sensor is calibrated\n    When the self-test is performed with a pressure of <pressure>\n    Then the pressure sensor should read <expected_reading>\n    Examples:\n      | pressure | expected_reading |\n      | 0        | 0                |\n      | 100      | 100              |\n      | 200      | 200              |\n      | 300      | 300              |\n      | 400      | 400              |\n\n  Scenario: Controller supports pre-test mode\n    Given the controller is in normal mode\n    When the pre-test mode is activated\n    Then the controller should enter pre-test mode\n\n  Scenario: GUI supports controller's pre-test mode\n    Given the GUI is displayed\n    And the controller is in normal mode\n    When the pre-test mode button is clicked\n    Then the GUI should indicate that the controller is in pre-test mode\n\n  Scenario Outline: Controller's pre-test mode includes checks\n    Given the controller is in pre-test mode\n    When the pre-test is executed with <condition>\n    Then the controller should perform <check>\n    Examples:\n      | condition          | check                           |\n      | flow sensor check  | validate flow sensor accuracy   |\n      | pressure sensor check | validate pressure sensor accuracy |\n      | system integrity check | verify system integrity       |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Validate flow sensor accuracy",
+          "req_ids": [
+            "RW-SW-161"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the blower is set to a certain speed",
+            "the air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {},
+          "steps": [
+            "perform the self-test"
+          ],
+          "expected": [
+            "the flow sensor should give the expected flow value"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Validate pressure sensor accuracy with 0 pressure",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the pressure sensor is calibrated"
+          ],
+          "inputs": {
+            "pressure": "0"
+          },
+          "steps": [
+            "perform the self-test with a pressure of 0"
+          ],
+          "expected": [
+            "the pressure sensor should read 0"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Validate pressure sensor accuracy with 100 pressure",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "normal",
+          "preconditions": [
+            "the pressure sensor is calibrated"
+          ],
+          "inputs": {
+            "pressure": "100"
+          },
+          "steps": [
+            "perform the self-test with a pressure of 100"
+          ],
+          "expected": [
+            "the pressure sensor should read 100"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Validate pressure sensor accuracy with 200 pressure",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "normal",
+          "preconditions": [
+            "the pressure sensor is calibrated"
+          ],
+          "inputs": {
+            "pressure": "200"
+          },
+          "steps": [
+            "perform the self-test with a pressure of 200"
+          ],
+          "expected": [
+            "the pressure sensor should read 200"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Validate pressure sensor accuracy with 300 pressure",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "normal",
+          "preconditions": [
+            "the pressure sensor is calibrated"
+          ],
+          "inputs": {
+            "pressure": "300"
+          },
+          "steps": [
+            "perform the self-test with a pressure of 300"
+          ],
+          "expected": [
+            "the pressure sensor should read 300"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Validate pressure sensor accuracy with 400 pressure",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the pressure sensor is calibrated"
+          ],
+          "inputs": {
+            "pressure": "400"
+          },
+          "steps": [
+            "perform the self-test with a pressure of 400"
+          ],
+          "expected": [
+            "the pressure sensor should read 400"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller supports pre-test mode",
+          "req_ids": [
+            "RW-SW-150"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is in normal mode"
+          ],
+          "inputs": {},
+          "steps": [
+            "activate the pre-test mode"
+          ],
+          "expected": [
+            "the controller should enter pre-test mode"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI supports controller's pre-test mode",
+          "req_ids": [
+            "RW-SW-151"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is displayed",
+            "the controller is in normal mode"
+          ],
+          "inputs": {},
+          "steps": [
+            "click the pre-test mode button"
+          ],
+          "expected": [
+            "the GUI should indicate that the controller is in pre-test mode"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Controller's pre-test mode includes flow sensor check",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is in pre-test mode"
+          ],
+          "inputs": {
+            "condition": "flow sensor check"
+          },
+          "steps": [
+            "execute the pre-test with flow sensor check"
+          ],
+          "expected": [
+            "the controller should perform validate flow sensor accuracy"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Controller's pre-test mode includes pressure sensor check",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is in pre-test mode"
+          ],
+          "inputs": {
+            "condition": "pressure sensor check"
+          },
+          "steps": [
+            "execute the pre-test with pressure sensor check"
+          ],
+          "expected": [
+            "the controller should perform validate pressure sensor accuracy"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Controller's pre-test mode includes system integrity check",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is in pre-test mode"
+          ],
+          "inputs": {
+            "condition": "system integrity check"
+          },
+          "steps": [
+            "execute the pre-test with system integrity check"
+          ],
+          "expected": [
+            "the controller should perform verify system integrity"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.7273,
+        "representation_score": 1.0,
+        "sfv_score": 0.8636,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #3 (TC-003): 'normal' is not one of ['positive', 'negative', 'boundary']",
+          "test case #4 (TC-004): 'normal' is not one of ['positive', 'negative', 'boundary']",
+          "test case #5 (TC-005): 'normal' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.86). Fix these problems and output the full corrected suite:\n- test case #3 (TC-003): 'normal' is not one of ['positive', 'negative', 'boundary']\n- test case #4 (TC-004): 'normal' is not one of ['positive', 'negative', 'boundary']\n- test case #5 (TC-005): 'normal' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "Feature: Self-Test and Pre-Test Mode Validation\n\n  Scenario: Validate flow sensor accuracy\n    Given the blower is set to a certain speed\n    And the air lines are open\n    And nothing is connected to the output\n    When the self-test is performed\n    Then the flow sensor should give the expected flow value\n\n  Scenario Outline: Validate pressure sensor accuracy\n    Given the pressure sensor is calibrated\n    When the self-test is performed with pressure <value>\n    Then the pressure sensor should read <expected_value>\n    Examples:\n      | kind     | value | expected_value |\n      | positive | 100   | 100            |\n      | negative | -10   | 0              |\n      | boundary | 0     | 0              |\n      | boundary | 200   | 200            |\n\n  Scenario: Controller supports pre-test mode\n    Given the controller is in normal operation mode\n    When the pre-test mode is activated\n    Then the controller should enter pre-test mode\n\n  Scenario: GUI supports controller's pre-test mode\n    Given the GUI is displayed\n    And the controller is in normal operation mode\n    When the user activates the pre-test mode from the GUI\n    Then the GUI should indicate that the controller is in pre-test mode\n\n  Scenario Outline: Controller's pre-test mode includes checks\n    Given the controller is in pre-test mode\n    When the pre-test mode performs check <check_name> with value <value>\n    Then the check <check_name> should pass with result <expected_result>\n    Examples:\n      | kind     | check_name       | value | expected_result |\n      | positive | flow_sensor      | 100   | pass            |\n      | negative | flow_sensor      | -10   | fail            |\n      | boundary | flow_sensor      | 0     | pass            |\n      | boundary | flow_sensor      | 200   | pass            |\n      | positive | pressure_sensor  | 100   | pass            |\n      | negative | pressure_sensor  | -10   | fail            |\n      | boundary | pressure_sensor  | 0     | pass            |\n      | boundary | pressure_sensor  | 200   | pass            |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Validate flow sensor accuracy",
+          "req_ids": [
+            "RW-SW-161"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the blower is set to a certain speed",
+            "the air lines are open",
+            "nothing is connected to the output"
+          ],
+          "inputs": {},
+          "steps": [
+            "the self-test is performed"
+          ],
+          "expected": [
+            "the flow sensor should give the expected flow value"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Validate pressure sensor accuracy with positive value",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the pressure sensor is calibrated"
+          ],
+          "inputs": {
+            "value": 100
+          },
+          "steps": [
+            "the self-test is performed with pressure 100"
+          ],
+          "expected": [
+            "the pressure sensor should read 100"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Validate pressure sensor accuracy with negative value",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the pressure sensor is calibrated"
+          ],
+          "inputs": {
+            "value": -10
+          },
+          "steps": [
+            "the self-test is performed with pressure -10"
+          ],
+          "expected": [
+            "the pressure sensor should read 0"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Validate pressure sensor accuracy with boundary value 0",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the pressure sensor is calibrated"
+          ],
+          "inputs": {
+            "value": 0
+          },
+          "steps": [
+            "the self-test is performed with pressure 0"
+          ],
+          "expected": [
+            "the pressure sensor should read 0"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Validate pressure sensor accuracy with boundary value 200",
+          "req_ids": [
+            "RW-SW-166"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the pressure sensor is calibrated"
+          ],
+          "inputs": {
+            "value": 200
+          },
+          "steps": [
+            "the self-test is performed with pressure 200"
+          ],
+          "expected": [
+            "the pressure sensor should read 200"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller supports pre-test mode",
+          "req_ids": [
+            "RW-SW-150"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is in normal operation mode"
+          ],
+          "inputs": {},
+          "steps": [
+            "the pre-test mode is activated"
+          ],
+          "expected": [
+            "the controller should enter pre-test mode"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI supports controller's pre-test mode",
+          "req_ids": [
+            "RW-SW-151"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the GUI is displayed",
+            "the controller is in normal operation mode"
+          ],
+          "inputs": {},
+          "steps": [
+            "the user activates the pre-test mode from the GUI"
+          ],
+          "expected": [
+            "the GUI should indicate that the controller is in pre-test mode"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Controller's pre-test mode includes flow sensor check with positive value",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is in pre-test mode"
+          ],
+          "inputs": {
+            "check_name": "flow_sensor",
+            "value": 100
+          },
+          "steps": [
+            "the pre-test mode performs check flow_sensor with value 100"
+          ],
+          "expected": [
+            "the check flow_sensor should pass with result pass"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Controller's pre-test mode includes flow sensor check with negative value",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller is in pre-test mode"
+          ],
+          "inputs": {
+            "check_name": "flow_sensor",
+            "value": -10
+          },
+          "steps": [
+            "the pre-test mode performs check flow_sensor with value -10"
+          ],
+          "expected": [
+            "the check flow_sensor should pass with result fail"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Controller's pre-test mode includes flow sensor check with boundary value 0",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the controller is in pre-test mode"
+          ],
+          "inputs": {
+            "check_name": "flow_sensor",
+            "value": 0
+          },
+          "steps": [
+            "the pre-test mode performs check flow_sensor with value 0"
+          ],
+          "expected": [
+            "the check flow_sensor should pass with result pass"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Controller's pre-test mode includes flow sensor check with boundary value 200",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the controller is in pre-test mode"
+          ],
+          "inputs": {
+            "check_name": "flow_sensor",
+            "value": 200
+          },
+          "steps": [
+            "the pre-test mode performs check flow_sensor with value 200"
+          ],
+          "expected": [
+            "the check flow_sensor should pass with result pass"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Controller's pre-test mode includes pressure sensor check with positive value",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the controller is in pre-test mode"
+          ],
+          "inputs": {
+            "check_name": "pressure_sensor",
+            "value": 100
+          },
+          "steps": [
+            "the pre-test mode performs check pressure_sensor with value 100"
+          ],
+          "expected": [
+            "the check pressure_sensor should pass with result pass"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Controller's pre-test mode includes pressure sensor check with negative value",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the controller is in pre-test mode"
+          ],
+          "inputs": {
+            "check_name": "pressure_sensor",
+            "value": -10
+          },
+          "steps": [
+            "the pre-test mode performs check pressure_sensor with value -10"
+          ],
+          "expected": [
+            "the check pressure_sensor should pass with result fail"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Controller's pre-test mode includes pressure sensor check with boundary value 0",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the controller is in pre-test mode"
+          ],
+          "inputs": {
+            "check_name": "pressure_sensor",
+            "value": 0
+          },
+          "steps": [
+            "the pre-test mode performs check pressure_sensor with value 0"
+          ],
+          "expected": [
+            "the check pressure_sensor should pass with result pass"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Controller's pre-test mode includes pressure sensor check with boundary value 200",
+          "req_ids": [
+            "RW-SW-152"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the controller is in pre-test mode"
+          ],
+          "inputs": {
+            "check_name": "pressure_sensor",
+            "value": 200
+          },
+          "steps": [
+            "the pre-test mode performs check pressure_sensor with value 200"
+          ],
+          "expected": [
+            "the check pressure_sensor should pass with result pass"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.93,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.1905,
+        "hallucinated": [
+          {
+            "value": "100",
+            "context": "pressure sensor input",
+            "grounded": false
+          },
+          {
+            "value": "-10",
+            "context": "pressure sensor input",
+            "grounded": false
+          },
+          {
+            "value": "0",
+            "context": "pressure sensor input",
+            "grounded": false
+          },
+          {
+            "value": "200",
+            "context": "pressure sensor input",
+            "grounded": false
+          },
+          {
+            "value": "100",
+            "context": "flow sensor input",
+            "grounded": false
+          },
+          {
+            "value": "-10",
+            "context": "flow sensor input",
+            "grounded": false
+          },
+          {
+            "value": "0",
+            "context": "flow sensor input",
+            "grounded": false
+          },
+          {
+            "value": "200",
+            "context": "flow sensor input",
+            "grounded": false
+          },
+          {
+            "value": "pass",
+            "context": "check result",
+            "grounded": false
+          },
+          {
+            "value": "fail",
+            "context": "check result",
+            "grounded": false
+          },
+          {
+            "value": "the pressure sensor should read 100",
+            "context": "expected output",
+            "grounded": false
+          },
+          {
+            "value": "the pressure sensor should read 0",
+            "context": "expected output",
+            "grounded": false
+          },
+          {
+            "value": "the pressure sensor should read 200",
+            "context": "expected output",
+            "grounded": false
+          },
+          {
+            "value": "the check flow_sensor should pass with result pass",
+            "context": "expected check result",
+            "grounded": false
+          },
+          {
+            "value": "the check flow_sensor should pass with result fail",
+            "context": "expected check result",
+            "grounded": false
+          },
+          {
+            "value": "the check pressure_sensor should pass with result pass",
+            "context": "expected check result",
+            "grounded": false
+          },
+          {
+            "value": "the check pressure_sensor should pass with result fail",
+            "context": "expected check result",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 21,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "TC-001 uses vague expected flow value; add concrete numeric expectation.",
+          "No boundary values tested for flow sensor accuracy.",
+          "Pass/fail semantics for pre-test mode checks are not defined in SRS; tests assume them.",
+          "Negative pressure values may not be realistic; requirement does not specify handling.",
+          "Test suite does not assert system state transitions or error codes for invalid inputs."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.8681,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

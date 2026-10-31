@@ -1,0 +1,988 @@
+{
+  "unit_id": "U19_3",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.75,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "within_radius",
+        "context": "patient location",
+        "grounded": false
+      },
+      {
+        "value": "outside_radius",
+        "context": "patient location",
+        "grounded": false
+      },
+      {
+        "value": "boundary_radius",
+        "context": "patient location",
+        "grounded": false
+      },
+      {
+        "value": "500001",
+        "context": "pincode",
+        "grounded": false
+      },
+      {
+        "value": "500002",
+        "context": "pincode",
+        "grounded": false
+      },
+      {
+        "value": "boundary_pincode",
+        "context": "pincode",
+        "grounded": false
+      },
+      {
+        "value": "completed",
+        "context": "delivery status",
+        "grounded": false
+      },
+      {
+        "value": "unauthorized",
+        "context": "lab request status",
+        "grounded": false
+      },
+      {
+        "value": "authorized",
+        "context": "lab request status",
+        "grounded": false
+      },
+      {
+        "value": "processed and confirmed",
+        "context": "appointment status",
+        "grounded": false
+      },
+      {
+        "value": "rejected with a message indicating the zone is not covered",
+        "context": "appointment rejection message",
+        "grounded": false
+      },
+      {
+        "value": "routed to authorized chemist in Pincode 500001",
+        "context": "prescription routing",
+        "grounded": false
+      },
+      {
+        "value": "not routed to authorized chemist in Pincode 500001",
+        "context": "prescription routing negative",
+        "grounded": false
+      },
+      {
+        "value": "marked as completed and payment should be recorded",
+        "context": "prescription completion",
+        "grounded": false
+      },
+      {
+        "value": "rejected with a message indicating unauthorized access",
+        "context": "lab request rejection message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 15,
+    "uncovered_clauses": [
+      "VIRTUA-3-3",
+      "VIRTUA-3-7"
+    ],
+    "weaknesses": [
+      "Add tests for Chemist per Pincode (VIRTUA-3-3).",
+      "Add tests for no systemic matching (VIRTUA-3-7).",
+      "Include explicit status codes or messages in expected results for higher oracle assertiveness.",
+      "Test boundary conditions for pincode ranges (just inside/outside boundary).",
+      "Verify that only patients within zone can register with explicit negative test for zone membership."
+    ],
+    "traceability": 0.5,
+    "untraced_reqs": [
+      "VIRTUA-3-2",
+      "VIRTUA-3-3",
+      "VIRTUA-3-6",
+      "VIRTUA-3-7"
+    ],
+    "fsa_score": 0.555,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Services Availability and Management\n\n  Scenario: Patient registration and appointment requests within the zone\n    Given the patient is located within the 25 sqkm radius of Padmavathi Hospital\n    When the patient registers and applies for an appointment\n    Then the appointment request should be processed and confirmed\n\n  Scenario: Patient registration and appointment requests outside the zone\n    Given the patient is located outside the 25 sqkm radius of Padmavathi Hospital\n    When the patient registers and applies for an appointment\n    Then the appointment request should be rejected with a message indicating the zone is not covered\n\n  Scenario: Prescription routing based on patient pincode\n    Given the patient's address is in Pincode 500001\n    When the patient submits a prescription request\n    Then the prescription should be routed to the authorized chemist in Pincode 500001\n\n  Scenario: Prescription routing based on patient pincode (negative)\n    Given the patient's address is in Pincode 500002\n    When the patient submits a prescription request\n    Then the prescription should not be routed to the authorized chemist in Pincode 500001\n\n  Scenario: Offline delivery and payment collection\n    Given the prescription is routed to the authorized chemist in Pincode 500001\n    When the chemist delivers the medicines and collects payment\n    Then the prescription should be marked as completed and payment should be recorded\n\n  Scenario: Unauthorized laboratory access (negative)\n    Given the patient's address is in Pincode 500001\n    When the patient submits a laboratory request\n    Then the laboratory request should be rejected with a message indicating unauthorized access\n\n  Scenario: Authorized laboratory access\n    Given the patient's address is in Pincode 500001\n    When the patient submits a laboratory request\n    Then the laboratory request should be processed and confirmed\n\n  Scenario: Boundary value testing for radius\n    Given the patient is located at the boundary of the 25 sqkm radius of Padmavathi Hospital\n    When the patient registers and applies for an appointment\n    Then the appointment request should be processed and confirmed\n\n  Scenario: Boundary value testing for pincode\n    Given the patient's address is in the boundary pincode of the zone\n    When the patient submits a prescription request\n    Then the prescription should be routed to the authorized chemist in the boundary pincode",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Patient registration and appointment requests within the zone",
+      "req_ids": [
+        "VIRTUA-3-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "The patient is located within the 25 sqkm radius of Padmavathi Hospital"
+      ],
+      "inputs": {
+        "patient_location": "within_radius"
+      },
+      "steps": [
+        "The patient registers and applies for an appointment"
+      ],
+      "expected": [
+        "The appointment request should be processed and confirmed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Patient registration and appointment requests outside the zone",
+      "req_ids": [
+        "VIRTUA-3-1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "The patient is located outside the 25 sqkm radius of Padmavathi Hospital"
+      ],
+      "inputs": {
+        "patient_location": "outside_radius"
+      },
+      "steps": [
+        "The patient registers and applies for an appointment"
+      ],
+      "expected": [
+        "The appointment request should be rejected with a message indicating the zone is not covered"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Prescription routing based on patient pincode",
+      "req_ids": [
+        "VIRTUA-3-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "The patient's address is in Pincode 500001"
+      ],
+      "inputs": {
+        "patient_pincode": "500001"
+      },
+      "steps": [
+        "The patient submits a prescription request"
+      ],
+      "expected": [
+        "The prescription should be routed to the authorized chemist in Pincode 500001"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Prescription routing based on patient pincode (negative)",
+      "req_ids": [
+        "VIRTUA-3-4"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "The patient's address is in Pincode 500002"
+      ],
+      "inputs": {
+        "patient_pincode": "500002"
+      },
+      "steps": [
+        "The patient submits a prescription request"
+      ],
+      "expected": [
+        "The prescription should not be routed to the authorized chemist in Pincode 500001"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Offline delivery and payment collection",
+      "req_ids": [
+        "VIRTUA-3-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "The prescription is routed to the authorized chemist in Pincode 500001"
+      ],
+      "inputs": {
+        "delivery_and_payment": "completed"
+      },
+      "steps": [
+        "The chemist delivers the medicines and collects payment"
+      ],
+      "expected": [
+        "The prescription should be marked as completed and payment should be recorded"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Unauthorized laboratory access (negative)",
+      "req_ids": [
+        "VIRTUA-3-8"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "The patient's address is in Pincode 500001"
+      ],
+      "inputs": {
+        "laboratory_request": "unauthorized"
+      },
+      "steps": [
+        "The patient submits a laboratory request"
+      ],
+      "expected": [
+        "The laboratory request should be rejected with a message indicating unauthorized access"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Authorized laboratory access",
+      "req_ids": [
+        "VIRTUA-3-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "The patient's address is in Pincode 500001"
+      ],
+      "inputs": {
+        "laboratory_request": "authorized"
+      },
+      "steps": [
+        "The patient submits a laboratory request"
+      ],
+      "expected": [
+        "The laboratory request should be processed and confirmed"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Boundary value testing for radius",
+      "req_ids": [
+        "VIRTUA-3-1"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "The patient is located at the boundary of the 25 sqkm radius of Padmavathi Hospital"
+      ],
+      "inputs": {
+        "patient_location": "boundary_radius"
+      },
+      "steps": [
+        "The patient registers and applies for an appointment"
+      ],
+      "expected": [
+        "The appointment request should be processed and confirmed"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Boundary value testing for pincode",
+      "req_ids": [
+        "VIRTUA-3-4"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "The patient's address is in the boundary pincode of the zone"
+      ],
+      "inputs": {
+        "patient_pincode": "boundary_pincode"
+      },
+      "steps": [
+        "The patient submits a prescription request"
+      ],
+      "expected": [
+        "The prescription should be routed to the authorized chemist in the boundary pincode"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Appointment and Prescription Management\n\n  Scenario Outline: Register and apply for Appointment/Consultation Request\n    Given the patient is located in Pincode <pincode>\n    When the patient registers and applies for an appointment/consultation request\n    Then the request should be routed to the authorized chemist in the same Pincode\n\n    Examples:\n      | pincode |\n      | 500001  |\n      | 500002  |\n      | 500003  |\n\n  Scenario Outline: Prescription Request Routing\n    Given the patient is located in Pincode <pincode>\n    When the patient submits a prescription request\n    Then the request should be routed to the authorized chemist in the same Pincode\n\n    Examples:\n      | pincode |\n      | 500001  |\n      | 500002  |\n      | 500003  |\n\n  Scenario Outline: Offline Delivery and Payment Collection\n    Given the patient is located in Pincode <pincode>\n    When the authorized chemist delivers the medicines and collects payment\n    Then the prescription should be marked as completed\n\n    Examples:\n      | pincode |\n      | 500001  |\n      | 500002  |\n      | 500003  |\n\n  Scenario Outline: Negative Path - Invalid Pincode\n    Given the patient is located in Pincode <pincode>\n    When the patient registers and applies for an appointment/consultation request\n    Then the request should not be routed and an error message should be displayed\n\n    Examples:\n      | pincode |\n      | 500004  |\n      | 500005  |\n      | 500006  |\n\n  Scenario Outline: Boundary Path - Edge Pincode\n    Given the patient is located in Pincode <pincode>\n    When the patient registers and applies for an appointment/consultation request\n    Then the request should be routed to the authorized chemist in the same Pincode\n\n    Examples:\n      | pincode |\n      | 500000  |\n      | 500007  |\n      | 500008  |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Register and apply for Appointment/Consultation Request - Normal",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The patient is located in Pincode 500001"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "pincode": "500001"
+          },
+          "steps": [
+            "The patient registers and applies for an appointment/consultation request"
+          ],
+          "expected": [
+            "The request should be routed to the authorized chemist in Pincode 500001"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Register and apply for Appointment/Consultation Request - Edge Pincode",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "The patient is located in Pincode 500000"
+          ],
+          "inputs": {
+            "name": "Jane Doe",
+            "pincode": "500000"
+          },
+          "steps": [
+            "The patient registers and applies for an appointment/consultation request"
+          ],
+          "expected": [
+            "The request should be routed to the authorized chemist in Pincode 500000"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Register and apply for Appointment/Consultation Request - Invalid Pincode",
+          "req_ids": [
+            "VIRTUA-3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "The patient is located in Pincode 500004"
+          ],
+          "inputs": {
+            "name": "Alice Smith",
+            "pincode": "500004"
+          },
+          "steps": [
+            "The patient registers and applies for an appointment/consultation request"
+          ],
+          "expected": [
+            "The request should not be routed and an error message should be displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Prescription Request Routing - Normal",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The patient is located in Pincode 500002"
+          ],
+          "inputs": {
+            "name": "Bob Johnson",
+            "pincode": "500002"
+          },
+          "steps": [
+            "The patient submits a prescription request"
+          ],
+          "expected": [
+            "The request should be routed to the authorized chemist in Pincode 500002"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Prescription Request Routing - Edge Pincode",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "The patient is located in Pincode 500007"
+          ],
+          "inputs": {
+            "name": "Charlie Brown",
+            "pincode": "500007"
+          },
+          "steps": [
+            "The patient submits a prescription request"
+          ],
+          "expected": [
+            "The request should be routed to the authorized chemist in Pincode 500007"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Prescription Request Routing - Invalid Pincode",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "The patient is located in Pincode 500005"
+          ],
+          "inputs": {
+            "name": "Diana Prince",
+            "pincode": "500005"
+          },
+          "steps": [
+            "The patient submits a prescription request"
+          ],
+          "expected": [
+            "The request should not be routed and an error message should be displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Offline Delivery and Payment Collection - Normal",
+          "req_ids": [
+            "VIRTUA-3-5",
+            "VIRTUA-3-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The patient is located in Pincode 500003"
+          ],
+          "inputs": {
+            "name": "Eve Wilson",
+            "pincode": "500003"
+          },
+          "steps": [
+            "The authorized chemist delivers the medicines and collects payment"
+          ],
+          "expected": [
+            "The prescription should be marked as completed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Offline Delivery and Payment Collection - Edge Pincode",
+          "req_ids": [
+            "VIRTUA-3-5",
+            "VIRTUA-3-6"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "The patient is located in Pincode 500008"
+          ],
+          "inputs": {
+            "name": "Franklin Roosevelt",
+            "pincode": "500008"
+          },
+          "steps": [
+            "The authorized chemist delivers the medicines and collects payment"
+          ],
+          "expected": [
+            "The prescription should be marked as completed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Offline Delivery and Payment Collection - Invalid Pincode",
+          "req_ids": [
+            "VIRTUA-3-5",
+            "VIRTUA-3-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "The patient is located in Pincode 500006"
+          ],
+          "inputs": {
+            "name": "Grace Hopper",
+            "pincode": "500006"
+          },
+          "steps": [
+            "The authorized chemist delivers the medicines and collects payment"
+          ],
+          "expected": [
+            "The prescription should not be marked as completed and an error message should be displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.5,
+        "negative_coverage": 0.5,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0714,
+        "hallucinated": [
+          {
+            "value": "500001",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "500002",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "500003",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "500004",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "500005",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "500006",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "500000",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "500007",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "500008",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "not completed",
+            "context": "state after failed delivery",
+            "grounded": false
+          },
+          {
+            "value": "error message displayed",
+            "context": "error handling",
+            "grounded": false
+          },
+          {
+            "value": "request routed",
+            "context": "routing outcome",
+            "grounded": false
+          },
+          {
+            "value": "request not routed",
+            "context": "routing outcome",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 14,
+        "uncovered_clauses": [
+          "VIRTUA-3-1",
+          "VIRTUA-3-3",
+          "VIRTUA-3-7",
+          "VIRTUA-3-8"
+        ],
+        "weaknesses": [
+          "No coverage for service availability zone (radius or specified pin codes).",
+          "No tests for exactly one authorized chemist per pincode.",
+          "No tests for laboratory per pincode or zone.",
+          "Assertions are vague; need concrete expected states or error codes.",
+          "Boundary values not aligned with defined limits; no real boundary testing for radius or pincode ranges."
+        ],
+        "traceability": 0.5,
+        "untraced_reqs": [
+          "VIRTUA-3-1",
+          "VIRTUA-3-3",
+          "VIRTUA-3-7",
+          "VIRTUA-3-8"
+        ],
+        "fsa_score": 0.2907,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.2907; sub-scores {'clause_coverage': 0.5, 'negative_coverage': 0.5, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0714}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-3-1', 'VIRTUA-3-3', 'VIRTUA-3-7', 'VIRTUA-3-8'] (add at least one each)\n- uncovered clause: VIRTUA-3-1\n- uncovered clause: VIRTUA-3-3\n- uncovered clause: VIRTUA-3-7\n- uncovered clause: VIRTUA-3-8\n- ungrounded value '500001' (pincode): remove or use the SRS value\n- ungrounded value '500002' (pincode): remove or use the SRS value\n- ungrounded value '500003' (pincode): remove or use the SRS value\n- ungrounded value '500004' (pincode): remove or use the SRS value\n- ungrounded value '500005' (pincode): remove or use the SRS value\n- ungrounded value '500006' (pincode): remove or use the SRS value\n- No coverage for service availability zone (radius or specified pin codes).\n- No tests for exactly one authorized chemist per pincode.\n- No tests for laboratory per pincode or zone.\n- Assertions are vague; need concrete expected states or error codes.\n- Boundary values not aligned with defined limits; no real boundary testing for radius or pincode ranges.",
+      "artifact": "Feature: Services Availability and Management\n\n  Scenario: Patient registration and appointment requests within the zone\n    Given the patient is located within the 25 sqkm radius of Padmavathi Hospital\n    When the patient registers and applies for an appointment\n    Then the appointment request should be processed and confirmed\n\n  Scenario: Patient registration and appointment requests outside the zone\n    Given the patient is located outside the 25 sqkm radius of Padmavathi Hospital\n    When the patient registers and applies for an appointment\n    Then the appointment request should be rejected with a message indicating the zone is not covered\n\n  Scenario: Prescription routing based on patient pincode\n    Given the patient's address is in Pincode 500001\n    When the patient submits a prescription request\n    Then the prescription should be routed to the authorized chemist in Pincode 500001\n\n  Scenario: Prescription routing based on patient pincode (negative)\n    Given the patient's address is in Pincode 500002\n    When the patient submits a prescription request\n    Then the prescription should not be routed to the authorized chemist in Pincode 500001\n\n  Scenario: Offline delivery and payment collection\n    Given the prescription is routed to the authorized chemist in Pincode 500001\n    When the chemist delivers the medicines and collects payment\n    Then the prescription should be marked as completed and payment should be recorded\n\n  Scenario: Unauthorized laboratory access (negative)\n    Given the patient's address is in Pincode 500001\n    When the patient submits a laboratory request\n    Then the laboratory request should be rejected with a message indicating unauthorized access\n\n  Scenario: Authorized laboratory access\n    Given the patient's address is in Pincode 500001\n    When the patient submits a laboratory request\n    Then the laboratory request should be processed and confirmed\n\n  Scenario: Boundary value testing for radius\n    Given the patient is located at the boundary of the 25 sqkm radius of Padmavathi Hospital\n    When the patient registers and applies for an appointment\n    Then the appointment request should be processed and confirmed\n\n  Scenario: Boundary value testing for pincode\n    Given the patient's address is in the boundary pincode of the zone\n    When the patient submits a prescription request\n    Then the prescription should be routed to the authorized chemist in the boundary pincode",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient registration and appointment requests within the zone",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The patient is located within the 25 sqkm radius of Padmavathi Hospital"
+          ],
+          "inputs": {
+            "patient_location": "within_radius"
+          },
+          "steps": [
+            "The patient registers and applies for an appointment"
+          ],
+          "expected": [
+            "The appointment request should be processed and confirmed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Patient registration and appointment requests outside the zone",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "The patient is located outside the 25 sqkm radius of Padmavathi Hospital"
+          ],
+          "inputs": {
+            "patient_location": "outside_radius"
+          },
+          "steps": [
+            "The patient registers and applies for an appointment"
+          ],
+          "expected": [
+            "The appointment request should be rejected with a message indicating the zone is not covered"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Prescription routing based on patient pincode",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The patient's address is in Pincode 500001"
+          ],
+          "inputs": {
+            "patient_pincode": "500001"
+          },
+          "steps": [
+            "The patient submits a prescription request"
+          ],
+          "expected": [
+            "The prescription should be routed to the authorized chemist in Pincode 500001"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Prescription routing based on patient pincode (negative)",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "The patient's address is in Pincode 500002"
+          ],
+          "inputs": {
+            "patient_pincode": "500002"
+          },
+          "steps": [
+            "The patient submits a prescription request"
+          ],
+          "expected": [
+            "The prescription should not be routed to the authorized chemist in Pincode 500001"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Offline delivery and payment collection",
+          "req_ids": [
+            "VIRTUA-3-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The prescription is routed to the authorized chemist in Pincode 500001"
+          ],
+          "inputs": {
+            "delivery_and_payment": "completed"
+          },
+          "steps": [
+            "The chemist delivers the medicines and collects payment"
+          ],
+          "expected": [
+            "The prescription should be marked as completed and payment should be recorded"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Unauthorized laboratory access (negative)",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "The patient's address is in Pincode 500001"
+          ],
+          "inputs": {
+            "laboratory_request": "unauthorized"
+          },
+          "steps": [
+            "The patient submits a laboratory request"
+          ],
+          "expected": [
+            "The laboratory request should be rejected with a message indicating unauthorized access"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Authorized laboratory access",
+          "req_ids": [
+            "VIRTUA-3-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The patient's address is in Pincode 500001"
+          ],
+          "inputs": {
+            "laboratory_request": "authorized"
+          },
+          "steps": [
+            "The patient submits a laboratory request"
+          ],
+          "expected": [
+            "The laboratory request should be processed and confirmed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Boundary value testing for radius",
+          "req_ids": [
+            "VIRTUA-3-1"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "The patient is located at the boundary of the 25 sqkm radius of Padmavathi Hospital"
+          ],
+          "inputs": {
+            "patient_location": "boundary_radius"
+          },
+          "steps": [
+            "The patient registers and applies for an appointment"
+          ],
+          "expected": [
+            "The appointment request should be processed and confirmed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Boundary value testing for pincode",
+          "req_ids": [
+            "VIRTUA-3-4"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "The patient's address is in the boundary pincode of the zone"
+          ],
+          "inputs": {
+            "patient_pincode": "boundary_pincode"
+          },
+          "steps": [
+            "The patient submits a prescription request"
+          ],
+          "expected": [
+            "The prescription should be routed to the authorized chemist in the boundary pincode"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "within_radius",
+            "context": "patient location",
+            "grounded": false
+          },
+          {
+            "value": "outside_radius",
+            "context": "patient location",
+            "grounded": false
+          },
+          {
+            "value": "boundary_radius",
+            "context": "patient location",
+            "grounded": false
+          },
+          {
+            "value": "500001",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "500002",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "boundary_pincode",
+            "context": "pincode",
+            "grounded": false
+          },
+          {
+            "value": "completed",
+            "context": "delivery status",
+            "grounded": false
+          },
+          {
+            "value": "unauthorized",
+            "context": "lab request status",
+            "grounded": false
+          },
+          {
+            "value": "authorized",
+            "context": "lab request status",
+            "grounded": false
+          },
+          {
+            "value": "processed and confirmed",
+            "context": "appointment status",
+            "grounded": false
+          },
+          {
+            "value": "rejected with a message indicating the zone is not covered",
+            "context": "appointment rejection message",
+            "grounded": false
+          },
+          {
+            "value": "routed to authorized chemist in Pincode 500001",
+            "context": "prescription routing",
+            "grounded": false
+          },
+          {
+            "value": "not routed to authorized chemist in Pincode 500001",
+            "context": "prescription routing negative",
+            "grounded": false
+          },
+          {
+            "value": "marked as completed and payment should be recorded",
+            "context": "prescription completion",
+            "grounded": false
+          },
+          {
+            "value": "rejected with a message indicating unauthorized access",
+            "context": "lab request rejection message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 15,
+        "uncovered_clauses": [
+          "VIRTUA-3-3",
+          "VIRTUA-3-7"
+        ],
+        "weaknesses": [
+          "Add tests for Chemist per Pincode (VIRTUA-3-3).",
+          "Add tests for no systemic matching (VIRTUA-3-7).",
+          "Include explicit status codes or messages in expected results for higher oracle assertiveness.",
+          "Test boundary conditions for pincode ranges (just inside/outside boundary).",
+          "Verify that only patients within zone can register with explicit negative test for zone membership."
+        ],
+        "traceability": 0.5,
+        "untraced_reqs": [
+          "VIRTUA-3-2",
+          "VIRTUA-3-3",
+          "VIRTUA-3-6",
+          "VIRTUA-3-7"
+        ],
+        "fsa_score": 0.555,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.555; sub-scores {'clause_coverage': 0.75, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.5, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-3-2', 'VIRTUA-3-3', 'VIRTUA-3-6', 'VIRTUA-3-7'] (add at least one each)\n- uncovered clause: VIRTUA-3-3\n- uncovered clause: VIRTUA-3-7\n- ungrounded value 'within_radius' (patient location): remove or use the SRS value\n- ungrounded value 'outside_radius' (patient location): remove or use the SRS value\n- ungrounded value 'boundary_radius' (patient location): remove or use the SRS value\n- ungrounded value '500001' (pincode): remove or use the SRS value\n- ungrounded value '500002' (pincode): remove or use the SRS value\n- ungrounded value 'boundary_pincode' (pincode): remove or use the SRS value\n- Add tests for Chemist per Pincode (VIRTUA-3-3).\n- Add tests for no systemic matching (VIRTUA-3-7).\n- Include explicit status codes or messages in expected results for higher oracle assertiveness.\n- Test boundary conditions for pincode ranges (just inside/outside boundary).\n- Verify that only patients within zone can register with explicit negative test for zone membership.",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "```artifact\nFeature: Services offered in and around Padmavathi Hospital\n\n  Scenario: Patient registers and applies for appointment within radius\n    Given the patient is located within 25 sqkm of Padmavathi Hospital\n    When the patient registers and applies for an appointment\n    Then the appointment request should be accepted\n\n  Scenario: Patient registers and applies for appointment outside radius\n    Given the patient is located outside 25 sqkm of Padmavathi Hospital\n    When the patient registers and applies for an appointment\n    Then the appointment request should be rejected with a message \"Service not available in your area\"\n\n  Scenario: Patient registers and applies for appointment at boundary radius\n    Given the patient is located at the boundary of 25 sqkm of Padmavathi Hospital\n    When the patient registers and applies for an appointment\n    Then the appointment request should be accepted\n\n  Scenario: Patient registers and applies for appointment with invalid pincode\n    Given the patient is located within 25 sqkm of Padmavathi Hospital but with an invalid pincode\n    When the patient registers and applies for an appointment\n    Then the appointment request should be rejected with a message \"Invalid pincode\"\n\n  Scenario: Chemist delivers medicine and marks prescription\n    Given the patient is located within 25 sqkm of Padmavathi Hospital\n    And the patient has a valid prescription\n    When the Chemist delivers the medicine and marks the prescription\n    Then the prescription should be marked as delivered\n\n  Scenario: Chemist delivers medicine and collects payment\n    Given the patient is located within 25 sqkm of Padmavathi Hospital\n    And the patient has a valid prescription\n    When the Chemist delivers the medicine and collects payment\n    Then the payment should be collected and the prescription marked as delivered\n\n  Scenario: Chemist delivers medicine and marks prescription with invalid pincode\n    Given the patient is located within 25 sqkm of Padmavathi Hospital but with an invalid pincode\n    And the patient has a valid prescription\n    When the Chemist delivers the medicine and marks the prescription\n    Then the prescription should not be marked as delivered and a message \"Invalid pincode\" should be shown\n\n  Scenario: Chemist delivers medicine and collects payment with invalid pincode\n    Given the patient is located within 25 sqkm of Padmavathi Hospital but with an invalid pincode\n    And the patient has a valid prescription\n    When the Chemist delivers the medicine and collects payment\n    Then the payment should not be collected and a message \"Invalid pincode\" should be shown\n\n  Scenario: Chemist delivers medicine and marks prescription at boundary pincode\n    Given the patient is located at the boundary of 25 sqkm of Padmavathi Hospital\n    And the patient has a valid prescription\n    When the Chemist delivers the medicine and marks the prescription\n    Then the prescription should be marked as delivered\n\n  Scena",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "```artifact\nFeature: Services offered in and around Padmavathi Hospital\n\n  Scenario Outline: Patients can register and apply for appointments/consultation requests within the specified zone\n    Given the patient is located in a Pincode within the 25 sqkm radius of Padmavathi Hospital\n    When the patient registers and applies for an appointment/consultation request\n    Then the request should be accepted and the patient should receive a confirmation message\n\n  Scenario Outline: Patients can only register and apply for appointments/consultation requests within the specified zone\n    Given the patient is located in a Pincode outside the 25 sqkm radius of Padmavathi Hospital\n    When the patient registers and applies for an appointment/consultation request\n    Then the request should be rejected and the patient should receive an error message\n\n  Scenario Outline: Authorized Chemist is available for each Pincode\n    Given the patient is located in a Pincode\n    When the patient registers and applies for an appointment/consultation request\n    Then the request should be routed to the authorized Chemist for that Pincode\n\n  Scenario Outline: Prescription requests are routed to the correct Chemist\n    Given the patient is located in a Pincode\n    When the patient submits a prescription request\n    Then the request should be routed to the authorized Chemist for that Pincode\n\n  Scenario Outline: Chemist delivers medicines and collects payments\n    Given the patient is located in a Pincode\n    When the Chemist delivers the medicines and collects payment from the patient\n    Then the prescription should be marked as completed\n\n  Scenario Outline: Chemist delivers medicines and collects payments\n    Given the patient is located in a Pincode\n    When the Chemist delivers the medicines and collects payment from the patient\n    Then the prescription should be marked as completed\n\n  Scenario Outline: Chemist delivers medicines and collects payments\n    Given the patient is located in a Pincode\n    When the Chemist delivers the medicines and collects payment from the patient\n    Then the prescription should be marked as completed\n\n  Scenario Outline: Chemist delivers medicines and collects payments\n    Given the patient is located in a Pincode\n    When the Chemist delivers the medicines and collects payment from the patient\n    Then the prescription should be marked as completed\n\n  Scenario Outline: Chemist delivers medicines and collects payments\n    Given the patient is located in a Pincode\n    When the Chemist delivers the medicines and collects payment from the patient\n    Then the prescription should be marked as completed\n\n  Scenario Outline: Chemist delivers medicines and collects payments\n    Given the patient is located in a Pincode\n    When the Chemist delivers the medicines and collects payment from the patient\n    Then the prescription should be marked as completed\n\n  Scenario Outline: Chemist delivers medicines and collects payments\n    Given the pati",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    }
+  ]
+}

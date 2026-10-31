@@ -1,0 +1,781 @@
+{
+  "unit_id": "U06_Alarms",
+  "representation": "Sequence Diagrams",
+  "generator": "ollama:codegemma:7b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Sequence Diagrams",
+    "group": 3,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.875,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.6,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 9,
+    "uncovered_clauses": [
+      "RW-SW-71"
+    ],
+    "weaknesses": [
+      "No negative test cases for error handling",
+      "Missing verification of legibility at 1 meter (RW-SW-71)",
+      "Vague expected results in TC-001, TC-003, TC-004",
+      "No network latency assertions",
+      "No alt/opt/loop frame coverage"
+    ],
+    "traceability": 0.875,
+    "untraced_reqs": [
+      "RW-SW-71"
+    ],
+    "fsa_score": 0.74,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "@start\nController -> GUI: Alarm detected\nGUI -> Controller: Alarm priority assigned\nController -> Hardware PCB: Buzzer command sent\nGUI -> Controller: List of active alarms requested\nGUI <- Controller: List of active alarms\n@end\n\n@start\nController -> GUI: Alarm code enumerated\n@end\n\n@start\nController -> Hardware PCB: Buzzer command sent\n@end\n\n@start\nController -> GUI: Alarm displayed\n@end",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Controller detects and assigns priority to alarm",
+      "req_ids": [
+        "RW-SW-66",
+        "RW-SW-68"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "alarm_status": "detected",
+        "alarm_priority": "highest"
+      },
+      "steps": [
+        "Alarm detected",
+        "Alarm priority assigned"
+      ],
+      "expected": [
+        "Alarm code enumerated",
+        "Alarm displayed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Controller commands buzzer for high severity alarm",
+      "req_ids": [
+        "RW-SW-67",
+        "RW-SW-73"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "alarm_severity": "high"
+      },
+      "steps": [
+        "Controller commands buzzer"
+      ],
+      "expected": [
+        "Buzzer color is red",
+        "Buzzer flashes at 2Hz with 50% duty cycle"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Controller displays list of active alarms",
+      "req_ids": [
+        "RW-SW-70"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "active_alarms_list": "list"
+      },
+      "steps": [
+        "GUI requests list of active alarms"
+      ],
+      "expected": [
+        "GUI displays list of active alarms"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Controller displays alarm on main screen",
+      "req_ids": [
+        "RW-SW-69"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "alarm_priority": "highest"
+      },
+      "steps": [
+        "Alarm detected",
+        "Alarm priority assigned"
+      ],
+      "expected": [
+        "Alarm displayed on main screen"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Controller displays low severity alarm with constant yellow light",
+      "req_ids": [
+        "RW-SW-74"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "alarm_severity": "low"
+      },
+      "steps": [
+        "Controller commands buzzer"
+      ],
+      "expected": [
+        "Buzzer color is yellow",
+        "Buzzer is constantly on"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "**Sequence Diagram for U06_Alarms**",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI detects and displays alarm",
+          "req_ids": [
+            "RW-SW-66"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is running"
+          ],
+          "inputs": {
+            "alarm": "detected"
+          },
+          "steps": [
+            "GUI requests alarm status",
+            "Controller responds with alarm status",
+            "GUI displays alarm on main screen"
+          ],
+          "expected": [
+            "Alarm is displayed on main screen"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI displays highest priority alarm",
+          "req_ids": [
+            "RW-SW-69"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller has enumerated alarm codes and assigned priorities"
+          ],
+          "inputs": {
+            "alarm_priority": "highest"
+          },
+          "steps": [
+            "GUI requests alarm priority",
+            "Controller responds with alarm priority",
+            "GUI displays highest priority alarm on main screen"
+          ],
+          "expected": [
+            "Highest priority alarm is displayed on main screen"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI displays list of active alarms",
+          "req_ids": [
+            "RW-SW-70"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller has a list of active alarms"
+          ],
+          "inputs": {
+            "active_alarms": "list"
+          },
+          "steps": [
+            "GUI requests list of active alarms",
+            "Controller responds with list of active alarms",
+            "GUI displays list of active alarms on button press"
+          ],
+          "expected": [
+            "List of active alarms is displayed on button press"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Hardware PCB indicates high severity alarms",
+          "req_ids": [
+            "RW-SW-73"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is commanding the hardware PCB"
+          ],
+          "inputs": {
+            "alarm_severity": "high"
+          },
+          "steps": [
+            "Controller commands buzzer with red color and flashing frequency of 2Hz with a 50% duty cycle"
+          ],
+          "expected": [
+            "Hardware PCB indicates high severity alarm with red color and flashing frequency"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.57,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "detected",
+            "context": "input alarm status",
+            "grounded": false
+          },
+          {
+            "value": "highest",
+            "context": "input alarm priority",
+            "grounded": false
+          },
+          {
+            "value": "list",
+            "context": "input active alarms list",
+            "grounded": false
+          },
+          {
+            "value": "high",
+            "context": "input alarm severity",
+            "grounded": false
+          },
+          {
+            "value": "red color",
+            "context": "buzzer color for high severity",
+            "grounded": false
+          },
+          {
+            "value": "2Hz",
+            "context": "flashing frequency for high severity",
+            "grounded": false
+          },
+          {
+            "value": "50%",
+            "context": "duty cycle for high severity",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 7,
+        "uncovered_clauses": [
+          "RW-SW-67",
+          "RW-SW-68",
+          "RW-SW-71",
+          "RW-SW-74"
+        ],
+        "weaknesses": [
+          "Add test for controller commanding buzzer (RW-SW-67).",
+          "Add test for enumeration of alarm codes and priority assignment (RW-SW-68).",
+          "Add test for legibility at 1 m distance (RW-SW-71).",
+          "Add test for low‑severity alarm indication (RW-SW-74).",
+          "Improve oracle assertions to check concrete values such as color codes, frequency, and duty cycle."
+        ],
+        "traceability": 0.5,
+        "untraced_reqs": [
+          "RW-SW-67",
+          "RW-SW-68",
+          "RW-SW-71",
+          "RW-SW-74"
+        ],
+        "fsa_score": 0.408,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.408; sub-scores {'clause_coverage': 0.57, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-67', 'RW-SW-68', 'RW-SW-71', 'RW-SW-74'] (add at least one each)\n- uncovered clause: RW-SW-67\n- uncovered clause: RW-SW-68\n- uncovered clause: RW-SW-71\n- uncovered clause: RW-SW-74\n- ungrounded value 'detected' (input alarm status): remove or use the SRS value\n- ungrounded value 'highest' (input alarm priority): remove or use the SRS value\n- ungrounded value 'list' (input active alarms list): remove or use the SRS value\n- ungrounded value 'high' (input alarm severity): remove or use the SRS value\n- ungrounded value 'red color' (buzzer color for high severity): remove or use the SRS value\n- ungrounded value '2Hz' (flashing frequency for high severity): remove or use the SRS value\n- Add test for controller commanding buzzer (RW-SW-67).\n- Add test for enumeration of alarm codes and priority assignment (RW-SW-68).\n- Add test for legibility at 1 m distance (RW-SW-71).\n- Add test for low‑severity alarm indication (RW-SW-74).\n- Improve oracle assertions to check concrete values such as color codes, frequency, and duty cycle.",
+      "artifact": "@start\nController -> GUI: Alarm detected\nGUI -> Controller: Alarm priority assigned\nController -> Hardware PCB: Buzzer command sent\nGUI -> Controller: List of active alarms requested\nGUI <- Controller: List of active alarms\n@end\n\n@start\nController -> GUI: Alarm code enumerated\n@end\n\n@start\nController -> Hardware PCB: Buzzer command sent\n@end\n\n@start\nController -> GUI: Alarm displayed\n@end",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller detects and assigns priority to alarm",
+          "req_ids": [
+            "RW-SW-66",
+            "RW-SW-68"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "alarm_status": "detected",
+            "alarm_priority": "highest"
+          },
+          "steps": [
+            "Alarm detected",
+            "Alarm priority assigned"
+          ],
+          "expected": [
+            "Alarm code enumerated",
+            "Alarm displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller commands buzzer for high severity alarm",
+          "req_ids": [
+            "RW-SW-67",
+            "RW-SW-73"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "alarm_severity": "high"
+          },
+          "steps": [
+            "Controller commands buzzer"
+          ],
+          "expected": [
+            "Buzzer color is red",
+            "Buzzer flashes at 2Hz with 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Controller displays list of active alarms",
+          "req_ids": [
+            "RW-SW-70"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "active_alarms_list": "list"
+          },
+          "steps": [
+            "GUI requests list of active alarms"
+          ],
+          "expected": [
+            "GUI displays list of active alarms"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Controller displays alarm on main screen",
+          "req_ids": [
+            "RW-SW-69"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "alarm_priority": "highest"
+          },
+          "steps": [
+            "Alarm detected",
+            "Alarm priority assigned"
+          ],
+          "expected": [
+            "Alarm displayed on main screen"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller displays low severity alarm with constant yellow light",
+          "req_ids": [
+            "RW-SW-74"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "alarm_severity": "low"
+          },
+          "steps": [
+            "Controller commands buzzer"
+          ],
+          "expected": [
+            "Buzzer color is yellow",
+            "Buzzer is constantly on"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.6,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 9,
+        "uncovered_clauses": [
+          "RW-SW-71"
+        ],
+        "weaknesses": [
+          "No negative test cases for error handling",
+          "Missing verification of legibility at 1 meter (RW-SW-71)",
+          "Vague expected results in TC-001, TC-003, TC-004",
+          "No network latency assertions",
+          "No alt/opt/loop frame coverage"
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-71"
+        ],
+        "fsa_score": 0.74,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.74; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.6, 'boundary_coverage': 1.0, 'groundedness_mg': 1.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-71'] (add at least one each)\n- uncovered clause: RW-SW-71\n- No negative test cases for error handling\n- Missing verification of legibility at 1 meter (RW-SW-71)\n- Vague expected results in TC-001, TC-003, TC-004\n- No network latency assertions\n- No alt/opt/loop frame coverage",
+      "artifact": "@startuml\nsequenceDiagram\n    participant Controller\n    participant GUI\n    participant HardwarePCB\n\n    Controller->>GUI: Alarm detected\n    activate GUI\n    GUI->>Controller: Alarm code and priority\n    deactivate GUI\n\n    Controller->>HardwarePCB: Buzzer command\n    activate HardwarePCB\n    HardwarePCB->>Controller: Buzzer status\n    deactivate HardwarePCB\n\n    GUI->>Controller: List of active alarms\n    activate Controller\n    Controller->>GUI: List of alarms\n    deactivate GUI\n\n    GUI->>Controller: Alarm on main screen\n    activate Controller\n    Controller->>GUI: Alarm display\n    deactivate GUI\n\n    GUI->>Controller: Legibility check\n    activate Controller\n    Controller->>GUI: Legibility status\n    deactivate GUI\n\n    alt High severity alarm\n        GUI->>Controller: Alarm color and flashing frequency\n        activate Controller\n        Controller->>HardwarePCB: Buzzer configuration\n        deactivate HardwarePCB\n    else Low severity alarm\n        GUI->>Controller: Alarm color\n        activate Controller\n        Controller->>HardwarePCB: Buzzer configuration\n        deactivate HardwarePCB\n    end\n@enduml",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Verify alarm display for high severity alarm",
+          "req_ids": [
+            "RW-SW-66",
+            "RW-SW-69",
+            "RW-SW-73"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Alarm detected with high severity"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI displays alarm on main screen",
+            "Alarm color is red",
+            "Flashing frequency is 2Hz with 50% duty cycle"
+          ],
+          "expected": [
+            "Alarm is displayed correctly"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Verify alarm display for low severity alarm",
+          "req_ids": [
+            "RW-SW-66",
+            "RW-SW-69",
+            "RW-SW-74"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Alarm detected with low severity"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI displays alarm on main screen",
+            "Alarm color is yellow"
+          ],
+          "expected": [
+            "Alarm is displayed correctly"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Verify alarm list display",
+          "req_ids": [
+            "RW-SW-66",
+            "RW-SW-70"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Multiple alarms active"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI displays list of active alarms"
+          ],
+          "expected": [
+            "List of alarms is displayed correctly"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Verify alarm legibility at 1 meter distance",
+          "req_ids": [
+            "RW-SW-66",
+            "RW-SW-71"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Alarm displayed on main screen"
+          ],
+          "inputs": {},
+          "steps": [
+            "Check if alarm is legible at 1 meter distance"
+          ],
+          "expected": [
+            "Alarm is legible at 1 meter distance"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.5,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 7,
+        "uncovered_clauses": [
+          "RW-SW-66",
+          "RW-SW-67",
+          "RW-SW-68",
+          "RW-SW-69"
+        ],
+        "weaknesses": [
+          "Add tests for controller receiving alarms from GUI (RW-SW-66).",
+          "Add tests for controller commanding the buzzer (RW-SW-67).",
+          "Add tests for GUI/Controller enumerating alarm codes and priorities (RW-SW-68).",
+          "Add tests to verify GUI displays the highest priority alarm when multiple alarms are active (RW-SW-69).",
+          "Strengthen oracle assertions to check concrete values such as color codes, frequency, duty cycle, and legibility metrics."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "RW-SW-67",
+          "RW-SW-68"
+        ],
+        "fsa_score": 0.395,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.395; sub-scores {'clause_coverage': 0.5, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.3, 'boundary_coverage': 0.0, 'groundedness_mg': 1.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-67', 'RW-SW-68'] (add at least one each)\n- uncovered clause: RW-SW-66\n- uncovered clause: RW-SW-67\n- uncovered clause: RW-SW-68\n- uncovered clause: RW-SW-69\n- Add tests for controller receiving alarms from GUI (RW-SW-66).\n- Add tests for controller commanding the buzzer (RW-SW-67).\n- Add tests for GUI/Controller enumerating alarm codes and priorities (RW-SW-68).\n- Add tests to verify GUI displays the highest priority alarm when multiple alarms are active (RW-SW-69).\n- Strengthen oracle assertions to check concrete values such as color codes, frequency, duty cycle, and legibility metrics.",
+      "artifact": "@start_of_turn\nController -> GUI: Alarm detected\nGUI -> Controller: Alarm code and priority\nController -> Hardware PCB: Buzzer command\nGUI -> Controller: Button press\nController -> GUI: Alarm display",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller detects high severity alarm",
+          "req_ids": [
+            "RW-SW-66",
+            "RW-SW-73"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is initialized"
+          ],
+          "inputs": {
+            "alarm_code": 1,
+            "priority": "HIGH"
+          },
+          "steps": [
+            "Controller receives alarm from GUI"
+          ],
+          "expected": [
+            "Buzzer flashes with red color at 2Hz with 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller detects low severity alarm",
+          "req_ids": [
+            "RW-SW-66",
+            "RW-SW-74"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is initialized"
+          ],
+          "inputs": {
+            "alarm_code": 2,
+            "priority": "LOW"
+          },
+          "steps": [
+            "Controller receives alarm from GUI"
+          ],
+          "expected": [
+            "Buzzer is constantly on with yellow color"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI enumerates alarm codes and priorities",
+          "req_ids": [
+            "RW-SW-68"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI displays list of alarm codes and priorities"
+          ],
+          "expected": [
+            "Alarm codes and priorities are displayed correctly"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI displays highest priority alarm",
+          "req_ids": [
+            "RW-SW-69"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Multiple alarms are active"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI displays highest priority alarm"
+          ],
+          "expected": [
+            "Highest priority alarm is displayed on main screen"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.5,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.5556,
+        "hallucinated": [
+          {
+            "value": "alarm_code 1",
+            "context": "input to controller",
+            "grounded": false
+          },
+          {
+            "value": "priority HIGH",
+            "context": "input to controller",
+            "grounded": false
+          },
+          {
+            "value": "alarm_code 2",
+            "context": "input to controller",
+            "grounded": false
+          },
+          {
+            "value": "priority LOW",
+            "context": "input to controller",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 9,
+        "uncovered_clauses": [
+          "RW-SW-70",
+          "RW-SW-71"
+        ],
+        "weaknesses": [
+          "No test for GUI list of active alarms on button press (RW-SW-70).",
+          "No test for legibility at 1 meter (RW-SW-71).",
+          "Missing negative test cases for invalid alarm codes or missing priority.",
+          "Oracle assertions for GUI display are vague; need concrete checks.",
+          "Boundary conditions for flashing frequency and duty cycle not tested."
+        ],
+        "traceability": 0.625,
+        "untraced_reqs": [
+          "RW-SW-67",
+          "RW-SW-70",
+          "RW-SW-71"
+        ],
+        "fsa_score": 0.4583,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,1573 @@
+{
+  "unit_id": "U29_19",
+  "representation": "Use-Cases & User Stories",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Use-Cases & User Stories",
+    "group": 1,
+    "schema_score": 0.6364,
+    "representation_score": 1.0,
+    "sfv_score": 0.8182,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "test case #2 (TC-002): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']"
+    ]
+  },
+  "fsa": null,
+  "artifact": "**Use-Cases & User Stories**\n\n*Actor: Patient*\n\n**UC-PUQ01: Query Patient Details**\n- **Primary Success Flow:**\n  1. Patient enters Patient Id.\n  2. System displays Patient details.\n  3. Patient can modify details except Pin-Code which is restricted to Zone.\n- **Alternative Flow:**\n  1. If Patient Id is invalid, display \"Invalid Patient Id\".\n- **Exception Flow:**\n  1. If attempting to modify Pin-Code to a value outside the Zone, display \"Pin-Code modification outside Zone is prohibited\".\n\n*Actor: Doctor*\n\n**UC-DOC01: Create Consultation Request**\n- **Primary Success Flow:**\n  1. Doctor selects Patient Id.\n  2. System displays Patient details.\n  3. Doctor enters Speciality, Symptoms, Consultation request/Appointment, and Appointment date.\n  4. If Appointment Request is for the next day, create an entry in Patient Appointment file.\n- **Alternative Flow:**\n  1. If Appointment date is not the next day, prompt \"Appointment not scheduled for next day; no entry created\".\n- **Exception Flow:**\n  1. If attempting to schedule an appointment beyond allowed date range, display \"Appointment date out of allowed range\".\n\n**UC-DOC02: Provide Consultation**\n- **Primary Success Flow:**\n  1. Doctor views all consultation requests.\n  2. Doctor selects a request.\n  3. Doctor enters Diagnosis, prescribes up to 8 medicines, and optionally requests lab tests (max 5).\n- **Alternative Flow:**\n  1. If no lab tests are requested, proceed without additional steps.\n- **Exception Flow:**\n  1. If attempting to prescribe more than 8 medicines, display \"Maximum of 8 medicines allowed\".\n  2. If attempting to request more than 5 lab tests, display \"Maximum of 5 lab tests allowed\".\n\n*Actor: Chemist*\n\n**UC-CHEM01: Dispense Medicines**\n- **Primary Success Flow:**\n  1. Chemist views all consultation requests.\n  2. Chemist selects a request.\n  3. Chemist dispenses medicines as per Prescription and marks the flag in Prescription.\n- **Alternative Flow:**\n  1. If Prescription is already marked, skip marking step.\n- **Exception Flow:**\n  1. If attempting to dispense without a valid Prescription, display \"Prescription not found\".\n\n*Actor: Lab Technician*\n\n**UC-LAB01: Conduct Lab Tests**\n- **Primary Success Flow:**\n  1. Lab Technician views all consultation requests.\n  2. Lab Technician selects a request.\n  3. Technician notes down required lab tests, records Patient details, and marks the flag in Prescription.\n  4. Technician adds the lab report.\n- **Alternative Flow:**\n  1. If no lab tests are requested, skip lab test steps.\n- **Exception Flow:**\n  1. If attempting to mark the Prescription flag without a valid Prescription, display \"Invalid Prescription\".",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "UC-PUQ01: Query Patient Details - Positive",
+      "req_ids": [
+        "VCDPA03"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient Id is valid"
+      ],
+      "inputs": {
+        "patientId": "12345"
+      },
+      "steps": [
+        "Enter Patient Id",
+        "Display Patient details",
+        "Attempt to modify Pin-Code within Zone"
+      ],
+      "expected": [
+        "Pin-Code modification allowed within Zone"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "UC-PUQ01: Query Patient Details - Exception",
+      "req_ids": [
+        "VCDPA03"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "Patient Id is valid"
+      ],
+      "inputs": {
+        "patientId": "12345"
+      },
+      "steps": [
+        "Enter Patient Id",
+        "Attempt to modify Pin-Code outside Zone"
+      ],
+      "expected": [
+        "Error message: 'Pin-Code modification outside Zone is prohibited'"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "UC-DOC01: Create Consultation Request - Positive",
+      "req_ids": [
+        "VCDPA04"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor logged in"
+      ],
+      "inputs": {
+        "patientId": "12345",
+        "speciality": "Cardiology",
+        "symptoms": "Chest Pain",
+        "appointmentDate": "2023-10-12"
+      },
+      "steps": [
+        "Select Patient Id",
+        "Enter Speciality, Symptoms, Appointment Request",
+        "Confirm Appointment date"
+      ],
+      "expected": [
+        "Entry created in Patient Appointment file"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "UC-DOC01: Create Consultation Request - Alternative",
+      "req_ids": [
+        "VCDPA04"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Doctor logged in"
+      ],
+      "inputs": {
+        "patientId": "12345",
+        "speciality": "Cardiology",
+        "symptoms": "Chest Pain",
+        "appointmentDate": "2023-10-13"
+      },
+      "steps": [
+        "Select Patient Id",
+        "Enter Speciality, Symptoms, Appointment Request",
+        "Confirm Appointment date"
+      ],
+      "expected": [
+        "Message: 'Appointment not scheduled for next day; no entry created'"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "UC-DOC02: Provide Consultation - Positive",
+      "req_ids": [
+        "VCDDR02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor logged in",
+        "Consultation request exists"
+      ],
+      "inputs": {
+        "diagnosis": "Heart Attack",
+        "medicines": [
+          "Aspirin",
+          "Beta Blocker"
+        ],
+        "labTests": [
+          "ECG",
+          "Blood Test"
+        ]
+      },
+      "steps": [
+        "Select Consultation request",
+        "Enter Diagnosis",
+        "Prescribe medicines",
+        "Request lab tests"
+      ],
+      "expected": [
+        "Diagnosis recorded, medicines prescribed, lab tests requested"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "UC-DOC02: Provide Consultation - Exception",
+      "req_ids": [
+        "VCDDR02"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "Doctor logged in",
+        "Consultation request exists"
+      ],
+      "inputs": {
+        "diagnosis": "Heart Attack",
+        "medicines": [
+          "Aspirin",
+          "Beta Blocker",
+          "Corticosteroid",
+          "Statins",
+          "ACE Inhibitor",
+          "Diuretic",
+          "Anticoagulant",
+          "Nitrates",
+          "Another Medicine"
+        ]
+      },
+      "steps": [
+        "Select Consultation request",
+        "Enter Diagnosis",
+        "Attempt to prescribe 9 medicines"
+      ],
+      "expected": [
+        "Error message: 'Maximum of 8 medicines allowed'"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "UC-CHEM01: Dispense Medicines - Positive",
+      "req_ids": [
+        "VCDCM01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist logged in",
+        "Prescription exists"
+      ],
+      "inputs": {
+        "prescriptionId": "PRES001"
+      },
+      "steps": [
+        "Select Prescription",
+        "Dispense medicines",
+        "Mark Prescription flag"
+      ],
+      "expected": [
+        "Medicines dispensed, Prescription flag marked"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "UC-CHEM01: Dispense Medicines - Alternative",
+      "req_ids": [
+        "VCDCM01"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Chemist logged in",
+        "Prescription exists"
+      ],
+      "inputs": {
+        "prescriptionId": "PRES001"
+      },
+      "steps": [
+        "Select Prescription",
+        "Attempt to dispense without marking flag"
+      ],
+      "expected": [
+        "Message: 'Prescription already marked'"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "UC-LAB01: Conduct Lab Tests - Positive",
+      "req_ids": [
+        "VCDLB01",
+        "VCDLB02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Lab Technician logged in",
+        "Prescription exists"
+      ],
+      "inputs": {
+        "prescriptionId": "PRES001",
+        "labTests": [
+          "ECG",
+          "Blood Test"
+        ]
+      },
+      "steps": [
+        "Select Prescription",
+        "Note lab requests",
+        "Mark Prescription flag",
+        "Add lab report"
+      ],
+      "expected": [
+        "Lab tests conducted, Prescription flag marked, Report added"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "UC-LAB01: Conduct Lab Tests - Exception",
+      "req_ids": [
+        "VCDLB01",
+        "VCDLB02"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "Lab Technician logged in",
+        "Prescription exists"
+      ],
+      "inputs": {
+        "prescriptionId": "PRES001",
+        "labTests": [
+          "ECG",
+          "Blood Test",
+          "X-Ray",
+          "MRI",
+          "Ultrasound",
+          "Another Test",
+          "YetAnotherTest"
+        ]
+      },
+      "steps": [
+        "Select Prescription",
+        "Attempt to note 7 lab tests"
+      ],
+      "expected": [
+        "Error message: 'Maximum of 5 lab tests allowed'"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "UC-LAB01: Conduct Lab Tests - Exception",
+      "req_ids": [
+        "VCDLB01",
+        "VCDLB02"
+      ],
+      "kind": "exception",
+      "preconditions": [
+        "Lab Technician logged in",
+        "Invalid Prescription"
+      ],
+      "inputs": {
+        "prescriptionId": "INVALID_PRES"
+      },
+      "steps": [
+        "Attempt to mark Prescription flag"
+      ],
+      "expected": [
+        "Error message: 'Invalid Prescription'"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "**Use-Case 1: Query Patient Details by Patient ID**\n- **Actor:** System User (Patient Portal)\n- **Goal:** Retrieve and optionally modify patient details.\n- **Preconditions:** Patient ID exists in the database.\n- **Primary Success Flow:**\n  1. User enters Patient ID.\n  2. System validates Patient ID.\n  3. System displays patient details (Name, Age, Address, Pin-Code).\n  4. User can modify fields except Pin-Code.\n- **Alternative Flow:**\n  1. If Pin-Code modification is attempted, system rejects changes outside the Zone.\n- **Exception Flow:**\n  1. Patient ID does not exist → System displays error message \"Patient ID not found.\"\n\n**Use-Case 2: Create Patient Appointment Request**\n- **Actor:** System User (Patient Portal)\n- **Goal:** Submit a consultation request for the next day.\n- **Preconditions:** Patient details are displayed.\n- **Primary Success Flow:**\n  1. User selects \"Request Consultation.\"\n  2. User inputs Speciality, Symptoms, and Appointment Date (must be next day).\n  3. System validates inputs.\n  4. System creates an entry in the Patient Appointment file.\n- **Alternative Flow:**\n  1. If Appointment Date is not the next day, system prompts to select next day.\n- **Exception Flow:**\n  1. Invalid Speciality or Symptoms → System displays error message \"Invalid input.\"\n\n**Use-Case 3: Doctor Views and Processes Consultation Requests**\n- **Actor:** Doctor\n- **Goal:** View and provide consultations for patient requests.\n- **Preconditions:** Consultation requests exist in the workflow.\n- **Primary Success Flow:**\n  1. Doctor logs in and navigates to Consultation Requests.\n  2. System lists all pending requests.\n  3. Doctor selects a request.\n  4. System displays patient details and request information.\n  5. Doctor enters Diagnosis and Prescribes up to 8 medicines.\n  6. Doctor optionally requests up to 5 lab tests.\n  7. System updates the Prescription with entered details.\n- **Alternative Flow:**\n  1. If no requests are available, system displays \"No pending requests.\"\n- **Exception Flow:**\n  1. Doctor attempts to prescribe more than 8 medicines → System rejects excess prescriptions.\n\n**Use-Case 4: Chemist Dispenses Medicines Based on Prescription**\n- **Actor:** Chemist\n- **Goal:** Dispense medicines as per Doctor's prescription.\n- **Preconditions:** Prescription is marked by Doctor.\n- **Primary Success Flow:**\n  1. Chemist logs in and selects Consultation Requests.\n  2. System lists all prescriptions marked by Doctor.\n  3. Chemist selects a prescription.\n  4. System displays prescribed medicines.\n  5. Chemist dispenses the medicines and marks the Prescription flag.\n- **Alternative Flow:**\n  1. If no prescriptions are marked, system displays \"No prescriptions to dispense.\"\n- **Exception Flow:**\n  1. Chemist attempts to dispense a non-existent prescription → System displays error \"Prescription not found.\"\n\n**Use-Case 5: Lab Processes and Records Lab Tests**\n- **Actor:** Lab Technician\n- **Goal:** Note down lab requests and update the prescription.\n- **Preconditions:** Prescription includes lab test requests.\n- **Primary Success Flow:**\n  1. Lab Technician logs in and selects Consultation Requests.\n  2. System lists all prescriptions with lab test requests.\n  3. Technician selects a prescription.\n  4. System displays lab test details.\n  5. Technician notes down the lab requests and patient details.\n  6. Technician marks the Prescription flag and adds the lab report.\n- **Alternative Flow:**\n  1. If no lab requests are present, system displays \"No lab tests to process.\"\n- **Exception Flow:**\n  1. Technician attempts to add a lab report for a non-existent prescription → System displays error \"Prescription not found.\"",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Query Patient Details by Patient ID",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient ID exists in the database"
+          ],
+          "inputs": {
+            "patient_id": "12345"
+          },
+          "steps": [
+            "Enter Patient ID",
+            "Validate Patient ID",
+            "Display patient details",
+            "Attempt to modify Pin-Code"
+          ],
+          "expected": [
+            "Patient details displayed",
+            "Pin-Code modification rejected outside Zone"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Create Patient Appointment Request for Next Day",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient details are displayed"
+          ],
+          "inputs": {
+            "speciality": "Cardiology",
+            "symptoms": "Chest Pain",
+            "appointment_date": "2023-10-12"
+          },
+          "steps": [
+            "Select Request Consultation",
+            "Input Speciality, Symptoms, Appointment Date",
+            "Validate inputs",
+            "Create entry in Patient Appointment file"
+          ],
+          "expected": [
+            "Appointment request created for next day"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor Views and Processes Consultation Requests",
+          "req_ids": [
+            "VCDDR01",
+            "VCDDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Consultation requests exist"
+          ],
+          "inputs": {
+            "patient_id": "12345"
+          },
+          "steps": [
+            "Log in as Doctor",
+            "Navigate to Consultation Requests",
+            "Select a request",
+            "Enter Diagnosis",
+            "Prescribe medicines (max 8)",
+            "Request lab tests (max 5)",
+            "Update Prescription"
+          ],
+          "expected": [
+            "Diagnosis entered",
+            "Medicines prescribed up to 8",
+            "Lab tests requested up to 5",
+            "Prescription updated"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Chemist Dispenses Medicines Based on Prescription",
+          "req_ids": [
+            "VCDCM01",
+            "VCDCM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription is marked by Doctor"
+          ],
+          "inputs": {
+            "prescription_id": "PR-001"
+          },
+          "steps": [
+            "Log in as Chemist",
+            "Select Consultation Requests",
+            "Select a marked prescription",
+            "Dispense medicines",
+            "Mark Prescription flag"
+          ],
+          "expected": [
+            "Medicines dispensed",
+            "Prescription flag marked"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Lab Processes and Records Lab Tests",
+          "req_ids": [
+            "VCDLB01",
+            "VCDLB02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription includes lab test requests"
+          ],
+          "inputs": {
+            "prescription_id": "PR-001"
+          },
+          "steps": [
+            "Log in as Lab Technician",
+            "Select Consultation Requests",
+            "Select a prescription with lab tests",
+            "Note down lab requests",
+            "Mark Prescription flag",
+            "Add lab report"
+          ],
+          "expected": [
+            "Lab tests noted",
+            "Prescription flag marked",
+            "Lab report added"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Pin-Code Modification Outside Zone Exception",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient ID exists"
+          ],
+          "inputs": {
+            "patient_id": "12345",
+            "new_pin_code": "99999"
+          },
+          "steps": [
+            "Enter Patient ID",
+            "Attempt to modify Pin-Code to outside Zone"
+          ],
+          "expected": [
+            "Error message: 'Pin-Code modification rejected outside Zone'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Appointment Date Not Next Day Alternative",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Patient details are displayed"
+          ],
+          "inputs": {
+            "speciality": "Neurology",
+            "symptoms": "Headache",
+            "appointment_date": "2023-10-14"
+          },
+          "steps": [
+            "Select Request Consultation",
+            "Input Speciality, Symptoms, Appointment Date (not next day)",
+            "Validate inputs"
+          ],
+          "expected": [
+            "Prompt to select next day appointment date"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Prescribe More Than 8 Medicines Exception",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Doctor logged in and consultation request selected"
+          ],
+          "inputs": {
+            "prescription_id": "PR-001",
+            "medicines": [
+              "Med1",
+              "Med2",
+              "Med3",
+              "Med4",
+              "Med5",
+              "Med6",
+              "Med7",
+              "Med8",
+              "Med9"
+            ]
+          },
+          "steps": [
+            "Enter Diagnosis",
+            "Attempt to prescribe 9 medicines"
+          ],
+          "expected": [
+            "Error message: 'Cannot prescribe more than 8 medicines'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "No Pending Consultation Requests Alternative",
+          "req_ids": [
+            "VCDDR01"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Doctor logged in"
+          ],
+          "steps": [
+            "Navigate to Consultation Requests",
+            "Check for pending requests"
+          ],
+          "expected": [
+            "Message: 'No pending requests'"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "No Lab Tests to Process Exception",
+          "req_ids": [
+            "VCDLB01"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Lab Technician logged in"
+          ],
+          "steps": [
+            "Select Consultation Requests",
+            "Check for prescriptions with lab test requests"
+          ],
+          "expected": [
+            "Message: 'No lab tests to process'"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Prescription Not Found Exception",
+          "req_ids": [
+            "VCDCM02",
+            "VCDLB02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Prescription ID provided"
+          ],
+          "inputs": {
+            "prescription_id": "INVALID_PR"
+          },
+          "steps": [
+            "Select a prescription",
+            "Attempt to dispense or add lab report"
+          ],
+          "expected": [
+            "Error message: 'Prescription not found'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.4545,
+        "representation_score": 1.0,
+        "sfv_score": 0.7273,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #7 (TC-007): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.73). Fix these problems and output the full corrected suite:\n- test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #7 (TC-007): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #9 (TC-009): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories for Healthcare Workflow System**\n\n---\n\n### Use-Case: Query Patient Details (VCDPA03)\n\n**Primary Actor:** Patient / Administrator  \n**Goal:** Retrieve and optionally modify patient details, ensuring the pin-code remains within the defined zone.\n\n**Preconditions:**  \n- Patient ID is valid.  \n- System is logged in with appropriate privileges.\n\n**Main Success Scenario:**  \n1. System prompts for Patient ID.  \n2. System displays patient details (name, address, pin-code, etc.).  \n3. User can modify all fields except pin-code.  \n4. If modification attempts to set pin-code outside the zone, system rejects change.\n\n**Alternative Scenarios:**  \n- **A1:** Patient ID not found → System displays \"Patient ID not found\" message.  \n- **A2:** User lacks modification privileges → System displays \"Insufficient privileges\" message.\n\n**Exception Scenarios:**  \n- **E1:** Attempt to modify pin-code to an invalid zone → System throws \"Pin-code modification outside zone\" error.  \n- **E2:** System failure during display → System logs error and prompts user to retry.\n\n---\n\n### Use-Case: Create Patient Appointment (VCDPA04)\n\n**Primary Actor:** Patient  \n**Goal:** Submit consultation request and schedule an appointment if requested for the next day.\n\n**Preconditions:**  \n- Patient ID is valid.  \n- System is logged in.\n\n**Main Success Scenario:**  \n1. System prompts for Patient ID.  \n2. System displays patient details.  \n3. User enters specialty, symptoms, and requests an appointment.  \n4. If appointment is for the next day, system creates an entry in the Patient Appointment file.\n\n**Alternative Scenarios:**  \n- **A1:** Appointment not for next day → System schedules for requested date.  \n- **A2:** User cancels request → System removes pending entry.\n\n**Exception Scenarios:**  \n- **E1:** Invalid specialty or symptom selection → System displays \"Invalid input\" error.  \n- **E2:** System unable to create appointment entry → System logs error and notifies user.\n\n---\n\n### Use-Case: Doctor Provides Consultation (VCDDR01 & VCDDR02)\n\n**Primary Actor:** Doctor  \n**Goal:** Review consultation requests, provide diagnosis, prescribe medicines, and request lab tests.\n\n**Preconditions:**  \n- Doctor is logged in.  \n- Consultation requests are available.\n\n**Main Success Scenario:**  \n1. System displays all consultation requests.  \n2. Doctor selects a request.  \n3. System shows patient details and entered information.  \n4. Doctor enters diagnosis, prescribes up to 8 medicines, and optionally requests up to 5 lab tests.  \n5. System updates the consultation record.\n\n**Alternative Scenarios:**  \n- **A1:** Doctor declines a request → System marks request as declined.  \n- **A2:** Doctor modifies diagnosis after consultation → System updates diagnosis field.\n\n**Exception Scenarios:**  \n- **E1:** Doctor attempts to prescribe more than 8 medicines → System throws \"Medicine limit exceeded\" error.  \n- **E2:** System fails to update lab test request → System logs error and prompts retry.\n\n---\n\n### Use-Case: Chemist Dispenses Medicines (VCDCM01 & VCDCM02)\n\n**Primary Actor:** Chemist  \n**Goal:** Retrieve consultation requests, dispense medicines, and mark prescription status.\n\n**Preconditions:**  \n- Chemist is logged in.  \n- Consultation requests are available.\n\n**Main Success Scenario:**  \n1. System displays all consultation requests.  \n2. Chemist selects a request.  \n3. System shows prescription details.  \n4. Chemist dispenses medicines listed in the prescription and marks the prescription flag as dispensed.\n\n**Alternative Scenarios:**  \n- **A1:** Chemist finds a prescription incomplete → System prompts to verify prescription details.  \n- **A2:** Chemist cancels dispensing → System marks request as not dispensed.\n\n**Exception Scenarios:**  \n- **E1:** Attempt to dispense without marking prescription → System throws \"Prescription not marked\" error.  \n- **E2:** System error during dispensing → System logs error and notifies user.\n\n---\n\n### Use-Case: Lab Conducts Tests (VCDLB01 & VCDLB02)\n\n**Primary Actor:** Lab Technician  \n**Goal:** Retrieve consultation requests, note lab tests, and update prescription with results.\n\n**Preconditions:**  \n- Lab technician is logged in.  \n- Consultation requests with lab tests are available.\n\n**Main Success Scenario:**  \n1. System displays all consultation requests.  \n2. Lab technician selects a request.  \n3. System shows prescription and patient details.  \n4. Technician notes required lab tests, performs them, and updates the prescription with the report.\n\n**Alternative Scenarios:**  \n- **A1:** Lab technician skips optional tests → System updates prescription accordingly.  \n- **A2:** Technician modifies test parameters after initiation → System allows modification within limits.\n\n**Exception Scenarios:**  \n- **E1:** Attempt to add more than 5 lab tests → System throws \"Lab test limit exceeded\" error.  \n- **E2:** System failure during report update → System logs error and prompts retry.\n\n---",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Query Patient Details - Positive",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient ID is valid"
+          ],
+          "inputs": {
+            "patient_id": "12345"
+          },
+          "steps": [
+            "Enter Patient ID",
+            "Display patient details",
+            "Modify fields except pin-code"
+          ],
+          "expected": [
+            "Patient details displayed",
+            "Pin-code unchanged"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Query Patient Details - Exception (Pin-code outside zone)",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient ID is valid"
+          ],
+          "inputs": {
+            "patient_id": "12345",
+            "new_pin_code": "99999"
+          },
+          "steps": [
+            "Enter Patient ID",
+            "Attempt to modify pin-code"
+          ],
+          "expected": [
+            "Error message: Pin-code modification outside zone"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Create Patient Appointment - Positive",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient ID is valid"
+          ],
+          "inputs": {
+            "patient_id": "12345",
+            "specialty": "Cardiology",
+            "symptoms": "Chest pain",
+            "appointment_date": "2023-12-01"
+          },
+          "steps": [
+            "Enter Patient ID",
+            "Select specialty and symptoms",
+            "Request appointment"
+          ],
+          "expected": [
+            "Appointment entry created in Patient Appointment file"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Create Patient Appointment - Alternative (Next day)",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Patient ID is valid"
+          ],
+          "inputs": {
+            "patient_id": "12345",
+            "appointment_date": "Tomorrow"
+          },
+          "steps": [
+            "Enter Patient ID",
+            "Request appointment for next day"
+          ],
+          "expected": [
+            "Appointment entry created for next day"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor Provides Consultation - Positive",
+          "req_ids": [
+            "VCDDR01",
+            "VCDDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged in"
+          ],
+          "inputs": {
+            "consultation_id": "C001",
+            "diagnosis": "Heart condition",
+            "medicines": [
+              "Aspirin",
+              "Lisinopril"
+            ],
+            "lab_tests": [
+              "ECG",
+              "Blood test"
+            ]
+          },
+          "steps": [
+            "Select consultation request",
+            "Enter diagnosis",
+            "Prescribe medicines",
+            "Request lab tests"
+          ],
+          "expected": [
+            "Diagnosis recorded",
+            "Medicines prescribed",
+            "Lab tests requested"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Doctor Provides Consultation - Exception (Medicine limit)",
+          "req_ids": [
+            "VCDDR01",
+            "VCDDR02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Doctor is logged in"
+          ],
+          "inputs": {
+            "consultation_id": "C001",
+            "medicines": [
+              "Aspirin",
+              "Lisinopril",
+              "Warfarin",
+              "Clopidogrel",
+              "Enalapril",
+              "Atorvastatin",
+              "Metformin",
+              "Simvastatin",
+              "ExtraMed"
+            ]
+          },
+          "steps": [
+            "Select consultation request",
+            "Attempt to prescribe 9 medicines"
+          ],
+          "expected": [
+            "Error message: Medicine limit exceeded"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Chemist Dispenses Medicines - Positive",
+          "req_ids": [
+            "VCDCM01",
+            "VCDCM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist is logged in"
+          ],
+          "inputs": {
+            "prescription_id": "P001",
+            "medicines": [
+              "Aspirin",
+              "Lisinopril"
+            ]
+          },
+          "steps": [
+            "Select prescription",
+            "Dispense medicines",
+            "Mark prescription as dispensed"
+          ],
+          "expected": [
+            "Medicines dispensed",
+            "Prescription marked"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Chemist Dispenses Medicines - Exception (Prescription not marked)",
+          "req_ids": [
+            "VCDCM01",
+            "VCDCM02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Chemist is logged in"
+          ],
+          "inputs": {
+            "prescription_id": "P001"
+          },
+          "steps": [
+            "Select prescription",
+            "Attempt to dispense without marking"
+          ],
+          "expected": [
+            "Error message: Prescription not marked"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Lab Conducts Tests - Positive",
+          "req_ids": [
+            "VCDLB01",
+            "VCDLB02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab technician is logged in"
+          ],
+          "inputs": {
+            "prescription_id": "P001",
+            "lab_tests": [
+              "ECG",
+              "Blood test"
+            ]
+          },
+          "steps": [
+            "Select prescription",
+            "Note lab tests",
+            "Update prescription with report"
+          ],
+          "expected": [
+            "Lab tests conducted",
+            "Prescription updated with report"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Lab Conducts Tests - Exception (Lab test limit)",
+          "req_ids": [
+            "VCDLB01",
+            "VCDLB02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Lab technician is logged in"
+          ],
+          "inputs": {
+            "prescription_id": "P001",
+            "lab_tests": [
+              "ECG",
+              "Blood test",
+              "Urine test",
+              "Stool test",
+              "Liver test",
+              "Kidney test",
+              "ExtraTest"
+            ]
+          },
+          "steps": [
+            "Select prescription",
+            "Attempt to add 7 lab tests"
+          ],
+          "expected": [
+            "Error message: Lab test limit exceeded"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Lab Conducts Tests - Exception (System failure during report update)",
+          "req_ids": [
+            "VCDLB01",
+            "VCDLB02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Lab technician is logged in"
+          ],
+          "inputs": {
+            "prescription_id": "P001",
+            "lab_tests": [
+              "ECG",
+              "Blood test"
+            ]
+          },
+          "steps": [
+            "Select prescription",
+            "Note lab tests",
+            "Attempt to update report"
+          ],
+          "expected": [
+            "Error message: System failure during report update"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.4545,
+        "representation_score": 1.0,
+        "sfv_score": 0.7273,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #2 (TC-002): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #4 (TC-004): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.73). Fix these problems and output the full corrected suite:\n- test case #2 (TC-002): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #4 (TC-004): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories for Healthcare Workflow System**\n\n---\n\n### Use-Case: Query Patient Details (VCDPA03)\n**Primary Actor:** Patient Portal User  \n**Goal:** Retrieve and optionally modify patient details, ensuring the pin-code remains within the defined zone.\n\n**Preconditions:**  \n- User is authenticated.  \n- Patient ID exists in the system.\n\n**Main Success Scenario:**  \n1. User enters Patient ID.  \n2. System displays patient details (name, address, pin-code, etc.).  \n3. User can modify all fields except pin-code.  \n4. If modification attempts to set pin-code outside the zone, system rejects change.\n\n**Alternative Scenarios:**  \n- **A1:** Pin-code modification attempt outside zone → System displays error message and retains original pin-code.  \n\n**Exception Scenarios:**  \n- **E1:** Invalid Patient ID → System displays \"Patient not found\" message.  \n- **E2:** User lacks permission to modify patient details → System displays \"Access denied\" message.\n\n---\n\n### Use-Case: Create Patient Appointment (VCDPA04)\n**Primary Actor:** Patient Portal User  \n**Goal:** Submit a consultation request and schedule an appointment if requested for the next day.\n\n**Preconditions:**  \n- User is authenticated.  \n- Patient ID exists.  \n\n**Main Success Scenario:**  \n1. User enters Patient ID and selects specialty, symptoms, and requests an appointment.  \n2. User specifies appointment date.  \n3. If appointment date is for the next day, system creates an entry in the Patient Appointment file.\n\n**Alternative Scenarios:**  \n- **A1:** Appointment date is not for the next day → System records request but does not auto-schedule.  \n\n**Exception Scenarios:**  \n- **E1:** User attempts to schedule an appointment outside allowed date range → System displays error message.  \n- **E2:** User lacks permission to create appointments → System displays \"Access denied\" message.\n\n---\n\n### Use-Case: Doctor Provides Consultation (VCDDR01 & VCDDR02)\n**Primary Actor:** Doctor  \n\n**Goal:** View consultation requests, provide diagnosis, prescribe medicines, and request lab tests.\n\n**Preconditions:**  \n- Doctor is authenticated.  \n- Consultation requests exist.\n\n**Main Success Scenario:**  \n1. Doctor views all consultation requests.  \n2. Doctor selects a request.  \n3. System displays patient details and current consultation status.  \n4. Doctor enters diagnosis, prescribes up to 8 medicines, and optionally requests up to 5 lab tests.  \n5. System updates the consultation record.\n\n**Alternative Scenarios:**  \n- **A1:** Doctor chooses not to request lab tests → System records only diagnosis and prescriptions.  \n\n**Exception Scenarios:**  \n- **E1:** Doctor attempts to prescribe more than 8 medicines → System rejects additional prescriptions.  \n- **E2:** Doctor attempts to request more than 5 lab tests → System rejects additional requests.  \n- **E3:** Doctor lacks permission to view consultation requests → System displays \"Access denied\" message.\n\n---\n\n### Use-Case: Chemist Dispenses Medicines (VCDCM01 & VCDCM02)\n**Primary Actor:** Chemist  \n\n**Goal:** View consultation requests, dispense medicines, and mark prescriptions as completed.\n\n**Preconditions:**  \n- Chemist is authenticated.  \n- Consultation requests with prescriptions exist.\n\n**Main Success Scenario:**  \n1. Chemist views all consultation requests.  \n2. Chemist selects a request.  \n3. System displays prescription details.  \n4. Chemist dispenses medicines listed in the prescription.  \n5. Chemist marks the prescription flag as completed.\n\n**Alternative Scenarios:**  \n- **A1:** Chemist cannot find required medicines → System prompts to check inventory or request restock.  \n\n**Exception Scenarios:**  \n- **E1:** Chemist attempts to mark prescription as completed without dispensing medicines → System displays warning.  \n- **E2:** Chemist lacks permission to view consultation requests → System displays \"Access denied\" message.\n\n---\n\n### Use-Case: Lab Conducts Tests (VCDLB01 & VCDLB02)\n**Primary Actor:** Lab Technician  \n\n**Goal:** View consultation requests, note lab tests, and add test reports.\n\n**Preconditions:**  \n- Lab technician is authenticated.  \n- Consultation requests with lab test requests exist.\n\n**Main Success Scenario:**  \n1. Lab technician views all consultation requests.  \n2. Lab technician selects a request.  \n3. System displays prescription and patient details.  \n4. Lab technician notes the required lab tests.  \n5. Lab technician marks the prescription flag as completed and adds the lab report.\n\n**Alternative Scenarios:**  \n- **A1:** Lab technician cannot perform certain tests → System prompts to check equipment availability.  \n\n**Exception Scenarios:**  \n- **E1:** Lab technician attempts to add a report without completing tests → System displays warning.  \n- **E2:** Lab technician lacks permission to view consultation requests → System displays \"Access denied\" message.\n\n---\n\n**Note:** All actors (Patient Portal User, Doctor, Chemist, Lab Technician) have privileges defined in the system security requirements, ensuring role-based access control.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Query Patient Details with Valid ID",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is authenticated",
+            "Patient ID exists"
+          ],
+          "inputs": {
+            "patientId": "12345"
+          },
+          "steps": [
+            "Enter Patient ID",
+            "Display patient details",
+            "Attempt to modify pin-code to outside zone"
+          ],
+          "expected": [
+            "Error message displayed",
+            "Pin-code unchanged"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Query Patient Details with Invalid ID",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "User is authenticated"
+          ],
+          "inputs": {
+            "patientId": "99999"
+          },
+          "steps": [
+            "Enter Patient ID",
+            "Attempt to display details"
+          ],
+          "expected": [
+            "Message: 'Patient not found'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Create Patient Appointment for Next Day",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User is authenticated",
+            "Patient ID exists"
+          ],
+          "inputs": {
+            "patientId": "12345",
+            "appointmentDate": "2023-10-12"
+          },
+          "steps": [
+            "Enter Patient ID",
+            "Select specialty and symptoms",
+            "Request appointment for next day",
+            "Verify entry in Patient Appointment file"
+          ],
+          "expected": [
+            "Appointment entry created"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Create Patient Appointment for Non-Next Day",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "User is authenticated",
+            "Patient ID exists"
+          ],
+          "inputs": {
+            "patientId": "12345",
+            "appointmentDate": "2023-10-15"
+          },
+          "steps": [
+            "Enter Patient ID",
+            "Select specialty and symptoms",
+            "Request appointment for non-next day",
+            "Verify request status"
+          ],
+          "expected": [
+            "Request recorded, no auto-schedule"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor Provides Consultation with Diagnosis and Prescriptions",
+          "req_ids": [
+            "VCDDR01",
+            "VCDDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is authenticated",
+            "Consultation request exists"
+          ],
+          "inputs": {
+            "consultationId": "C001",
+            "diagnosis": "Flu",
+            "medicines": [
+              "Paracetamol",
+              "Amoxicillin"
+            ],
+            "labTests": [
+              "Blood Sugar"
+            ]
+          },
+          "steps": [
+            "Select consultation request",
+            "Enter diagnosis",
+            "Prescribe medicines",
+            "Request lab test",
+            "Mark consultation as completed"
+          ],
+          "expected": [
+            "Diagnosis recorded",
+            "Prescriptions applied",
+            "Lab test requested",
+            "Consultation marked completed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Doctor Attempts to Prescribe More Than 8 Medicines",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Doctor is authenticated",
+            "Consultation request exists"
+          ],
+          "inputs": {
+            "consultationId": "C001",
+            "medicines": [
+              "Med1",
+              "Med2",
+              "Med3",
+              "Med4",
+              "Med5",
+              "Med6",
+              "Med7",
+              "Med8",
+              "Med9"
+            ]
+          },
+          "steps": [
+            "Select consultation request",
+            "Attempt to prescribe 9 medicines"
+          ],
+          "expected": [
+            "Error message displayed",
+            "Only 8 medicines prescribed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Doctor Requests More Than 5 Lab Tests",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Doctor is authenticated",
+            "Consultation request exists"
+          ],
+          "inputs": {
+            "consultationId": "C001",
+            "labTests": [
+              "Test1",
+              "Test2",
+              "Test3",
+              "Test4",
+              "Test5",
+              "Test6"
+            ]
+          },
+          "steps": [
+            "Select consultation request",
+            "Attempt to request 6 lab tests"
+          ],
+          "expected": [
+            "Error message displayed",
+            "Only 5 lab tests requested"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Chemist Dispenses Medicines and Marks Prescription Completed",
+          "req_ids": [
+            "VCDCM01",
+            "VCDCM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist is authenticated",
+            "Consultation request with prescription exists"
+          ],
+          "inputs": {
+            "consultationId": "C001",
+            "medicines": [
+              "Paracetamol",
+              "Amoxicillin"
+            ]
+          },
+          "steps": [
+            "Select consultation request",
+            "Dispense medicines",
+            "Mark prescription as completed"
+          ],
+          "expected": [
+            "Medicines dispensed",
+            "Prescription marked completed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Lab Conducts Tests and Adds Report",
+          "req_ids": [
+            "VCDLB01",
+            "VCDLB02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab technician is authenticated",
+            "Consultation request with lab test request exists"
+          ],
+          "inputs": {
+            "consultationId": "C001",
+            "labTests": [
+              "Blood Sugar",
+              "HbA1c"
+            ],
+            "report": "Report123"
+          },
+          "steps": [
+            "Select consultation request",
+            "Note lab tests",
+            "Add lab report",
+            "Mark prescription as completed"
+          ],
+          "expected": [
+            "Lab tests noted",
+            "Report added",
+            "Prescription marked completed"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Lab Attempts to Add Report Without Completing Tests",
+          "req_ids": [
+            "VCDLB02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Lab technician is authenticated",
+            "Consultation request with lab test request exists"
+          ],
+          "inputs": {
+            "consultationId": "C001",
+            "report": "Report123"
+          },
+          "steps": [
+            "Select consultation request",
+            "Attempt to add report without noting tests"
+          ],
+          "expected": [
+            "Warning message displayed",
+            "Report not added"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Unauthorized Access Attempt to Consultation Requests",
+          "req_ids": [
+            "VCDDR01",
+            "VCDCM01",
+            "VCDLB01"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "User without appropriate role attempts access"
+          ],
+          "inputs": {
+            "userId": "unauthorizedUser"
+          },
+          "steps": [
+            "Attempt to view consultation requests"
+          ],
+          "expected": [
+            "Message: 'Access denied'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.4545,
+        "representation_score": 1.0,
+        "sfv_score": 0.7273,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #2 (TC-002): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #4 (TC-004): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #7 (TC-007): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.73). Fix these problems and output the full corrected suite:\n- test case #2 (TC-002): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #4 (TC-004): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #7 (TC-007): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories**\n\n*Actor: Patient*\n\n**UC-PUQ01: Query Patient Details**\n- **Primary Success Flow:**\n  1. Patient enters Patient Id.\n  2. System displays Patient details.\n  3. Patient can modify details except Pin-Code which is restricted to Zone.\n- **Alternative Flow:**\n  1. If Patient Id is invalid, display \"Invalid Patient Id\".\n- **Exception Flow:**\n  1. If attempting to modify Pin-Code to a value outside the Zone, display \"Pin-Code modification outside Zone is prohibited\".\n\n*Actor: Doctor*\n\n**UC-DOC01: Create Consultation Request**\n- **Primary Success Flow:**\n  1. Doctor selects Patient Id.\n  2. System displays Patient details.\n  3. Doctor enters Speciality, Symptoms, Consultation request/Appointment, and Appointment date.\n  4. If Appointment Request is for the next day, create an entry in Patient Appointment file.\n- **Alternative Flow:**\n  1. If Appointment date is not the next day, prompt \"Appointment not scheduled for next day; no entry created\".\n- **Exception Flow:**\n  1. If attempting to schedule an appointment beyond allowed date range, display \"Appointment date out of allowed range\".\n\n**UC-DOC02: Provide Consultation**\n- **Primary Success Flow:**\n  1. Doctor views all consultation requests.\n  2. Doctor selects a request.\n  3. Doctor enters Diagnosis, prescribes up to 8 medicines, and optionally requests lab tests (max 5).\n- **Alternative Flow:**\n  1. If no lab tests are requested, proceed without additional steps.\n- **Exception Flow:**\n  1. If attempting to prescribe more than 8 medicines, display \"Maximum of 8 medicines allowed\".\n  2. If attempting to request more than 5 lab tests, display \"Maximum of 5 lab tests allowed\".\n\n*Actor: Chemist*\n\n**UC-CHEM01: Dispense Medicines**\n- **Primary Success Flow:**\n  1. Chemist views all consultation requests.\n  2. Chemist selects a request.\n  3. Chemist dispenses medicines as per Prescription and marks the flag in Prescription.\n- **Alternative Flow:**\n  1. If Prescription is already marked, skip marking step.\n- **Exception Flow:**\n  1. If attempting to dispense without a valid Prescription, display \"Prescription not found\".\n\n*Actor: Lab Technician*\n\n**UC-LAB01: Conduct Lab Tests**\n- **Primary Success Flow:**\n  1. Lab Technician views all consultation requests.\n  2. Lab Technician selects a request.\n  3. Technician notes down required lab tests, records Patient details, and marks the flag in Prescription.\n  4. Technician adds the lab report.\n- **Alternative Flow:**\n  1. If no lab tests are requested, skip lab test steps.\n- **Exception Flow:**\n  1. If attempting to mark the Prescription flag without a valid Prescription, display \"Invalid Prescription\".",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "UC-PUQ01: Query Patient Details - Positive",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Id is valid"
+          ],
+          "inputs": {
+            "patientId": "12345"
+          },
+          "steps": [
+            "Enter Patient Id",
+            "Display Patient details",
+            "Attempt to modify Pin-Code within Zone"
+          ],
+          "expected": [
+            "Pin-Code modification allowed within Zone"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "UC-PUQ01: Query Patient Details - Exception",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Patient Id is valid"
+          ],
+          "inputs": {
+            "patientId": "12345"
+          },
+          "steps": [
+            "Enter Patient Id",
+            "Attempt to modify Pin-Code outside Zone"
+          ],
+          "expected": [
+            "Error message: 'Pin-Code modification outside Zone is prohibited'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "UC-DOC01: Create Consultation Request - Positive",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor logged in"
+          ],
+          "inputs": {
+            "patientId": "12345",
+            "speciality": "Cardiology",
+            "symptoms": "Chest Pain",
+            "appointmentDate": "2023-10-12"
+          },
+          "steps": [
+            "Select Patient Id",
+            "Enter Speciality, Symptoms, Appointment Request",
+            "Confirm Appointment date"
+          ],
+          "expected": [
+            "Entry created in Patient Appointment file"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "UC-DOC01: Create Consultation Request - Alternative",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor logged in"
+          ],
+          "inputs": {
+            "patientId": "12345",
+            "speciality": "Cardiology",
+            "symptoms": "Chest Pain",
+            "appointmentDate": "2023-10-13"
+          },
+          "steps": [
+            "Select Patient Id",
+            "Enter Speciality, Symptoms, Appointment Request",
+            "Confirm Appointment date"
+          ],
+          "expected": [
+            "Message: 'Appointment not scheduled for next day; no entry created'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "UC-DOC02: Provide Consultation - Positive",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor logged in",
+            "Consultation request exists"
+          ],
+          "inputs": {
+            "diagnosis": "Heart Attack",
+            "medicines": [
+              "Aspirin",
+              "Beta Blocker"
+            ],
+            "labTests": [
+              "ECG",
+              "Blood Test"
+            ]
+          },
+          "steps": [
+            "Select Consultation request",
+            "Enter Diagnosis",
+            "Prescribe medicines",
+            "Request lab tests"
+          ],
+          "expected": [
+            "Diagnosis recorded, medicines prescribed, lab tests requested"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "UC-DOC02: Provide Consultation - Exception",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Doctor logged in",
+            "Consultation request exists"
+          ],
+          "inputs": {
+            "diagnosis": "Heart Attack",
+            "medicines": [
+              "Aspirin",
+              "Beta Blocker",
+              "Corticosteroid",
+              "Statins",
+              "ACE Inhibitor",
+              "Diuretic",
+              "Anticoagulant",
+              "Nitrates",
+              "Another Medicine"
+            ]
+          },
+          "steps": [
+            "Select Consultation request",
+            "Enter Diagnosis",
+            "Attempt to prescribe 9 medicines"
+          ],
+          "expected": [
+            "Error message: 'Maximum of 8 medicines allowed'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "UC-CHEM01: Dispense Medicines - Positive",
+          "req_ids": [
+            "VCDCM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist logged in",
+            "Prescription exists"
+          ],
+          "inputs": {
+            "prescriptionId": "PRES001"
+          },
+          "steps": [
+            "Select Prescription",
+            "Dispense medicines",
+            "Mark Prescription flag"
+          ],
+          "expected": [
+            "Medicines dispensed, Prescription flag marked"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "UC-CHEM01: Dispense Medicines - Alternative",
+          "req_ids": [
+            "VCDCM01"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist logged in",
+            "Prescription exists"
+          ],
+          "inputs": {
+            "prescriptionId": "PRES001"
+          },
+          "steps": [
+            "Select Prescription",
+            "Attempt to dispense without marking flag"
+          ],
+          "expected": [
+            "Message: 'Prescription already marked'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "UC-LAB01: Conduct Lab Tests - Positive",
+          "req_ids": [
+            "VCDLB01",
+            "VCDLB02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab Technician logged in",
+            "Prescription exists"
+          ],
+          "inputs": {
+            "prescriptionId": "PRES001",
+            "labTests": [
+              "ECG",
+              "Blood Test"
+            ]
+          },
+          "steps": [
+            "Select Prescription",
+            "Note lab requests",
+            "Mark Prescription flag",
+            "Add lab report"
+          ],
+          "expected": [
+            "Lab tests conducted, Prescription flag marked, Report added"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "UC-LAB01: Conduct Lab Tests - Exception",
+          "req_ids": [
+            "VCDLB01",
+            "VCDLB02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Lab Technician logged in",
+            "Prescription exists"
+          ],
+          "inputs": {
+            "prescriptionId": "PRES001",
+            "labTests": [
+              "ECG",
+              "Blood Test",
+              "X-Ray",
+              "MRI",
+              "Ultrasound",
+              "Another Test",
+              "YetAnotherTest"
+            ]
+          },
+          "steps": [
+            "Select Prescription",
+            "Attempt to note 7 lab tests"
+          ],
+          "expected": [
+            "Error message: 'Maximum of 5 lab tests allowed'"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "UC-LAB01: Conduct Lab Tests - Exception",
+          "req_ids": [
+            "VCDLB01",
+            "VCDLB02"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Lab Technician logged in",
+            "Invalid Prescription"
+          ],
+          "inputs": {
+            "prescriptionId": "INVALID_PRES"
+          },
+          "steps": [
+            "Attempt to mark Prescription flag"
+          ],
+          "expected": [
+            "Error message: 'Invalid Prescription'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.6364,
+        "representation_score": 1.0,
+        "sfv_score": 0.8182,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #2 (TC-002): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #11 (TC-011): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    }
+  ]
+}

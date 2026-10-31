@@ -1,0 +1,1079 @@
+{
+  "unit_id": "U09_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.65,
+    "hallucinated": [
+      {
+        "value": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "context": "sensor readings for leakage calculation",
+        "grounded": false
+      },
+      {
+        "value": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "context": "sensor readings for leakage calculation",
+        "grounded": false
+      },
+      {
+        "value": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "context": "sensor readings for leakage calculation",
+        "grounded": false
+      },
+      {
+        "value": 1.5,
+        "context": "computed leakage value",
+        "grounded": false
+      },
+      {
+        "value": 3.0,
+        "context": "computed leakage value",
+        "grounded": false
+      },
+      {
+        "value": 0.0,
+        "context": "computed leakage value",
+        "grounded": false
+      },
+      {
+        "value": "GUI logs an error",
+        "context": "error handling message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 20,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Inconsistent labeling of test kinds (e.g., TC-003 marked negative but tests a positive scenario).",
+      "Some tests assume prior alarm state (e.g., alarm active) without explicitly setting it, which may lead to false positives.",
+      "No explicit verification that alarm priority values are stored in a defined enum or numeric mapping.",
+      "No tests for verifying the content or severity of the error log when invalid VTI values are provided.",
+      "No tests for sensor readings outside the expected range (e.g., negative or excessively high values)."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.9325,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Controller and GUI Alarm Functionality\n\n  Scenario: Controller reports proximal tube connection status\n    Given the proximal tube is connected\n    When the controller checks the proximal tube connection\n    Then the controller reports that the proximal tube is connected\n\n  Scenario: Controller reports proximal tube disconnection status\n    Given the proximal tube is disconnected\n    When the controller checks the proximal tube connection\n    Then the controller reports that the proximal tube is disconnected\n\n  Scenario: GUI activates proximal tube disconnect alarm when tube is disconnected\n    Given the proximal tube is disconnected\n    When the GUI checks the proximal tube connection status\n    Then the GUI activates the \"proximal tube disconnect\" alarm\n\n  Scenario: GUI deactivates proximal tube disconnect alarm when tube is reconnected\n    Given the proximal tube disconnect alarm is active\n    And the proximal tube is reconnected\n    When the GUI checks the proximal tube connection status\n    Then the GUI deactivates the \"proximal tube disconnect\" alarm\n\n  Scenario: Proximal tube disconnect alarm has medium priority\n    Given the proximal tube disconnect alarm is active\n    When the GUI retrieves the priority of the \"proximal tube disconnect\" alarm\n    Then the priority of the \"proximal tube disconnect\" alarm is medium\n\n  Scenario Outline: GUI detects obstruction based on VTI value\n    Given the VTI value is <VTI>\n    When the GUI checks for obstruction\n    Then the GUI <obstruction_status>\n    Examples:\n      | VTI  | obstruction_status       |\n      | 99   | detects obstruction      |\n      | 100  | does not detect obstruction |\n      | 101  | does not detect obstruction |\n\n  Scenario: GUI activates obstruction alarm when obstruction is detected\n    Given the VTI value is 99\n    When the GUI checks for obstruction\n    Then the GUI activates the \"obstruction\" alarm\n\n  Scenario: GUI deactivates obstruction alarm when obstruction is not detected\n    Given the VTI value is 101\n    And the obstruction alarm is active\n    When the GUI checks for obstruction\n    Then the GUI deactivates the \"obstruction\" alarm\n\n  Scenario: Obstruction alarm has high priority\n    Given the obstruction alarm is active\n    When the GUI retrieves the priority of the \"obstruction\" alarm\n    Then the priority of the \"obstruction\" alarm is high\n\n  Scenario Outline: GUI computes amount of leakage based on sensor readings\n    Given the sensor readings are <sensor_readings>\n    When the GUI computes the amount of leakage\n    Then the computed leakage is <leakage>\n    Examples:\n      | sensor_readings | leakage |\n      | 0.5, 0.5, 0.5   | 1.5     |\n      | 1.0, 1.0, 1.0   | 3.0     |\n      | 0.0, 0.0, 0.0   | 0.0     |\n\n  Scenario Outline: GUI handles invalid VTI values\n    Given the VTI value is <VTI>\n    When the GUI checks for obstruction\n    Then the GUI <response>\n    Examples:\n      | VTI  | response                    |\n      | -1   | logs an error               |\n      | abc  | logs an error               |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Controller reports proximal tube connection status",
+      "req_ids": [
+        "RW-SW-103"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the proximal tube is connected"
+      ],
+      "inputs": {},
+      "steps": [
+        "the controller checks the proximal tube connection"
+      ],
+      "expected": [
+        "the controller reports that the proximal tube is connected"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Controller reports proximal tube disconnection status",
+      "req_ids": [
+        "RW-SW-103"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the proximal tube is disconnected"
+      ],
+      "inputs": {},
+      "steps": [
+        "the controller checks the proximal tube connection"
+      ],
+      "expected": [
+        "the controller reports that the proximal tube is disconnected"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "GUI activates proximal tube disconnect alarm when tube is disconnected",
+      "req_ids": [
+        "RW-SW-104"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the proximal tube is disconnected"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI checks the proximal tube connection status"
+      ],
+      "expected": [
+        "the GUI activates the \"proximal tube disconnect\" alarm"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "GUI deactivates proximal tube disconnect alarm when tube is reconnected",
+      "req_ids": [
+        "RW-SW-104"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the proximal tube disconnect alarm is active",
+        "the proximal tube is reconnected"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI checks the proximal tube connection status"
+      ],
+      "expected": [
+        "the GUI deactivates the \"proximal tube disconnect\" alarm"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Proximal tube disconnect alarm has medium priority",
+      "req_ids": [
+        "RW-SW-105"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the proximal tube disconnect alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI retrieves the priority of the \"proximal tube disconnect\" alarm"
+      ],
+      "expected": [
+        "the priority of the \"proximal tube disconnect\" alarm is medium"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "GUI detects obstruction based on VTI value",
+      "req_ids": [
+        "RW-SW-106"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the VTI value is 99"
+      ],
+      "inputs": {
+        "VTI": 99
+      },
+      "steps": [
+        "the GUI checks for obstruction"
+      ],
+      "expected": [
+        "the GUI detects obstruction"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "GUI detects obstruction based on VTI value",
+      "req_ids": [
+        "RW-SW-106"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the VTI value is 100"
+      ],
+      "inputs": {
+        "VTI": 100
+      },
+      "steps": [
+        "the GUI checks for obstruction"
+      ],
+      "expected": [
+        "the GUI does not detect obstruction"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "GUI detects obstruction based on VTI value",
+      "req_ids": [
+        "RW-SW-106"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the VTI value is 101"
+      ],
+      "inputs": {
+        "VTI": 101
+      },
+      "steps": [
+        "the GUI checks for obstruction"
+      ],
+      "expected": [
+        "the GUI does not detect obstruction"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "GUI activates obstruction alarm when obstruction is detected",
+      "req_ids": [
+        "RW-SW-107"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the VTI value is 99"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI checks for obstruction"
+      ],
+      "expected": [
+        "the GUI activates the \"obstruction\" alarm"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "GUI deactivates obstruction alarm when obstruction is not detected",
+      "req_ids": [
+        "RW-SW-108"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the VTI value is 101",
+        "the obstruction alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI checks for obstruction"
+      ],
+      "expected": [
+        "the GUI deactivates the \"obstruction\" alarm"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Obstruction alarm has high priority",
+      "req_ids": [
+        "RW-SW-109"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the obstruction alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the GUI retrieves the priority of the \"obstruction\" alarm"
+      ],
+      "expected": [
+        "the priority of the \"obstruction\" alarm is high"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "GUI computes amount of leakage based on sensor readings",
+      "req_ids": [
+        "RW-SW-110"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the sensor readings are 0.5, 0.5, 0.5"
+      ],
+      "inputs": {
+        "sensor_readings": "0.5, 0.5, 0.5"
+      },
+      "steps": [
+        "the GUI computes the amount of leakage"
+      ],
+      "expected": [
+        "the computed leakage is 1.5"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "GUI computes amount of leakage based on sensor readings",
+      "req_ids": [
+        "RW-SW-110"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the sensor readings are 1.0, 1.0, 1.0"
+      ],
+      "inputs": {
+        "sensor_readings": "1.0, 1.0, 1.0"
+      },
+      "steps": [
+        "the GUI computes the amount of leakage"
+      ],
+      "expected": [
+        "the computed leakage is 3.0"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "GUI computes amount of leakage based on sensor readings",
+      "req_ids": [
+        "RW-SW-110"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the sensor readings are 0.0, 0.0, 0.0"
+      ],
+      "inputs": {
+        "sensor_readings": "0.0, 0.0, 0.0"
+      },
+      "steps": [
+        "the GUI computes the amount of leakage"
+      ],
+      "expected": [
+        "the computed leakage is 0.0"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "GUI handles invalid VTI values",
+      "req_ids": [
+        "RW-SW-106"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the VTI value is -1"
+      ],
+      "inputs": {
+        "VTI": -1
+      },
+      "steps": [
+        "the GUI checks for obstruction"
+      ],
+      "expected": [
+        "the GUI logs an error"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "GUI handles invalid VTI values",
+      "req_ids": [
+        "RW-SW-106"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the VTI value is abc"
+      ],
+      "inputs": {
+        "VTI": "abc"
+      },
+      "steps": [
+        "the GUI checks for obstruction"
+      ],
+      "expected": [
+        "the GUI logs an error"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarms for Proximal Tube and Obstruction Detection\n\n  Scenario: Controller reports proximal tube connection status\n    Given the proximal tube is connected\n    When the controller checks the proximal tube connection\n    Then the controller reports that the proximal tube is connected\n\n  Scenario: Controller reports proximal tube disconnection status\n    Given the proximal tube is disconnected\n    When the controller checks the proximal tube connection\n    Then the controller reports that the proximal tube is disconnected\n\n  Scenario: GUI computes proximal tube disconnect alarm\n    Given the proximal tube is disconnected\n    When the GUI checks the proximal tube connection status\n    Then the GUI activates the \"proximal tube disconnect\" alarm\n\n  Scenario: GUI does not compute proximal tube disconnect alarm when tube is connected\n    Given the proximal tube is connected\n    When the GUI checks the proximal tube connection status\n    Then the GUI does not activate the \"proximal tube disconnect\" alarm\n\n  Scenario: Proximal tube disconnect alarm has medium priority\n    Given the \"proximal tube disconnect\" alarm is active\n    When the GUI checks the priority of the \"proximal tube disconnect\" alarm\n    Then the GUI reports that the \"proximal tube disconnect\" alarm has medium priority\n\n  Scenario Outline: GUI detects obstruction based on VTI value\n    Given the VTI value is <VTI>\n    When the GUI checks for obstruction\n    Then the GUI <result> the obstruction alarm\n\n    Examples:\n      | VTI  | result         |\n      | 99   | activates      |\n      | 100  | does not activate |\n      | 101  | does not activate |\n\n  Scenario: Obstruction alarm has high priority\n    Given the obstruction alarm is active\n    When the GUI checks the priority of the obstruction alarm\n    Then the GUI reports that the obstruction alarm has high priority\n\n  Scenario Outline: GUI computes amount of leakage based on sensor readings\n    Given the sensor readings indicate a leakage rate of <leakage_rate> L/min\n    When the GUI computes the amount of leakage\n    Then the GUI reports the leakage rate as <leakage_rate> L/min\n\n    Examples:\n      | leakage_rate |\n      | 0            |\n      | 5            |\n      | 10           |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller reports proximal tube connection status",
+          "req_ids": [
+            "RW-SW-103"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the proximal tube is connected"
+          ],
+          "inputs": {},
+          "steps": [
+            "the controller checks the proximal tube connection"
+          ],
+          "expected": [
+            "the controller reports that the proximal tube is connected"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller reports proximal tube disconnection status",
+          "req_ids": [
+            "RW-SW-103"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the proximal tube is disconnected"
+          ],
+          "inputs": {},
+          "steps": [
+            "the controller checks the proximal tube connection"
+          ],
+          "expected": [
+            "the controller reports that the proximal tube is disconnected"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI computes proximal tube disconnect alarm",
+          "req_ids": [
+            "RW-SW-104"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the proximal tube is disconnected"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks the proximal tube connection status"
+          ],
+          "expected": [
+            "the GUI activates the \"proximal tube disconnect\" alarm"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI does not compute proximal tube disconnect alarm when tube is connected",
+          "req_ids": [
+            "RW-SW-104"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the proximal tube is connected"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks the proximal tube connection status"
+          ],
+          "expected": [
+            "the GUI does not activate the \"proximal tube disconnect\" alarm"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Proximal tube disconnect alarm has medium priority",
+          "req_ids": [
+            "RW-SW-105"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the \"proximal tube disconnect\" alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks the priority of the \"proximal tube disconnect\" alarm"
+          ],
+          "expected": [
+            "the GUI reports that the \"proximal tube disconnect\" alarm has medium priority"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI detects obstruction based on VTI value (below threshold)",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the VTI value is 99"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks for obstruction"
+          ],
+          "expected": [
+            "the GUI activates the obstruction alarm"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI detects obstruction based on VTI value (at threshold)",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the VTI value is 100"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks for obstruction"
+          ],
+          "expected": [
+            "the GUI does not activate the obstruction alarm"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI detects obstruction based on VTI value (above threshold)",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the VTI value is 101"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks for obstruction"
+          ],
+          "expected": [
+            "the GUI does not activate the obstruction alarm"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Obstruction alarm has high priority",
+          "req_ids": [
+            "RW-SW-109"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the obstruction alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks the priority of the obstruction alarm"
+          ],
+          "expected": [
+            "the GUI reports that the obstruction alarm has high priority"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI computes amount of leakage based on sensor readings (no leakage)",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the sensor readings indicate a leakage rate of 0 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI computes the amount of leakage"
+          ],
+          "expected": [
+            "the GUI reports the leakage rate as 0 L/min"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "GUI computes amount of leakage based on sensor readings (some leakage)",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the sensor readings indicate a leakage rate of 5 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI computes the amount of leakage"
+          ],
+          "expected": [
+            "the GUI reports the leakage rate as 5 L/min"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "GUI computes amount of leakage based on sensor readings (high leakage)",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the sensor readings indicate a leakage rate of 10 L/min"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI computes the amount of leakage"
+          ],
+          "expected": [
+            "the GUI reports the leakage rate as 10 L/min"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 14,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No test for alarm deactivation when proximal tube reconnects",
+          "No test for obstruction alarm deactivation when VTI rises above threshold after being below",
+          "No test for invalid or out-of-range VTI values (negative, non-numeric)",
+          "No test for leakage calculation with varying sensor inputs",
+          "No test verifying numeric mapping of priority levels"
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "RW-SW-107",
+          "RW-SW-108"
+        ],
+        "fsa_score": 1.0,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 1.0; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 1.0, 'oracle_assertiveness': 1.0, 'boundary_coverage': 1.0, 'groundedness_mg': 1.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-107', 'RW-SW-108'] (add at least one each)\n- No test for alarm deactivation when proximal tube reconnects\n- No test for obstruction alarm deactivation when VTI rises above threshold after being below\n- No test for invalid or out-of-range VTI values (negative, non-numeric)\n- No test for leakage calculation with varying sensor inputs\n- No test verifying numeric mapping of priority levels",
+      "artifact": "Feature: Controller and GUI Alarm Functionality\n\n  Scenario: Controller reports proximal tube connection status\n    Given the proximal tube is connected\n    When the controller checks the proximal tube connection\n    Then the controller reports that the proximal tube is connected\n\n  Scenario: Controller reports proximal tube disconnection status\n    Given the proximal tube is disconnected\n    When the controller checks the proximal tube connection\n    Then the controller reports that the proximal tube is disconnected\n\n  Scenario: GUI activates proximal tube disconnect alarm when tube is disconnected\n    Given the proximal tube is disconnected\n    When the GUI checks the proximal tube connection status\n    Then the GUI activates the \"proximal tube disconnect\" alarm\n\n  Scenario: GUI deactivates proximal tube disconnect alarm when tube is reconnected\n    Given the proximal tube disconnect alarm is active\n    And the proximal tube is reconnected\n    When the GUI checks the proximal tube connection status\n    Then the GUI deactivates the \"proximal tube disconnect\" alarm\n\n  Scenario: Proximal tube disconnect alarm has medium priority\n    Given the proximal tube disconnect alarm is active\n    When the GUI retrieves the priority of the \"proximal tube disconnect\" alarm\n    Then the priority of the \"proximal tube disconnect\" alarm is medium\n\n  Scenario Outline: GUI detects obstruction based on VTI value\n    Given the VTI value is <VTI>\n    When the GUI checks for obstruction\n    Then the GUI <obstruction_status>\n    Examples:\n      | VTI  | obstruction_status       |\n      | 99   | detects obstruction      |\n      | 100  | does not detect obstruction |\n      | 101  | does not detect obstruction |\n\n  Scenario: GUI activates obstruction alarm when obstruction is detected\n    Given the VTI value is 99\n    When the GUI checks for obstruction\n    Then the GUI activates the \"obstruction\" alarm\n\n  Scenario: GUI deactivates obstruction alarm when obstruction is not detected\n    Given the VTI value is 101\n    And the obstruction alarm is active\n    When the GUI checks for obstruction\n    Then the GUI deactivates the \"obstruction\" alarm\n\n  Scenario: Obstruction alarm has high priority\n    Given the obstruction alarm is active\n    When the GUI retrieves the priority of the \"obstruction\" alarm\n    Then the priority of the \"obstruction\" alarm is high\n\n  Scenario Outline: GUI computes amount of leakage based on sensor readings\n    Given the sensor readings are <sensor_readings>\n    When the GUI computes the amount of leakage\n    Then the computed leakage is <leakage>\n    Examples:\n      | sensor_readings | leakage |\n      | 0.5, 0.5, 0.5   | 1.5     |\n      | 1.0, 1.0, 1.0   | 3.0     |\n      | 0.0, 0.0, 0.0   | 0.0     |\n\n  Scenario Outline: GUI handles invalid VTI values\n    Given the VTI value is <VTI>\n    When the GUI checks for obstruction\n    Then the GUI <response>\n    Examples:\n      | VTI  | response                    |\n      | -1   | logs an error               |\n      | abc  | logs an error               |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller reports proximal tube connection status",
+          "req_ids": [
+            "RW-SW-103"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the proximal tube is connected"
+          ],
+          "inputs": {},
+          "steps": [
+            "the controller checks the proximal tube connection"
+          ],
+          "expected": [
+            "the controller reports that the proximal tube is connected"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller reports proximal tube disconnection status",
+          "req_ids": [
+            "RW-SW-103"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the proximal tube is disconnected"
+          ],
+          "inputs": {},
+          "steps": [
+            "the controller checks the proximal tube connection"
+          ],
+          "expected": [
+            "the controller reports that the proximal tube is disconnected"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI activates proximal tube disconnect alarm when tube is disconnected",
+          "req_ids": [
+            "RW-SW-104"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the proximal tube is disconnected"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks the proximal tube connection status"
+          ],
+          "expected": [
+            "the GUI activates the \"proximal tube disconnect\" alarm"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI deactivates proximal tube disconnect alarm when tube is reconnected",
+          "req_ids": [
+            "RW-SW-104"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the proximal tube disconnect alarm is active",
+            "the proximal tube is reconnected"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks the proximal tube connection status"
+          ],
+          "expected": [
+            "the GUI deactivates the \"proximal tube disconnect\" alarm"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Proximal tube disconnect alarm has medium priority",
+          "req_ids": [
+            "RW-SW-105"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the proximal tube disconnect alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI retrieves the priority of the \"proximal tube disconnect\" alarm"
+          ],
+          "expected": [
+            "the priority of the \"proximal tube disconnect\" alarm is medium"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI detects obstruction based on VTI value",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the VTI value is 99"
+          ],
+          "inputs": {
+            "VTI": 99
+          },
+          "steps": [
+            "the GUI checks for obstruction"
+          ],
+          "expected": [
+            "the GUI detects obstruction"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI detects obstruction based on VTI value",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the VTI value is 100"
+          ],
+          "inputs": {
+            "VTI": 100
+          },
+          "steps": [
+            "the GUI checks for obstruction"
+          ],
+          "expected": [
+            "the GUI does not detect obstruction"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI detects obstruction based on VTI value",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the VTI value is 101"
+          ],
+          "inputs": {
+            "VTI": 101
+          },
+          "steps": [
+            "the GUI checks for obstruction"
+          ],
+          "expected": [
+            "the GUI does not detect obstruction"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI activates obstruction alarm when obstruction is detected",
+          "req_ids": [
+            "RW-SW-107"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the VTI value is 99"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks for obstruction"
+          ],
+          "expected": [
+            "the GUI activates the \"obstruction\" alarm"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI deactivates obstruction alarm when obstruction is not detected",
+          "req_ids": [
+            "RW-SW-108"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the VTI value is 101",
+            "the obstruction alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI checks for obstruction"
+          ],
+          "expected": [
+            "the GUI deactivates the \"obstruction\" alarm"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Obstruction alarm has high priority",
+          "req_ids": [
+            "RW-SW-109"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the obstruction alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the GUI retrieves the priority of the \"obstruction\" alarm"
+          ],
+          "expected": [
+            "the priority of the \"obstruction\" alarm is high"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "GUI computes amount of leakage based on sensor readings",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the sensor readings are 0.5, 0.5, 0.5"
+          ],
+          "inputs": {
+            "sensor_readings": "0.5, 0.5, 0.5"
+          },
+          "steps": [
+            "the GUI computes the amount of leakage"
+          ],
+          "expected": [
+            "the computed leakage is 1.5"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "GUI computes amount of leakage based on sensor readings",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the sensor readings are 1.0, 1.0, 1.0"
+          ],
+          "inputs": {
+            "sensor_readings": "1.0, 1.0, 1.0"
+          },
+          "steps": [
+            "the GUI computes the amount of leakage"
+          ],
+          "expected": [
+            "the computed leakage is 3.0"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "GUI computes amount of leakage based on sensor readings",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the sensor readings are 0.0, 0.0, 0.0"
+          ],
+          "inputs": {
+            "sensor_readings": "0.0, 0.0, 0.0"
+          },
+          "steps": [
+            "the GUI computes the amount of leakage"
+          ],
+          "expected": [
+            "the computed leakage is 0.0"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "GUI handles invalid VTI values",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the VTI value is -1"
+          ],
+          "inputs": {
+            "VTI": -1
+          },
+          "steps": [
+            "the GUI checks for obstruction"
+          ],
+          "expected": [
+            "the GUI logs an error"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "GUI handles invalid VTI values",
+          "req_ids": [
+            "RW-SW-106"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the VTI value is abc"
+          ],
+          "inputs": {
+            "VTI": "abc"
+          },
+          "steps": [
+            "the GUI checks for obstruction"
+          ],
+          "expected": [
+            "the GUI logs an error"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.65,
+        "hallucinated": [
+          {
+            "value": [
+              0.5,
+              0.5,
+              0.5
+            ],
+            "context": "sensor readings for leakage calculation",
+            "grounded": false
+          },
+          {
+            "value": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "context": "sensor readings for leakage calculation",
+            "grounded": false
+          },
+          {
+            "value": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "context": "sensor readings for leakage calculation",
+            "grounded": false
+          },
+          {
+            "value": 1.5,
+            "context": "computed leakage value",
+            "grounded": false
+          },
+          {
+            "value": 3.0,
+            "context": "computed leakage value",
+            "grounded": false
+          },
+          {
+            "value": 0.0,
+            "context": "computed leakage value",
+            "grounded": false
+          },
+          {
+            "value": "GUI logs an error",
+            "context": "error handling message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 20,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Inconsistent labeling of test kinds (e.g., TC-003 marked negative but tests a positive scenario).",
+          "Some tests assume prior alarm state (e.g., alarm active) without explicitly setting it, which may lead to false positives.",
+          "No explicit verification that alarm priority values are stored in a defined enum or numeric mapping.",
+          "No tests for verifying the content or severity of the error log when invalid VTI values are provided.",
+          "No tests for sensor readings outside the expected range (e.g., negative or excessively high values)."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.9325,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

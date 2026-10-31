@@ -1,0 +1,558 @@
+{
+  "unit_id": "U02_4",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen3:30b-a3b",
+  "system_type": "standard",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 0.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "dev123",
+        "context": "developer ID",
+        "grounded": false
+      },
+      {
+        "value": "non_existent",
+        "context": "requirement ID",
+        "grounded": false
+      },
+      {
+        "value": 1000,
+        "context": "requirement count",
+        "grounded": false
+      },
+      {
+        "value": 1001,
+        "context": "requirement count",
+        "grounded": false
+      },
+      {
+        "value": -1,
+        "context": "requirement count",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 5,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add concrete assertions for error codes and messages",
+      "Verify persistence by checking specific data values, not just existence",
+      "Include boundary tests for maximum supported requirement count as per scalability requirement",
+      "Test secure storage by verifying encryption or access controls",
+      "Ensure installation tests cover dependency resolution and environment checks"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.53,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Requirement Storage and Management\n\n          Scenario: Store a requirement and verify persistence\n            Given a requirement is created\n            When the requirement is stored\n            Then the requirement must be retrievable after system restart\n\n          Scenario: Change a requirement and verify the change is recorded\n            Given a requirement exists\n            When the requirement is changed\n            Then the change must be recorded in the version history\n\n          Scenario: Attempt to change a non-existent requirement\n            Given no requirement exists with ID \"non_existent\"\n            When the requirement \"non_existent\" is changed\n            Then the system must return an error\n\n          Scenario: Change a requirement with a valid developer ID\n            Given a requirement exists\n            And a developer with ID \"dev123\" exists\n            When the requirement is changed by developer \"dev123\"\n            Then the change must be associated with developer \"dev123\"\n\n          Scenario: Change a requirement without a developer ID\n            Given a requirement exists\n            When the requirement is changed without a developer ID\n            Then the system must return an error\n\n          Scenario Outline: System can handle a specified number of requirements\n            Given the system is installed\n            When the system stores <count> requirements\n            Then the system should <expected_result>\n\n            Examples:\n              | count | expected_result |\n              | 1000  | success         |\n              | 1001  | success         |\n              | -1    | failure         |\n\n          Scenario: Install the system with minimal steps\n            Given the installation package is available\n            When the installation command is executed\n            Then the installation must complete without errors\n\n          Scenario: Attempt to install without required dependencies\n            Given the system is missing a required dependency\n            When the installation command is executed\n            Then the installation must fail",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Store requirement and verify persistence",
+      "req_ids": [
+        "REQ011"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A requirement is created"
+      ],
+      "inputs": {},
+      "steps": [
+        "Store the requirement"
+      ],
+      "expected": [
+        "The requirement is retrievable after system restart"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Change requirement and verify change recorded",
+      "req_ids": [
+        "REQ012"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A requirement exists"
+      ],
+      "inputs": {},
+      "steps": [
+        "Change the requirement"
+      ],
+      "expected": [
+        "The change is recorded in the version history"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Attempt to change non-existent requirement",
+      "req_ids": [
+        "REQ012"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "No requirement exists with ID 'non_existent'"
+      ],
+      "inputs": {
+        "requirement_id": "non_existent"
+      },
+      "steps": [
+        "Attempt to change requirement 'non_existent'"
+      ],
+      "expected": [
+        "The system returns an error"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Change requirement with valid developer ID",
+      "req_ids": [
+        "REQ013"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "A requirement exists",
+        "A developer with ID 'dev123' exists"
+      ],
+      "inputs": {
+        "developer_id": "dev123"
+      },
+      "steps": [
+        "Change the requirement by developer 'dev123'"
+      ],
+      "expected": [
+        "The change is associated with developer 'dev123'"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Change requirement without developer ID",
+      "req_ids": [
+        "REQ013"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "A requirement exists"
+      ],
+      "inputs": {},
+      "steps": [
+        "Change the requirement without a developer ID"
+      ],
+      "expected": [
+        "The system returns an error"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Store 1000 requirements (normal)",
+      "req_ids": [
+        "REQ014"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "The system is installed"
+      ],
+      "inputs": {
+        "count": 1000
+      },
+      "steps": [
+        "Store 1000 requirements"
+      ],
+      "expected": [
+        "The system stores all 1000 requirements without error"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Store 1001 requirements (edge)",
+      "req_ids": [
+        "REQ014"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "The system is installed"
+      ],
+      "inputs": {
+        "count": 1001
+      },
+      "steps": [
+        "Store 1001 requirements"
+      ],
+      "expected": [
+        "The system stores all 1001 requirements without error"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Store -1 requirements (invalid)",
+      "req_ids": [
+        "REQ014"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "The system is installed"
+      ],
+      "inputs": {
+        "count": -1
+      },
+      "steps": [
+        "Attempt to store -1 requirements"
+      ],
+      "expected": [
+        "The system returns an error"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Install system with minimal steps",
+      "req_ids": [
+        "REQ015"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "The installation package is available"
+      ],
+      "inputs": {},
+      "steps": [
+        "Execute the installation command"
+      ],
+      "expected": [
+        "The installation completes without errors"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Install without required dependencies",
+      "req_ids": [
+        "REQ015"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "The system is missing a required dependency"
+      ],
+      "inputs": {},
+      "steps": [
+        "Execute the installation command"
+      ],
+      "expected": [
+        "The installation fails"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given 5 requirements (REQ011 to REQ015). We must create a test suite in Gherkin (BDD DSL) that covers each requirement with at least one scenario. Additionally, we must have a Scenario Outline with Examples tables for normal, edge, and invalid values.\n\nHowever, note that the requirements are about the system's behavior and not about specific user interactions. We have to write scenarios that reflect the requirement in terms of user-visible behavior (as per the instructions).\n\nLet's break down each requirement and think about how to test it:\n\nREQ011: Doorstop shall store requirements in a permanent and secure manner.\n  - We can test by creating a requirement and then verifying it is stored (e.g., after restart, it's still there and not accessible to unauthorized users).\n\nREQ012: Doorstop shall handle change management of the requirements.\n  - We can test by changing a requirement and then verifying the change is recorded (e.g., version history, change log).\n\nREQ013: Doorstop shall associate requirements changes to existing developer identification.\n  - We can test by making a change and then verifying that the change is linked to a specific developer (we assume we have a developer ID).\n\nREQ014: Doorstop shall be scalable to support thousands of requirements.\n  - We can test by creating a large number of requirements (e.g., 1000, 10000) and verifying the system handles it without errors.\n\nREQ015: Doorstop shall provide a lightweight installation method.\n  - We can test by installing the system and verifying the installation is lightweight (e.g., small disk space, few steps).\n\nBut note: The instructions say \"user-visible behaviour, acceptance criteria\". So we have to frame the scenarios as if a user is doing something.\n\nAlso, note: We must have a Scenario Outline with Examples tables for normal, edge, and invalid values. However, the requirements are not all about data that has normal/edge/invalid values. We have to interpret:\n\n- For REQ011: We might not have a direct input for \"permanent and secure\", but we can test by creating a requirement and then checking it's still there after a restart (normal) and also test with an invalid storage method (but that's not directly testable by the requirement). Instead, we'll focus on the requirement by testing the storage and security via the user's perspective.\n\nBut note: The requirement says \"permanent and secure\". We can test:\n  - Normal: Store a requirement and then restart the system and verify it's still there.\n  - Edge: Store a requirement and then try to delete it without authorization (should fail) -> but that's more about security.\n  - Invalid: Try to store a requirement with an invalid format? But the requirement doesn't specify format.\n\nHowever, the instructions say: \"every requirements clause maps to a unique scenario\". So we'll create one scenario per requirement, but for the ones that have data (like scalability) we can use a Scenario Outline.\n\nBut note: The requirement REQ014 is about sc",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": "Feature: Requirement Storage and Management\n\n          Scenario: Store a requirement and verify persistence\n            Given a requirement is created\n            When the requirement is stored\n            Then the requirement must be retrievable after system restart\n\n          Scenario: Change a requirement and verify the change is recorded\n            Given a requirement exists\n            When the requirement is changed\n            Then the change must be recorded in the version history\n\n          Scenario: Attempt to change a non-existent requirement\n            Given no requirement exists with ID \"non_existent\"\n            When the requirement \"non_existent\" is changed\n            Then the system must return an error\n\n          Scenario: Change a requirement with a valid developer ID\n            Given a requirement exists\n            And a developer with ID \"dev123\" exists\n            When the requirement is changed by developer \"dev123\"\n            Then the change must be associated with developer \"dev123\"\n\n          Scenario: Change a requirement without a developer ID\n            Given a requirement exists\n            When the requirement is changed without a developer ID\n            Then the system must return an error\n\n          Scenario Outline: System can handle a specified number of requirements\n            Given the system is installed\n            When the system stores <count> requirements\n            Then the system should <expected_result>\n\n            Examples:\n              | count | expected_result |\n              | 1000  | success         |\n              | 1001  | success         |\n              | -1    | failure         |\n\n          Scenario: Install the system with minimal steps\n            Given the installation package is available\n            When the installation command is executed\n            Then the installation must complete without errors\n\n          Scenario: Attempt to install without required dependencies\n            Given the system is missing a required dependency\n            When the installation command is executed\n            Then the installation must fail",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Store requirement and verify persistence",
+          "req_ids": [
+            "REQ011"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A requirement is created"
+          ],
+          "inputs": {},
+          "steps": [
+            "Store the requirement"
+          ],
+          "expected": [
+            "The requirement is retrievable after system restart"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Change requirement and verify change recorded",
+          "req_ids": [
+            "REQ012"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A requirement exists"
+          ],
+          "inputs": {},
+          "steps": [
+            "Change the requirement"
+          ],
+          "expected": [
+            "The change is recorded in the version history"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Attempt to change non-existent requirement",
+          "req_ids": [
+            "REQ012"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No requirement exists with ID 'non_existent'"
+          ],
+          "inputs": {
+            "requirement_id": "non_existent"
+          },
+          "steps": [
+            "Attempt to change requirement 'non_existent'"
+          ],
+          "expected": [
+            "The system returns an error"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Change requirement with valid developer ID",
+          "req_ids": [
+            "REQ013"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A requirement exists",
+            "A developer with ID 'dev123' exists"
+          ],
+          "inputs": {
+            "developer_id": "dev123"
+          },
+          "steps": [
+            "Change the requirement by developer 'dev123'"
+          ],
+          "expected": [
+            "The change is associated with developer 'dev123'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Change requirement without developer ID",
+          "req_ids": [
+            "REQ013"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A requirement exists"
+          ],
+          "inputs": {},
+          "steps": [
+            "Change the requirement without a developer ID"
+          ],
+          "expected": [
+            "The system returns an error"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Store 1000 requirements (normal)",
+          "req_ids": [
+            "REQ014"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The system is installed"
+          ],
+          "inputs": {
+            "count": 1000
+          },
+          "steps": [
+            "Store 1000 requirements"
+          ],
+          "expected": [
+            "The system stores all 1000 requirements without error"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Store 1001 requirements (edge)",
+          "req_ids": [
+            "REQ014"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "The system is installed"
+          ],
+          "inputs": {
+            "count": 1001
+          },
+          "steps": [
+            "Store 1001 requirements"
+          ],
+          "expected": [
+            "The system stores all 1001 requirements without error"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Store -1 requirements (invalid)",
+          "req_ids": [
+            "REQ014"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "The system is installed"
+          ],
+          "inputs": {
+            "count": -1
+          },
+          "steps": [
+            "Attempt to store -1 requirements"
+          ],
+          "expected": [
+            "The system returns an error"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Install system with minimal steps",
+          "req_ids": [
+            "REQ015"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "The installation package is available"
+          ],
+          "inputs": {},
+          "steps": [
+            "Execute the installation command"
+          ],
+          "expected": [
+            "The installation completes without errors"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Install without required dependencies",
+          "req_ids": [
+            "REQ015"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "The system is missing a required dependency"
+          ],
+          "inputs": {},
+          "steps": [
+            "Execute the installation command"
+          ],
+          "expected": [
+            "The installation fails"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "dev123",
+            "context": "developer ID",
+            "grounded": false
+          },
+          {
+            "value": "non_existent",
+            "context": "requirement ID",
+            "grounded": false
+          },
+          {
+            "value": 1000,
+            "context": "requirement count",
+            "grounded": false
+          },
+          {
+            "value": 1001,
+            "context": "requirement count",
+            "grounded": false
+          },
+          {
+            "value": -1,
+            "context": "requirement count",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 5,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add concrete assertions for error codes and messages",
+          "Verify persistence by checking specific data values, not just existence",
+          "Include boundary tests for maximum supported requirement count as per scalability requirement",
+          "Test secure storage by verifying encryption or access controls",
+          "Ensure installation tests cover dependency resolution and environment checks"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.53,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

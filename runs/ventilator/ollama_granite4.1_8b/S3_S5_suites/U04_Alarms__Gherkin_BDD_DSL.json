@@ -1,0 +1,580 @@
+{
+  "unit_id": "U04_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.8,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.5455,
+    "hallucinated": [
+      {
+        "value": 120,
+        "context": "current breath VTE value",
+        "grounded": false
+      },
+      {
+        "value": 100,
+        "context": "HIGH VTE threshold",
+        "grounded": false
+      },
+      {
+        "value": 1,
+        "context": "minutes after cancellation",
+        "grounded": false
+      },
+      {
+        "value": 2,
+        "context": "minutes after cancellation",
+        "grounded": false
+      },
+      {
+        "value": 1,
+        "context": "breathId 1",
+        "grounded": false
+      },
+      {
+        "value": 2,
+        "context": "breathId 2",
+        "grounded": false
+      },
+      {
+        "value": 3,
+        "context": "breathId 3",
+        "grounded": false
+      },
+      {
+        "value": 100,
+        "context": "VTE for breath 1",
+        "grounded": false
+      },
+      {
+        "value": 150,
+        "context": "VTE for breath 2",
+        "grounded": false
+      },
+      {
+        "value": 200,
+        "context": "VTE for breath 3",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 22,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No negative test cases for error paths",
+      "No boundary value tests for VTE threshold (exact threshold, just below)",
+      "No tests for priority codes or numeric priority levels",
+      "No detailed verification of event log content beyond presence",
+      "Missing Scenario Outline with Examples covering normal, edge, and invalid values"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.6768,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Alarm Management for Ventilator GUI\n\n  Scenario: LOW VTE alarm is of medium priority\n    Given the GUI is initialized\n    When a LOW VTE alarm condition is met\n    Then the alarm priority displayed should be \"Medium\"\n\n  Scenario: HIGH VTE alarm is of medium priority\n    Given the GUI is initialized\n    When a HIGH VTE alarm condition is met\n    Then the alarm priority displayed should be \"Medium\"\n\n  Scenario: Compute HIGH VTE alarm based on VTE threshold\n    Given the current breath VTE is 120\n    And the HIGH VTE threshold is 100\n    When the GUI computes the VTE alarm\n    Then a HIGH VTE alarm should be active\n\n  Scenario: Compute VTE for each breath\n    Given a series of breath data with varying VTE values\n    When the GUI computes VTE for each breath\n    Then the computed VTE values should match the input data\n\n  Scenario: Cancel \"pressure high\" alarm and prevent re-trigger for 2 minutes\n    Given a \"pressure high\" alarm is active\n    When the alarm is cancelled\n    And 1 minute later the pressure condition remains unchanged\n    Then the \"pressure high\" alarm should not re-trigger\n    And after 2 minutes the alarm should remain inactive\n\n  Scenario: Compute high-priority alarm on O2 input line disconnection\n    Given the O2 input line is disconnected\n    When the GUI computes the alarm status\n    Then a high-priority alarm should be triggered\n\n  Scenario: Display all currently active alarms\n    Given multiple alarms (HIGH VTE, LOW VTE, O2 disconnection) are active\n    When the GUI displays active alarms\n    Then all active alarms should be listed\n\n  Scenario Outline: Event log includes confirmed alarm settings\n    Given an alarm setting is confirmed\n    When the event log is queried\n    Then the confirmed alarm setting should appear in the event log\n\n    Examples:\n      | alarm_type      | priority | status      |\n      | HIGH VTE        | Medium   | Active      |\n      | LOW VTE         | Medium   | Inactive    |\n      | O2 Disconnection| High     | Confirmed   |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "LOW VTE alarm is of medium priority",
+      "req_ids": [
+        "RW-SW-16"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI is initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "Given the GUI is initialized",
+        "When a LOW VTE alarm condition is met",
+        "Then the alarm priority displayed should be \"Medium\""
+      ],
+      "expected": [
+        "Medium"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "HIGH VTE alarm is of medium priority",
+      "req_ids": [
+        "RW-SW-17"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI is initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "Given the GUI is initialized",
+        "When a HIGH VTE alarm condition is met",
+        "Then the alarm priority displayed should be \"Medium\""
+      ],
+      "expected": [
+        "Medium"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Compute HIGH VTE alarm based on VTE threshold",
+      "req_ids": [
+        "RW-SW-15"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Current breath VTE is 120",
+        "HIGH VTE threshold is 100"
+      ],
+      "inputs": {
+        "currentVTE": 120,
+        "highVTEThreshold": 100
+      },
+      "steps": [
+        "Given the current breath VTE is 120",
+        "And the HIGH VTE threshold is 100",
+        "When the GUI computes the VTE alarm",
+        "Then a HIGH VTE alarm should be active"
+      ],
+      "expected": [
+        "HIGH VTE alarm active"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Compute VTE for each breath",
+      "req_ids": [
+        "RW-SW-18"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Series of breath data with varying VTE values"
+      ],
+      "inputs": {
+        "breathData": [
+          {
+            "breathId": 1,
+            "VTE": 100
+          },
+          {
+            "breathId": 2,
+            "VTE": 150
+          },
+          {
+            "breathId": 3,
+            "VTE": 200
+          }
+        ]
+      },
+      "steps": [
+        "Given a series of breath data with varying VTE values",
+        "When the GUI computes VTE for each breath",
+        "Then the computed VTE values should match the input data"
+      ],
+      "expected": [
+        "Computed VTE for breath 1 = 100",
+        "Computed VTE for breath 2 = 150",
+        "Computed VTE for breath 3 = 200"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Cancel \"pressure high\" alarm and prevent re-trigger for 2 minutes",
+      "req_ids": [
+        "RW-SW-19"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "\"pressure high\" alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "Given a \"pressure high\" alarm is active",
+        "When the alarm is cancelled",
+        "And 1 minute later the pressure condition remains unchanged",
+        "Then the \"pressure high\" alarm should not re-trigger",
+        "And after 2 minutes the alarm should remain inactive"
+      ],
+      "expected": [
+        "Alarm inactive after cancellation",
+        "No re-trigger within 2 minutes"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Compute high-priority alarm on O2 input line disconnection",
+      "req_ids": [
+        "RW-SW-20"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "O2 input line is disconnected"
+      ],
+      "inputs": {},
+      "steps": [
+        "Given the O2 input line is disconnected",
+        "When the GUI computes the alarm status",
+        "Then a high-priority alarm should be triggered"
+      ],
+      "expected": [
+        "High-priority alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Display all currently active alarms",
+      "req_ids": [
+        "RW-SW-22"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Multiple alarms (HIGH VTE, LOW VTE, O2 Disconnection) are active"
+      ],
+      "inputs": {},
+      "steps": [
+        "Given multiple alarms (HIGH VTE, LOW VTE, O2 Disconnection) are active",
+        "When the GUI displays active alarms",
+        "Then all active alarms should be listed"
+      ],
+      "expected": [
+        "HIGH VTE alarm listed",
+        "LOW VTE alarm listed",
+        "O2 Disconnection alarm listed"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Event log includes confirmed alarm settings",
+      "req_ids": [
+        "RW-SW-26"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "An alarm setting is confirmed"
+      ],
+      "inputs": {},
+      "steps": [
+        "Given an alarm setting is confirmed",
+        "When the event log is queried",
+        "Then the confirmed alarm setting should appear in the event log"
+      ],
+      "expected": [
+        "Confirmed alarm setting appears in event log"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarm Management for Ventilator GUI\n\n  Scenario: LOW VTE alarm is of medium priority\n    Given the GUI is initialized\n    When a LOW VTE alarm condition is met\n    Then the alarm priority displayed should be \"Medium\"\n\n  Scenario: HIGH VTE alarm is of medium priority\n    Given the GUI is initialized\n    When a HIGH VTE alarm condition is met\n    Then the alarm priority displayed should be \"Medium\"\n\n  Scenario: Compute HIGH VTE alarm based on VTE threshold\n    Given the current breath VTE is 120\n    And the HIGH VTE threshold is 100\n    When the GUI computes the VTE alarm\n    Then a HIGH VTE alarm should be active\n\n  Scenario: Compute VTE for each breath\n    Given a series of breath data with varying VTE values\n    When the GUI computes VTE for each breath\n    Then the computed VTE values should match the input data\n\n  Scenario: Cancel \"pressure high\" alarm and prevent re-trigger for 2 minutes\n    Given a \"pressure high\" alarm is active\n    When the alarm is cancelled\n    And 1 minute later the pressure condition remains unchanged\n    Then the \"pressure high\" alarm should not re-trigger\n    And after 2 minutes the alarm should remain inactive\n\n  Scenario: Compute high-priority alarm on O2 input line disconnection\n    Given the O2 input line is disconnected\n    When the GUI computes the alarm status\n    Then a high-priority alarm should be triggered\n\n  Scenario: Display all currently active alarms\n    Given multiple alarms (HIGH VTE, LOW VTE, O2 disconnection) are active\n    When the GUI displays active alarms\n    Then all active alarms should be listed\n\n  Scenario Outline: Event log includes confirmed alarm settings\n    Given an alarm setting is confirmed\n    When the event log is queried\n    Then the confirmed alarm setting should appear in the event log\n\n    Examples:\n      | alarm_type      | priority | status      |\n      | HIGH VTE        | Medium   | Active      |\n      | LOW VTE         | Medium   | Inactive    |\n      | O2 Disconnection| High     | Confirmed   |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "LOW VTE alarm is of medium priority",
+          "req_ids": [
+            "RW-SW-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given the GUI is initialized",
+            "When a LOW VTE alarm condition is met",
+            "Then the alarm priority displayed should be \"Medium\""
+          ],
+          "expected": [
+            "Medium"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "HIGH VTE alarm is of medium priority",
+          "req_ids": [
+            "RW-SW-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given the GUI is initialized",
+            "When a HIGH VTE alarm condition is met",
+            "Then the alarm priority displayed should be \"Medium\""
+          ],
+          "expected": [
+            "Medium"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Compute HIGH VTE alarm based on VTE threshold",
+          "req_ids": [
+            "RW-SW-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Current breath VTE is 120",
+            "HIGH VTE threshold is 100"
+          ],
+          "inputs": {
+            "currentVTE": 120,
+            "highVTEThreshold": 100
+          },
+          "steps": [
+            "Given the current breath VTE is 120",
+            "And the HIGH VTE threshold is 100",
+            "When the GUI computes the VTE alarm",
+            "Then a HIGH VTE alarm should be active"
+          ],
+          "expected": [
+            "HIGH VTE alarm active"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Compute VTE for each breath",
+          "req_ids": [
+            "RW-SW-18"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Series of breath data with varying VTE values"
+          ],
+          "inputs": {
+            "breathData": [
+              {
+                "breathId": 1,
+                "VTE": 100
+              },
+              {
+                "breathId": 2,
+                "VTE": 150
+              },
+              {
+                "breathId": 3,
+                "VTE": 200
+              }
+            ]
+          },
+          "steps": [
+            "Given a series of breath data with varying VTE values",
+            "When the GUI computes VTE for each breath",
+            "Then the computed VTE values should match the input data"
+          ],
+          "expected": [
+            "Computed VTE for breath 1 = 100",
+            "Computed VTE for breath 2 = 150",
+            "Computed VTE for breath 3 = 200"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Cancel \"pressure high\" alarm and prevent re-trigger for 2 minutes",
+          "req_ids": [
+            "RW-SW-19"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "\"pressure high\" alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given a \"pressure high\" alarm is active",
+            "When the alarm is cancelled",
+            "And 1 minute later the pressure condition remains unchanged",
+            "Then the \"pressure high\" alarm should not re-trigger",
+            "And after 2 minutes the alarm should remain inactive"
+          ],
+          "expected": [
+            "Alarm inactive after cancellation",
+            "No re-trigger within 2 minutes"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Compute high-priority alarm on O2 input line disconnection",
+          "req_ids": [
+            "RW-SW-20"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "O2 input line is disconnected"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given the O2 input line is disconnected",
+            "When the GUI computes the alarm status",
+            "Then a high-priority alarm should be triggered"
+          ],
+          "expected": [
+            "High-priority alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Display all currently active alarms",
+          "req_ids": [
+            "RW-SW-22"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Multiple alarms (HIGH VTE, LOW VTE, O2 Disconnection) are active"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given multiple alarms (HIGH VTE, LOW VTE, O2 Disconnection) are active",
+            "When the GUI displays active alarms",
+            "Then all active alarms should be listed"
+          ],
+          "expected": [
+            "HIGH VTE alarm listed",
+            "LOW VTE alarm listed",
+            "O2 Disconnection alarm listed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Event log includes confirmed alarm settings",
+          "req_ids": [
+            "RW-SW-26"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "An alarm setting is confirmed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Given an alarm setting is confirmed",
+            "When the event log is queried",
+            "Then the confirmed alarm setting should appear in the event log"
+          ],
+          "expected": [
+            "Confirmed alarm setting appears in event log"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.5455,
+        "hallucinated": [
+          {
+            "value": 120,
+            "context": "current breath VTE value",
+            "grounded": false
+          },
+          {
+            "value": 100,
+            "context": "HIGH VTE threshold",
+            "grounded": false
+          },
+          {
+            "value": 1,
+            "context": "minutes after cancellation",
+            "grounded": false
+          },
+          {
+            "value": 2,
+            "context": "minutes after cancellation",
+            "grounded": false
+          },
+          {
+            "value": 1,
+            "context": "breathId 1",
+            "grounded": false
+          },
+          {
+            "value": 2,
+            "context": "breathId 2",
+            "grounded": false
+          },
+          {
+            "value": 3,
+            "context": "breathId 3",
+            "grounded": false
+          },
+          {
+            "value": 100,
+            "context": "VTE for breath 1",
+            "grounded": false
+          },
+          {
+            "value": 150,
+            "context": "VTE for breath 2",
+            "grounded": false
+          },
+          {
+            "value": 200,
+            "context": "VTE for breath 3",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 22,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No negative test cases for error paths",
+          "No boundary value tests for VTE threshold (exact threshold, just below)",
+          "No tests for priority codes or numeric priority levels",
+          "No detailed verification of event log content beyond presence",
+          "Missing Scenario Outline with Examples covering normal, edge, and invalid values"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.6768,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

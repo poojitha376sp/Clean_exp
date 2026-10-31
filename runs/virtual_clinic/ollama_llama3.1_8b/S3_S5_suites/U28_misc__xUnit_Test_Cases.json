@@ -1,0 +1,1784 @@
+{
+  "unit_id": "U28_misc",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.875,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.1333,
+    "hallucinated": [
+      {
+        "value": "Chemist Name",
+        "context": "chemist_name after query",
+        "grounded": false
+      },
+      {
+        "value": "Chemist Address",
+        "context": "chemist_address after query",
+        "grounded": false
+      },
+      {
+        "value": "Chemist Contact Details",
+        "context": "chemist_contact_details after query",
+        "grounded": false
+      },
+      {
+        "value": "symptom_code",
+        "context": "symptom_code after add",
+        "grounded": false
+      },
+      {
+        "value": "symptom_description",
+        "context": "symptom_description after add",
+        "grounded": false
+      },
+      {
+        "value": "new_symptom_description",
+        "context": "symptom_description after edit",
+        "grounded": false
+      },
+      {
+        "value": "patient_id",
+        "context": "patient_id after update",
+        "grounded": false
+      },
+      {
+        "value": "name",
+        "context": "patient_name after update",
+        "grounded": false
+      },
+      {
+        "value": "age",
+        "context": "patient_age after update",
+        "grounded": false
+      },
+      {
+        "value": "sex",
+        "context": "patient_sex after update",
+        "grounded": false
+      },
+      {
+        "value": "address",
+        "context": "patient_address after update",
+        "grounded": false
+      },
+      {
+        "value": "contact_details",
+        "context": "patient_contact_details after update",
+        "grounded": false
+      },
+      {
+        "value": "",
+        "context": "chemist_name after deletion",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 15,
+    "uncovered_clauses": [
+      "VCDPA02"
+    ],
+    "weaknesses": [
+      "Add tests for modifying and deleting chemist/lab details after query",
+      "Include negative tests for symptom operations when symptom does not exist",
+      "Test patient registration to capture details per VCDPA02",
+      "Cover additional actions in VCMPA01 such as raising consultations and generating reports",
+      "Use pytest.raises for exception verification instead of checking error_message strings"
+    ],
+    "traceability": 0.625,
+    "untraced_reqs": [
+      "VCDPA02",
+      "VCMSYM02",
+      "VCMSYM03"
+    ],
+    "fsa_score": 0.805,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "import unittest\nfrom unittest.mock import patch\nfrom your_module import ChemistLabScreen, SymptomScreen, PatientProfileScreen\n\nclass TestChemistLabScreen(unittest.TestCase):\n    def test_query_chemist_lab(self):\n        chemist_lab_screen = ChemistLabScreen()\n        chemist_lab_screen.query_chemist_lab(\"chemist_id\")\n        self.assertEqual(chemist_lab_screen.chemist_name, \"Chemist Name\")\n        self.assertEqual(chemist_lab_screen.chemist_address, \"Chemist Address\")\n        self.assertEqual(chemist_lab_screen.chemist_contact_details, \"Chemist Contact Details\")\n\n    def test_query_non_existent_chemist_lab(self):\n        chemist_lab_screen = ChemistLabScreen()\n        with patch('your_module.get_chemist_lab', return_value=None):\n            chemist_lab_screen.query_chemist_lab(\"non_existent_id\")\n        self.assertEqual(chemist_lab_screen.error_message, \"Chemist or Lab does not exist\")\n\n    def test_delete_chemist_lab_with_open_prescriptions(self):\n        chemist_lab_screen = ChemistLabScreen()\n        with patch('your_module.get_open_prescriptions', return_value=[1, 2, 3]):\n            chemist_lab_screen.delete_chemist_lab(\"chemist_id\")\n        self.assertEqual(chemist_lab_screen.error_message, \"Chemist or Lab has open Prescription Requests - cannot delete\")\n\n    def test_delete_chemist_lab_without_open_prescriptions(self):\n        chemist_lab_screen = ChemistLabScreen()\n        with patch('your_module.get_open_prescriptions', return_value=[]):\n            chemist_lab_screen.delete_chemist_lab(\"chemist_id\")\n        self.assertEqual(chemist_lab_screen.chemist_name, \"\")\n\nclass TestSymptomScreen(unittest.TestCase):\n    def test_add_symptom_code(self):\n        symptom_screen = SymptomScreen()\n        symptom_screen.add_symptom_code(\"symptom_code\", \"symptom_description\")\n        self.assertEqual(symptom_screen.symptom_code, \"symptom_code\")\n        self.assertEqual(symptom_screen.symptom_description, \"symptom_description\")\n\n    def test_edit_symptom_code(self):\n        symptom_screen = SymptomScreen()\n        symptom_screen.edit_symptom_code(\"symptom_code\", \"new_symptom_description\")\n        self.assertEqual(symptom_screen.symptom_code, \"symptom_code\")\n        self.assertEqual(symptom_screen.symptom_description, \"new_symptom_description\")\n\n    def test_delete_symptom_code(self):\n        symptom_screen = SymptomScreen()\n        symptom_screen.delete_symptom_code(\"symptom_code\")\n        self.assertEqual(symptom_screen.symptom_code, \"\")\n\nclass TestPatientProfileScreen(unittest.TestCase):\n    def test_update_patient_profile(self):\n        patient_profile_screen = PatientProfileScreen()\n        patient_profile_screen.update_patient_profile(\"patient_id\", \"name\", \"age\", \"sex\", \"address\", \"contact_details\")\n        self.assertEqual(patient_profile_screen.patient_id, \"patient_id\")\n        self.assertEqual(patient_profile_screen.patient_name, \"name\")\n        self.assertEqual(patient_profile_screen.patient_age, \"age\")\n        self.assertEqual(patient_profile_screen.patient_sex, \"sex\")\n        self.assertEqual(patient_profile_screen.patient_address, \"address\")\n        self.assertEqual(patient_profile_screen.patient_contact_details, \"contact_details\")\n\nif __name__ == '__main__':\n    unittest.main()",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Query Chemist/Lab Screen",
+      "req_ids": [
+        "VCMCL03-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist/Lab exists"
+      ],
+      "inputs": {
+        "chemist_id": "chemist_id"
+      },
+      "steps": [
+        "query_chemist_lab"
+      ],
+      "expected": [
+        "Chemist/Lab name and address are displayed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Query Non-Existent Chemist/Lab",
+      "req_ids": [
+        "VCMCL03-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Chemist/Lab does not exist"
+      ],
+      "inputs": {
+        "chemist_id": "non_existent_id"
+      },
+      "steps": [
+        "query_chemist_lab"
+      ],
+      "expected": [
+        "Error message 'Chemist or Lab does not exist' is displayed"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Delete Chemist/Lab with Open Prescriptions",
+      "req_ids": [
+        "VCMCL03-3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Chemist/Lab has open prescriptions"
+      ],
+      "inputs": {
+        "chemist_id": "chemist_id"
+      },
+      "steps": [
+        "delete_chemist_lab"
+      ],
+      "expected": [
+        "Error message 'Chemist or Lab has open Prescription Requests - cannot delete' is displayed"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Delete Chemist/Lab without Open Prescriptions",
+      "req_ids": [
+        "VCMCL03-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist/Lab does not have open prescriptions"
+      ],
+      "inputs": {
+        "chemist_id": "chemist_id"
+      },
+      "steps": [
+        "delete_chemist_lab"
+      ],
+      "expected": [
+        "Chemist/Lab details are deleted"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Add Symptom Code",
+      "req_ids": [
+        "VCMSYM01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Symptom code does not exist"
+      ],
+      "inputs": {
+        "symptom_code": "symptom_code",
+        "symptom_description": "symptom_description"
+      },
+      "steps": [
+        "add_symptom_code"
+      ],
+      "expected": [
+        "Symptom code and description are added"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Edit Symptom Code",
+      "req_ids": [
+        "VCMSYM01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Symptom code exists"
+      ],
+      "inputs": {
+        "symptom_code": "symptom_code",
+        "new_symptom_description": "new_symptom_description"
+      },
+      "steps": [
+        "edit_symptom_code"
+      ],
+      "expected": [
+        "Symptom code and description are updated"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Delete Symptom Code",
+      "req_ids": [
+        "VCMSYM01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Symptom code exists"
+      ],
+      "inputs": {
+        "symptom_code": "symptom_code"
+      },
+      "steps": [
+        "delete_symptom_code"
+      ],
+      "expected": [
+        "Symptom code is deleted"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Update Patient Profile",
+      "req_ids": [
+        "VCMPA01"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient profile exists"
+      ],
+      "inputs": {
+        "patient_id": "patient_id",
+        "name": "name",
+        "age": "age",
+        "sex": "sex",
+        "address": "address",
+        "contact_details": "contact_details"
+      },
+      "steps": [
+        "update_patient_profile"
+      ],
+      "expected": [
+        "Patient profile is updated"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "import unittest\nfrom unittest.mock import patch\nfrom your_module import ChemistLabScreen, SymptomScreen, PatientProfileScreen\n\nclass TestChemistLabScreen(unittest.TestCase):\n    def test_query_chemist_lab(self):\n        chemist_lab_screen = ChemistLabScreen()\n        chemist_lab_screen.query_chemist_lab(\"chemist_id\")\n        self.assertEqual(chemist_lab_screen.chemist_name, \"Chemist Name\")\n        self.assertEqual(chemist_lab_screen.chemist_address, \"Chemist Address\")\n        self.assertEqual(chemist_lab_screen.chemist_contact_details, \"Chemist Contact Details\")\n\n    def test_query_non_existent_chemist_lab(self):\n        chemist_lab_screen = ChemistLabScreen()\n        with patch('your_module.get_chemist_lab', return_value=None):\n            chemist_lab_screen.query_chemist_lab(\"non_existent_id\")\n        self.assertEqual(chemist_lab_screen.error_message, \"Chemist or Lab does not exist\")\n\n    def test_delete_chemist_lab_with_open_prescriptions(self):\n        chemist_lab_screen = ChemistLabScreen()\n        with patch('your_module.get_open_prescriptions', return_value=[1, 2, 3]):\n            chemist_lab_screen.delete_chemist_lab(\"chemist_id\")\n        self.assertEqual(chemist_lab_screen.error_message, \"Chemist or Lab has open Prescription Requests - cannot delete\")\n\n    def test_delete_chemist_lab_without_open_prescriptions(self):\n        chemist_lab_screen = ChemistLabScreen()\n        with patch('your_module.get_open_prescriptions', return_value=[]):\n            chemist_lab_screen.delete_chemist_lab(\"chemist_id\")\n        self.assertEqual(chemist_lab_screen.chemist_name, \"\")\n\nclass TestSymptomScreen(unittest.TestCase):\n    def test_add_symptom_code(self):\n        symptom_screen = SymptomScreen()\n        symptom_screen.add_symptom_code(\"symptom_code\", \"symptom_description\")\n        self.assertEqual(symptom_screen.symptom_code, \"symptom_code\")\n        self.assertEqual(symptom_screen.symptom_description, \"symptom_description\")\n\n    def test_edit_symptom_code(self):\n        symptom_screen = SymptomScreen()\n        symptom_screen.edit_symptom_code(\"symptom_code\", \"new_symptom_description\")\n        self.assertEqual(symptom_screen.symptom_code, \"symptom_code\")\n        self.assertEqual(symptom_screen.symptom_description, \"new_symptom_description\")\n\n    def test_delete_symptom_code(self):\n        symptom_screen = SymptomScreen()\n        symptom_screen.delete_symptom_code(\"symptom_code\")\n        self.assertEqual(symptom_screen.symptom_code, \"\")\n\nclass TestPatientProfileScreen(unittest.TestCase):\n    def test_update_patient_profile(self):\n        patient_profile_screen = PatientProfileScreen()\n        patient_profile_screen.update_patient_profile(\"patient_id\", \"name\", \"age\", \"sex\", \"address\", \"contact_details\")\n        self.assertEqual(patient_profile_screen.patient_id, \"patient_id\")\n        self.assertEqual(patient_profile_screen.patient_name, \"name\")\n        self.assertEqual(patient_profile_screen.patient_age, \"age\")\n        self.assertEqual(patient_profile_screen.patient_sex, \"sex\")\n        self.assertEqual(patient_profile_screen.patient_address, \"address\")\n        self.assertEqual(patient_profile_screen.patient_contact_details, \"contact_details\")\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Query Chemist/Lab Screen",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist/Lab exists"
+          ],
+          "inputs": {
+            "chemist_id": "chemist_id"
+          },
+          "steps": [
+            "query_chemist_lab"
+          ],
+          "expected": [
+            "Chemist/Lab name and address are displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Query Non-Existent Chemist/Lab",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist/Lab does not exist"
+          ],
+          "inputs": {
+            "chemist_id": "non_existent_id"
+          },
+          "steps": [
+            "query_chemist_lab"
+          ],
+          "expected": [
+            "Error message 'Chemist or Lab does not exist' is displayed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Chemist/Lab with Open Prescriptions",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist/Lab has open prescriptions"
+          ],
+          "inputs": {
+            "chemist_id": "chemist_id"
+          },
+          "steps": [
+            "delete_chemist_lab"
+          ],
+          "expected": [
+            "Error message 'Chemist or Lab has open Prescription Requests - cannot delete' is displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete Chemist/Lab without Open Prescriptions",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist/Lab does not have open prescriptions"
+          ],
+          "inputs": {
+            "chemist_id": "chemist_id"
+          },
+          "steps": [
+            "delete_chemist_lab"
+          ],
+          "expected": [
+            "Chemist/Lab details are deleted"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Add Symptom Code",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom code does not exist"
+          ],
+          "inputs": {
+            "symptom_code": "symptom_code",
+            "symptom_description": "symptom_description"
+          },
+          "steps": [
+            "add_symptom_code"
+          ],
+          "expected": [
+            "Symptom code and description are added"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Edit Symptom Code",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom code exists"
+          ],
+          "inputs": {
+            "symptom_code": "symptom_code",
+            "new_symptom_description": "new_symptom_description"
+          },
+          "steps": [
+            "edit_symptom_code"
+          ],
+          "expected": [
+            "Symptom code and description are updated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Delete Symptom Code",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom code exists"
+          ],
+          "inputs": {
+            "symptom_code": "symptom_code"
+          },
+          "steps": [
+            "delete_symptom_code"
+          ],
+          "expected": [
+            "Symptom code is deleted"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Update Patient Profile",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient profile exists"
+          ],
+          "inputs": {
+            "patient_id": "patient_id",
+            "name": "name",
+            "age": "age",
+            "sex": "sex",
+            "address": "address",
+            "contact_details": "contact_details"
+          },
+          "steps": [
+            "update_patient_profile"
+          ],
+          "expected": [
+            "Patient profile is updated"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.1333,
+        "hallucinated": [
+          {
+            "value": "Chemist Name",
+            "context": "chemist_name after query",
+            "grounded": false
+          },
+          {
+            "value": "Chemist Address",
+            "context": "chemist_address after query",
+            "grounded": false
+          },
+          {
+            "value": "Chemist Contact Details",
+            "context": "chemist_contact_details after query",
+            "grounded": false
+          },
+          {
+            "value": "symptom_code",
+            "context": "symptom_code after add",
+            "grounded": false
+          },
+          {
+            "value": "symptom_description",
+            "context": "symptom_description after add",
+            "grounded": false
+          },
+          {
+            "value": "new_symptom_description",
+            "context": "symptom_description after edit",
+            "grounded": false
+          },
+          {
+            "value": "patient_id",
+            "context": "patient_id after update",
+            "grounded": false
+          },
+          {
+            "value": "name",
+            "context": "patient_name after update",
+            "grounded": false
+          },
+          {
+            "value": "age",
+            "context": "patient_age after update",
+            "grounded": false
+          },
+          {
+            "value": "sex",
+            "context": "patient_sex after update",
+            "grounded": false
+          },
+          {
+            "value": "address",
+            "context": "patient_address after update",
+            "grounded": false
+          },
+          {
+            "value": "contact_details",
+            "context": "patient_contact_details after update",
+            "grounded": false
+          },
+          {
+            "value": "",
+            "context": "chemist_name after deletion",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 15,
+        "uncovered_clauses": [
+          "VCDPA02"
+        ],
+        "weaknesses": [
+          "Add tests for modifying and deleting chemist/lab details after query",
+          "Include negative tests for symptom operations when symptom does not exist",
+          "Test patient registration to capture details per VCDPA02",
+          "Cover additional actions in VCMPA01 such as raising consultations and generating reports",
+          "Use pytest.raises for exception verification instead of checking error_message strings"
+        ],
+        "traceability": 0.625,
+        "untraced_reqs": [
+          "VCDPA02",
+          "VCMSYM02",
+          "VCMSYM03"
+        ],
+        "fsa_score": 0.805,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.805; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.9, 'boundary_coverage': 1.0, 'groundedness_mg': 0.1333}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCDPA02', 'VCMSYM02', 'VCMSYM03'] (add at least one each)\n- uncovered clause: VCDPA02\n- ungrounded value 'Chemist Name' (chemist_name after query): remove or use the SRS value\n- ungrounded value 'Chemist Address' (chemist_address after query): remove or use the SRS value\n- ungrounded value 'Chemist Contact Details' (chemist_contact_details after query): remove or use the SRS value\n- ungrounded value 'symptom_code' (symptom_code after add): remove or use the SRS value\n- ungrounded value 'symptom_description' (symptom_description after add): remove or use the SRS value\n- ungrounded value 'new_symptom_description' (symptom_description after edit): remove or use the SRS value\n- Add tests for modifying and deleting chemist/lab details after query\n- Include negative tests for symptom operations when symptom does not exist\n- Test patient registration to capture details per VCDPA02\n- Cover additional actions in VCMPA01 such as raising consultations and generating reports\n- Use pytest.raises for exception verification instead of checking error_message strings",
+      "artifact": "import pytest\nfrom your_module import ChemistLabService, SymptomService, PatientService\n\n@pytest.fixture\ndef chemist_lab_service():\n    return ChemistLabService()\n\n@pytest.fixture\ndef symptom_service():\n    return SymptomService()\n\n@pytest.fixture\ndef patient_service():\n    return PatientService()\n\ndef test_query_chemist_lab(chemist_lab_service):\n    chemist_id = 1\n    chemist_name = \"John Doe\"\n    chemist_address = \"123 Main St\"\n    chemist_contact_details = \"123-456-7890\"\n    response = chemist_lab_service.query_chemist_lab(chemist_id)\n    assert response['chemist_name'] == chemist_name\n    assert response['chemist_address'] == chemist_address\n    assert response['chemist_contact_details'] == chemist_contact_details\n\ndef test_update_chemist_lab(chemist_lab_service):\n    chemist_id = 1\n    chemist_name = \"Jane Doe\"\n    chemist_address = \"456 Elm St\"\n    chemist_contact_details = \"987-654-3210\"\n    response = chemist_lab_service.update_chemist_lab(chemist_id, chemist_name, chemist_address, chemist_contact_details)\n    assert response['chemist_name'] == chemist_name\n    assert response['chemist_address'] == chemist_address\n    assert response['chemist_contact_details'] == chemist_contact_details\n\ndef test_delete_chemist_lab(chemist_lab_service):\n    chemist_id = 1\n    response = chemist_lab_service.delete_chemist_lab(chemist_id)\n    assert response == {'message': 'Chemist or Lab has open Prescription Requests - cannot delete'}\n\ndef test_add_symptom(symptom_service):\n    symptom_code = \"SYM001\"\n    symptom_description = \"Symptom 1\"\n    response = symptom_service.add_symptom(symptom_code, symptom_description)\n    assert response['symptom_code'] == symptom_code\n    assert response['symptom_description'] == symptom_description\n\ndef test_edit_symptom(symptom_service):\n    symptom_code = \"SYM001\"\n    new_symptom_description = \"New Symptom 1\"\n    response = symptom_service.edit_symptom(symptom_code, new_symptom_description)\n    assert response['symptom_description'] == new_symptom_description\n\ndef test_delete_symptom(symptom_service):\n    symptom_code = \"SYM001\"\n    response = symptom_service.delete_symptom(symptom_code)\n    assert response == {'message': 'Symptom does not exist'}\n\ndef test_patient_registration(patient_service):\n    patient_id = 1\n    patient_name = \"John Doe\"\n    patient_age = 30\n    patient_sex = \"Male\"\n    patient_address = \"123 Main St\"\n    patient_contact_details = \"123-456-7890\"\n    response = patient_service.register_patient(patient_id, patient_name, patient_age, patient_sex, patient_address, patient_contact_details)\n    assert response['patient_name'] == patient_name\n    assert response['patient_age'] == patient_age\n    assert response['patient_sex'] == patient_sex\n    assert response['patient_address'] == patient_address\n    assert response['patient_contact_details'] == patient_contact_details\n\ndef test_raise_consultation(chemist_lab_service):\n    chemist_id = 1\n    response = chemist_lab_service.raise_consultation(chemist_id)\n    assert response == {'message': 'Consultation raised successfully'}\n\ndef test_generate_prescription_report(chemist_lab_service):\n    chemist_id = 1\n    response = chemist_lab_service.generate_prescription_report(chemist_id)\n    assert response == {'message': 'Prescription report generated successfully'}\n\ndef test_print_invoice(chemist_lab_service):\n    chemist_id = 1\n    response = chemist_lab_service.print_invoice(chemist_id)\n    assert response == {'message': 'Invoice printed successfully'}\n\ndef test_update_patient_profile(patient_service):\n    patient_id = 1\n    patient_name = \"Jane Doe\"\n    patient_age = 31\n    patient_sex = \"Female\"\n    patient_address = \"456 Elm St\"\n    patient_contact_details = \"987-654-3210\"\n    response = patient_service.update_patient_profile(patient_id, patient_name, patient_age, patient_sex, patient_address, patient_contact_details)\n    assert response['patient_name'] == patient_name\n    assert response['patient_age'] == patient_age\n    assert response['patient_sex'] == patient_sex\n    assert response['patient_address'] == patient_address\n    assert response['patient_contact_details'] == patient_contact_details\n\ndef test_update_patient_profile_negative(patient_service):\n    patient_id = 1\n    patient_name = \"\"\n    patient_age = -1\n    patient_sex = \"\"\n    patient_address = \"\"\n    patient_contact_details = \"\"\n    with pytest.raises(ValueError):\n        patient_service.update_patient_profile(patient_id, patient_name, patient_age, patient_sex, patient_address, patient_contact_details)\n\ndef test_add_symptom_negative(symptom_service):\n    symptom_code = \"\"\n    symptom_description = \"\"\n    with pytest.raises(ValueError):\n        symptom_service.add_symptom(symptom_code, symptom_description)\n\ndef test_edit_symptom_negative(symptom_service):\n    symptom_code = \"\"\n    new_symptom_description = \"\"\n    with pytest.raises(ValueError):\n        symptom_service.edit_symptom(symptom_code, new_symptom_description)\n\ndef test_delete_symptom_negative(symptom_service):\n    symptom_code = \"\"\n    with pytest.raises(ValueError):\n        symptom_service.delete_symptom(symptom_code)",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Query Chemist Lab",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist Lab exists"
+          ],
+          "inputs": {
+            "chemist_id": 1
+          },
+          "steps": [
+            "Query chemist lab"
+          ],
+          "expected": [
+            "Chemist name and address are displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Update Chemist Lab",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist Lab exists"
+          ],
+          "inputs": {
+            "chemist_id": 1,
+            "chemist_name": "Jane Doe",
+            "chemist_address": "456 Elm St"
+          },
+          "steps": [
+            "Update chemist lab"
+          ],
+          "expected": [
+            "Chemist name and address are updated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete Chemist Lab",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist Lab exists"
+          ],
+          "inputs": {
+            "chemist_id": 1
+          },
+          "steps": [
+            "Delete chemist lab"
+          ],
+          "expected": [
+            "Chemist lab is deleted"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Add Symptom",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom does not exist"
+          ],
+          "inputs": {
+            "symptom_code": "SYM001",
+            "symptom_description": "Symptom 1"
+          },
+          "steps": [
+            "Add symptom"
+          ],
+          "expected": [
+            "Symptom is added"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Edit Symptom",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom exists"
+          ],
+          "inputs": {
+            "symptom_code": "SYM001",
+            "new_symptom_description": "New Symptom 1"
+          },
+          "steps": [
+            "Edit symptom"
+          ],
+          "expected": [
+            "Symptom is edited"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete Symptom",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom exists"
+          ],
+          "inputs": {
+            "symptom_code": "SYM001"
+          },
+          "steps": [
+            "Delete symptom"
+          ],
+          "expected": [
+            "Symptom is deleted"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient Registration",
+          "req_ids": [
+            "VCDPA02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient does not exist"
+          ],
+          "inputs": {
+            "patient_id": 1,
+            "patient_name": "John Doe",
+            "patient_age": 30,
+            "patient_sex": "Male",
+            "patient_address": "123 Main St",
+            "patient_contact_details": "123-456-7890"
+          },
+          "steps": [
+            "Register patient"
+          ],
+          "expected": [
+            "Patient is registered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Raise Consultation",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist Lab exists"
+          ],
+          "inputs": {
+            "chemist_id": 1
+          },
+          "steps": [
+            "Raise consultation"
+          ],
+          "expected": [
+            "Consultation is raised"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Generate Prescription Report",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist Lab exists"
+          ],
+          "inputs": {
+            "chemist_id": 1
+          },
+          "steps": [
+            "Generate prescription report"
+          ],
+          "expected": [
+            "Prescription report is generated"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Print Invoice",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist Lab exists"
+          ],
+          "inputs": {
+            "chemist_id": 1
+          },
+          "steps": [
+            "Print invoice"
+          ],
+          "expected": [
+            "Invoice is printed"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Update Patient Profile",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient exists"
+          ],
+          "inputs": {
+            "patient_id": 1,
+            "patient_name": "Jane Doe",
+            "patient_age": 31,
+            "patient_sex": "Female",
+            "patient_address": "456 Elm St",
+            "patient_contact_details": "987-654-3210"
+          },
+          "steps": [
+            "Update patient profile"
+          ],
+          "expected": [
+            "Patient profile is updated"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Update Patient Profile Negative",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient exists"
+          ],
+          "inputs": {
+            "patient_id": 1,
+            "patient_name": "",
+            "patient_age": -1,
+            "patient_sex": "",
+            "patient_address": "",
+            "patient_contact_details": ""
+          },
+          "steps": [
+            "Update patient profile"
+          ],
+          "expected": [
+            "Error: Invalid patient details"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Add Symptom Negative",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom does not exist"
+          ],
+          "inputs": {
+            "symptom_code": "",
+            "symptom_description": ""
+          },
+          "steps": [
+            "Add symptom"
+          ],
+          "expected": [
+            "Error: Invalid symptom details"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Edit Symptom Negative",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom exists"
+          ],
+          "inputs": {
+            "symptom_code": "",
+            "new_symptom_description": ""
+          },
+          "steps": [
+            "Edit symptom"
+          ],
+          "expected": [
+            "Error: Invalid symptom details"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Delete Symptom Negative",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom exists"
+          ],
+          "inputs": {
+            "symptom_code": ""
+          },
+          "steps": [
+            "Delete symptom"
+          ],
+          "expected": [
+            "Error: Invalid symptom code"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.65,
+        "negative_coverage": 0.33,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0476,
+        "hallucinated": [
+          {
+            "value": "1",
+            "context": "chemist_id",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "chemist_name",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "chemist_address",
+            "grounded": false
+          },
+          {
+            "value": "123-456-7890",
+            "context": "chemist_contact_details",
+            "grounded": false
+          },
+          {
+            "value": "Jane Doe",
+            "context": "chemist_name",
+            "grounded": false
+          },
+          {
+            "value": "456 Elm St",
+            "context": "chemist_address",
+            "grounded": false
+          },
+          {
+            "value": "987-654-3210",
+            "context": "chemist_contact_details",
+            "grounded": false
+          },
+          {
+            "value": "SYM001",
+            "context": "symptom_code",
+            "grounded": false
+          },
+          {
+            "value": "Symptom 1",
+            "context": "symptom_description",
+            "grounded": false
+          },
+          {
+            "value": "New Symptom 1",
+            "context": "new_symptom_description",
+            "grounded": false
+          },
+          {
+            "value": "Symptom does not exist",
+            "context": "delete symptom error message",
+            "grounded": false
+          },
+          {
+            "value": "Consultation raised successfully",
+            "context": "raise consultation message",
+            "grounded": false
+          },
+          {
+            "value": "Prescription report generated successfully",
+            "context": "generate prescription report message",
+            "grounded": false
+          },
+          {
+            "value": "Invoice printed successfully",
+            "context": "print invoice message",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "patient_age",
+            "grounded": false
+          },
+          {
+            "value": "Male",
+            "context": "patient_sex",
+            "grounded": false
+          },
+          {
+            "value": "31",
+            "context": "patient_age",
+            "grounded": false
+          },
+          {
+            "value": "Female",
+            "context": "patient_sex",
+            "grounded": false
+          },
+          {
+            "value": "-1",
+            "context": "patient_age negative",
+            "grounded": false
+          },
+          {
+            "value": "",
+            "context": "empty string for negative tests",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 21,
+        "uncovered_clauses": [
+          "VCMCL03-2",
+          "VCMCL03-3 delete no open requests",
+          "VCMSYM03 query symptom",
+          "VCMPA01 view appointment request"
+        ],
+        "weaknesses": [
+          "Add test for non‑existent chemist to cover VCMCL03-2",
+          "Add test for deleting chemist when no open prescriptions to cover VCMCL03-3 delete no open requests",
+          "Add test for querying symptom to cover VCMSYM03 query symptom",
+          "Add test for viewing appointment requests to cover VCMPA01 view appointment request",
+          "Replace hardcoded data with parameterised fixtures or realistic data generation to reduce hallucination"
+        ],
+        "traceability": 0.5,
+        "untraced_reqs": [
+          "VCMCL03-2",
+          "VCMCL03-3",
+          "VCMSYM02",
+          "VCMSYM03"
+        ],
+        "fsa_score": 0.6016,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.6016; sub-scores {'clause_coverage': 0.65, 'negative_coverage': 0.33, 'oracle_assertiveness': 0.9, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0476}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCMCL03-2', 'VCMCL03-3', 'VCMSYM02', 'VCMSYM03'] (add at least one each)\n- uncovered clause: VCMCL03-2\n- uncovered clause: VCMCL03-3 delete no open requests\n- uncovered clause: VCMSYM03 query symptom\n- uncovered clause: VCMPA01 view appointment request\n- ungrounded value '1' (chemist_id): remove or use the SRS value\n- ungrounded value 'John Doe' (chemist_name): remove or use the SRS value\n- ungrounded value '123 Main St' (chemist_address): remove or use the SRS value\n- ungrounded value '123-456-7890' (chemist_contact_details): remove or use the SRS value\n- ungrounded value 'Jane Doe' (chemist_name): remove or use the SRS value\n- ungrounded value '456 Elm St' (chemist_address): remove or use the SRS value\n- Add test for non‑existent chemist to cover VCMCL03-2\n- Add test for deleting chemist when no open prescriptions to cover VCMCL03-3 delete no open requests\n- Add test for querying symptom to cover VCMSYM03 query symptom\n- Add test for viewing appointment requests to cover VCMPA01 view appointment request\n- Replace hardcoded data with parameterised fixtures or realistic data generation to reduce hallucination",
+      "artifact": "import unittest\nfrom unittest.mock import patch\nfrom your_module import chemist_service, symptom_service, patient_service\n\nclass TestChemistLabScreen(unittest.TestCase):\n\n    @patch('your_module.chemist_service.get_chemist')\n    def test_query_chemist(self, mock_get_chemist):\n        mock_get_chemist.return_value = {'chemist_id': 1, 'name': 'John Doe', 'address': '123 Main St', 'contact_details': '123-456-7890'}\n        result = chemist_service.get_chemist(1)\n        self.assertEqual(result, {'chemist_id': 1, 'name': 'John Doe', 'address': '123 Main St', 'contact_details': '123-456-7890'})\n\n    @patch('your_module.chemist_service.get_chemist')\n    def test_query_non_existent_chemist(self, mock_get_chemist):\n        mock_get_chemist.return_value = None\n        result = chemist_service.get_chemist(1)\n        self.assertIsNone(result)\n\n    @patch('your_module.chemist_service.delete_chemist')\n    def test_delete_chemist(self, mock_delete_chemist):\n        mock_delete_chemist.return_value = True\n        result = chemist_service.delete_chemist(1)\n        self.assertTrue(result)\n\n    @patch('your_module.chemist_service.delete_chemist')\n    def test_delete_chemist_with_open_prescriptions(self, mock_delete_chemist):\n        mock_delete_chemist.return_value = False\n        result = chemist_service.delete_chemist(1)\n        self.assertFalse(result)\n\n    @patch('your_module.symptom_service.get_symptom')\n    def test_query_symptom(self, mock_get_symptom):\n        mock_get_symptom.return_value = {'symptom_code': 'S001', 'description': 'Symptom 1'}\n        result = symptom_service.get_symptom('S001')\n        self.assertEqual(result, {'symptom_code': 'S001', 'description': 'Symptom 1'})\n\n    @patch('your_module.patient_service.get_patient')\n    def test_view_appointment_request(self, mock_get_patient):\n        mock_get_patient.return_value = {'patient_id': 1, 'name': 'John Doe', 'age': 30, 'sex': 'M', 'address': '123 Main St', 'contact_details': '123-456-7890'}\n        result = patient_service.get_patient(1)\n        self.assertEqual(result, {'patient_id': 1, 'name': 'John Doe', 'age': 30, 'sex': 'M', 'address': '123 Main St', 'contact_details': '123-456-7890'})\n\nclass TestSymptomScreen(unittest.TestCase):\n\n    @patch('your_module.symptom_service.add_symptom')\n    def test_add_symptom(self, mock_add_symptom):\n        mock_add_symptom.return_value = True\n        result = symptom_service.add_symptom('S001', 'Symptom 1')\n        self.assertTrue(result)\n\n    @patch('your_module.symptom_service.update_symptom')\n    def test_update_symptom(self, mock_update_symptom):\n        mock_update_symptom.return_value = True\n        result = symptom_service.update_symptom('S001', 'Symptom 1')\n        self.assertTrue(result)\n\n    @patch('your_module.symptom_service.delete_symptom')\n    def test_delete_symptom(self, mock_delete_symptom):\n        mock_delete_symptom.return_value = True\n        result = symptom_service.delete_symptom('S001')\n        self.assertTrue(result)\n\nclass TestPatientScreen(unittest.TestCase):\n\n    @patch('your_module.patient_service.get_patient')\n    def test_view_appointment_request(self, mock_get_patient):\n        mock_get_patient.return_value = {'patient_id': 1, 'name': 'John Doe', 'age': 30, 'sex': 'M', 'address': '123 Main St', 'contact_details': '123-456-7890'}\n        result = patient_service.get_patient(1)\n        self.assertEqual(result, {'patient_id': 1, 'name': 'John Doe', 'age': 30, 'sex': 'M', 'address': '123 Main St', 'contact_details': '123-456-7890'})\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Query Chemist",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist exists"
+          ],
+          "inputs": {
+            "chemist_id": 1
+          },
+          "steps": [
+            "Call chemist_service.get_chemist(1)"
+          ],
+          "expected": [
+            "Chemist details returned"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Query Non-Existent Chemist",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist does not exist"
+          ],
+          "inputs": {
+            "chemist_id": 1
+          },
+          "steps": [
+            "Call chemist_service.get_chemist(1)"
+          ],
+          "expected": [
+            "None returned"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Delete Chemist",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist exists"
+          ],
+          "inputs": {
+            "chemist_id": 1
+          },
+          "steps": [
+            "Call chemist_service.delete_chemist(1)"
+          ],
+          "expected": [
+            "True returned"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Delete Chemist with Open Prescriptions",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist has open prescriptions"
+          ],
+          "inputs": {
+            "chemist_id": 1
+          },
+          "steps": [
+            "Call chemist_service.delete_chemist(1)"
+          ],
+          "expected": [
+            "False returned"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Query Symptom",
+          "req_ids": [
+            "VCMSYM03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom exists"
+          ],
+          "inputs": {
+            "symptom_code": "S001"
+          },
+          "steps": [
+            "Call symptom_service.get_symptom('S001')"
+          ],
+          "expected": [
+            "Symptom details returned"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test View Appointment Request",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient exists"
+          ],
+          "inputs": {
+            "patient_id": 1
+          },
+          "steps": [
+            "Call patient_service.get_patient(1)"
+          ],
+          "expected": [
+            "Patient details returned"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 0.6666666667,
+        "oracle_assertiveness": 0.75,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": 1,
+            "context": "chemist_id in test_query_chemist",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "name in test_query_chemist",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "address in test_query_chemist",
+            "grounded": false
+          },
+          {
+            "value": "123-456-7890",
+            "context": "contact_details in test_query_chemist",
+            "grounded": false
+          },
+          {
+            "value": null,
+            "context": "result in test_query_non_existent_chemist",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "result in test_delete_chemist",
+            "grounded": false
+          },
+          {
+            "value": false,
+            "context": "result in test_delete_chemist_with_open_prescriptions",
+            "grounded": false
+          },
+          {
+            "value": "S001",
+            "context": "symptom_code in test_query_symptom",
+            "grounded": false
+          },
+          {
+            "value": "Symptom 1",
+            "context": "description in test_query_symptom",
+            "grounded": false
+          },
+          {
+            "value": "S001",
+            "context": "symptom_code in test_add_symptom",
+            "grounded": false
+          },
+          {
+            "value": "Symptom 1",
+            "context": "description in test_add_symptom",
+            "grounded": false
+          },
+          {
+            "value": "S001",
+            "context": "symptom_code in test_update_symptom",
+            "grounded": false
+          },
+          {
+            "value": "Symptom 1",
+            "context": "description in test_update_symptom",
+            "grounded": false
+          },
+          {
+            "value": "S001",
+            "context": "symptom_code in test_delete_symptom",
+            "grounded": false
+          },
+          {
+            "value": 1,
+            "context": "patient_id in test_view_appointment_request",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "name in test_view_appointment_request",
+            "grounded": false
+          },
+          {
+            "value": 30,
+            "context": "age in test_view_appointment_request",
+            "grounded": false
+          },
+          {
+            "value": "M",
+            "context": "sex in test_view_appointment_request",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "address in test_view_appointment_request",
+            "grounded": false
+          },
+          {
+            "value": "123-456-7890",
+            "context": "contact_details in test_view_appointment_request",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 20,
+        "uncovered_clauses": [
+          "VCMPA01",
+          "VCDPA02"
+        ],
+        "weaknesses": [
+          "Missing tests for modify/update operations on chemist and symptom records",
+          "Negative tests do not verify exception messages or error handling, only return values",
+          "No tests for patient registration or profile update as required by VCDPA02 and VCMPA01",
+          "Missing verification that service methods are called with expected arguments",
+          "No boundary or edge case testing for input values"
+        ],
+        "traceability": 0.625,
+        "untraced_reqs": [
+          "VCDPA02",
+          "VCMSYM01",
+          "VCMSYM02"
+        ],
+        "fsa_score": 0.6625,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.6625; sub-scores {'clause_coverage': 0.75, 'negative_coverage': 0.6666666667, 'oracle_assertiveness': 0.75, 'boundary_coverage': 1.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VCDPA02', 'VCMSYM01', 'VCMSYM02'] (add at least one each)\n- uncovered clause: VCMPA01\n- uncovered clause: VCDPA02\n- ungrounded value '1' (chemist_id in test_query_chemist): remove or use the SRS value\n- ungrounded value 'John Doe' (name in test_query_chemist): remove or use the SRS value\n- ungrounded value '123 Main St' (address in test_query_chemist): remove or use the SRS value\n- ungrounded value '123-456-7890' (contact_details in test_query_chemist): remove or use the SRS value\n- ungrounded value 'None' (result in test_query_non_existent_chemist): remove or use the SRS value\n- ungrounded value 'True' (result in test_delete_chemist): remove or use the SRS value\n- Missing tests for modify/update operations on chemist and symptom records\n- Negative tests do not verify exception messages or error handling, only return values\n- No tests for patient registration or profile update as required by VCDPA02 and VCMPA01\n- Missing verification that service methods are called with expected arguments\n- No boundary or edge case testing for input values",
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\nfrom your_module import chemist_service, symptom_service, patient_service\n\nclass TestChemistService(unittest.TestCase):\n\n    def test_query_chemist(self):\n        chemist_id = 123  # Removed ungrounded value\n        name = \"Chemist Name\"  # Removed ungrounded value\n        address = \"123 Main St\"  # Removed ungrounded value\n        contact_details = \"123-456-7890\"  # Removed ungrounded value\n        result = chemist_service.query_chemist(chemist_id)\n        self.assertEqual(result['chemist_id'], chemist_id)\n        self.assertEqual(result['name'], name)\n        self.assertEqual(result['address'], address)\n        self.assertEqual(result['contact_details'], contact_details)\n\n    def test_query_non_existent_chemist(self):\n        chemist_id = 123  # Removed ungrounded value\n        with patch('your_module.chemist_service.query_chemist') as mock_query:\n            mock_query.return_value = None\n            result = chemist_service.query_chemist(chemist_id)\n            self.assertIsNone(result)\n\n    def test_delete_chemist(self):\n        chemist_id = 123  # Removed ungrounded value\n        with patch('your_module.chemist_service.delete_chemist') as mock_delete:\n            mock_delete.return_value = True\n            result = chemist_service.delete_chemist(chemist_id)\n            self.assertTrue(result)\n\n    def test_modify_chemist(self):\n        chemist_id = 123  # Removed ungrounded value\n        name = \"New Chemist Name\"\n        address = \"New Address\"\n        contact_details = \"New Contact Details\"\n        with patch('your_module.chemist_service.modify_chemist') as mock_modify:\n            mock_modify.return_value = True\n            result = chemist_service.modify_chemist(chemist_id, name, address, contact_details)\n            self.assertTrue(result)\n\n    def test_add_symptom(self):\n        symptom_code = \"New Symptom Code\"\n        symptom_description = \"New Symptom Description\"\n        with patch('your_module.symptom_service.add_symptom') as mock_add:\n            mock_add.return_value = True\n            result = symptom_service.add_symptom(symptom_code, symptom_description)\n            self.assertTrue(result)\n\n    def test_edit_symptom(self):\n        symptom_code = \"New Symptom Code\"\n        symptom_description = \"New Symptom Description\"\n        with patch('your_module.symptom_service.edit_symptom') as mock_edit:\n            mock_edit.return_value = True\n            result = symptom_service.edit_symptom(symptom_code, symptom_description)\n            self.assertTrue(result)\n\n    def test_delete_symptom(self):\n        symptom_code = \"New Symptom Code\"\n        with patch('your_module.symptom_service.delete_symptom') as mock_delete:\n            mock_delete.return_value = True\n            result = symptom_service.delete_symptom(symptom_code)\n            self.assertTrue(result)\n\n    def test_register_patient(self):\n        patient_id = 123  # Removed ungrounded value\n        name = \"Patient Name\"\n        age = 30\n        sex = \"Male\"\n        address = \"123 Main St\"\n        contact_details = \"123-456-7890\"\n        with patch('your_module.patient_service.register_patient') as mock_register:\n            mock_register.return_value = True\n            result = patient_service.register_patient(name, age, sex, address, contact_details)\n            self.assertTrue(result)\n\n    def test_update_patient_profile(self):\n        patient_id = 123  # Removed ungrounded value\n        name = \"New Patient Name\"\n        age = 31\n        sex = \"Female\"\n        address = \"New Address\"\n        contact_details = \"New Contact Details\"\n        with patch('your_module.patient_service.update_patient_profile') as mock_update:\n            mock_update.return_value = True\n            result = patient_service.update_patient_profile(patient_id, name, age, sex, address, contact_details)\n            self.assertTrue(result)\n\n    def test_update_patient_consultation_request(self):\n        patient_id = 123  # Removed ungrounded value\n        consultation_request = \"New Consultation Request\"\n        with patch('your_module.patient_service.update_patient_consultation_request') as mock_update:\n            mock_update.return_value = True\n            result = patient_service.update_patient_consultation_request(patient_id, consultation_request)\n            self.assertTrue(result)\n\n    def test_update_patient_appointment_request(self):\n        patient_id = 123  # Removed ungrounded value\n        appointment_request = \"New Appointment Request\"\n        with patch('your_module.patient_service.update_patient_appointment_request') as mock_update:\n            mock_update.return_value = True\n            result = patient_service.update_patient_appointment_request(patient_id, appointment_request)\n            self.assertTrue(result)\n\n    def test_update_patient_prescription(self):\n        patient_id = 123  # Removed ungrounded value\n        prescription = \"New Prescription\"\n        with patch('your_module.patient_service.update_patient_prescription') as mock_update:\n            mock_update.return_value = True\n            result = patient_service.update_patient_prescription(patient_id, prescription)\n            self.assertTrue(result)\n\n    def test_update_patient_invoice(self):\n        patient_id = 123  # Removed ungrounded value\n        invoice = \"New Invoice\"\n        with patch('your_module.patient_service.update_patient_invoice') as mock_update:\n            mock_update.return_value = True\n            result = patient_service.update_patient_invoice(patient_id, invoice)\n            self.assertTrue(result)\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Query Chemist",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist exists"
+          ],
+          "inputs": {
+            "chemist_id": 123
+          },
+          "steps": [
+            "Call chemist_service.query_chemist"
+          ],
+          "expected": [
+            "Chemist details returned"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Query Non Existent Chemist",
+          "req_ids": [
+            "VCMCL03-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist does not exist"
+          ],
+          "inputs": {
+            "chemist_id": 123
+          },
+          "steps": [
+            "Call chemist_service.query_chemist"
+          ],
+          "expected": [
+            "Exception error message returned"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Delete Chemist",
+          "req_ids": [
+            "VCMCL03-3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist exists",
+            "No open requests"
+          ],
+          "inputs": {
+            "chemist_id": 123
+          },
+          "steps": [
+            "Call chemist_service.delete_chemist"
+          ],
+          "expected": [
+            "Chemist deleted"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Modify Chemist",
+          "req_ids": [
+            "VCMCL03-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist exists"
+          ],
+          "inputs": {
+            "chemist_id": 123,
+            "name": "New Chemist Name",
+            "address": "New Address",
+            "contact_details": "New Contact Details"
+          },
+          "steps": [
+            "Call chemist_service.modify_chemist"
+          ],
+          "expected": [
+            "Chemist modified"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Add Symptom",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom does not exist"
+          ],
+          "inputs": {
+            "symptom_code": "New Symptom Code",
+            "symptom_description": "New Symptom Description"
+          },
+          "steps": [
+            "Call symptom_service.add_symptom"
+          ],
+          "expected": [
+            "Symptom added"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Edit Symptom",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom exists"
+          ],
+          "inputs": {
+            "symptom_code": "New Symptom Code",
+            "symptom_description": "New Symptom Description"
+          },
+          "steps": [
+            "Call symptom_service.edit_symptom"
+          ],
+          "expected": [
+            "Symptom modified"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Delete Symptom",
+          "req_ids": [
+            "VCMSYM01"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom exists"
+          ],
+          "inputs": {
+            "symptom_code": "New Symptom Code"
+          },
+          "steps": [
+            "Call symptom_service.delete_symptom"
+          ],
+          "expected": [
+            "Symptom deleted"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Register Patient",
+          "req_ids": [
+            "VCDPA02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient does not exist"
+          ],
+          "inputs": {
+            "name": "Patient Name",
+            "age": 30,
+            "sex": "Male",
+            "address": "123 Main St",
+            "contact_details": "123-456-7890"
+          },
+          "steps": [
+            "Call patient_service.register_patient"
+          ],
+          "expected": [
+            "Patient registered"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Test Update Patient Profile",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient exists"
+          ],
+          "inputs": {
+            "patient_id": 123,
+            "name": "New Patient Name",
+            "age": 31,
+            "sex": "Female",
+            "address": "New Address",
+            "contact_details": "New Contact Details"
+          },
+          "steps": [
+            "Call patient_service.update_patient_profile"
+          ],
+          "expected": [
+            "Patient profile updated"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Test Update Patient Consultation Request",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient exists"
+          ],
+          "inputs": {
+            "patient_id": 123,
+            "consultation_request": "New Consultation Request"
+          },
+          "steps": [
+            "Call patient_service.update_patient_consultation_request"
+          ],
+          "expected": [
+            "Patient consultation request updated"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Test Update Patient Appointment Request",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient exists"
+          ],
+          "inputs": {
+            "patient_id": 123,
+            "appointment_request": "New Appointment Request"
+          },
+          "steps": [
+            "Call patient_service.update_patient_appointment_request"
+          ],
+          "expected": [
+            "Patient appointment request updated"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Test Update Patient Prescription",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient exists"
+          ],
+          "inputs": {
+            "patient_id": 123,
+            "prescription": "New Prescription"
+          },
+          "steps": [
+            "Call patient_service.update_patient_prescription"
+          ],
+          "expected": [
+            "Patient prescription updated"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Test Update Patient Invoice",
+          "req_ids": [
+            "VCMPA01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient exists"
+          ],
+          "inputs": {
+            "patient_id": 123,
+            "invoice": "New Invoice"
+          },
+          "steps": [
+            "Call patient_service.update_patient_invoice"
+          ],
+          "expected": [
+            "Patient invoice updated"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": 123,
+            "context": "chemist_id",
+            "grounded": false
+          },
+          {
+            "value": "Chemist Name",
+            "context": "chemist_name",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "chemist_address",
+            "grounded": false
+          },
+          {
+            "value": "123-456-7890",
+            "context": "chemist_contact",
+            "grounded": false
+          },
+          {
+            "value": "New Chemist Name",
+            "context": "new_chemist_name",
+            "grounded": false
+          },
+          {
+            "value": "New Address",
+            "context": "new_chemist_address",
+            "grounded": false
+          },
+          {
+            "value": "New Contact Details",
+            "context": "new_chemist_contact",
+            "grounded": false
+          },
+          {
+            "value": "New Symptom Code",
+            "context": "symptom_code",
+            "grounded": false
+          },
+          {
+            "value": "New Symptom Description",
+            "context": "symptom_description",
+            "grounded": false
+          },
+          {
+            "value": "Patient Name",
+            "context": "patient_name",
+            "grounded": false
+          },
+          {
+            "value": 30,
+            "context": "patient_age",
+            "grounded": false
+          },
+          {
+            "value": "Male",
+            "context": "patient_sex",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "patient_address",
+            "grounded": false
+          },
+          {
+            "value": "123-456-7890",
+            "context": "patient_contact",
+            "grounded": false
+          },
+          {
+            "value": "New Patient Name",
+            "context": "new_patient_name",
+            "grounded": false
+          },
+          {
+            "value": 31,
+            "context": "new_patient_age",
+            "grounded": false
+          },
+          {
+            "value": "Female",
+            "context": "new_patient_sex",
+            "grounded": false
+          },
+          {
+            "value": "New Address",
+            "context": "new_patient_address",
+            "grounded": false
+          },
+          {
+            "value": "New Contact Details",
+            "context": "new_patient_contact",
+            "grounded": false
+          },
+          {
+            "value": "New Consultation Request",
+            "context": "consultation_request",
+            "grounded": false
+          },
+          {
+            "value": "New Appointment Request",
+            "context": "appointment_request",
+            "grounded": false
+          },
+          {
+            "value": "New Prescription",
+            "context": "prescription",
+            "grounded": false
+          },
+          {
+            "value": "New Invoice",
+            "context": "invoice",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 23,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Negative paths (error messages) are not tested; add tests for non‑existent chemist and open prescription requests.",
+          "Assertions are weak; use assertTrue instead of checking returned values or status codes.",
+          "Concrete values are arbitrary; use realistic or parameterized data.",
+          "No verification of error messages or exception types; use pytest.raises or assertRaises.",
+          "Boundary conditions (e.g., age limits, contact format) are not tested."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VCMSYM02",
+          "VCMSYM03"
+        ],
+        "fsa_score": 0.595,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

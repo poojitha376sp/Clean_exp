@@ -1,0 +1,359 @@
+{
+  "unit_id": "U09_Alarms",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:qwen3:30b-a3b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 1.0,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.8,
+    "hallucinated": [
+      {
+        "value": 100,
+        "context": "sensor reading flow value",
+        "grounded": false
+      },
+      {
+        "value": "non-negative",
+        "context": "leakage computed as non-negative number",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 10,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No test for controller when tube is disconnected (negative case).",
+      "No test for GUI when proximal tube is connected (alarm inactive).",
+      "No test for obstruction alarm when VTI > 100 (e.g., 101 ml).",
+      "No test for compute_leakage with zero or negative flow values.",
+      "No test for exception handling or invalid inputs (e.g., missing sensor_readings keys)."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.82,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "import pytest\n\nclass MockController:\n    def __init__(self, tube_connected=True):\n        self.tube_connected = tube_connected\n\n    def is_proximal_tube_connected(self):\n        return self.tube_connected\n\nclass MockGUI:\n    def __init__(self):\n        self.alarm_active = {}\n        self.alarm_priority = {}\n        self.vti = 0.0\n\n    def set_vti(self, vti):\n        self.vti = vti\n\n    def get_alarm_status(self, alarm_name):\n        return self.alarm_active.get(alarm_name, False)\n\n    def get_alarm_priority(self, alarm_name):\n        return self.alarm_priority.get(alarm_name, None)\n\n    def compute_obstruction_alarm(self):\n        if self.vti < 100:\n            self.alarm_active['obstruction'] = True\n            self.alarm_priority['obstruction'] = 'high'\n        else:\n            self.alarm_active['obstruction'] = False\n\n    def set_proximal_tube_disconnected(self, disconnected):\n        if disconnected:\n            self.alarm_active['proximal_tube_disconnect'] = True\n            self.alarm_priority['proximal_tube_disconnect'] = 'medium'\n        else:\n            self.alarm_active['proximal_tube_disconnect'] = False\n\n    def compute_leakage(self, sensor_readings):\n        flow = sensor_readings.get('flow', 0)\n        return flow / 1000.0\n\ndef test_rw_sw_103_connected():\n    controller = MockController(tube_connected=True)\n    assert controller.is_proximal_tube_connected() is True\n\ndef test_rw_sw_104_105():\n    gui = MockGUI()\n    gui.set_proximal_tube_disconnected(True)\n    assert gui.get_alarm_status('proximal_tube_disconnect') is True\n    assert gui.get_alarm_priority('proximal_tube_disconnect') == 'medium'\n\ndef test_rw_sw_106_107_109():\n    gui = MockGUI()\n    gui.set_vti(99.9)\n    gui.compute_obstruction_alarm()\n    assert gui.get_alarm_status('obstruction') is True\n    assert gui.get_alarm_priority('obstruction') == 'high'\n\ndef test_rw_sw_108():\n    gui = MockGUI()\n    gui.set_vti(100.0)\n    gui.compute_obstruction_alarm()\n    assert gui.get_alarm_status('obstruction') is False\n\ndef test_rw_sw_110():\n    gui = MockGUI()\n    sensor_readings = {'flow': 100}\n    leakage = gui.compute_leakage(sensor_readings)\n    assert isinstance(leakage, (int, float))\n    assert leakage >= 0",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Controller reports proximal tube connected",
+      "req_ids": [
+        "RW-SW-103"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Proximal tube is connected"
+      ],
+      "inputs": {},
+      "steps": [
+        "Call controller's is_proximal_tube_connected()"
+      ],
+      "expected": [
+        "Returns True"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Proximal tube disconnect alarm active and medium priority",
+      "req_ids": [
+        "RW-SW-104",
+        "RW-SW-105"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Proximal tube is disconnected"
+      ],
+      "inputs": {},
+      "steps": [
+        "Set proximal tube disconnected",
+        "Check alarm status and priority for 'proximal_tube_disconnect'"
+      ],
+      "expected": [
+        "Alarm status is True",
+        "Alarm priority is 'medium'"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Obstruction detected and alarm active with high priority",
+      "req_ids": [
+        "RW-SW-106",
+        "RW-SW-107",
+        "RW-SW-109"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "VTI = 99.9 ml"
+      ],
+      "inputs": {
+        "VTI": 99.9
+      },
+      "steps": [
+        "Set VTI to 99.9",
+        "Compute obstruction alarm"
+      ],
+      "expected": [
+        "Obstruction detected (True)",
+        "Obstruction alarm active (True)",
+        "Obstruction alarm priority is 'high'"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Obstruction alarm inactive when obstruction not detected",
+      "req_ids": [
+        "RW-SW-108"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "VTI = 100.0 ml"
+      ],
+      "inputs": {
+        "VTI": 100.0
+      },
+      "steps": [
+        "Set VTI to 100.0",
+        "Compute obstruction alarm"
+      ],
+      "expected": [
+        "Obstruction alarm inactive (False)"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Leakage computed as non-negative number",
+      "req_ids": [
+        "RW-SW-110"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Sensor readings provided"
+      ],
+      "inputs": {
+        "sensor_readings": {
+          "flow": 100
+        }
+      },
+      "steps": [
+        "Call compute_leakage with sensor readings"
+      ],
+      "expected": [
+        "Returns a non-negative number"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "class TestU09Alarms:\n    def test_proximal_tube_disconnected(self):\n        # Mock controller to report disconnected\n        mock_controller = Mock()\n        mock_controller.is_proximal_tube_connected.return_value = False\n\n        # Check controller reports disconnected (RW-SW-103)\n        assert not mock_controller.is_proximal_tube_connected()\n\n        # Check GUI alarm for proximal tube disconnect is active (RW-SW-104)\n        alarm = gui.get_alarm(\"proximal_tube_disconnect\")\n        assert alarm.is_active\n\n        # Check priority is medium (RW-SW-105)\n        assert alarm.priority == \"medium\"\n\n    def test_proximal_tube_connected(self):\n        # Mock controller to report connected\n        mock_controller = Mock()\n        mock_controller.is_proximal_tube_connected.return_value = True\n\n        # Check controller reports connected (RW-SW-103)\n        assert mock_controller.is_proximal_tube_connected()\n\n        # Check GUI alarm for proximal tube disconnect is inactive (negative test for alarm condition)\n        alarm = gui.get_alarm(\"proximal_tube_disconnect\")\n        assert not alarm.is_active\n\n    def test_obstruction_detected(self):\n        # Mock VTI to 99ml\n        mock_sensor = Mock()\n        mock_sensor.get_vti.return_value = 99\n\n        # Check obstruction alarm is active (RW-SW-107)\n        alarm = gui.get_alarm(\"obstruction\")\n        assert alarm.is_active\n\n        # Check priority is high (RW-SW-109)\n        assert alarm.priority == \"high\"\n\n        # Also, the condition VTI<100ml is met (RW-SW-106) - we don't need to assert the condition, because we set it to 99.\n        # But note: the requirement RW-SW-106 is about the condition, so we are testing the condition by setting VTI=99.\n\n    def test_obstruction_not_detected(self):\n        # Mock VTI to 100ml\n        mock_sensor = Mock()\n        mock_sensor.get_vti.return_value = 100\n\n        # Check obstruction alarm is inactive (RW-SW-108)\n        alarm = gui.get_alarm(\"obstruction\")\n        assert not alarm.is_active\n\n    def test_leakage_computation(self):\n        # Mock sensor readings (we assume a function that takes a sensor reading value)\n        # We'll use two different sensor readings: 0 and 100\n        sensor1 = 0\n        sensor2 = 100\n\n        # Compute leakage for sensor1\n        leakage1 = gui.compute_leakage(sensor1)\n        # Compute leakage for sensor2\n        leakage2 = gui.compute_leakage(sensor2)\n\n        # Check that leakage values are numbers (and not None)\n        assert isinstance(leakage1, (int, float))\n        assert isinstance(leakage2, (int, float))\n\n        # Check that the leakage values are different (since sensor readings are different)\n        assert leakage1 != leakage2",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).",
+      "artifact": "import pytest\n\nclass MockController:\n    def __init__(self, tube_connected=True):\n        self.tube_connected = tube_connected\n\n    def is_proximal_tube_connected(self):\n        return self.tube_connected\n\nclass MockGUI:\n    def __init__(self):\n        self.alarm_active = {}\n        self.alarm_priority = {}\n        self.vti = 0.0\n\n    def set_vti(self, vti):\n        self.vti = vti\n\n    def get_alarm_status(self, alarm_name):\n        return self.alarm_active.get(alarm_name, False)\n\n    def get_alarm_priority(self, alarm_name):\n        return self.alarm_priority.get(alarm_name, None)\n\n    def compute_obstruction_alarm(self):\n        if self.vti < 100:\n            self.alarm_active['obstruction'] = True\n            self.alarm_priority['obstruction'] = 'high'\n        else:\n            self.alarm_active['obstruction'] = False\n\n    def set_proximal_tube_disconnected(self, disconnected):\n        if disconnected:\n            self.alarm_active['proximal_tube_disconnect'] = True\n            self.alarm_priority['proximal_tube_disconnect'] = 'medium'\n        else:\n            self.alarm_active['proximal_tube_disconnect'] = False\n\n    def compute_leakage(self, sensor_readings):\n        flow = sensor_readings.get('flow', 0)\n        return flow / 1000.0\n\ndef test_rw_sw_103_connected():\n    controller = MockController(tube_connected=True)\n    assert controller.is_proximal_tube_connected() is True\n\ndef test_rw_sw_104_105():\n    gui = MockGUI()\n    gui.set_proximal_tube_disconnected(True)\n    assert gui.get_alarm_status('proximal_tube_disconnect') is True\n    assert gui.get_alarm_priority('proximal_tube_disconnect') == 'medium'\n\ndef test_rw_sw_106_107_109():\n    gui = MockGUI()\n    gui.set_vti(99.9)\n    gui.compute_obstruction_alarm()\n    assert gui.get_alarm_status('obstruction') is True\n    assert gui.get_alarm_priority('obstruction') == 'high'\n\ndef test_rw_sw_108():\n    gui = MockGUI()\n    gui.set_vti(100.0)\n    gui.compute_obstruction_alarm()\n    assert gui.get_alarm_status('obstruction') is False\n\ndef test_rw_sw_110():\n    gui = MockGUI()\n    sensor_readings = {'flow': 100}\n    leakage = gui.compute_leakage(sensor_readings)\n    assert isinstance(leakage, (int, float))\n    assert leakage >= 0",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller reports proximal tube connected",
+          "req_ids": [
+            "RW-SW-103"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Proximal tube is connected"
+          ],
+          "inputs": {},
+          "steps": [
+            "Call controller's is_proximal_tube_connected()"
+          ],
+          "expected": [
+            "Returns True"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Proximal tube disconnect alarm active and medium priority",
+          "req_ids": [
+            "RW-SW-104",
+            "RW-SW-105"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Proximal tube is disconnected"
+          ],
+          "inputs": {},
+          "steps": [
+            "Set proximal tube disconnected",
+            "Check alarm status and priority for 'proximal_tube_disconnect'"
+          ],
+          "expected": [
+            "Alarm status is True",
+            "Alarm priority is 'medium'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Obstruction detected and alarm active with high priority",
+          "req_ids": [
+            "RW-SW-106",
+            "RW-SW-107",
+            "RW-SW-109"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI = 99.9 ml"
+          ],
+          "inputs": {
+            "VTI": 99.9
+          },
+          "steps": [
+            "Set VTI to 99.9",
+            "Compute obstruction alarm"
+          ],
+          "expected": [
+            "Obstruction detected (True)",
+            "Obstruction alarm active (True)",
+            "Obstruction alarm priority is 'high'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Obstruction alarm inactive when obstruction not detected",
+          "req_ids": [
+            "RW-SW-108"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "VTI = 100.0 ml"
+          ],
+          "inputs": {
+            "VTI": 100.0
+          },
+          "steps": [
+            "Set VTI to 100.0",
+            "Compute obstruction alarm"
+          ],
+          "expected": [
+            "Obstruction alarm inactive (False)"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Leakage computed as non-negative number",
+          "req_ids": [
+            "RW-SW-110"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Sensor readings provided"
+          ],
+          "inputs": {
+            "sensor_readings": {
+              "flow": 100
+            }
+          },
+          "steps": [
+            "Call compute_leakage with sensor readings"
+          ],
+          "expected": [
+            "Returns a non-negative number"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.8,
+        "hallucinated": [
+          {
+            "value": 100,
+            "context": "sensor reading flow value",
+            "grounded": false
+          },
+          {
+            "value": "non-negative",
+            "context": "leakage computed as non-negative number",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 10,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No test for controller when tube is disconnected (negative case).",
+          "No test for GUI when proximal tube is connected (alarm inactive).",
+          "No test for obstruction alarm when VTI > 100 (e.g., 101 ml).",
+          "No test for compute_leakage with zero or negative flow values.",
+          "No test for exception handling or invalid inputs (e.g., missing sensor_readings keys)."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.82,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

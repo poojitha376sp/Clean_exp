@@ -1,0 +1,109 @@
+{
+  "unit_id": "U18_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen3:30b-a3b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 0.0,
+    "representation_score": 0.0,
+    "sfv_score": 0.0,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "No canonical test cases found (expected a JSON list).",
+      "Representation artifact is empty."
+    ]
+  },
+  "fsa": null,
+  "artifact": null,
+  "test_cases": null,
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given several requirements (BR-8-1, BR-8-2, BR-9-1, BR-9-2, BR-10-1, BR-10-2) that we must test.\n\nWe note:\n- Each requirement must map to a unique scenario (or scenario outline with examples).\n- We must have a Scenario Outline with Examples for normal, edge, and invalid values.\n\nHowever, note that the requirements are about the mapping between entities. We have:\n- Patient Consultation Request -> Prescription (one-to-one)\n- Prescription -> Chemist (one-to-one, via Pincode)\n- Prescription -> Lab (one-to-one, via Pincode)\n\nBut note: \n- BR-8-1: Each Patient Consultation Request generates ONE prescription.\n- BR-8-2: Prescription shall be mapped to ONE AND ONLY ONE Patient Consultation Request.\n\nSo for the prescription, it must be linked to exactly one consultation request.\n\nSimilarly, for the chemist and lab:\n- BR-9-1: Each Chemist receives one or more prescriptions (only required fields).\n- BR-9-2: Each prescription is mapped to ONE and ONLY ONE Chemist (via Pincode).\n- BR-10-1: Each Lab receives one or more prescriptions (only required fields).\n- BR-10-2: Each prescription is mapped to ONE and ONLY ONE Lab (via Pincode).\n\nWe note that the requirements do not specify the exact fields for \"required fields\", so we cannot invent them. We'll focus on the mapping.\n\nWe must design test cases that cover:\n1. The generation of a prescription from a consultation request (BR-8-1 and BR-8-2).\n2. The mapping of a prescription to a chemist (BR-9-2) and to a lab (BR-10-2).\n\nBut note: BR-9-1 and BR-10-1 are about the chemist and lab receiving one or more prescriptions. However, the test for BR-9-1 and BR-10-1 would be about the chemist/lab having multiple prescriptions, but the requirement for the prescription mapping (BR-9-2 and BR-10-2) is the one that we can test at the prescription level.\n\nWe are to test the system behavior as per the requirements. We cannot test the \"receiving\" (BR-9-1 and BR-10-1) directly because they are about the chemist/lab having multiple prescriptions, but the requirement for the prescription (BR-9-2 and BR-10-2) is about the prescription being mapped to exactly one chemist/lab.\n\nTherefore, we will focus on the prescription mapping (BR-9-2 and BR-10-2) and the consultation request to prescription (BR-8-1 and BR-8-2).\n\nWe note that the requirements do not specify what happens if a prescription is mapped to two chemists or two labs. So we must test for the \"only one\" constraint.\n\nWe'll design:\n\nFor BR-8-1 and BR-8-2 (which are about the same mapping but from two angles):\n- We can have a scenario that a consultation request generates one prescription (so one prescription per consultation request) and that the prescription is linked to exactly one consultation request.\n\nBut note: the requirement says \"Each Patient Consultation Request ‘Generates’ ONE prescription.\" and \"Prescription shall be mapped to ONE AND ONLY ONE Patient Consultation Request.\"\n\nSo we can test:\n- When a consultation request is created, it generates exactly one pre",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given requirements BR-8-1, BR-8-2, BR-9-1, BR-9-2, BR-10-1, BR-10-2.\n We must create a Gherkin test suite (Feature, Scenarios) and a JSON test case list.\n\n Important: \n - Every requirement clause must map to a unique scenario (so we'll have at least 6 scenarios, but note that some might be combined in a scenario outline? However, the problem says \"unique scenario\" per requirement id, so we'll have one scenario per requirement id? But note: the requirement BR-8-1 and BR-8-2 are about the same prescription and consultation request, so they might be tested together. However, the problem says \"every requirements clause\" meaning each requirement id must be covered by at least one test case.\n\n But note: the problem says \"Every requirements clause maps to a unique scenario\". So we have 6 requirement clauses (BR-8-1, BR-8-2, BR-9-1, BR-9-2, BR-10-1, BR-10-2). Therefore, we need 6 scenarios? However, note that BR-9-1 and BR-9-2 are about Chemist, and BR-10-1 and BR-10-2 are about Labs. We can have:\n\n Scenario 1: for BR-8-1 and BR-8-2 (because they are about the same prescription and consultation request)\n Scenario 2: for BR-9-1 and BR-9-2 (about Chemist)\n Scenario 3: for BR-10-1 and BR-10-2 (about Labs)\n\n But note: the problem says \"unique scenario\" per requirement id. However, it doesn't say we can't have a scenario that covers multiple requirements. But to be safe, we'll create one scenario per requirement id? Actually, the problem says \"every requirements clause\" meaning each requirement id must be covered by at least one test case. So we can have a scenario that covers two requirements (like BR-8-1 and BR-8-2) and that would cover both.\n\n However, the problem also says: \"The test set must contain a Scenario Outline with Examples tables containing normal, edge, and invalid values.\"\n\n So we are going to have:\n\n Feature: Prescription Mapping and Distribution\n\n But note: the requirements are about:\n   - One prescription per consultation request (BR-8-1, BR-8-2)\n   - Prescriptions mapped to one chemist (BR-9-2) and one lab (BR-10-2) and the chemist/lab receiving one or more (BR-9-1, BR-10-1)\n\n We'll structure:\n\n Scenario: A consultation request generates exactly one prescription (BR-8-1, BR-8-2)\n   Given a patient consultation request is created\n   When the system processes the request\n   Then one prescription is generated\n   And the prescription is mapped to the consultation request (only one)\n\n But note: the requirement BR-8-2 says \"Prescription shall be mapped to ONE AND ONLY ONE Patient Consultation Request.\" So we are testing that the prescription is linked to exactly one consultation request.\n\n However, the problem says: \"Each Patient Consultation Request ‘Generates’ ONE prescription.\" -> so one consultation request leads to one prescription.\n\n Now, for the chemist and lab, we have two separate requirements (for chemist and for lab). But note: a prescription is mapped to one chemist and one lab? Actually, the requirements say:\n\n   BR-9-2: Each",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given requirements BR-8-1, BR-8-2, BR-9-1, BR-9-2, BR-10-1, BR-10-2.\n We must create a Gherkin test suite (Feature, Scenarios) and a JSON test case list.\n\n Important: \n - Every requirement clause must map to a unique scenario (so we'll have at least 6 scenarios, but note that some might be combined in a scenario outline? However, the problem says \"unique scenario\" per requirement id, so we'll have one scenario per requirement id? But note: the requirement BR-8-1 and BR-8-2 are about the same prescription and consultation request, so they might be tested together. However, the problem says \"every requirements clause\" meaning each requirement id must be covered by at least one test case.\n\n But note: the problem says \"Every requirements clause maps to a unique scenario\". So we have 6 requirement clauses (BR-8-1, BR-8-2, BR-9-1, BR-9-2, BR-10-1, BR-10-2). Therefore, we need 6 scenarios? However, note that BR-9-1 and BR-9-2 are about Chemist, and BR-10-1 and BR-10-2 are about Labs. We can have:\n\n Scenario 1: for BR-8-1 and BR-8-2 (because they are about the same prescription and consultation request)\n Scenario 2: for BR-9-1 and BR-9-2 (about Chemist)\n Scenario 3: for BR-10-1 and BR-10-2 (about Labs)\n\n But note: the problem says \"unique scenario\" per requirement id. However, it doesn't say we can't have a scenario that covers multiple requirements. But to be safe, we'll create one scenario per requirement id? Actually, the problem says \"every requirements clause\" meaning each requirement id must be covered by at least one test case. So we can have a scenario that covers two requirements (like BR-8-1 and BR-8-2) and that would cover both.\n\n However, the problem also says: \"The test set must contain a Scenario Outline with Examples tables containing normal, edge, and invalid values.\"\n\n So we are going to have:\n\n Feature: Prescription Mapping and Distribution\n\n But note: the requirements are about:\n   - One prescription per consultation request (BR-8-1, BR-8-2)\n   - Prescriptions mapped to one chemist (BR-9-2) and one lab (BR-10-2) and the chemist/lab receiving one or more (BR-9-1, BR-10-1)\n\n We'll structure:\n\n Scenario: A consultation request generates exactly one prescription (BR-8-1, BR-8-2)\n   Given a patient consultation request is created\n   When the system processes the request\n   Then one prescription is generated\n   And the prescription is mapped to the consultation request (only one)\n\n But note: the requirement BR-8-2 says \"Prescription shall be mapped to ONE AND ONLY ONE Patient Consultation Request.\" So we are testing that the prescription is linked to exactly one consultation request.\n\n However, the problem says: \"Each Patient Consultation Request ‘Generates’ ONE prescription.\" -> so one consultation request leads to one prescription.\n\n Now, for the chemist and lab, we have two separate requirements (for chemist and for lab). But note: a prescription is mapped to one chemist and one lab? Actually, the requirements say:\n\n   BR-9-2: Each",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given requirements BR-8-1, BR-8-2, BR-9-1, BR-9-2, BR-10-1, BR-10-2.\n We must create a Gherkin test suite (Feature, Scenarios) and a JSON test case list.\n\n Important: \n - Every requirement clause must map to a unique scenario (so we'll have at least 6 scenarios, but note that some might be combined in a scenario outline? However, the problem says \"unique scenario\" per requirement id, so we'll have one scenario per requirement id? But note: the requirement BR-8-1 and BR-8-2 are about the same prescription and consultation request, so they might be tested together. However, the problem says \"every requirements clause\" meaning each requirement id must be covered by at least one test case.\n\n But note: the problem says \"Every requirements clause maps to a unique scenario\". So we have 6 requirement clauses (BR-8-1, BR-8-2, BR-9-1, BR-9-2, BR-10-1, BR-10-2). Therefore, we need 6 scenarios? However, note that BR-9-1 and BR-9-2 are about Chemist, and BR-10-1 and BR-10-2 are about Labs. We can have:\n\n Scenario 1: for BR-8-1 and BR-8-2 (because they are about the same prescription and consultation request)\n Scenario 2: for BR-9-1 and BR-9-2 (about Chemist)\n Scenario 3: for BR-10-1 and BR-10-2 (about Labs)\n\n But note: the problem says \"unique scenario\" per requirement id. However, it doesn't say we can't have a scenario that covers multiple requirements. But to be safe, we'll create one scenario per requirement id? Actually, the problem says \"every requirements clause\" meaning each requirement id must be covered by at least one test case. So we can have a scenario that covers two requirements (like BR-8-1 and BR-8-2) and that would cover both.\n\n However, the problem also says: \"The test set must contain a Scenario Outline with Examples tables containing normal, edge, and invalid values.\"\n\n So we are going to have:\n\n Feature: Prescription Mapping and Distribution\n\n But note: the requirements are about:\n   - One prescription per consultation request (BR-8-1, BR-8-2)\n   - Prescriptions mapped to one chemist (BR-9-2) and one lab (BR-10-2) and the chemist/lab receiving one or more (BR-9-1, BR-10-1)\n\n We'll structure:\n\n Scenario: A consultation request generates exactly one prescription (BR-8-1, BR-8-2)\n   Given a patient consultation request is created\n   When the system processes the request\n   Then one prescription is generated\n   And the prescription is mapped to the consultation request (only one)\n\n But note: the requirement BR-8-2 says \"Prescription shall be mapped to ONE AND ONLY ONE Patient Consultation Request.\" So we are testing that the prescription is linked to exactly one consultation request.\n\n However, the problem says: \"Each Patient Consultation Request ‘Generates’ ONE prescription.\" -> so one consultation request leads to one prescription.\n\n Now, for the chemist and lab, we have two separate requirements (for chemist and for lab). But note: a prescription is mapped to one chemist and one lab? Actually, the requirements say:\n\n   BR-9-2: Each",
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    }
+  ]
+}

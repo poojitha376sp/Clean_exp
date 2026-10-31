@@ -1,0 +1,1038 @@
+{
+  "unit_id": "U04_2",
+  "representation": "Sequence Diagrams",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Sequence Diagrams",
+    "group": 3,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.125,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "PAT-001",
+        "context": "patientId",
+        "grounded": false
+      },
+      {
+        "value": "Headache, fever",
+        "context": "consultationDetails",
+        "grounded": false
+      },
+      {
+        "value": "PR-001",
+        "context": "prescriptionId",
+        "grounded": false
+      },
+      {
+        "value": "Paracetamol",
+        "context": "medicineList[0]",
+        "grounded": false
+      },
+      {
+        "value": "Ibuprofen",
+        "context": "medicineList[1]",
+        "grounded": false
+      },
+      {
+        "value": "123 Main St",
+        "context": "deliveryAddress",
+        "grounded": false
+      },
+      {
+        "value": "Blood",
+        "context": "specimenType",
+        "grounded": false
+      },
+      {
+        "value": "Cardiology",
+        "context": "specialtyName",
+        "grounded": false
+      },
+      {
+        "value": "Dr. Smith",
+        "context": "doctorName",
+        "grounded": false
+      },
+      {
+        "value": "SP-001",
+        "context": "specialtyId",
+        "grounded": false
+      },
+      {
+        "value": "City Lab",
+        "context": "labName",
+        "grounded": false
+      },
+      {
+        "value": "Health Mart",
+        "context": "pharmacyName",
+        "grounded": false
+      },
+      {
+        "value": "DO-001",
+        "context": "doctorId",
+        "grounded": false
+      },
+      {
+        "value": "SP-002",
+        "context": "newSpecialtyId",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 14,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Lacks concrete assertions (e.g., status codes, timestamps, error messages);",
+      "Does not test optional or alternative frames;",
+      "Missing network latency bounds and async call assertions;",
+      "No loop or retry logic tests;",
+      "Negative paths for other requirements (e.g., prescription delivery failures) are absent."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.555,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Patient -> System: generateConsultationRequest()\nSystem -> Doctor: notifyConsultationRequest()\nDoctor -> System: viewConsultationRequest()\nDoctor -> System: provideDiagnosis()\nSystem -> Patient: sendDiagnosis()\nPatient -> System: receiveDiagnosis()\nSystem -> Chemist: sendPrescription()\nSystem -> Labs: sendPrescription()\nChemist -> System: receivePrescription()\nLabs -> System: receivePrescription()\nChemist -> Patient: deliverMedicines()\nLabs -> Patient: deliverLabReport()\nLabs -> System: updateLabReport()\n\nAdmin -> System: setupSpecialties()\nSystem -> Admin: confirmSpecialties()\nAdmin -> System: addDoctor()\nSystem -> Admin: confirmDoctorAdded()\nAdmin -> System: addLab()\nSystem -> Admin: confirmLabAdded()\nAdmin -> System: addPharmacy()\nSystem -> Admin: confirmPharmacyAdded()\nAdmin -> System: editDoctorInfo(doctorId)\nSystem -> Admin: confirmDoctorInfoUpdated()",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Patient generates a consultation request and doctor views it",
+      "req_ids": [
+        "VIRTUA-2.2-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient is authenticated",
+        "System is operational"
+      ],
+      "inputs": {
+        "patientId": "PAT-001",
+        "consultationDetails": "Headache, fever"
+      },
+      "steps": [
+        "Patient calls generateConsultationRequest API",
+        "System logs request and notifies Doctor",
+        "Doctor views the request in the dashboard",
+        "Doctor provides a diagnosis"
+      ],
+      "expected": [
+        "Doctor's diagnosis is recorded",
+        "Patient receives diagnosis notification"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Prescription is sent to patient, chemist, and labs",
+      "req_ids": [
+        "VIRTUA-2.2-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Diagnosis is provided",
+        "Prescription details are available"
+      ],
+      "inputs": {
+        "prescriptionId": "PR-001",
+        "medicineList": [
+          "Paracetamol",
+          "Ibuprofen"
+        ]
+      },
+      "steps": [
+        "System sends prescription to Patient",
+        "System sends prescription to Chemist",
+        "System sends prescription to Labs"
+      ],
+      "expected": [
+        "Patient receives prescription",
+        "Chemist receives prescription",
+        "Labs receive prescription"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Chemist delivers medicines to the patient",
+      "req_ids": [
+        "VIRTUA-2.2-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Prescription is received",
+        "Medicines are available"
+      ],
+      "inputs": {
+        "prescriptionId": "PR-001",
+        "deliveryAddress": "123 Main St"
+      },
+      "steps": [
+        "Chemist confirms prescription details",
+        "Chemist picks up medicines",
+        "Chemist delivers medicines to patient"
+      ],
+      "expected": [
+        "Patient receives medicines",
+        "System logs delivery"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Labs collect specimen and deliver lab report",
+      "req_ids": [
+        "VIRTUA-2.2-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Prescription is received",
+        "Specimen collection is scheduled"
+      ],
+      "inputs": {
+        "prescriptionId": "PR-001",
+        "specimenType": "Blood"
+      },
+      "steps": [
+        "Labs schedule specimen collection",
+        "Labs collect specimen from patient",
+        "Labs process specimen and generate report",
+        "Labs send report to patient",
+        "Labs update report in system"
+      ],
+      "expected": [
+        "Patient receives lab report",
+        "System contains updated lab report"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Admin sets up specialties",
+      "req_ids": [
+        "VIRTUA-2.3-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin is authenticated"
+      ],
+      "inputs": {
+        "specialtyName": "Cardiology"
+      },
+      "steps": [
+        "Admin calls setupSpecialties API",
+        "System creates new specialty"
+      ],
+      "expected": [
+        "Specialty is listed in system"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Admin adds a doctor",
+      "req_ids": [
+        "VIRTUA-2.3-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin is authenticated",
+        "Doctor details are provided"
+      ],
+      "inputs": {
+        "doctorName": "Dr. Smith",
+        "specialtyId": "SP-001"
+      },
+      "steps": [
+        "Admin calls addDoctor API",
+        "System registers new doctor"
+      ],
+      "expected": [
+        "Doctor is listed in system"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Admin adds a lab",
+      "req_ids": [
+        "VIRTUA-2.3-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin is authenticated"
+      ],
+      "inputs": {
+        "labName": "City Lab"
+      },
+      "steps": [
+        "Admin calls addLab API",
+        "System registers new lab"
+      ],
+      "expected": [
+        "Lab is listed in system"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Admin adds a pharmacy",
+      "req_ids": [
+        "VIRTUA-2.3-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin is authenticated"
+      ],
+      "inputs": {
+        "pharmacyName": "Health Mart"
+      },
+      "steps": [
+        "Admin calls addPharmacy API",
+        "System registers new pharmacy"
+      ],
+      "expected": [
+        "Pharmacy is listed in system"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Admin edits doctor information",
+      "req_ids": [
+        "VIRTUA-2.3-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin is authenticated",
+        "Doctor exists"
+      ],
+      "inputs": {
+        "doctorId": "DO-001",
+        "newSpecialtyId": "SP-002"
+      },
+      "steps": [
+        "Admin calls editDoctorInfo API",
+        "System updates doctor's specialty"
+      ],
+      "expected": [
+        "Doctor's specialty is updated in system"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Negative path: System fails to notify doctor of consultation request",
+      "req_ids": [
+        "VIRTUA-2.2-5"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient generates request",
+        "System is down"
+      ],
+      "inputs": {
+        "patientId": "PAT-001",
+        "consultationDetails": "Headache, fever"
+      },
+      "steps": [
+        "Patient calls generateConsultationRequest API",
+        "System attempts to notify Doctor but fails"
+      ],
+      "expected": [
+        "Doctor does not receive notification",
+        "System logs error"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Boundary value: Maximum number of consultation requests per day",
+      "req_ids": [
+        "VIRTUA-2.2-5"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System rate limits requests"
+      ],
+      "inputs": {
+        "patientId": "PAT-001",
+        "consultationDetails": "Headache, fever"
+      },
+      "steps": [
+        "Patient generates consultation requests up to the limit",
+        "System accepts last request",
+        "System rejects additional request"
+      ],
+      "expected": [
+        "Last request is accepted",
+        "Additional request is rejected"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient generates consultation request and doctor provides diagnosis",
+          "req_ids": [
+            "VIRTUA-2.2-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is registered",
+            "Doctor is logged in"
+          ],
+          "inputs": {
+            "patientId": "PAT-001",
+            "doctorId": "DOC-001",
+            "consultationDetails": "Headache, fever"
+          },
+          "steps": [
+            "Patient initiates consultation request",
+            "System notifies Doctor of the request",
+            "Doctor views the request and provides a diagnosis",
+            "System notifies Patient of the diagnosis"
+          ],
+          "expected": [
+            "Doctor receives and responds to the consultation request",
+            "Patient receives the diagnosis notification"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Doctor generates prescription and it is sent to Patient, Chemist, and Labs",
+          "req_ids": [
+            "VIRTUA-2.2-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Diagnosis is provided",
+            "Prescription details are valid"
+          ],
+          "inputs": {
+            "prescriptionDetails": "Paracetamol 500mg, 2 tablets twice daily"
+          },
+          "steps": [
+            "Doctor generates prescription based on diagnosis",
+            "System sends prescription to Patient",
+            "System sends prescription to Chemist",
+            "System sends prescription to Lab"
+          ],
+          "expected": [
+            "Patient receives the prescription",
+            "Chemist receives the prescription for medicine delivery",
+            "Lab receives the prescription for specimen collection"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Chemist delivers medicines to the patient based on the prescription",
+          "req_ids": [
+            "VIRTUA-2.2-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription is received",
+            "Medicines are available"
+          ],
+          "inputs": {
+            "prescriptionId": "PRE-001",
+            "medicineDetails": "Paracetamol 500mg, 2 tablets"
+          },
+          "steps": [
+            "Chemist receives prescription",
+            "Chemist confirms delivery request to System",
+            "Chemist delivers medicines to Patient"
+          ],
+          "expected": [
+            "Patient receives the prescribed medicines"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Lab collects specimen and delivers lab report to the patient and updates the system",
+          "req_ids": [
+            "VIRTUA-2.2-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription is received",
+            "Specimen collection is possible"
+          ],
+          "inputs": {
+            "prescriptionId": "PRE-001",
+            "specimenDetails": "Blood sample"
+          },
+          "steps": [
+            "Lab receives prescription",
+            "Lab confirms specimen collection request to System",
+            "Lab collects specimen from Patient",
+            "Lab submits lab report to System",
+            "System delivers lab report to Patient",
+            "System updates report for future reference"
+          ],
+          "expected": [
+            "Patient receives the lab report",
+            "System stores the lab report for future reference"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Admin sets up specialties",
+          "req_ids": [
+            "VIRTUA-2.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged in"
+          ],
+          "inputs": {
+            "specialtyName": "Cardiology"
+          },
+          "steps": [
+            "Admin initiates specialty setup",
+            "System validates and creates the specialty"
+          ],
+          "expected": [
+            "Specialty is created in the system"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin adds a doctor",
+          "req_ids": [
+            "VIRTUA-2.3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged in",
+            "Doctor details are valid"
+          ],
+          "inputs": {
+            "doctorName": "Dr. Smith",
+            "specialtyId": "SPE-001",
+            "contactDetails": "email@example.com"
+          },
+          "steps": [
+            "Admin initiates doctor addition",
+            "System validates and adds the doctor"
+          ],
+          "expected": [
+            "Doctor is added to the system"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Admin adds a lab",
+          "req_ids": [
+            "VIRTUA-2.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged in",
+            "Lab details are valid"
+          ],
+          "inputs": {
+            "labName": "City Lab",
+            "location": "Downtown"
+          },
+          "steps": [
+            "Admin initiates lab addition",
+            "System validates and adds the lab"
+          ],
+          "expected": [
+            "Lab is added to the system"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Admin adds a pharmacy",
+          "req_ids": [
+            "VIRTUA-2.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged in",
+            "Pharmacy details are valid"
+          ],
+          "inputs": {
+            "pharmacyName": "Health Mart",
+            "location": "Uptown"
+          },
+          "steps": [
+            "Admin initiates pharmacy addition",
+            "System validates and adds the pharmacy"
+          ],
+          "expected": [
+            "Pharmacy is added to the system"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Admin updates doctor information (update)",
+          "req_ids": [
+            "VIRTUA-2.3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged in",
+            "Doctor exists",
+            "New details are valid"
+          ],
+          "inputs": {
+            "doctorId": "DOC-001",
+            "newContactDetails": "newemail@example.com"
+          },
+          "steps": [
+            "Admin initiates doctor information update",
+            "System validates and updates the doctor's information"
+          ],
+          "expected": [
+            "Doctor's information is updated in the system"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Admin deletes a doctor (error path)",
+          "req_ids": [
+            "VIRTUA-2.3-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Admin is logged in",
+            "Doctor exists"
+          ],
+          "inputs": {
+            "doctorId": "DOC-001"
+          },
+          "steps": [
+            "Admin initiates doctor deletion",
+            "System checks for dependent records",
+            "System deletes the doctor if no dependencies"
+          ],
+          "expected": [
+            "Doctor is deleted from the system",
+            "Error message if deletion fails due to dependencies"
+          ]
+        }
+      ],
+      "raw_if_unparsed": "```artifact\n```mermaid\nsequenceDiagram\n    participant Patient\n    participant Doctor\n    participant Admin\n    participant Chemist\n    participant Lab\n    participant System\n\n    Patient->>Doctor: Generate consultation request\n    Doctor->>System: Retrieve consultation request\n    System-->>Doctor: Display consultation request\n    Doctor->>System: Provide diagnosis\n    System->>Patient: Notify diagnosis\n\n    Doctor->>System: Generate prescription\n    System->>Patient: Send prescription\n    System->>Chemist: Send prescription\n    System->>Lab: Send prescription\n\n    Chemist->>System: Receive prescription\n    System-->>Chemist: Confirm delivery request\n    Chemist->>Patient: Deliver medicines\n\n    Lab->>System: Receive prescription\n    System-->>Lab: Confirm specimen collection request\n    Lab->>Patient: Collect specimen\n    Lab->>System: Submit lab report\n    System-->>Patient: Deliver lab report\n    System->>System: Update report for future reference\n```\n```\n\n```json\n[\n  {\n    \"id\": \"TC-001\",\n    \"title\": \"Patient generates consultation request and doctor provides diagnosis\",\n    \"req_ids\": [\"VIRTUA-2.2-5\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"Patient is registered\", \"Doctor is logged in\"],\n    \"inputs\": {\n      \"patientId\": \"PAT-001\",\n      \"doctorId\": \"DOC-001\",\n      \"consultationDetails\": \"Headache, fever\"\n    },\n    \"steps\": [\n      \"Patient initiates consultation request\",\n      \"System notifies Doctor of the request\",\n      \"Doctor views the request and provides a diagnosis\",\n      \"System notifies Patient of the diagnosis\"\n    ],\n    \"expected\": [\n      \"Doctor receives and responds to the consultation request\",\n      \"Patient receives the diagnosis notification\"\n    ]\n  },\n  {\n    \"id\": \"TC-002\",\n    \"title\": \"Doctor generates prescription and it is sent to Patient, Chemist, and Labs\",\n    \"req_ids\": [\"VIRTUA-2.2-6\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"Diagnosis is provided\", \"Prescription details are valid\"],\n    \"inputs\": {\n      \"prescriptionDetails\": \"Paracetamol 500mg, 2 tablets twice daily\"\n    },\n    \"steps\": [\n      \"Doctor generates prescription based on diagnosis\",\n      \"System sends prescription to Patient\",\n      \"System sends prescription to Chemist\",\n      \"System sends prescription to Lab\"\n    ],\n    \"expected\": [\n      \"Patient receives the prescription\",\n      \"Chemist receives the prescription for medicine delivery\",\n      \"Lab receives the prescription for specimen collection\"\n    ]\n  },\n  {\n    \"id\": \"TC-003\",\n    \"title\": \"Chemist delivers medicines to the patient based on the prescription\",\n    \"req_ids\": [\"VIRTUA-2.2-7\"],\n    \"kind\": \"positive\",\n    \"preconditions\": [\"Prescription is received\", \"Medicines are available\"],\n    \"inputs\": {\n      \"prescriptionId\": \"PRE-001\",\n      \"medicineDetails\": \"Paracetamol 500mg, 2 tablets\"\n    },\n    \"steps\": [\n      \"Chemist receives prescription\",\n      \"Chemist confirms delivery request to System\",\n      \"Chemist delivers medicines to Patient\"\n    ],",
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Representation artifact is empty.",
+      "artifact": "Patient -> System: generateConsultationRequest()\nSystem -> Doctor: notifyConsultationRequest()\nDoctor -> System: viewConsultationRequest()\nDoctor -> System: provideDiagnosis()\nSystem -> Patient: sendDiagnosis()\nPatient -> System: receiveDiagnosis()\nSystem -> Chemist: sendPrescription()\nSystem -> Labs: sendPrescription()\nChemist -> System: receivePrescription()\nLabs -> System: receivePrescription()\nChemist -> Patient: deliverMedicines()\nLabs -> Patient: deliverLabReport()\nLabs -> System: updateLabReport()\n\nAdmin -> System: setupSpecialties()\nSystem -> Admin: confirmSpecialties()\nAdmin -> System: addDoctor()\nSystem -> Admin: confirmDoctorAdded()\nAdmin -> System: addLab()\nSystem -> Admin: confirmLabAdded()\nAdmin -> System: addPharmacy()\nSystem -> Admin: confirmPharmacyAdded()\nAdmin -> System: editDoctorInfo(doctorId)\nSystem -> Admin: confirmDoctorInfoUpdated()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient generates a consultation request and doctor views it",
+          "req_ids": [
+            "VIRTUA-2.2-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is authenticated",
+            "System is operational"
+          ],
+          "inputs": {
+            "patientId": "PAT-001",
+            "consultationDetails": "Headache, fever"
+          },
+          "steps": [
+            "Patient calls generateConsultationRequest API",
+            "System logs request and notifies Doctor",
+            "Doctor views the request in the dashboard",
+            "Doctor provides a diagnosis"
+          ],
+          "expected": [
+            "Doctor's diagnosis is recorded",
+            "Patient receives diagnosis notification"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Prescription is sent to patient, chemist, and labs",
+          "req_ids": [
+            "VIRTUA-2.2-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Diagnosis is provided",
+            "Prescription details are available"
+          ],
+          "inputs": {
+            "prescriptionId": "PR-001",
+            "medicineList": [
+              "Paracetamol",
+              "Ibuprofen"
+            ]
+          },
+          "steps": [
+            "System sends prescription to Patient",
+            "System sends prescription to Chemist",
+            "System sends prescription to Labs"
+          ],
+          "expected": [
+            "Patient receives prescription",
+            "Chemist receives prescription",
+            "Labs receive prescription"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Chemist delivers medicines to the patient",
+          "req_ids": [
+            "VIRTUA-2.2-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription is received",
+            "Medicines are available"
+          ],
+          "inputs": {
+            "prescriptionId": "PR-001",
+            "deliveryAddress": "123 Main St"
+          },
+          "steps": [
+            "Chemist confirms prescription details",
+            "Chemist picks up medicines",
+            "Chemist delivers medicines to patient"
+          ],
+          "expected": [
+            "Patient receives medicines",
+            "System logs delivery"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Labs collect specimen and deliver lab report",
+          "req_ids": [
+            "VIRTUA-2.2-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription is received",
+            "Specimen collection is scheduled"
+          ],
+          "inputs": {
+            "prescriptionId": "PR-001",
+            "specimenType": "Blood"
+          },
+          "steps": [
+            "Labs schedule specimen collection",
+            "Labs collect specimen from patient",
+            "Labs process specimen and generate report",
+            "Labs send report to patient",
+            "Labs update report in system"
+          ],
+          "expected": [
+            "Patient receives lab report",
+            "System contains updated lab report"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Admin sets up specialties",
+          "req_ids": [
+            "VIRTUA-2.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is authenticated"
+          ],
+          "inputs": {
+            "specialtyName": "Cardiology"
+          },
+          "steps": [
+            "Admin calls setupSpecialties API",
+            "System creates new specialty"
+          ],
+          "expected": [
+            "Specialty is listed in system"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin adds a doctor",
+          "req_ids": [
+            "VIRTUA-2.3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is authenticated",
+            "Doctor details are provided"
+          ],
+          "inputs": {
+            "doctorName": "Dr. Smith",
+            "specialtyId": "SP-001"
+          },
+          "steps": [
+            "Admin calls addDoctor API",
+            "System registers new doctor"
+          ],
+          "expected": [
+            "Doctor is listed in system"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Admin adds a lab",
+          "req_ids": [
+            "VIRTUA-2.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is authenticated"
+          ],
+          "inputs": {
+            "labName": "City Lab"
+          },
+          "steps": [
+            "Admin calls addLab API",
+            "System registers new lab"
+          ],
+          "expected": [
+            "Lab is listed in system"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Admin adds a pharmacy",
+          "req_ids": [
+            "VIRTUA-2.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is authenticated"
+          ],
+          "inputs": {
+            "pharmacyName": "Health Mart"
+          },
+          "steps": [
+            "Admin calls addPharmacy API",
+            "System registers new pharmacy"
+          ],
+          "expected": [
+            "Pharmacy is listed in system"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Admin edits doctor information",
+          "req_ids": [
+            "VIRTUA-2.3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is authenticated",
+            "Doctor exists"
+          ],
+          "inputs": {
+            "doctorId": "DO-001",
+            "newSpecialtyId": "SP-002"
+          },
+          "steps": [
+            "Admin calls editDoctorInfo API",
+            "System updates doctor's specialty"
+          ],
+          "expected": [
+            "Doctor's specialty is updated in system"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Negative path: System fails to notify doctor of consultation request",
+          "req_ids": [
+            "VIRTUA-2.2-5"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient generates request",
+            "System is down"
+          ],
+          "inputs": {
+            "patientId": "PAT-001",
+            "consultationDetails": "Headache, fever"
+          },
+          "steps": [
+            "Patient calls generateConsultationRequest API",
+            "System attempts to notify Doctor but fails"
+          ],
+          "expected": [
+            "Doctor does not receive notification",
+            "System logs error"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Boundary value: Maximum number of consultation requests per day",
+          "req_ids": [
+            "VIRTUA-2.2-5"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System rate limits requests"
+          ],
+          "inputs": {
+            "patientId": "PAT-001",
+            "consultationDetails": "Headache, fever"
+          },
+          "steps": [
+            "Patient generates consultation requests up to the limit",
+            "System accepts last request",
+            "System rejects additional request"
+          ],
+          "expected": [
+            "Last request is accepted",
+            "Additional request is rejected"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.125,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "PAT-001",
+            "context": "patientId",
+            "grounded": false
+          },
+          {
+            "value": "Headache, fever",
+            "context": "consultationDetails",
+            "grounded": false
+          },
+          {
+            "value": "PR-001",
+            "context": "prescriptionId",
+            "grounded": false
+          },
+          {
+            "value": "Paracetamol",
+            "context": "medicineList[0]",
+            "grounded": false
+          },
+          {
+            "value": "Ibuprofen",
+            "context": "medicineList[1]",
+            "grounded": false
+          },
+          {
+            "value": "123 Main St",
+            "context": "deliveryAddress",
+            "grounded": false
+          },
+          {
+            "value": "Blood",
+            "context": "specimenType",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "specialtyName",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Smith",
+            "context": "doctorName",
+            "grounded": false
+          },
+          {
+            "value": "SP-001",
+            "context": "specialtyId",
+            "grounded": false
+          },
+          {
+            "value": "City Lab",
+            "context": "labName",
+            "grounded": false
+          },
+          {
+            "value": "Health Mart",
+            "context": "pharmacyName",
+            "grounded": false
+          },
+          {
+            "value": "DO-001",
+            "context": "doctorId",
+            "grounded": false
+          },
+          {
+            "value": "SP-002",
+            "context": "newSpecialtyId",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 14,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Lacks concrete assertions (e.g., status codes, timestamps, error messages);",
+          "Does not test optional or alternative frames;",
+          "Missing network latency bounds and async call assertions;",
+          "No loop or retry logic tests;",
+          "Negative paths for other requirements (e.g., prescription delivery failures) are absent."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.555,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

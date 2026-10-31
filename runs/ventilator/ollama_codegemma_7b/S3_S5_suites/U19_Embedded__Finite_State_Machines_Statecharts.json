@@ -1,0 +1,760 @@
+{
+  "unit_id": "U19_Embedded",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:codegemma:7b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.8,
+    "sfv_score": 0.9,
+    "threshold": 0.7,
+    "sfv_pass": true,
+    "issues": [
+      "missing: transitions (>=2)"
+    ]
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.75,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.9583,
+    "hallucinated": [
+      {
+        "value": "Error message indicating pressure limit exceeded",
+        "context": "error message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 24,
+    "uncovered_clauses": [
+      "RW-SW-4",
+      "RW-SW-52"
+    ],
+    "weaknesses": [
+      "No test covers RW-SW-4 (prevent pressure dropping below -4cm).",
+      "No test covers RW-SW-52 (measure PEEP).",
+      "Transition guard conditions are only tested for True values; False values not exercised.",
+      "Transition from EXPIRATION to IDLE is not tested, leaving transition coverage incomplete.",
+      "Boundary values near limits (e.g., 5cm, 55cm, 59cm, 61cm) are not tested, reducing boundary coverage."
+    ],
+    "traceability": 0.75,
+    "untraced_reqs": [
+      "RW-SW-4",
+      "RW-SW-52"
+    ],
+    "fsa_score": 0.8037,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "## Test Suite for Unit U19_Embedded\n\n**Mode:** Controller\n\n**States:**\n* IDLE\n* INSPIRATION\n* EXPIRATION\n\n**Events:**\n* START_BREATHE\n* END_INSPIRATION\n* END_EXPIRATION\n\n**Transitions:**\n* START_BREATHE -> INSPIRATION\n* END_INSPIRATION -> EXPIRATION\n* END_EXPIRATION -> IDLE\n\n**Guard Conditions:**\n* INSPIRATION: pressure <= -4cm\n* EXPIRATION: pressure >= 60cm\n\n**Initial State:** IDLE\n\n**Test Cases:**\n\n**TC-001:** Positive - Controller responds within 10% of commanded pressure\n* Precondition: Controller is in IDLE state\n* Input: Command pressure of 30cmH2O\n* Steps: Send command pressure to controller\n* Expected: Controller pressure within 3cmH2O of commanded pressure\n\n**TC-002:** Negative - Controller exceeds maximum pressure limit\n* Precondition: Controller is in IDLE state\n* Input: Command pressure of 70cmH2O\n* Steps: Send command pressure to controller\n* Expected: Error message indicating pressure limit exceeded\n\n**TC-003:** Positive - Controller triggers inspiration cycle when pressure reaches -4cm\n* Precondition: Controller is in IDLE state\n* Input: Pressure reaches -4cm\n* Steps: Monitor controller state transition\n* Expected: Controller transitions to INSPIRATION state\n\n**TC-004:** Positive - Controller triggers expiration cycle when pressure reaches 60cm\n* Precondition: Controller is in INSPIRATION state\n* Input: Pressure reaches 60cm\n* Steps: Monitor controller state transition\n* Expected: Controller transitions to EXPIRATION state\n\n**TC-005:** Boundary - Controller meets PIP target within 5cmH2O tolerance\n* Precondition: Controller is in EXPIRATION state\n* Input: PIP target of 30cmH2O\n* Steps: Monitor controller pressure\n* Expected: Controller pressure within 5cmH2O of PIP target\n\n**TC-006:** Boundary - Controller meets breath rate within 1 breath tolerance\n* Precondition: Controller is in IDLE state\n* Input: Breath rate target of 10 breaths per minute\n* Steps: Monitor breath rate sensor\n* Expected: Breath rate within 1 breath per minute of target",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Controller responds within 10% of commanded pressure",
+      "req_ids": [
+        "RW-SW-55"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in IDLE state"
+      ],
+      "inputs": {
+        "pressure": 30
+      },
+      "steps": [
+        "Send command pressure to controller"
+      ],
+      "expected": [
+        "Controller pressure within 3cmH2O of commanded pressure"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Controller exceeds maximum pressure limit",
+      "req_ids": [
+        "RW-SW-7"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Controller is in IDLE state"
+      ],
+      "inputs": {
+        "pressure": 70
+      },
+      "steps": [
+        "Send command pressure to controller"
+      ],
+      "expected": [
+        "Error message indicating pressure limit exceeded"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Controller triggers inspiration cycle when pressure reaches -4cm",
+      "req_ids": [
+        "RW-SW-56"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in IDLE state"
+      ],
+      "inputs": {
+        "pressure": -4
+      },
+      "steps": [
+        "Monitor controller state transition"
+      ],
+      "expected": [
+        "Controller transitions to INSPIRATION state"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Controller triggers expiration cycle when pressure reaches 60cm",
+      "req_ids": [
+        "RW-SW-57"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is in INSPIRATION state"
+      ],
+      "inputs": {
+        "pressure": 60
+      },
+      "steps": [
+        "Monitor controller state transition"
+      ],
+      "expected": [
+        "Controller transitions to EXPIRATION state"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Controller meets PIP target within 5cmH2O tolerance",
+      "req_ids": [
+        "RW-SW-59"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Controller is in EXPIRATION state"
+      ],
+      "inputs": {
+        "pip_target": 30
+      },
+      "steps": [
+        "Monitor controller pressure"
+      ],
+      "expected": [
+        "Controller pressure within 5cmH2O of PIP target"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Controller meets breath rate within 1 breath tolerance",
+      "req_ids": [
+        "RW-SW-62"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Controller is in IDLE state"
+      ],
+      "inputs": {
+        "breath_rate_target": 10
+      },
+      "steps": [
+        "Monitor breath rate sensor"
+      ],
+      "expected": [
+        "Breath rate within 1 breath per minute of target"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "## Test Suite for Unit U19_Embedded\n\n**Mode:** Controller\n\n**States:**\n* IDLE\n* INSPIRATION\n* EXPIRATION\n\n**Events:**\n* START_BREATHE\n* END_INSPIRATION\n* END_EXPIRATION\n\n**Transitions:**\n* START_BREATHE -> INSPIRATION\n* END_INSPIRATION -> EXPIRATION\n* END_EXPIRATION -> IDLE\n\n**Guard Conditions:**\n* INSPIRATION: pressure <= -4cm\n* EXPIRATION: pressure >= 60cm\n\n**Initial State:** IDLE\n\n**Test Cases:**\n\n**TC-001:** Positive - Controller responds within 10% of commanded pressure\n* Precondition: Controller is in IDLE state\n* Input: Command pressure of 30cmH2O\n* Steps: Send command pressure to controller\n* Expected: Controller pressure within 3cmH2O of commanded pressure\n\n**TC-002:** Negative - Controller exceeds maximum pressure limit\n* Precondition: Controller is in IDLE state\n* Input: Command pressure of 70cmH2O\n* Steps: Send command pressure to controller\n* Expected: Error message indicating pressure limit exceeded\n\n**TC-003:** Positive - Controller triggers inspiration cycle when pressure reaches -4cm\n* Precondition: Controller is in IDLE state\n* Input: Pressure reaches -4cm\n* Steps: Monitor controller state transition\n* Expected: Controller transitions to INSPIRATION state\n\n**TC-004:** Positive - Controller triggers expiration cycle when pressure reaches 60cm\n* Precondition: Controller is in INSPIRATION state\n* Input: Pressure reaches 60cm\n* Steps: Monitor controller state transition\n* Expected: Controller transitions to EXPIRATION state\n\n**TC-005:** Boundary - Controller meets PIP target within 5cmH2O tolerance\n* Precondition: Controller is in EXPIRATION state\n* Input: PIP target of 30cmH2O\n* Steps: Monitor controller pressure\n* Expected: Controller pressure within 5cmH2O of PIP target\n\n**TC-006:** Boundary - Controller meets breath rate within 1 breath tolerance\n* Precondition: Controller is in IDLE state\n* Input: Breath rate target of 10 breaths per minute\n* Steps: Monitor breath rate sensor\n* Expected: Breath rate within 1 breath per minute of target",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller responds within 10% of commanded pressure",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in IDLE state"
+          ],
+          "inputs": {
+            "pressure": 30
+          },
+          "steps": [
+            "Send command pressure to controller"
+          ],
+          "expected": [
+            "Controller pressure within 3cmH2O of commanded pressure"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller exceeds maximum pressure limit",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Controller is in IDLE state"
+          ],
+          "inputs": {
+            "pressure": 70
+          },
+          "steps": [
+            "Send command pressure to controller"
+          ],
+          "expected": [
+            "Error message indicating pressure limit exceeded"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Controller triggers inspiration cycle when pressure reaches -4cm",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in IDLE state"
+          ],
+          "inputs": {
+            "pressure": -4
+          },
+          "steps": [
+            "Monitor controller state transition"
+          ],
+          "expected": [
+            "Controller transitions to INSPIRATION state"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Controller triggers expiration cycle when pressure reaches 60cm",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in INSPIRATION state"
+          ],
+          "inputs": {
+            "pressure": 60
+          },
+          "steps": [
+            "Monitor controller state transition"
+          ],
+          "expected": [
+            "Controller transitions to EXPIRATION state"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller meets PIP target within 5cmH2O tolerance",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller is in EXPIRATION state"
+          ],
+          "inputs": {
+            "pip_target": 30
+          },
+          "steps": [
+            "Monitor controller pressure"
+          ],
+          "expected": [
+            "Controller pressure within 5cmH2O of PIP target"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller meets breath rate within 1 breath tolerance",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller is in IDLE state"
+          ],
+          "inputs": {
+            "breath_rate_target": 10
+          },
+          "steps": [
+            "Monitor breath rate sensor"
+          ],
+          "expected": [
+            "Breath rate within 1 breath per minute of target"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": [
+          "missing: transitions (>=2)"
+        ]
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.9583,
+        "hallucinated": [
+          {
+            "value": "Error message indicating pressure limit exceeded",
+            "context": "error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 24,
+        "uncovered_clauses": [
+          "RW-SW-4",
+          "RW-SW-52"
+        ],
+        "weaknesses": [
+          "No test covers RW-SW-4 (prevent pressure dropping below -4cm).",
+          "No test covers RW-SW-52 (measure PEEP).",
+          "Transition guard conditions are only tested for True values; False values not exercised.",
+          "Transition from EXPIRATION to IDLE is not tested, leaving transition coverage incomplete.",
+          "Boundary values near limits (e.g., 5cm, 55cm, 59cm, 61cm) are not tested, reducing boundary coverage."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "RW-SW-4",
+          "RW-SW-52"
+        ],
+        "fsa_score": 0.8037,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.8037; sub-scores {'clause_coverage': 0.75, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.9, 'boundary_coverage': 0.5, 'groundedness_mg': 0.9583}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-4', 'RW-SW-52'] (add at least one each)\n- uncovered clause: RW-SW-4\n- uncovered clause: RW-SW-52\n- ungrounded value 'Error message indicating pressure limit exceeded' (error message): remove or use the SRS value\n- No test covers RW-SW-4 (prevent pressure dropping below -4cm).\n- No test covers RW-SW-52 (measure PEEP).\n- Transition guard conditions are only tested for True values; False values not exercised.\n- Transition from EXPIRATION to IDLE is not tested, leaving transition coverage incomplete.\n- Boundary values near limits (e.g., 5cm, 55cm, 59cm, 61cm) are not tested, reducing boundary coverage.",
+      "artifact": "@start\n  mode: IDLE\n  initial: true\n\n  mode Inspiration\n    on Event INSPIRATION_DETECTED\n      guard pressure < -4cm\n      transition EXPIRATION\n\n  mode Expiration\n    on Event EXPIRED\n      transition IDLE\n\n@end",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.6,
+        "sfv_score": 0.3,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: transitions (>=2)",
+          "missing: states declared"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.30). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- missing: transitions (>=2)\n- missing: states declared",
+      "artifact": "@start\ninitial state: IDLE\n\nmode TRIGGER_INSPIRATION:\n  on event INSPIRATION_DETECTED:\n    if pressure < -4cm:\n      transition to INSPIRATION\n    else:\n      transition to IDLE\n\nmode INSPIRATION:\n  on event INSPIRATION_ENDED:\n    transition to TRIGGER_EXPIRATION\n\nmode TRIGGER_EXPIRATION:\n  on event EXPIRATION_DETECTED:\n    transition to EXPIRATION\n\nmode EXPIRATION:\n  on event EXPIRATION_ENDED:\n    transition to TRIGGER_INSPIRATION\n\n@end",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Controller should trigger an inspiration cycle when pressure drops below -4cm",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "pressure is below -4cm"
+          ],
+          "inputs": {},
+          "steps": [
+            "pressure drops below -4cm"
+          ],
+          "expected": [
+            "controller triggers an inspiration cycle"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Controller should not trigger an inspiration cycle when pressure is not below -4cm",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "pressure is not below -4cm"
+          ],
+          "inputs": {},
+          "steps": [
+            "pressure is not below -4cm"
+          ],
+          "expected": [
+            "controller does not trigger an inspiration cycle"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Controller should trigger an expiration cycle when pressure reaches PEEP",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "pressure is equal to PEEP"
+          ],
+          "inputs": {},
+          "steps": [
+            "pressure reaches PEEP"
+          ],
+          "expected": [
+            "controller triggers an expiration cycle"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Controller should not trigger an expiration cycle when pressure is not equal to PEEP",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "pressure is not equal to PEEP"
+          ],
+          "inputs": {},
+          "steps": [
+            "pressure is not equal to PEEP"
+          ],
+          "expected": [
+            "controller does not trigger an expiration cycle"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller should be able to meet PIP targets within 5-55cmH2O +/- 5cm",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PIP target is within 5-55cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "controller is operating"
+          ],
+          "expected": [
+            "controller meets PIP target within 5-55cmH2O +/- 5cm"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller should not be able to meet PIP targets outside 5-55cmH2O +/- 5cm",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "PIP target is outside 5-55cmH2O +/- 5cm"
+          ],
+          "inputs": {},
+          "steps": [
+            "controller is operating"
+          ],
+          "expected": [
+            "controller does not meet PIP target"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller should be able to meet commanded breath rate within +- 1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "commanded breath rate is within +- 1 breath"
+          ],
+          "inputs": {},
+          "steps": [
+            "controller is operating"
+          ],
+          "expected": [
+            "controller meets commanded breath rate within +- 1 breath"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Controller should not be able to meet commanded breath rate outside +- 1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "commanded breath rate is outside +- 1 breath"
+          ],
+          "inputs": {},
+          "steps": [
+            "controller is operating"
+          ],
+          "expected": [
+            "controller does not meet commanded breath rate"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": [
+          "missing: transitions (>=2)"
+        ]
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.5,
+        "negative_coverage": 0.5,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.7222,
+        "hallucinated": [
+          {
+            "value": "IDLE",
+            "context": "FSM state",
+            "grounded": false
+          },
+          {
+            "value": "TRIGGER_INSPIRATION",
+            "context": "FSM state",
+            "grounded": false
+          },
+          {
+            "value": "INSPIRATION",
+            "context": "FSM state",
+            "grounded": false
+          },
+          {
+            "value": "TRIGGER_EXPIRATION",
+            "context": "FSM state",
+            "grounded": false
+          },
+          {
+            "value": "EXPIRATION",
+            "context": "FSM state",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 18,
+        "uncovered_clauses": [
+          "RW-SW-7",
+          "RW-SW-55",
+          "RW-SW-56",
+          "RW-SW-57"
+        ],
+        "weaknesses": [
+          "Add test cases for RW-SW-7, RW-SW-55, RW-SW-56, RW-SW-57",
+          "Use event-based triggers in test steps to match FSM events (e.g., INSPIRATION_DETECTED)",
+          "Assert concrete state transitions instead of vague actions",
+          "Test boundary values at edges (e.g., pressure = -4cm, PIP = 5cmH2O, 55cmH2O, breath rate ±1)",
+          "Verify that pressure never exceeds 60cmH2O (RW-SW-7) and that controller stays within limits"
+        ],
+        "traceability": 0.5,
+        "untraced_reqs": [
+          "RW-SW-55",
+          "RW-SW-56",
+          "RW-SW-57",
+          "RW-SW-7"
+        ],
+        "fsa_score": 0.5033,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.5033; sub-scores {'clause_coverage': 0.5, 'negative_coverage': 0.5, 'oracle_assertiveness': 0.3, 'boundary_coverage': 0.5, 'groundedness_mg': 0.7222}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-55', 'RW-SW-56', 'RW-SW-57', 'RW-SW-7'] (add at least one each)\n- uncovered clause: RW-SW-7\n- uncovered clause: RW-SW-55\n- uncovered clause: RW-SW-56\n- uncovered clause: RW-SW-57\n- ungrounded value 'IDLE' (FSM state): remove or use the SRS value\n- ungrounded value 'TRIGGER_INSPIRATION' (FSM state): remove or use the SRS value\n- ungrounded value 'INSPIRATION' (FSM state): remove or use the SRS value\n- ungrounded value 'TRIGGER_EXPIRATION' (FSM state): remove or use the SRS value\n- ungrounded value 'EXPIRATION' (FSM state): remove or use the SRS value\n- Add test cases for RW-SW-7, RW-SW-55, RW-SW-56, RW-SW-57\n- Use event-based triggers in test steps to match FSM events (e.g., INSPIRATION_DETECTED)\n- Assert concrete state transitions instead of vague actions\n- Test boundary values at edges (e.g., pressure = -4cm, PIP = 5cmH2O, 55cmH2O, breath rate ±1)\n- Verify that pressure never exceeds 60cmH2O (RW-SW-7) and that controller stays within limits",
+      "artifact": "## Test Suite for Unit U19_Embedded\n\n**States:**\n* IDLE\n* TRIGGER_INSPIRATION\n* INSPIRATION\n* TRIGGER_EXPIRATION\n* EXPIRATION\n\n**Events:**\n* INSPIRATION_DETECTED\n* EXPIRATION_DETECTED\n* PRESSURE_ABOVE_LIMIT\n* BREATH_RATE_ABOVE_LIMIT\n\n**Transitions:**\n* TRIGGER_INSPIRATION -> INSPIRATION (when INSPIRATION_DETECTED)\n* INSPIRATION -> TRIGGER_EXPIRATION (when EXPIRATION_DETECTED)\n* TRIGGER_EXPIRATION -> EXPIRATION (when EXPIRATION_DETECTED)\n* EXPIRATION -> IDLE (when pressure <= -4cm or BREATH_RATE_ABOVE_LIMIT)\n\n**Test Cases:**\n\n**TC-001:** Verify pressure does not drop below -4cm.\n* Precondition: Controller is in IDLE state.\n* Input: None.\n* Step: Trigger inspiration.\n* Expected: Controller stays in INSPIRATION state and pressure does not drop below -4cm.\n\n**TC-002:** Verify pressure does not exceed 60cmH2O.\n* Precondition: Controller is in IDLE state.\n* Input: None.\n* Step: Trigger inspiration.\n* Expected: Controller stays in INSPIRATION state and pressure does not exceed 60cmH2O.\n\n**TC-003:** Verify controller meets PIP target within 10%.\n* Precondition: Controller is in IDLE state.\n* Input: PIP target of 20cmH2O.\n* Step: Trigger inspiration.\n* Expected: Controller reaches PIP target within 10%.\n\n**TC-004:** Verify controller triggers inspiration cycle when pressure reaches PEEP.\n* Precondition: Controller is in IDLE state.\n* Input: PEEP of 4cm.\n* Step: Set pressure to 4cm.\n* Expected: Controller transitions to INSPIRATION state.\n\n**TC-005:** Verify controller triggers expiration cycle when pressure reaches PIP.\n* Precondition: Controller is in INSPIRATION state.\n* Input: PIP of 20cmH2O.\n* Step: Set pressure to 20cmH2O.\n* Expected: Controller transitions to EXPIRATION state.\n\n**TC-006:** Verify controller meets commanded breath rate within ±1 breath.\n* Precondition: Controller is in IDLE state.\n* Input: Commanded breath rate of 10 breaths per minute.\n* Step: Set breath rate to 10 breaths per minute.\n* Expected: Controller maintains commanded breath rate within ±1 breath.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Verify pressure does not drop below -4cm",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in IDLE state."
+          ],
+          "inputs": {},
+          "steps": [
+            "Trigger inspiration."
+          ],
+          "expected": [
+            "Controller stays in INSPIRATION state and pressure does not drop below -4cm."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Verify pressure does not exceed 60cmH2O",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in IDLE state."
+          ],
+          "inputs": {},
+          "steps": [
+            "Trigger inspiration."
+          ],
+          "expected": [
+            "Controller stays in INSPIRATION state and pressure does not exceed 60cmH2O."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Verify controller meets PIP target within 10%",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in IDLE state."
+          ],
+          "inputs": {
+            "pip_target": 20
+          },
+          "steps": [
+            "Trigger inspiration."
+          ],
+          "expected": [
+            "Controller reaches PIP target within 10%."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Verify controller triggers inspiration cycle when pressure reaches PEEP",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in IDLE state."
+          ],
+          "inputs": {
+            "peep": 4
+          },
+          "steps": [
+            "Set pressure to 4cm."
+          ],
+          "expected": [
+            "Controller transitions to INSPIRATION state."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Verify controller triggers expiration cycle when pressure reaches PIP",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in INSPIRATION state."
+          ],
+          "inputs": {
+            "pip": 20
+          },
+          "steps": [
+            "Set pressure to 20cmH2O."
+          ],
+          "expected": [
+            "Controller transitions to EXPIRATION state."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Verify controller meets commanded breath rate within ±1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is in IDLE state."
+          ],
+          "inputs": {
+            "commanded_breath_rate": 10
+          },
+          "steps": [
+            "Set breath rate to 10 breaths per minute."
+          ],
+          "expected": [
+            "Controller maintains commanded breath rate within ±1 breath."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.6,
+        "sfv_score": 0.8,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: initial state"
+        ]
+      }
+    }
+  ]
+}

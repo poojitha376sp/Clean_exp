@@ -1,0 +1,1005 @@
+{
+  "unit_id": "U01_General",
+  "representation": "Temporal Logic (LTL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Temporal Logic (LTL)",
+    "group": 3,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 1.0,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.3333,
+    "hallucinated": [
+      {
+        "value": "0.99",
+        "context": "stability threshold",
+        "grounded": false
+      },
+      {
+        "value": "0.98",
+        "context": "stability threshold",
+        "grounded": false
+      },
+      {
+        "value": "real_time",
+        "context": "runtime reference",
+        "grounded": false
+      },
+      {
+        "value": "max_power",
+        "context": "maximum power budget",
+        "grounded": false
+      },
+      {
+        "value": "false",
+        "context": "inspiration detection flag",
+        "grounded": false
+      },
+      {
+        "value": "stress",
+        "context": "system mode",
+        "grounded": false
+      },
+      {
+        "value": "normal",
+        "context": "breathing pattern",
+        "grounded": false
+      },
+      {
+        "value": "variable",
+        "context": "breathing pattern",
+        "grounded": false
+      },
+      {
+        "value": "none",
+        "context": "breathing pattern",
+        "grounded": false
+      },
+      {
+        "value": "1",
+        "context": "time or power offset",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 15,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Negative test TC-008 incorrectly asserts the same condition as the positive test; should assert failure.",
+      "Assertions use abstract variables (real_time, max_power) without concrete values, reducing test determinism.",
+      "Boundary tests rely on unspecified offsets (e.g., \"- 1\") without defining the unit or value.",
+      "The suite lacks tests for error handling when clock overflows or power budget is exceeded.",
+      "No tests cover interactions between multiple requirements (e.g., power consumption during stress test)."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.9,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "G !(clock_value >= 1209600)  % [RW-SW-8] Clock should not overflow within 2 weeks (1209600 seconds)\nG (algorithm_stability > 0.99) % [RW-SW-9] Algorithm stability should be above 99% over 2 weeks\nG (execution_time < real_time) % [RW-SW-10] Execution time should be less than real_time for stress testing\nG (power_consumption <= max_power) % [RW-SW-41] Power consumption should not exceed max_power for 1 hour\nF (inspiration_detected = true) % [RW-SW-154] Inspiration should be detected eventually\n\n% Negative test cases\nG !(clock_value >= 1209601) % [RW-SW-8] Clock should not overflow at the boundary of 2 weeks\nG !(algorithm_stability <= 0.99) % [RW-SW-9] Algorithm stability should not drop below 99%\nG !(execution_time >= real_time) % [RW-SW-10] Execution time should not be equal to or exceed real_time\nG !(power_consumption > max_power) % [RW-SW-41] Power consumption should not exceed max_power at the boundary\nG !(inspiration_detected = false) % [RW-SW-154] Inspiration should not fail to be detected\n\n% Boundary tests\nG !(clock_value >= 1209599) % [RW-SW-8] Clock should not overflow just below 2 weeks\nG (algorithm_stability >= 0.98) % [RW-SW-9] Algorithm stability should be above 98% just below 99%\nG (execution_time <= real_time - 1) % [RW-SW-10] Execution time should be less than real_time - 1 for stress testing\nG (power_consumption <= max_power - 1) % [RW-SW-41] Power consumption should not exceed max_power - 1 for 1 hour\nG (inspiration_detected = true) % [RW-SW-154] Inspiration should be detected under varying breathing rates and noise",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Clock does not overflow within 2 weeks",
+      "req_ids": [
+        "RW-SW-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "duration": "1209600 seconds"
+      },
+      "steps": [
+        "Run system for 2 weeks"
+      ],
+      "expected": [
+        "clock_value < 1209600"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Algorithm maintains stability over 2 weeks",
+      "req_ids": [
+        "RW-SW-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "duration": "1209600 seconds"
+      },
+      "steps": [
+        "Run system for 2 weeks"
+      ],
+      "expected": [
+        "algorithm_stability > 0.99"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Software runs faster than real time for stress testing",
+      "req_ids": [
+        "RW-SW-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is in stress test mode"
+      ],
+      "inputs": {
+        "mode": "stress"
+      },
+      "steps": [
+        "Run system in stress test mode"
+      ],
+      "expected": [
+        "execution_time < real_time"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Software is power-efficient for 1 hour",
+      "req_ids": [
+        "RW-SW-41"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running on battery"
+      ],
+      "inputs": {
+        "duration": "3600 seconds"
+      },
+      "steps": [
+        "Run system for 1 hour"
+      ],
+      "expected": [
+        "power_consumption <= max_power"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Controller detects patient inspiration",
+      "req_ids": [
+        "RW-SW-154"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient is breathing"
+      ],
+      "inputs": {
+        "breathing": "normal"
+      },
+      "steps": [
+        "Simulate patient breathing"
+      ],
+      "expected": [
+        "inspiration_detected = true"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Clock does not overflow at the boundary of 2 weeks",
+      "req_ids": [
+        "RW-SW-8"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "duration": "1209601 seconds"
+      },
+      "steps": [
+        "Run system for 2 weeks and 1 second"
+      ],
+      "expected": [
+        "clock_value < 1209601"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Algorithm stability drops below 99%",
+      "req_ids": [
+        "RW-SW-9"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "duration": "1209600 seconds"
+      },
+      "steps": [
+        "Run system for 2 weeks with unstable conditions"
+      ],
+      "expected": [
+        "algorithm_stability <= 0.99"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Execution time equals real time",
+      "req_ids": [
+        "RW-SW-10"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "System is in stress test mode"
+      ],
+      "inputs": {
+        "mode": "stress"
+      },
+      "steps": [
+        "Run system in stress test mode"
+      ],
+      "expected": [
+        "execution_time < real_time"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Power consumption exceeds max power",
+      "req_ids": [
+        "RW-SW-41"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "System is running on battery"
+      ],
+      "inputs": {
+        "duration": "3600 seconds"
+      },
+      "steps": [
+        "Run system for 1 hour with high power consumption"
+      ],
+      "expected": [
+        "power_consumption <= max_power"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Inspiration detection fails",
+      "req_ids": [
+        "RW-SW-154"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient is not breathing"
+      ],
+      "inputs": {
+        "breathing": "none"
+      },
+      "steps": [
+        "Simulate no patient breathing"
+      ],
+      "expected": [
+        "inspiration_detected = false"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Clock does not overflow just below 2 weeks",
+      "req_ids": [
+        "RW-SW-8"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "duration": "1209599 seconds"
+      },
+      "steps": [
+        "Run system for 2 weeks minus 1 second"
+      ],
+      "expected": [
+        "clock_value < 1209599"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Algorithm stability is above 98% just below 99%",
+      "req_ids": [
+        "RW-SW-9"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {
+        "duration": "1209600 seconds"
+      },
+      "steps": [
+        "Run system for 2 weeks with stable conditions"
+      ],
+      "expected": [
+        "algorithm_stability >= 0.98"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Execution time is less than real time minus 1",
+      "req_ids": [
+        "RW-SW-10"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is in stress test mode"
+      ],
+      "inputs": {
+        "mode": "stress"
+      },
+      "steps": [
+        "Run system in stress test mode"
+      ],
+      "expected": [
+        "execution_time <= real_time - 1"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Power consumption does not exceed max power minus 1",
+      "req_ids": [
+        "RW-SW-41"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is running on battery"
+      ],
+      "inputs": {
+        "duration": "3600 seconds"
+      },
+      "steps": [
+        "Run system for 1 hour with moderate power consumption"
+      ],
+      "expected": [
+        "power_consumption <= max_power - 1"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "Inspiration detection under varying breathing rates and noise",
+      "req_ids": [
+        "RW-SW-154"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Patient is breathing with varying rates and noise"
+      ],
+      "inputs": {
+        "breathing": "variable"
+      },
+      "steps": [
+        "Simulate variable patient breathing"
+      ],
+      "expected": [
+        "inspiration_detected = true"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "G (clock_value < max_clock_value)  // [RW-SW-8] - Always, the clock value should be less than the maximum clock value to avoid overflow within 2 weeks\nG (algorithm_stability)            // [RW-SW-9] - Always, the numeric algorithms should maintain stability over 2 weeks\nF (execution_time < real_time)     // [RW-SW-10] - Eventually, the software algorithms should execute in faster than real time\nG (power_consumption < max_power)  // [RW-SW-41] - Always, the power consumption should be within the limit to allow continuous work from battery for 1 hour\nG (inspiration_detected -> F inspiration_confirmed)  // [RW-SW-154] - Always, when inspiration is detected, it should eventually be confirmed",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Clock does not overflow within 2 weeks",
+          "req_ids": [
+            "RW-SW-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "duration": "2 weeks"
+          },
+          "steps": [
+            "Run the system for 2 weeks"
+          ],
+          "expected": [
+            "Clock value remains below max_clock_value"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Numeric algorithms maintain stability over 2 weeks",
+          "req_ids": [
+            "RW-SW-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "duration": "2 weeks"
+          },
+          "steps": [
+            "Run the system for 2 weeks"
+          ],
+          "expected": [
+            "Algorithm stability is maintained"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Software executes in faster than real time",
+          "req_ids": [
+            "RW-SW-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "test_mode": "stress"
+          },
+          "steps": [
+            "Run the system in stress test mode"
+          ],
+          "expected": [
+            "Execution time is faster than real_time"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Power consumption is within limit for 1 hour",
+          "req_ids": [
+            "RW-SW-41"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running on battery"
+          ],
+          "inputs": {
+            "duration": "1 hour"
+          },
+          "steps": [
+            "Run the system for 1 hour on battery"
+          ],
+          "expected": [
+            "Power consumption remains below max_power"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller detects patient inspiration",
+          "req_ids": [
+            "RW-SW-154"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is breathing"
+          ],
+          "inputs": {
+            "patient_action": "inspiration"
+          },
+          "steps": [
+            "Simulate patient inspiration"
+          ],
+          "expected": [
+            "Inspiration is detected and confirmed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Temporal Logic (LTL)",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.2308,
+        "hallucinated": [
+          {
+            "value": "max_clock_value",
+            "context": "maximum clock value to avoid overflow",
+            "grounded": false
+          },
+          {
+            "value": "algorithm_stability",
+            "context": "numeric algorithm stability indicator",
+            "grounded": false
+          },
+          {
+            "value": "stress",
+            "context": "test mode for execution time",
+            "grounded": false
+          },
+          {
+            "value": "execution_time",
+            "context": "time taken by software algorithms",
+            "grounded": false
+          },
+          {
+            "value": "real_time",
+            "context": "real time execution threshold",
+            "grounded": false
+          },
+          {
+            "value": "max_power",
+            "context": "maximum power consumption allowed",
+            "grounded": false
+          },
+          {
+            "value": "power_consumption",
+            "context": "actual power consumption during test",
+            "grounded": false
+          },
+          {
+            "value": "inspiration_detected",
+            "context": "state indicating detection of inspiration",
+            "grounded": false
+          },
+          {
+            "value": "inspiration_confirmed",
+            "context": "state indicating confirmation of inspiration",
+            "grounded": false
+          },
+          {
+            "value": "clock_value",
+            "context": "current clock value",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 13,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test cases to cover error paths such as clock overflow and algorithm instability.",
+          "Provide concrete numeric thresholds for max_clock_value, max_power, and real_time to enable precise assertions.",
+          "Include boundary tests slightly above and below the 2‑week and 1‑hour limits to verify edge behavior.",
+          "Assert specific state transitions or output codes rather than generic phrases.",
+          "Verify inspiration detection under varying breathing rates and noise conditions."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.4646,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.4646; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.5, 'groundedness_mg': 0.2308}). Output the full improved suite addressing:\n- ungrounded value 'max_clock_value' (maximum clock value to avoid overflow): remove or use the SRS value\n- ungrounded value 'algorithm_stability' (numeric algorithm stability indicator): remove or use the SRS value\n- ungrounded value 'stress' (test mode for execution time): remove or use the SRS value\n- ungrounded value 'execution_time' (time taken by software algorithms): remove or use the SRS value\n- ungrounded value 'real_time' (real time execution threshold): remove or use the SRS value\n- ungrounded value 'max_power' (maximum power consumption allowed): remove or use the SRS value\n- Add negative test cases to cover error paths such as clock overflow and algorithm instability.\n- Provide concrete numeric thresholds for max_clock_value, max_power, and real_time to enable precise assertions.\n- Include boundary tests slightly above and below the 2‑week and 1‑hour limits to verify edge behavior.\n- Assert specific state transitions or output codes rather than generic phrases.\n- Verify inspiration detection under varying breathing rates and noise conditions.",
+      "artifact": "G !(clock_value >= 1209600)  % [RW-SW-8] Clock should not overflow within 2 weeks (1209600 seconds)\nG (algorithm_stability > 0.99) % [RW-SW-9] Algorithm stability should be above 99% over 2 weeks\nG (execution_time < real_time) % [RW-SW-10] Execution time should be less than real_time for stress testing\nG (power_consumption <= max_power) % [RW-SW-41] Power consumption should not exceed max_power for 1 hour\nF (inspiration_detected = true) % [RW-SW-154] Inspiration should be detected eventually\n\n% Negative test cases\nG !(clock_value >= 1209601) % [RW-SW-8] Clock should not overflow at the boundary of 2 weeks\nG !(algorithm_stability <= 0.99) % [RW-SW-9] Algorithm stability should not drop below 99%\nG !(execution_time >= real_time) % [RW-SW-10] Execution time should not be equal to or exceed real_time\nG !(power_consumption > max_power) % [RW-SW-41] Power consumption should not exceed max_power at the boundary\nG !(inspiration_detected = false) % [RW-SW-154] Inspiration should not fail to be detected\n\n% Boundary tests\nG !(clock_value >= 1209599) % [RW-SW-8] Clock should not overflow just below 2 weeks\nG (algorithm_stability >= 0.98) % [RW-SW-9] Algorithm stability should be above 98% just below 99%\nG (execution_time <= real_time - 1) % [RW-SW-10] Execution time should be less than real_time - 1 for stress testing\nG (power_consumption <= max_power - 1) % [RW-SW-41] Power consumption should not exceed max_power - 1 for 1 hour\nG (inspiration_detected = true) % [RW-SW-154] Inspiration should be detected under varying breathing rates and noise",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Clock does not overflow within 2 weeks",
+          "req_ids": [
+            "RW-SW-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "duration": "1209600 seconds"
+          },
+          "steps": [
+            "Run system for 2 weeks"
+          ],
+          "expected": [
+            "clock_value < 1209600"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Algorithm maintains stability over 2 weeks",
+          "req_ids": [
+            "RW-SW-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "duration": "1209600 seconds"
+          },
+          "steps": [
+            "Run system for 2 weeks"
+          ],
+          "expected": [
+            "algorithm_stability > 0.99"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Software runs faster than real time for stress testing",
+          "req_ids": [
+            "RW-SW-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is in stress test mode"
+          ],
+          "inputs": {
+            "mode": "stress"
+          },
+          "steps": [
+            "Run system in stress test mode"
+          ],
+          "expected": [
+            "execution_time < real_time"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Software is power-efficient for 1 hour",
+          "req_ids": [
+            "RW-SW-41"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running on battery"
+          ],
+          "inputs": {
+            "duration": "3600 seconds"
+          },
+          "steps": [
+            "Run system for 1 hour"
+          ],
+          "expected": [
+            "power_consumption <= max_power"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller detects patient inspiration",
+          "req_ids": [
+            "RW-SW-154"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is breathing"
+          ],
+          "inputs": {
+            "breathing": "normal"
+          },
+          "steps": [
+            "Simulate patient breathing"
+          ],
+          "expected": [
+            "inspiration_detected = true"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Clock does not overflow at the boundary of 2 weeks",
+          "req_ids": [
+            "RW-SW-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "duration": "1209601 seconds"
+          },
+          "steps": [
+            "Run system for 2 weeks and 1 second"
+          ],
+          "expected": [
+            "clock_value < 1209601"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Algorithm stability drops below 99%",
+          "req_ids": [
+            "RW-SW-9"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "duration": "1209600 seconds"
+          },
+          "steps": [
+            "Run system for 2 weeks with unstable conditions"
+          ],
+          "expected": [
+            "algorithm_stability <= 0.99"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Execution time equals real time",
+          "req_ids": [
+            "RW-SW-10"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is in stress test mode"
+          ],
+          "inputs": {
+            "mode": "stress"
+          },
+          "steps": [
+            "Run system in stress test mode"
+          ],
+          "expected": [
+            "execution_time < real_time"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Power consumption exceeds max power",
+          "req_ids": [
+            "RW-SW-41"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is running on battery"
+          ],
+          "inputs": {
+            "duration": "3600 seconds"
+          },
+          "steps": [
+            "Run system for 1 hour with high power consumption"
+          ],
+          "expected": [
+            "power_consumption <= max_power"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Inspiration detection fails",
+          "req_ids": [
+            "RW-SW-154"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient is not breathing"
+          ],
+          "inputs": {
+            "breathing": "none"
+          },
+          "steps": [
+            "Simulate no patient breathing"
+          ],
+          "expected": [
+            "inspiration_detected = false"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Clock does not overflow just below 2 weeks",
+          "req_ids": [
+            "RW-SW-8"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "duration": "1209599 seconds"
+          },
+          "steps": [
+            "Run system for 2 weeks minus 1 second"
+          ],
+          "expected": [
+            "clock_value < 1209599"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Algorithm stability is above 98% just below 99%",
+          "req_ids": [
+            "RW-SW-9"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {
+            "duration": "1209600 seconds"
+          },
+          "steps": [
+            "Run system for 2 weeks with stable conditions"
+          ],
+          "expected": [
+            "algorithm_stability >= 0.98"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Execution time is less than real time minus 1",
+          "req_ids": [
+            "RW-SW-10"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is in stress test mode"
+          ],
+          "inputs": {
+            "mode": "stress"
+          },
+          "steps": [
+            "Run system in stress test mode"
+          ],
+          "expected": [
+            "execution_time <= real_time - 1"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Power consumption does not exceed max power minus 1",
+          "req_ids": [
+            "RW-SW-41"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is running on battery"
+          ],
+          "inputs": {
+            "duration": "3600 seconds"
+          },
+          "steps": [
+            "Run system for 1 hour with moderate power consumption"
+          ],
+          "expected": [
+            "power_consumption <= max_power - 1"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Inspiration detection under varying breathing rates and noise",
+          "req_ids": [
+            "RW-SW-154"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Patient is breathing with varying rates and noise"
+          ],
+          "inputs": {
+            "breathing": "variable"
+          },
+          "steps": [
+            "Simulate variable patient breathing"
+          ],
+          "expected": [
+            "inspiration_detected = true"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Temporal Logic (LTL)",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.3333,
+        "hallucinated": [
+          {
+            "value": "0.99",
+            "context": "stability threshold",
+            "grounded": false
+          },
+          {
+            "value": "0.98",
+            "context": "stability threshold",
+            "grounded": false
+          },
+          {
+            "value": "real_time",
+            "context": "runtime reference",
+            "grounded": false
+          },
+          {
+            "value": "max_power",
+            "context": "maximum power budget",
+            "grounded": false
+          },
+          {
+            "value": "false",
+            "context": "inspiration detection flag",
+            "grounded": false
+          },
+          {
+            "value": "stress",
+            "context": "system mode",
+            "grounded": false
+          },
+          {
+            "value": "normal",
+            "context": "breathing pattern",
+            "grounded": false
+          },
+          {
+            "value": "variable",
+            "context": "breathing pattern",
+            "grounded": false
+          },
+          {
+            "value": "none",
+            "context": "breathing pattern",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "time or power offset",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 15,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Negative test TC-008 incorrectly asserts the same condition as the positive test; should assert failure.",
+          "Assertions use abstract variables (real_time, max_power) without concrete values, reducing test determinism.",
+          "Boundary tests rely on unspecified offsets (e.g., \"- 1\") without defining the unit or value.",
+          "The suite lacks tests for error handling when clock overflows or power budget is exceeded.",
+          "No tests cover interactions between multiple requirements (e.g., power consumption during stress test)."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.9,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

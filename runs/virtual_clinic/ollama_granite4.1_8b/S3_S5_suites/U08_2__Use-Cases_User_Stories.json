@@ -1,0 +1,977 @@
+{
+  "unit_id": "U08_2",
+  "representation": "Use-Cases & User Stories",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Use-Cases & User Stories",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.44999999999999996,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.0
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 0.7143,
+    "hallucinated": [
+      {
+        "value": "Cardiology",
+        "context": "specialty",
+        "grounded": false
+      },
+      {
+        "value": "large",
+        "context": "screen size",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 7,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add negative test cases for duplicate patient IDs and exceeding patient limit",
+      "Include alternative and exception flows in test cases to satisfy representation-specific criteria",
+      "Test boundary conditions for patient count and consultation requests (e.g., 249,999 and 250,001)",
+      "Provide concrete expected outputs such as specific error codes and messages",
+      "Verify adaptive UI on multiple screen sizes, not just \"large\""
+    ],
+    "traceability": 0.75,
+    "untraced_reqs": [
+      "VIRTUA-2.5-11",
+      "VIRTUA-2.5-14"
+    ],
+    "fsa_score": 0.58,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "**Use-Cases & User Stories for Virtual Health System (VIRTUA-2.5)**  \n\n---\n\n### Actor(s)\n- **Patient**: User who accesses the system to schedule consultations.\n- **Clinician**: User who manages consultations and specialties.\n- **Administrator**: User who provisions patients and configures system settings.\n\n---\n\n### Use-Case: Provision Patients (UC-001)\n**Primary Actor**: Administrator  \n**Goal**: Provision up to 250,000 unique patients in the system.\n\n**Preconditions**:\n- System is initialized.\n- Administrator has provisioning privilege.\n\n**Main Success Scenario**:\n1. Administrator logs in.\n2. Administrator navigates to “Patient Provisioning” module.\n3. Administrator enters patient details (e.g., name, contact info) for each patient.\n4. System validates uniqueness of patient identifiers.\n5. System stores patient records.\n6. Administrator receives confirmation of successful provisioning.\n\n**Alternative Flows**:\n- **AF-1**: If a duplicate patient identifier is entered, system prompts administrator to correct or skip.\n- **AF-2**: If provisioning exceeds 250,000, system displays warning and prevents further entries.\n\n**Exception Flows**:\n- **EF-1**: System fails to store a patient record due to database error → Administrator receives error message and can retry.\n- **EF-2**: Network timeout during provisioning → System retries automatically up to three times, then alerts administrator.\n\n---\n\n### Use-Case: Schedule Consultation (UC-002)\n**Primary Actor**: Patient  \n**Goal**: Schedule a consultation with a chosen specialty.\n\n**Preconditions**:\n- Patient is provisioned.\n- System supports the selected specialty.\n\n**Main Success Scenario**:\n1. Patient logs in.\n2. Patient selects a specialty from the list (up to 5 specialties by year 3).\n3. Patient chooses a date and time slot.\n4. System checks availability.\n5. System confirms the scheduled consultation.\n6. Patient receives confirmation via notification.\n\n**Alternative Flows**:\n- **AF-1**: Selected specialty not available → System suggests alternative specialties.\n- **AF-2**: No available time slot → System prompts patient to select a different date/time.\n\n**Exception Flows**:\n- **EF-1**: System encounters a concurrency conflict (two patients selecting the same slot) → System notifies both patients and allows one to proceed.\n- **EF-2**: Technical error during scheduling → Patient receives error message and can retry.\n\n---\n\n### Use-Case: Mobile Platform Compatibility (UC-003)\n**Primary Actor**: Patient  \n**Goal**: Ensure the system can run on an Android mobile platform in the future.\n\n**Preconditions**:\n- Mobile client is installed.\n- System backend is prepared for mobile API.\n\n**Main Success Scenario**:\n1. Patient opens the mobile app.\n2. App authenticates using existing credentials.\n3. App displays the same consultation scheduling interface as the web version.\n4. Patient schedules a consultation successfully via mobile.\n\n**Alternative Flows**:\n- **AF-1**: Mobile app fails to authenticate → System prompts re-entry of credentials.\n- **AF-2**: API endpoint not yet available → System displays a message indicating future availability.\n\n**Exception Flows**:\n- **EF-1**: Mobile app crashes during scheduling → System logs error and prompts user to retry.\n- **EF-2**: Network error on mobile device → System retries connection automatically.\n\n---\n\n### Use-Case: Adaptive User Interface Design (UC-004)\n**Primary Actor**: Patient & Clinician  \n**Goal**: Ensure UI adapts responsively across devices and maintains usability.\n\n**Preconditions**:\n- System is deployed on various devices (desktop, tablet, mobile).\n- Font size and layout settings are configurable.\n\n**Main Success Scenario**:\n1. User accesses the system on a device.\n2. System detects device type and screen size.\n3. UI automatically adjusts layout, font sizes, and control sizes for optimal readability.\n4. User interacts with the system without manual resizing.\n\n**Alternative Flows**:\n- **AF-1**: User manually overrides default settings → System applies user-selected preferences.\n- **AF-2**: Device supports multiple orientations → UI switches orientation seamlessly.\n\n**Exception Flows**:\n- **EF-1**: Detected device not supported → System displays a fallback basic interface.\n- **EF-2**: Font size setting fails to apply → System defaults to standard size and logs the issue.\n\n---\n\n### Use-Case: Scalability for Future Growth (UC-005)\n**Primary Actor**: Administrator  \n**Goal**: Design system architecture to handle projected growth in consultation requests and specialties.\n\n**Preconditions**:\n- System architecture is under design.\n- Projected load is 4.0 million consultation requests over 3 years.\n\n**Main Success Scenario**:\n1. Administrator reviews scalability requirements.\n2. System design incorporates load balancing, distributed databases, and modular service architecture.\n3. Simulations confirm system can handle 4.0 million requests without performance degradation.\n4. Administrator approves the design.\n\n**Alternative Flows**:\n- **AF-1**: Initial simulation shows insufficient capacity → Administrator iterates on architecture (e.g., adds more nodes).\n- **AF-2**: New specialty added beyond initial 5 → System automatically provisions additional resources.\n\n**Exception Flows**:\n- **EF-1**: Simulation fails due to unexpected database latency → Administrator investigates and optimizes query performance.\n- **EF-2**: Resource provisioning error during scaling test → System alerts administrator for manual intervention.\n\n---\n\n### Use-Case: Usability Testing (UC-006)\n**Primary Actor**: Patient  \n**Goal**: Validate that font sizes and ease of usage meet usability standards.\n\n**Preconditions**:\n- System UI is deployed.\n- Usability testing environment is set up.\n\n**Main Success Scenario**:\n1. Patient participates in a usability test session.\n2. Test administrator presents tasks (e.g., schedule a consultation).\n3. Patient completes tasks within acceptable time and with minimal errors.\n4. Test records positive usability metrics (e.g., task completion rate ≥ 90%, satisfaction score ≥ 4/5).\n\n**Alternative Flows**:\n- **AF-1**: Patient struggles with font size → Test administrator adjusts font size and retests.\n- **AF-2**: Patient finds navigation unintuitive → Test administrator provides additional guidance.\n\n**Exception Flows**:\n- **EF-1**: Patient reports severe difficulty due to layout → Test stops and logs critical usability issue.\n- **EF-2**: Technical glitch during test (e.g., UI freezes) → Test paused and system restarted.\n\n---\n\n**Note**: All test cases derived from the above use-cases must reference the specific requirement IDs (e.g., VIRTUA-2.5-10, VIRTUA-2.5-11, etc.) to ensure clause coverage.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Provision up to 250,000 unique patients",
+      "req_ids": [
+        "VIRTUA-2.5-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Administrator is logged in",
+        "System initialized"
+      ],
+      "inputs": {
+        "name": "patient_count",
+        "value": "250000"
+      },
+      "steps": [
+        "Administrator navigates to Patient Provisioning module",
+        "Administrator enters patient details for each patient",
+        "System validates uniqueness of patient identifiers",
+        "System stores patient records",
+        "Administrator receives confirmation"
+      ],
+      "expected": [
+        "All 250,000 patients are provisioned successfully",
+        "Confirmation message displayed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Schedule consultation with a specialty",
+      "req_ids": [
+        "VIRTUA-2.5-13"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient is provisioned",
+        "System supports selected specialty"
+      ],
+      "inputs": {
+        "name": "specialty",
+        "value": "Cardiology"
+      },
+      "steps": [
+        "Patient logs in",
+        "Patient selects a specialty from the list",
+        "Patient chooses a date and time slot",
+        "System checks availability",
+        "System confirms the scheduled consultation",
+        "Patient receives confirmation via notification"
+      ],
+      "expected": [
+        "Consultation is scheduled",
+        "Confirmation notification is sent"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Mobile platform compatibility test",
+      "req_ids": [
+        "VIRTUA-2.5-15"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Mobile client installed",
+        "System backend prepared for mobile API"
+      ],
+      "inputs": {
+        "name": "device_type",
+        "value": "Android"
+      },
+      "steps": [
+        "Patient opens the mobile app",
+        "App authenticates using existing credentials",
+        "App displays consultation scheduling interface",
+        "Patient schedules a consultation successfully via mobile"
+      ],
+      "expected": [
+        "Mobile app authenticates successfully",
+        "Consultation is scheduled on mobile"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Adaptive UI design test",
+      "req_ids": [
+        "VIRTUA-2.5-16"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System deployed on various devices",
+        "Font size settings configurable"
+      ],
+      "inputs": {
+        "name": "device_screen_size",
+        "value": "large"
+      },
+      "steps": [
+        "User accesses the system on a device",
+        "System detects device type and screen size",
+        "UI automatically adjusts layout, font sizes, and control sizes",
+        "User interacts with the system without manual resizing"
+      ],
+      "expected": [
+        "UI layout is responsive",
+        "Font sizes are optimized for readability"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Scalability test for 4.0 million consultation requests",
+      "req_ids": [
+        "VIRTUA-2.5-10"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System architecture under design",
+        "Projected load is 4.0 million requests over 3 years"
+      ],
+      "inputs": {
+        "name": "request_volume",
+        "value": "4000000"
+      },
+      "steps": [
+        "Administrator reviews scalability requirements",
+        "System design incorporates load balancing and distributed databases",
+        "Simulations confirm system can handle 4.0 million requests",
+        "Administrator approves the design"
+      ],
+      "expected": [
+        "Simulation shows no performance degradation",
+        "Approval is recorded"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Usability testing for font sizes and ease of usage",
+      "req_ids": [
+        "VIRTUA-2.5-17"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System UI deployed",
+        "Usability testing environment set up"
+      ],
+      "inputs": {
+        "name": "task_completion_rate",
+        "value": "90"
+      },
+      "steps": [
+        "Patient participates in a usability test session",
+        "Test administrator presents tasks (e.g., schedule a consultation)",
+        "Patient completes tasks within acceptable time and with minimal errors",
+        "Test records positive usability metrics"
+      ],
+      "expected": [
+        "Task completion rate ≥ 90%",
+        "Satisfaction score ≥ 4/5"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "**Use-Case: System Capacity Planning for Consultation Requests**\n\n*Actor:* System Architect\n\n*Goal:* Ensure the system can handle 4.0 Million Consultation Requests over a 3-year period.\n\n*Preconditions:*\n- The system is designed to support a growing number of consultation requests.\n- Historical data indicates a 3-year database would generate 4.0 Million Consultation Requests.\n\n*Primary Success Flow:*\n1. Analyze historical consultation request data.\n2. Project future request volume based on current growth trends.\n3. Design database schema and architecture to accommodate 4.0 Million requests.\n4. Validate system performance under projected load using stress testing.\n5. Confirm that the system meets performance benchmarks for response times and throughput.\n\n*Alternative Flow:*\n1. If projected growth exceeds initial estimates, iterate on architecture design.\n2. Implement scalable solutions such as sharding or distributed databases.\n3. Re-evaluate performance metrics post-implementation.\n\n*Exception Flow:*\n1. If the system fails to meet performance benchmarks during stress testing.\n2. Identify bottlenecks (e.g., database queries, server resources).\n3. Optimize code, database indexing, or hardware resources.\n4. Re-run performance tests until benchmarks are satisfied.\n\n---\n\n**Use-Case: Provisioning Unique Patients**\n\n*Actor:* System Administrator\n\n*Goal:* Provision up to 250,000 unique patients within the system.\n\n*Preconditions:*\n- Patient data is validated and sanitized before provisioning.\n- System capacity is checked to ensure it can accommodate the patient count.\n\n*Primary Success Flow:*\n1. Import patient records from external sources (e.g., CSV, API).\n2. Validate each patient record against defined schema (e.g., unique ID, contact information).\n3. Insert validated records into the patient database.\n4. Confirm successful insertion via system logs or confirmation messages.\n\n*Alternative Flow:*\n1. If duplicate patient records are detected, merge or flag them for manual review.\n2. Retry import for failed records after resolving conflicts.\n\n*Exception Flow:*\n1. If the system exceeds the 250,000 patient limit, trigger an alert.\n2. Review system capacity and consider scaling solutions (e.g., additional storage, partitioning).\n3. Update system documentation to reflect the new capacity limits.\n\n---\n\n**Use-Case: Supporting Multiple Specialties**\n\n*Actor:* Specialty Manager\n\n*Goal:* Ensure the system supports up to 5 specialties by the end of year 3.\n\n*Preconditions:*\n- Specialty definitions are finalized and integrated into the system.\n- User roles are configured to access specialty-specific modules.\n\n*Primary Success Flow:*\n1. Define each specialty with unique attributes (e.g., procedures, staff).\n2. Configure user roles to grant access to relevant specialties.\n3. Test specialty-specific workflows to ensure correct functionality.\n4. Validate that all 5 specialties are operational and accessible.\n\n*Alternative Flow:*\n1. If additional specialties are requested before year 3, assess system capacity.\n2. Implement new specialty modules following established patterns.\n3. Update user roles and training materials accordingly.\n\n*Exception Flow:*\n1. If a specialty module fails to load or functions incorrectly, diagnose the issue.\n2. Check for configuration errors or conflicts with existing modules.\n3. Roll back to a previous stable version if necessary and reapply updates.\n\n---\n\n**Use-Case: Future Mobile Platform Compatibility**\n\n*Actor:* Mobile Development Team\n\n*Goal:* Design the system to be compatible with future Android mobile platforms.\n\n*Preconditions:*\n- System APIs are designed to be platform-agnostic.\n- Mobile front-end framework is selected and integrated.\n\n*Primary Success Flow:*\n1. Abstract core functionalities into RESTful APIs.\n2. Develop mobile front-end using a cross-platform framework (e.g., React Native).\n3. Conduct compatibility testing on Android devices.\n4. Ensure seamless data synchronization and user experience across platforms.\n\n*Alternative Flow:*\n1. If initial mobile implementation faces compatibility issues, refine API endpoints.\n2. Optimize mobile front-end for performance and responsiveness.\n3. Iterate testing until all functional requirements are met.\n\n*Exception Flow:*\n1. If critical bugs persist post-testing, engage in root cause analysis.\n2. Collaborate with backend team to adjust API responses or data formats.\n3. Release a hotfix or update to resolve identified issues.\n\n---\n\n**Use-Case: Adaptive User Interface Design**\n\n*Actor:* UI/UX Designer\n\n*Goal:* Design user interfaces that adapt responsively across devices and screen sizes.\n\n*Preconditions:*\n- Design guidelines for adaptive responses are established.\n- Prototype tools are available for cross-device testing.\n\n*Primary Success Flow:*\n1. Create UI components with flexible layouts (e.g., CSS Grid, Flexbox).\n2. Implement media queries to adjust styles based on device width.\n3. Test UI components on various devices (desktop, tablet, mobile).\n4. Validate that all components render correctly and maintain usability.\n\n*Alternative Flow:*\n1. If a component fails to adapt, refine layout definitions.\n2. Adjust breakpoints and test again on affected devices.\n3. Iterate until all components meet adaptive design standards.\n\n*Exception Flow:*\n1. If critical usability issues arise (e.g., unreadable text, misaligned elements), prioritize fixes.\n2. Conduct user testing to gather feedback on problematic areas.\n3. Refine designs and retest until issues are resolved.\n\n---\n\n**Use-Case: Usability Enhancements for Font Sizes and Ease of Use**\n\n*Actor:* End User\n\n*Goal:* Ensure font sizes and overall system usability meet user expectations.\n\n*Preconditions:*\n- Usability guidelines are defined (e.g., minimum font size, contrast ratios).\n- Accessibility features are integrated into the system.\n\n*Primary Success Flow:*\n1. Set default font sizes based on usability guidelines.\n2. Provide user options to adjust font sizes according to preference.\n3. Test readability across different devices and lighting conditions.\n4. Confirm that users can navigate the system with ease and minimal effort.\n\n*Alternative Flow:*\n1. If users request additional font size options, implement a slider or dropdown menu.\n2. Test new options for compatibility and usability.\n3. Update documentation to reflect new customization features.\n\n*Exception Flow:*\n1. If users report persistent readability issues, investigate underlying causes.\n2. Check for software bugs or hardware limitations affecting display.\n3. Provide temporary workarounds and schedule a fix for future releases.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Validate System Capacity for 4.0 Million Consultation Requests",
+          "req_ids": [
+            "VIRTUA-2.5-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Historical data indicates 3-year database generates 4.0 Million Consultation Requests."
+          ],
+          "inputs": {
+            "projected_requests": "4000000"
+          },
+          "steps": [
+            "Analyze historical consultation request data.",
+            "Project future request volume.",
+            "Design database schema to accommodate projected volume.",
+            "Perform stress testing to validate performance."
+          ],
+          "expected": [
+            "System meets performance benchmarks for response times and throughput under 4.0 Million requests."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Provision Up to 250,000 Unique Patients",
+          "req_ids": [
+            "VIRTUA-2.5-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient data is validated and sanitized."
+          ],
+          "inputs": {
+            "patient_records": "250000"
+          },
+          "steps": [
+            "Import patient records from external sources.",
+            "Validate each patient record against schema.",
+            "Insert validated records into patient database.",
+            "Confirm successful insertion via system logs."
+          ],
+          "expected": [
+            "All 250,000 patient records are successfully provisioned without duplicates."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Support Up to 5 Specialties by Year 3",
+          "req_ids": [
+            "VIRTUA-2.5-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Specialty definitions are finalized."
+          ],
+          "inputs": {
+            "specialties": "5"
+          },
+          "steps": [
+            "Define each specialty with unique attributes.",
+            "Configure user roles for specialty access.",
+            "Test specialty-specific workflows.",
+            "Validate all 5 specialties are operational."
+          ],
+          "expected": [
+            "All five specialties function correctly and are accessible to authorized users."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Ensure Future Compatibility with Android Mobile Platform",
+          "req_ids": [
+            "VIRTUA-2.5-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System APIs are platform-agnostic."
+          ],
+          "inputs": {
+            "platform": "Android"
+          },
+          "steps": [
+            "Abstract core functionalities into RESTful APIs.",
+            "Develop mobile front-end using cross-platform framework.",
+            "Conduct compatibility testing on Android devices.",
+            "Ensure seamless data synchronization and user experience."
+          ],
+          "expected": [
+            "Mobile application functions correctly on Android devices with no critical bugs."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Design Adaptive User Interfaces for Various Devices",
+          "req_ids": [
+            "VIRTUA-2.5-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Design guidelines for adaptive responses are established."
+          ],
+          "inputs": {
+            "device_types": [
+              "desktop",
+              "tablet",
+              "mobile"
+            ]
+          },
+          "steps": [
+            "Create UI components with flexible layouts.",
+            "Implement media queries for device width adjustments.",
+            "Test UI components across devices.",
+            "Validate correct rendering and usability."
+          ],
+          "expected": [
+            "UI components adapt responsively across all tested devices."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Enhance Usability with Adjustable Font Sizes",
+          "req_ids": [
+            "VIRTUA-2.5-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Usability guidelines for font sizes are defined."
+          ],
+          "inputs": {
+            "font_size_options": [
+              "small",
+              "medium",
+              "large"
+            ]
+          },
+          "steps": [
+            "Set default font sizes based on guidelines.",
+            "Provide user options to adjust font sizes.",
+            "Test readability across devices and lighting.",
+            "Confirm ease of navigation and minimal effort."
+          ],
+          "expected": [
+            "Users can adjust font sizes and maintain readability and usability."
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Boundary Test for Consultation Request Volume",
+          "req_ids": [
+            "VIRTUA-2.5-10"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System designed for 4.0 Million requests."
+          ],
+          "inputs": {
+            "request_volume": "3999999"
+          },
+          "steps": [
+            "Simulate 3,999,999 consultation requests.",
+            "Monitor system performance and resource utilization.",
+            "Verify system stability and response times."
+          ],
+          "expected": [
+            "System handles near-maximum load without degradation."
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Exception Handling for Patient Provisioning Exceeding Limit",
+          "req_ids": [
+            "VIRTUA-2.5-12"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "System capacity set to 250,000 patients."
+          ],
+          "inputs": {
+            "patient_records": "250001"
+          },
+          "steps": [
+            "Attempt to provision 250,001 patient records.",
+            "Trigger alert if limit is exceeded.",
+            "Review system capacity and scaling options."
+          ],
+          "expected": [
+            "System alerts user and suggests capacity expansion before proceeding."
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Error Path for Specialty Module Loading Failure",
+          "req_ids": [
+            "VIRTUA-2.5-13"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Specialty module is configured for loading."
+          ],
+          "inputs": {
+            "specialty_name": "Oncology"
+          },
+          "steps": [
+            "Initiate loading of Oncology specialty module.",
+            "Check for loading errors or failures.",
+            "Diagnose and resolve configuration issues."
+          ],
+          "expected": [
+            "System logs error details and provides guidance for resolution."
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Usability Exception for Unreadable Text on Mobile",
+          "req_ids": [
+            "VIRTUA-2.5-17"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Font size is set to smallest option."
+          ],
+          "inputs": {
+            "device": "Android",
+            "font_size": "smallest"
+          },
+          "steps": [
+            "Test text readability on smallest font size.",
+            "Gather user feedback on readability.",
+            "Implement temporary increase in font size."
+          ],
+          "expected": [
+            "Text becomes readable and user experience is improved."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.8,
+        "representation_score": 1.0,
+        "sfv_score": 0.9,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.90). Fix these problems and output the full corrected suite:\n- test case #8 (TC-008): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories**\n\n*Actor:* System Administrator  \n*Goal:* Provision up to 250,000 unique patients within the system.\n\n**Primary Success Flow:**\n1. System Administrator logs into the provisioning interface.\n2. System Administrator enters patient details (name, DOB, contact info) for each patient.\n3. System validates the uniqueness of each patient record.\n4. System stores the patient record in the database.\n5. System confirms successful provisioning to the administrator.\n\n**Alternative Flow:**\n1. If a duplicate patient record is attempted, the system prompts the administrator to confirm or edit the existing record.\n\n**Exception Flow:**\n1. If the system exceeds the limit of 250,000 unique patients, it raises an error and prevents further provisioning.\n\n---\n\n*Actor:* System Designer  \n*Goal:* Design the system to handle 4.0 Million Consultation requests over a 3-year period, supporting up to 5 specialties.\n\n**Primary Success Flow:**\n1. System Designer inputs the projected consultation volume (4.0 Million) into the load testing module.\n2. System Designer configures the system to support up to 5 specialties.\n3. System simulates consultation requests over a 3-year period.\n4. System verifies that performance metrics (response time, throughput) meet predefined thresholds.\n\n**Alternative Flow:**\n1. If the projected consultation volume increases beyond 4.0 Million, the system automatically scales resources (e.g., database sharding, additional server instances).\n\n**Exception Flow:**\n1. If the system fails to meet performance thresholds under the simulated load, it alerts the designer for capacity planning adjustments.\n\n---\n\n*Actor:* Future Mobile User (Android)  \n*Goal:* Access the system via a mobile platform.\n\n**Primary Success Flow:**\n1. User downloads and installs the Android application.\n2. User logs in using existing credentials.\n3. Application displays the interface with adaptive responsiveness.\n4. User interacts with the system (e.g., schedules an appointment, views consultation history).\n\n**Alternative Flow:**\n1. If the application encounters a connectivity issue, it retries the connection or prompts the user to check network settings.\n\n**Exception Flow:**\n1. If the system is not yet available on Android, the application displays a message indicating future availability and collects user interest.\n\n---\n\n*Actor:* Usability Tester  \n*Goal:* Ensure the system interface is usable with appropriate font sizes and ease of use.\n\n**Primary Success Flow:**\n1. Tester accesses the interface on a device.\n2. Tester verifies that font sizes meet the specified readability standards.\n3. Tester navigates through typical user tasks (e.g., searching for a doctor, scheduling an appointment).\n4. Tester confirms that the interface is intuitive and requires minimal effort to complete tasks.\n\n**Alternative Flow:**\n1. If a user prefers a different font size, the system provides an option to adjust settings.\n\n**Exception Flow:**\n1. If the interface fails to meet usability standards (e.g., illegible text, confusing navigation), it triggers a usability review and redesign.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Provision up to 250,000 unique patients",
+          "req_ids": [
+            "VIRTUA-2.5-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System Administrator is logged in"
+          ],
+          "inputs": {
+            "name": "patient_details"
+          },
+          "steps": [
+            "System Administrator enters patient details",
+            "System validates uniqueness",
+            "System stores patient record",
+            "System confirms provisioning"
+          ],
+          "expected": [
+            "Successful provisioning of patient"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Handle duplicate patient provisioning attempt",
+          "req_ids": [
+            "VIRTUA-2.5-12"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "System Administrator attempts to provision a duplicate patient"
+          ],
+          "inputs": {
+            "name": "duplicate_patient_details"
+          },
+          "steps": [
+            "System detects duplicate",
+            "System prompts confirmation or edit",
+            "System Administrator chooses action"
+          ],
+          "expected": [
+            "Prompt displayed, no duplicate record created"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Exceed patient provisioning limit",
+          "req_ids": [
+            "VIRTUA-2.5-12"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "System attempts to provision beyond 250,000 patients"
+          ],
+          "inputs": {
+            "name": "excess_patient_details"
+          },
+          "steps": [
+            "System attempts to store additional patient",
+            "System raises error",
+            "System prevents further provisioning"
+          ],
+          "expected": [
+            "Error message displayed, provisioning halted"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Design system for 4.0 Million consultation requests",
+          "req_ids": [
+            "VIRTUA-2.5-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System Designer inputs load parameters"
+          ],
+          "inputs": {
+            "name": "consultation_volume",
+            "value": "4000000"
+          },
+          "steps": [
+            "System Designer enters consultation volume",
+            "System simulates requests over 3 years",
+            "System verifies performance metrics"
+          ],
+          "expected": [
+            "Performance metrics meet thresholds"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Scale system for increased consultation volume",
+          "req_ids": [
+            "VIRTUA-2.5-10"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Projected consultation volume exceeds 4.0 Million"
+          ],
+          "inputs": {
+            "name": "increased_volume",
+            "value": "5000000"
+          },
+          "steps": [
+            "System detects increased volume",
+            "System automatically scales resources",
+            "System continues simulation"
+          ],
+          "expected": [
+            "System scales resources, maintains performance"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Future mobile platform availability",
+          "req_ids": [
+            "VIRTUA-2.5-15"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "User attempts to access system via Android app before release"
+          ],
+          "inputs": {
+            "name": "android_app_launch"
+          },
+          "steps": [
+            "User downloads Android app",
+            "App checks system availability",
+            "App displays future availability message"
+          ],
+          "expected": [
+            "Message indicating future availability is shown"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Adaptive responsive design",
+          "req_ids": [
+            "VIRTUA-2.5-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User accesses interface on a mobile device"
+          ],
+          "inputs": {
+            "name": "device_orientation",
+            "value": "portrait"
+          },
+          "steps": [
+            "User opens interface",
+            "Interface adjusts layout responsively",
+            "User interacts with interface"
+          ],
+          "expected": [
+            "Interface adapts smoothly to orientation changes"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Usability test font sizes and ease of use",
+          "req_ids": [
+            "VIRTUA-2.5-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Usability Tester accesses interface"
+          ],
+          "inputs": {
+            "name": "font_size",
+            "value": "16px"
+          },
+          "steps": [
+            "Tester verifies font size readability",
+            "Tester navigates typical tasks",
+            "Tester confirms ease of use"
+          ],
+          "expected": [
+            "Readable font size, intuitive navigation"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Adjust font size preference",
+          "req_ids": [
+            "VIRTUA-2.5-17"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Tester selects font size adjustment"
+          ],
+          "inputs": {
+            "name": "font_size_preference",
+            "value": "18px"
+          },
+          "steps": [
+            "Tester accesses settings",
+            "Tester selects preferred font size",
+            "Interface updates font size"
+          ],
+          "expected": [
+            "Font size updated to preferred value"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Usability failure due to illegible text",
+          "req_ids": [
+            "VIRTUA-2.5-17"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Interface font size is below readability threshold"
+          ],
+          "inputs": {
+            "name": "font_size",
+            "value": "8px"
+          },
+          "steps": [
+            "Tester attempts to read text",
+            "Interface fails readability check",
+            "Usability review triggered"
+          ],
+          "expected": [
+            "Usability review initiated, redesign required"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.4,
+        "representation_score": 1.0,
+        "sfv_score": 0.7,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #2 (TC-002): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #5 (TC-005): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.70). Fix these problems and output the full corrected suite:\n- test case #2 (TC-002): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #5 (TC-005): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #9 (TC-009): 'alternative' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories for Virtual Health System (Unit U08_2)**\n\n---\n\n### Use-Case: System Scalability to Handle Consultation Requests\n\n**Primary Actor:** System Architect  \n**Goal:** Ensure the system can handle 4.0 Million Consultation requests over a 3-year period.\n\n**Preconditions:**  \n- Database initialized with patient records.  \n- System configured for expected load.\n\n**Main Success Scenario:**  \n1. Simulate 4,000,000 consultation requests over 3 years.  \n2. Verify system processes each request within acceptable latency (e.g., < 2 seconds).  \n3. Confirm no data loss or corruption.\n\n**Alternative Scenarios:**  \n- **AS-1:** If the request volume exceeds 4.0 Million, the system should gracefully degrade by queuing excess requests and notifying administrators.  \n- **AS-2:** If latency exceeds 2 seconds for any request, trigger an alert for performance tuning.\n\n**Exception Scenarios:**  \n- **ES-1:** If the database fails to store a consultation request, rollback to the last consistent state and log the error.  \n- **ES-2:** If system resources (CPU, memory) are exhausted, initiate auto-scaling or failover mechanisms.\n\n---\n\n### Use-Case: Provisioning of Unique Patients\n\n**Primary Actor:** System Administrator  \n**Goal:** Provision up to 250,000 unique patients.\n\n**Preconditions:**  \n- Patient data source is available.  \n- System is in a ready state.\n\n**Main Success Scenario:**  \n1. Import patient records from the data source.  \n2. Validate each record for uniqueness.  \n3. Confirm all 250,000 patients are successfully provisioned without duplicates.\n\n**Alternative Scenarios:**  \n- **AS-3:** If duplicate patient records are detected, prompt the administrator to resolve conflicts before proceeding.  \n- **AS-4:** If the import process is interrupted, allow resumption from the last successful record.\n\n**Exception Scenarios:**  \n- **ES-3:** If a critical error occurs during import (e.g., network failure), abort the operation and provide a detailed error report.  \n- **ES-4:** If storage capacity is insufficient, trigger a storage expansion process and retry the import.\n\n---\n\n### Use-Case: Support for Multiple Specialties\n\n**Primary Actor:** Healthcare Provider  \n**Goal:** Ensure the system supports up to 5 specialties by the end of year 3.\n\n**Preconditions:**  \n- Specialty definitions are configured.  \n- System is updated to the latest version.\n\n**Main Success Scenario:**  \n1. Configure up to 5 specialties in the system.  \n2. Verify each specialty can be selected during consultation scheduling.  \n3. Confirm reports and dashboards reflect data for each specialty accurately.\n\n**Alternative Scenarios:**  \n- **AS-5:** If additional specialties are requested beyond 5, provide a roadmap for future expansion.  \n- **AS-6:** If a specialty configuration fails, allow rollback to the previous stable configuration.\n\n**Exception Scenarios:**  \n- **ES-5:** If a specialty configuration causes system instability, isolate the configuration and investigate root cause.  \n- **ES-6:** If data integrity is compromised during specialty updates, initiate a data rollback and notify administrators.\n\n---\n\n### Use-Case: Future Growth Considerations\n\n**Primary Actor:** Product Manager  \n**Goal:** Design the system architecture to accommodate future growth.\n\n**Preconditions:**  \n- Current system architecture is documented.  \n- Growth projections are available.\n\n**Main Success Scenario:**  \n1. Review architecture for modularity and scalability.  \n2. Identify components that can be scaled horizontally or vertically.  \n3. Validate that new features can be integrated without major re-architecting.\n\n**Alternative Scenarios:**  \n- **AS-7:** If a new feature requires significant architectural changes, evaluate the feasibility of incremental upgrades.  \n- **AS-8:** If resource constraints are identified, propose a phased expansion plan.\n\n**Exception Scenarios:**  \n- **ES-7:** If architectural limitations are discovered during testing, document them for future redesign.  \n- **ES-8:** If integration of a new feature causes unforeseen performance degradation, prioritize performance optimization.\n\n---\n\n### Use-Case: Mobile Platform Compatibility\n\n**Primary Actor:** End User (Future Mobile User)  \n**Goal:** Ensure the system can be deployed on an Android platform in the future.\n\n**Preconditions:**  \n- Mobile development environment is set up.  \n- System APIs are accessible.\n\n**Main Success Scenario:**  \n1. Develop a mobile client that communicates with the backend APIs.  \n2. Test core functionalities (e.g., consultation scheduling, patient records) on Android devices.  \n3. Verify data synchronization and offline capabilities.\n\n**Alternative Scenarios:**  \n- **AS-9:** If certain functionalities are not supported on mobile, provide web-based alternatives.  \n- **AS-10:** If performance is suboptimal on low-end devices, implement adaptive loading strategies.\n\n**Exception Scenarios:**  \n- **ES-9:** If API changes break mobile client functionality, roll back to the last stable API version.  \n- **ES-10:** If device compatibility issues arise, create device-specific configurations or limit features.\n\n---\n\n### Use-Case: Adaptive User Interface Design\n\n**Primary Actor:** End User  \n**Goal:** Design user interfaces that adapt responsively across devices.\n\n**Preconditions:**  \n- UI design guidelines are established.  \n- Responsive design tools are available.\n\n**Main Success Scenario:**  \n1. Implement UI components that adjust layout based on screen size.  \n2. Test on various devices (desktop, tablet, mobile).  \n3. Confirm usability metrics (e.g., task completion time, error rate) meet targets.\n\n**Alternative Scenarios:**  \n- **AS-11:** If certain devices cannot support full adaptive features, provide simplified interfaces.  \n- **AS-12:** If user feedback indicates layout issues, iterate on design based on feedback.\n\n**Exception Scenarios:**  \n- **ES-11:** If a critical UI component fails to adapt, prioritize fixing the component for all supported devices.  \n- **ES-12:** If performance degrades due to adaptive design, optimize resource usage.\n\n---\n\n### Use-Case: Usability Considerations for Font Sizes and Ease of Use\n\n**Primary Actor:** End User  \n**Goal:** Ensure font sizes and overall system usability meet accessibility standards.\n\n**Preconditions:**  \n- Accessibility guidelines are defined.  \n- System supports customizable font settings.\n\n**Main Success Scenario:**  \n1. Set default font sizes that meet WCAG guidelines.  \n2. Allow users to adjust font sizes according to preference.  \n3. Validate that all text elements are legible across devices.\n\n**Alternative Scenarios:**  \n- **AS-13:** If users require additional customization options, provide advanced settings panel.  \n- **AS-14:** If certain font sizes cause layout issues, implement dynamic resizing logic.\n\n**Exception Scenarios:**  \n- **ES-13:** If font rendering fails on specific devices, identify and apply device-specific font fixes.  \n- **ES-14:** If usability testing reveals navigation difficulties, redesign navigation flow.\n\n---\n\n**Note:** All test cases derived from these use-cases must reference the specific requirement IDs (e.g., VIRTUA-2.5-10, VIRTUA-2.5-11, etc.) and adhere to the syntactic and coverage criteria outlined in the scoring guidelines.",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).",
+      "artifact": "**Use-Cases & User Stories for Virtual Health System (VIRTUA-2.5)**  \n\n---\n\n### Actor(s)\n- **Patient**: User who accesses the system to schedule consultations.\n- **Clinician**: User who manages consultations and specialties.\n- **Administrator**: User who provisions patients and configures system settings.\n\n---\n\n### Use-Case: Provision Patients (UC-001)\n**Primary Actor**: Administrator  \n**Goal**: Provision up to 250,000 unique patients in the system.\n\n**Preconditions**:\n- System is initialized.\n- Administrator has provisioning privilege.\n\n**Main Success Scenario**:\n1. Administrator logs in.\n2. Administrator navigates to “Patient Provisioning” module.\n3. Administrator enters patient details (e.g., name, contact info) for each patient.\n4. System validates uniqueness of patient identifiers.\n5. System stores patient records.\n6. Administrator receives confirmation of successful provisioning.\n\n**Alternative Flows**:\n- **AF-1**: If a duplicate patient identifier is entered, system prompts administrator to correct or skip.\n- **AF-2**: If provisioning exceeds 250,000, system displays warning and prevents further entries.\n\n**Exception Flows**:\n- **EF-1**: System fails to store a patient record due to database error → Administrator receives error message and can retry.\n- **EF-2**: Network timeout during provisioning → System retries automatically up to three times, then alerts administrator.\n\n---\n\n### Use-Case: Schedule Consultation (UC-002)\n**Primary Actor**: Patient  \n**Goal**: Schedule a consultation with a chosen specialty.\n\n**Preconditions**:\n- Patient is provisioned.\n- System supports the selected specialty.\n\n**Main Success Scenario**:\n1. Patient logs in.\n2. Patient selects a specialty from the list (up to 5 specialties by year 3).\n3. Patient chooses a date and time slot.\n4. System checks availability.\n5. System confirms the scheduled consultation.\n6. Patient receives confirmation via notification.\n\n**Alternative Flows**:\n- **AF-1**: Selected specialty not available → System suggests alternative specialties.\n- **AF-2**: No available time slot → System prompts patient to select a different date/time.\n\n**Exception Flows**:\n- **EF-1**: System encounters a concurrency conflict (two patients selecting the same slot) → System notifies both patients and allows one to proceed.\n- **EF-2**: Technical error during scheduling → Patient receives error message and can retry.\n\n---\n\n### Use-Case: Mobile Platform Compatibility (UC-003)\n**Primary Actor**: Patient  \n**Goal**: Ensure the system can run on an Android mobile platform in the future.\n\n**Preconditions**:\n- Mobile client is installed.\n- System backend is prepared for mobile API.\n\n**Main Success Scenario**:\n1. Patient opens the mobile app.\n2. App authenticates using existing credentials.\n3. App displays the same consultation scheduling interface as the web version.\n4. Patient schedules a consultation successfully via mobile.\n\n**Alternative Flows**:\n- **AF-1**: Mobile app fails to authenticate → System prompts re-entry of credentials.\n- **AF-2**: API endpoint not yet available → System displays a message indicating future availability.\n\n**Exception Flows**:\n- **EF-1**: Mobile app crashes during scheduling → System logs error and prompts user to retry.\n- **EF-2**: Network error on mobile device → System retries connection automatically.\n\n---\n\n### Use-Case: Adaptive User Interface Design (UC-004)\n**Primary Actor**: Patient & Clinician  \n**Goal**: Ensure UI adapts responsively across devices and maintains usability.\n\n**Preconditions**:\n- System is deployed on various devices (desktop, tablet, mobile).\n- Font size and layout settings are configurable.\n\n**Main Success Scenario**:\n1. User accesses the system on a device.\n2. System detects device type and screen size.\n3. UI automatically adjusts layout, font sizes, and control sizes for optimal readability.\n4. User interacts with the system without manual resizing.\n\n**Alternative Flows**:\n- **AF-1**: User manually overrides default settings → System applies user-selected preferences.\n- **AF-2**: Device supports multiple orientations → UI switches orientation seamlessly.\n\n**Exception Flows**:\n- **EF-1**: Detected device not supported → System displays a fallback basic interface.\n- **EF-2**: Font size setting fails to apply → System defaults to standard size and logs the issue.\n\n---\n\n### Use-Case: Scalability for Future Growth (UC-005)\n**Primary Actor**: Administrator  \n**Goal**: Design system architecture to handle projected growth in consultation requests and specialties.\n\n**Preconditions**:\n- System architecture is under design.\n- Projected load is 4.0 million consultation requests over 3 years.\n\n**Main Success Scenario**:\n1. Administrator reviews scalability requirements.\n2. System design incorporates load balancing, distributed databases, and modular service architecture.\n3. Simulations confirm system can handle 4.0 million requests without performance degradation.\n4. Administrator approves the design.\n\n**Alternative Flows**:\n- **AF-1**: Initial simulation shows insufficient capacity → Administrator iterates on architecture (e.g., adds more nodes).\n- **AF-2**: New specialty added beyond initial 5 → System automatically provisions additional resources.\n\n**Exception Flows**:\n- **EF-1**: Simulation fails due to unexpected database latency → Administrator investigates and optimizes query performance.\n- **EF-2**: Resource provisioning error during scaling test → System alerts administrator for manual intervention.\n\n---\n\n### Use-Case: Usability Testing (UC-006)\n**Primary Actor**: Patient  \n**Goal**: Validate that font sizes and ease of usage meet usability standards.\n\n**Preconditions**:\n- System UI is deployed.\n- Usability testing environment is set up.\n\n**Main Success Scenario**:\n1. Patient participates in a usability test session.\n2. Test administrator presents tasks (e.g., schedule a consultation).\n3. Patient completes tasks within acceptable time and with minimal errors.\n4. Test records positive usability metrics (e.g., task completion rate ≥ 90%, satisfaction score ≥ 4/5).\n\n**Alternative Flows**:\n- **AF-1**: Patient struggles with font size → Test administrator adjusts font size and retests.\n- **AF-2**: Patient finds navigation unintuitive → Test administrator provides additional guidance.\n\n**Exception Flows**:\n- **EF-1**: Patient reports severe difficulty due to layout → Test stops and logs critical usability issue.\n- **EF-2**: Technical glitch during test (e.g., UI freezes) → Test paused and system restarted.\n\n---\n\n**Note**: All test cases derived from the above use-cases must reference the specific requirement IDs (e.g., VIRTUA-2.5-10, VIRTUA-2.5-11, etc.) to ensure clause coverage.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Provision up to 250,000 unique patients",
+          "req_ids": [
+            "VIRTUA-2.5-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Administrator is logged in",
+            "System initialized"
+          ],
+          "inputs": {
+            "name": "patient_count",
+            "value": "250000"
+          },
+          "steps": [
+            "Administrator navigates to Patient Provisioning module",
+            "Administrator enters patient details for each patient",
+            "System validates uniqueness of patient identifiers",
+            "System stores patient records",
+            "Administrator receives confirmation"
+          ],
+          "expected": [
+            "All 250,000 patients are provisioned successfully",
+            "Confirmation message displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Schedule consultation with a specialty",
+          "req_ids": [
+            "VIRTUA-2.5-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient is provisioned",
+            "System supports selected specialty"
+          ],
+          "inputs": {
+            "name": "specialty",
+            "value": "Cardiology"
+          },
+          "steps": [
+            "Patient logs in",
+            "Patient selects a specialty from the list",
+            "Patient chooses a date and time slot",
+            "System checks availability",
+            "System confirms the scheduled consultation",
+            "Patient receives confirmation via notification"
+          ],
+          "expected": [
+            "Consultation is scheduled",
+            "Confirmation notification is sent"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Mobile platform compatibility test",
+          "req_ids": [
+            "VIRTUA-2.5-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Mobile client installed",
+            "System backend prepared for mobile API"
+          ],
+          "inputs": {
+            "name": "device_type",
+            "value": "Android"
+          },
+          "steps": [
+            "Patient opens the mobile app",
+            "App authenticates using existing credentials",
+            "App displays consultation scheduling interface",
+            "Patient schedules a consultation successfully via mobile"
+          ],
+          "expected": [
+            "Mobile app authenticates successfully",
+            "Consultation is scheduled on mobile"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Adaptive UI design test",
+          "req_ids": [
+            "VIRTUA-2.5-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System deployed on various devices",
+            "Font size settings configurable"
+          ],
+          "inputs": {
+            "name": "device_screen_size",
+            "value": "large"
+          },
+          "steps": [
+            "User accesses the system on a device",
+            "System detects device type and screen size",
+            "UI automatically adjusts layout, font sizes, and control sizes",
+            "User interacts with the system without manual resizing"
+          ],
+          "expected": [
+            "UI layout is responsive",
+            "Font sizes are optimized for readability"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Scalability test for 4.0 million consultation requests",
+          "req_ids": [
+            "VIRTUA-2.5-10"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System architecture under design",
+            "Projected load is 4.0 million requests over 3 years"
+          ],
+          "inputs": {
+            "name": "request_volume",
+            "value": "4000000"
+          },
+          "steps": [
+            "Administrator reviews scalability requirements",
+            "System design incorporates load balancing and distributed databases",
+            "Simulations confirm system can handle 4.0 million requests",
+            "Administrator approves the design"
+          ],
+          "expected": [
+            "Simulation shows no performance degradation",
+            "Approval is recorded"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Usability testing for font sizes and ease of usage",
+          "req_ids": [
+            "VIRTUA-2.5-17"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System UI deployed",
+            "Usability testing environment set up"
+          ],
+          "inputs": {
+            "name": "task_completion_rate",
+            "value": "90"
+          },
+          "steps": [
+            "Patient participates in a usability test session",
+            "Test administrator presents tasks (e.g., schedule a consultation)",
+            "Patient completes tasks within acceptable time and with minimal errors",
+            "Test records positive usability metrics"
+          ],
+          "expected": [
+            "Task completion rate ≥ 90%",
+            "Satisfaction score ≥ 4/5"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.44999999999999996,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.0
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.7143,
+        "hallucinated": [
+          {
+            "value": "Cardiology",
+            "context": "specialty",
+            "grounded": false
+          },
+          {
+            "value": "large",
+            "context": "screen size",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 7,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test cases for duplicate patient IDs and exceeding patient limit",
+          "Include alternative and exception flows in test cases to satisfy representation-specific criteria",
+          "Test boundary conditions for patient count and consultation requests (e.g., 249,999 and 250,001)",
+          "Provide concrete expected outputs such as specific error codes and messages",
+          "Verify adaptive UI on multiple screen sizes, not just \"large\""
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VIRTUA-2.5-11",
+          "VIRTUA-2.5-14"
+        ],
+        "fsa_score": 0.58,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

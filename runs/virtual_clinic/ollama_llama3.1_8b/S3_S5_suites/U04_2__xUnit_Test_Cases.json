@@ -1,0 +1,828 @@
+{
+  "unit_id": "U04_2",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "standard",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.4,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0714,
+    "hallucinated": [
+      {
+        "value": "Diagnosis given by doctor",
+        "context": "doctor.diagnosis string",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "doctor.prescription_generated flag",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "doctor.prescription_sent_to_patient flag",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "doctor.prescription_sent_to_chemist flag",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "doctor.prescription_sent_to_lab flag",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "chemist.delivers_medicines flag",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "lab.collects_specimen flag",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "lab.delivers_report flag",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "admin.sets_up_specialties flag",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "admin.adds_doctors flag",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "admin.adds_labs flag",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "admin.adds_pharmacy flag",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "admin.edits_doctor_info flag",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 14,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add negative test cases to cover error scenarios (e.g., missing prescription, unauthorized access).",
+      "Replace hardcoded boolean assertions with checks against expected system state changes.",
+      "Remove reliance on internal boolean flags; instead verify observable outcomes (e.g., messages, logs).",
+      "Use mock objects to simulate external services (chemist, lab) and verify interactions.",
+      "Ensure test suite covers boundary conditions such as empty prescription or null request ID."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.5707,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "import unittest\nfrom unittest.mock import Mock\nfrom your_module import Patient, Doctor, Chemist, Lab, Admin\n\nclass TestConsultationRequest(unittest.TestCase):\n\n    def setUp(self):\n        self.patient = Patient()\n        self.doctor = Doctor()\n        self.chemist = Chemist()\n        self.lab = Lab()\n        self.admin = Admin()\n\n    def test_doctor_sees_request(self):\n        # Preconditions: Patient generates a consultation request\n        self.patient.generate_consultation_request()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the doctor sees the request\n        self.assertTrue(self.doctor.sees_request(self.patient.request_id))\n        \n        # Expected: Doctor sees the request\n        self.assertEqual(self.doctor.sees_request(self.patient.request_id), True)\n\n    def test_doctor_gives_diagnosis(self):\n        # Preconditions: Patient generates a consultation request\n        self.patient.generate_consultation_request()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the doctor gives a diagnosis\n        self.doctor.give_diagnosis(self.patient.request_id)\n        \n        # Expected: Doctor gives a diagnosis\n        self.assertEqual(self.doctor.diagnosis, \"Diagnosis given by doctor\")\n\n    def test_prescription_generated(self):\n        # Preconditions: Patient generates a consultation request and doctor gives a diagnosis\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the prescription is generated\n        self.assertTrue(self.doctor.prescription_generated)\n        \n        # Expected: Prescription generated\n        self.assertEqual(self.doctor.prescription_generated, True)\n\n    def test_prescription_sent_to_patient(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, and prescription is generated\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the prescription is sent to the patient\n        self.assertTrue(self.doctor.prescription_sent_to_patient)\n        \n        # Expected: Prescription sent to patient\n        self.assertEqual(self.doctor.prescription_sent_to_patient, True)\n\n    def test_prescription_sent_to_chemist(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, and prescription is generated\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the prescription is sent to the chemist\n        self.assertTrue(self.doctor.prescription_sent_to_chemist)\n        \n        # Expected: Prescription sent to chemist\n        self.assertEqual(self.doctor.prescription_sent_to_chemist, True)\n\n    def test_prescription_sent_to_lab(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, and prescription is generated\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the prescription is sent to the lab\n        self.assertTrue(self.doctor.prescription_sent_to_lab)\n        \n        # Expected: Prescription sent to lab\n        self.assertEqual(self.doctor.prescription_sent_to_lab, True)\n\n    def test_chemist_delivers_medicines(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, prescription is generated, and prescription is sent to chemist\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        self.assertTrue(self.doctor.prescription_sent_to_chemist)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the chemist delivers the medicines\n        self.assertTrue(self.chemist.delivers_medicines)\n        \n        # Expected: Chemist delivers medicines\n        self.assertEqual(self.chemist.delivers_medicines, True)\n\n    def test_lab_collects_specimen(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, prescription is generated, and prescription is sent to lab\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        self.assertTrue(self.doctor.prescription_sent_to_lab)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the lab collects the specimen\n        self.assertTrue(self.lab.collects_specimen)\n        \n        # Expected: Lab collects specimen\n        self.assertEqual(self.lab.collects_specimen, True)\n\n    def test_lab_delivers_report(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, prescription is generated, and prescription is sent to lab\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        self.assertTrue(self.doctor.prescription_sent_to_lab)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the lab delivers the report\n        self.assertTrue(self.lab.delivers_report)\n        \n        # Expected: Lab delivers report\n        self.assertEqual(self.lab.delivers_report, True)\n\n    def test_admin_sets_up_specialties(self):\n        # Preconditions: Admin is logged in\n        self.admin.login()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the admin sets up specialties\n        self.assertTrue(self.admin.sets_up_specialties)\n        \n        # Expected: Admin sets up specialties\n        self.assertEqual(self.admin.sets_up_specialties, True)\n\n    def test_admin_adds_doctors(self):\n        # Preconditions: Admin is logged in\n        self.admin.login()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the admin adds doctors\n        self.assertTrue(self.admin.adds_doctors)\n        \n        # Expected: Admin adds doctors\n        self.assertEqual(self.admin.adds_doctors, True)\n\n    def test_admin_adds_labs(self):\n        # Preconditions: Admin is logged in\n        self.admin.login()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the admin adds labs\n        self.assertTrue(self.admin.adds_labs)\n        \n        # Expected: Admin adds labs\n        self.assertEqual(self.admin.adds_labs, True)\n\n    def test_admin_adds_pharmacy(self):\n        # Preconditions: Admin is logged in\n        self.admin.login()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the admin adds pharmacy\n        self.assertTrue(self.admin.adds_pharmacy)\n        \n        # Expected: Admin adds pharmacy\n        self.assertEqual(self.admin.adds_pharmacy, True)\n\n    def test_admin_edits_doctor_info(self):\n        # Preconditions: Admin is logged in\n        self.admin.login()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the admin edits doctor info\n        self.assertTrue(self.admin.edits_doctor_info)\n        \n        # Expected: Admin edits doctor info\n        self.assertEqual(self.admin.edits_doctor_info, True)\n\nif __name__ == '__main__':\n    unittest.main()",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Doctor sees request",
+      "req_ids": [
+        "VIRTUA-2.2-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient generates a consultation request"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the doctor sees the request"
+      ],
+      "expected": [
+        "Doctor sees the request"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Doctor gives diagnosis",
+      "req_ids": [
+        "VIRTUA-2.2-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient generates a consultation request"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the doctor gives a diagnosis"
+      ],
+      "expected": [
+        "Doctor gives a diagnosis"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Prescription generated",
+      "req_ids": [
+        "VIRTUA-2.2-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient generates a consultation request",
+        "Doctor gives a diagnosis"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the prescription is generated"
+      ],
+      "expected": [
+        "Prescription generated"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Prescription sent to patient",
+      "req_ids": [
+        "VIRTUA-2.2-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient generates a consultation request",
+        "Doctor gives a diagnosis",
+        "Prescription is generated"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the prescription is sent to the patient"
+      ],
+      "expected": [
+        "Prescription sent to patient"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Prescription sent to chemist",
+      "req_ids": [
+        "VIRTUA-2.2-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient generates a consultation request",
+        "Doctor gives a diagnosis",
+        "Prescription is generated"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the prescription is sent to the chemist"
+      ],
+      "expected": [
+        "Prescription sent to chemist"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Prescription sent to lab",
+      "req_ids": [
+        "VIRTUA-2.2-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient generates a consultation request",
+        "Doctor gives a diagnosis",
+        "Prescription is generated"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the prescription is sent to the lab"
+      ],
+      "expected": [
+        "Prescription sent to lab"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Chemist delivers medicines",
+      "req_ids": [
+        "VIRTUA-2.2-7"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient generates a consultation request",
+        "Doctor gives a diagnosis",
+        "Prescription is generated",
+        "Prescription is sent to chemist"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the chemist delivers the medicines"
+      ],
+      "expected": [
+        "Chemist delivers medicines"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Lab collects specimen",
+      "req_ids": [
+        "VIRTUA-2.2-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient generates a consultation request",
+        "Doctor gives a diagnosis",
+        "Prescription is generated",
+        "Prescription is sent to lab"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the lab collects the specimen"
+      ],
+      "expected": [
+        "Lab collects specimen"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Lab delivers report",
+      "req_ids": [
+        "VIRTUA-2.2-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient generates a consultation request",
+        "Doctor gives a diagnosis",
+        "Prescription is generated",
+        "Prescription is sent to lab"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the lab delivers the report"
+      ],
+      "expected": [
+        "Lab delivers report"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Admin sets up specialties",
+      "req_ids": [
+        "VIRTUA-2.3-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin is logged in"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the admin sets up specialties"
+      ],
+      "expected": [
+        "Admin sets up specialties"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Admin adds doctors",
+      "req_ids": [
+        "VIRTUA-2.3-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin is logged in"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the admin adds doctors"
+      ],
+      "expected": [
+        "Admin adds doctors"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Admin adds labs",
+      "req_ids": [
+        "VIRTUA-2.3-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin is logged in"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the admin adds labs"
+      ],
+      "expected": [
+        "Admin adds labs"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Admin adds pharmacy",
+      "req_ids": [
+        "VIRTUA-2.3-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin is logged in"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the admin adds pharmacy"
+      ],
+      "expected": [
+        "Admin adds pharmacy"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "Admin edits doctor info",
+      "req_ids": [
+        "VIRTUA-2.3-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin is logged in"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "Verify that the admin edits doctor info"
+      ],
+      "expected": [
+        "Admin edits doctor info"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "import unittest\nfrom unittest.mock import Mock\nfrom your_module import Patient, Doctor, Chemist, Lab, Admin\n\nclass TestConsultationRequest(unittest.TestCase):\n\n    def setUp(self):\n        self.patient = Patient()\n        self.doctor = Doctor()\n        self.chemist = Chemist()\n        self.lab = Lab()\n        self.admin = Admin()\n\n    def test_doctor_sees_request(self):\n        # Preconditions: Patient generates a consultation request\n        self.patient.generate_consultation_request()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the doctor sees the request\n        self.assertTrue(self.doctor.sees_request(self.patient.request_id))\n        \n        # Expected: Doctor sees the request\n        self.assertEqual(self.doctor.sees_request(self.patient.request_id), True)\n\n    def test_doctor_gives_diagnosis(self):\n        # Preconditions: Patient generates a consultation request\n        self.patient.generate_consultation_request()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the doctor gives a diagnosis\n        self.doctor.give_diagnosis(self.patient.request_id)\n        \n        # Expected: Doctor gives a diagnosis\n        self.assertEqual(self.doctor.diagnosis, \"Diagnosis given by doctor\")\n\n    def test_prescription_generated(self):\n        # Preconditions: Patient generates a consultation request and doctor gives a diagnosis\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the prescription is generated\n        self.assertTrue(self.doctor.prescription_generated)\n        \n        # Expected: Prescription generated\n        self.assertEqual(self.doctor.prescription_generated, True)\n\n    def test_prescription_sent_to_patient(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, and prescription is generated\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the prescription is sent to the patient\n        self.assertTrue(self.doctor.prescription_sent_to_patient)\n        \n        # Expected: Prescription sent to patient\n        self.assertEqual(self.doctor.prescription_sent_to_patient, True)\n\n    def test_prescription_sent_to_chemist(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, and prescription is generated\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the prescription is sent to the chemist\n        self.assertTrue(self.doctor.prescription_sent_to_chemist)\n        \n        # Expected: Prescription sent to chemist\n        self.assertEqual(self.doctor.prescription_sent_to_chemist, True)\n\n    def test_prescription_sent_to_lab(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, and prescription is generated\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the prescription is sent to the lab\n        self.assertTrue(self.doctor.prescription_sent_to_lab)\n        \n        # Expected: Prescription sent to lab\n        self.assertEqual(self.doctor.prescription_sent_to_lab, True)\n\n    def test_chemist_delivers_medicines(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, prescription is generated, and prescription is sent to chemist\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        self.assertTrue(self.doctor.prescription_sent_to_chemist)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the chemist delivers the medicines\n        self.assertTrue(self.chemist.delivers_medicines)\n        \n        # Expected: Chemist delivers medicines\n        self.assertEqual(self.chemist.delivers_medicines, True)\n\n    def test_lab_collects_specimen(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, prescription is generated, and prescription is sent to lab\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        self.assertTrue(self.doctor.prescription_sent_to_lab)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the lab collects the specimen\n        self.assertTrue(self.lab.collects_specimen)\n        \n        # Expected: Lab collects specimen\n        self.assertEqual(self.lab.collects_specimen, True)\n\n    def test_lab_delivers_report(self):\n        # Preconditions: Patient generates a consultation request, doctor gives a diagnosis, prescription is generated, and prescription is sent to lab\n        self.patient.generate_consultation_request()\n        self.doctor.give_diagnosis(self.patient.request_id)\n        self.assertTrue(self.doctor.prescription_generated)\n        self.assertTrue(self.doctor.prescription_sent_to_lab)\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the lab delivers the report\n        self.assertTrue(self.lab.delivers_report)\n        \n        # Expected: Lab delivers report\n        self.assertEqual(self.lab.delivers_report, True)\n\n    def test_admin_sets_up_specialties(self):\n        # Preconditions: Admin is logged in\n        self.admin.login()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the admin sets up specialties\n        self.assertTrue(self.admin.sets_up_specialties)\n        \n        # Expected: Admin sets up specialties\n        self.assertEqual(self.admin.sets_up_specialties, True)\n\n    def test_admin_adds_doctors(self):\n        # Preconditions: Admin is logged in\n        self.admin.login()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the admin adds doctors\n        self.assertTrue(self.admin.adds_doctors)\n        \n        # Expected: Admin adds doctors\n        self.assertEqual(self.admin.adds_doctors, True)\n\n    def test_admin_adds_labs(self):\n        # Preconditions: Admin is logged in\n        self.admin.login()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the admin adds labs\n        self.assertTrue(self.admin.adds_labs)\n        \n        # Expected: Admin adds labs\n        self.assertEqual(self.admin.adds_labs, True)\n\n    def test_admin_adds_pharmacy(self):\n        # Preconditions: Admin is logged in\n        self.admin.login()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the admin adds pharmacy\n        self.assertTrue(self.admin.adds_pharmacy)\n        \n        # Expected: Admin adds pharmacy\n        self.assertEqual(self.admin.adds_pharmacy, True)\n\n    def test_admin_edits_doctor_info(self):\n        # Preconditions: Admin is logged in\n        self.admin.login()\n        \n        # Inputs: None\n        # Steps:\n        # 1. Verify that the admin edits doctor info\n        self.assertTrue(self.admin.edits_doctor_info)\n        \n        # Expected: Admin edits doctor info\n        self.assertEqual(self.admin.edits_doctor_info, True)\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Doctor sees request",
+          "req_ids": [
+            "VIRTUA-2.2-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient generates a consultation request"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the doctor sees the request"
+          ],
+          "expected": [
+            "Doctor sees the request"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Doctor gives diagnosis",
+          "req_ids": [
+            "VIRTUA-2.2-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient generates a consultation request"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the doctor gives a diagnosis"
+          ],
+          "expected": [
+            "Doctor gives a diagnosis"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Prescription generated",
+          "req_ids": [
+            "VIRTUA-2.2-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient generates a consultation request",
+            "Doctor gives a diagnosis"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the prescription is generated"
+          ],
+          "expected": [
+            "Prescription generated"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Prescription sent to patient",
+          "req_ids": [
+            "VIRTUA-2.2-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient generates a consultation request",
+            "Doctor gives a diagnosis",
+            "Prescription is generated"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the prescription is sent to the patient"
+          ],
+          "expected": [
+            "Prescription sent to patient"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Prescription sent to chemist",
+          "req_ids": [
+            "VIRTUA-2.2-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient generates a consultation request",
+            "Doctor gives a diagnosis",
+            "Prescription is generated"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the prescription is sent to the chemist"
+          ],
+          "expected": [
+            "Prescription sent to chemist"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Prescription sent to lab",
+          "req_ids": [
+            "VIRTUA-2.2-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient generates a consultation request",
+            "Doctor gives a diagnosis",
+            "Prescription is generated"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the prescription is sent to the lab"
+          ],
+          "expected": [
+            "Prescription sent to lab"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Chemist delivers medicines",
+          "req_ids": [
+            "VIRTUA-2.2-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient generates a consultation request",
+            "Doctor gives a diagnosis",
+            "Prescription is generated",
+            "Prescription is sent to chemist"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the chemist delivers the medicines"
+          ],
+          "expected": [
+            "Chemist delivers medicines"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Lab collects specimen",
+          "req_ids": [
+            "VIRTUA-2.2-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient generates a consultation request",
+            "Doctor gives a diagnosis",
+            "Prescription is generated",
+            "Prescription is sent to lab"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the lab collects the specimen"
+          ],
+          "expected": [
+            "Lab collects specimen"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Lab delivers report",
+          "req_ids": [
+            "VIRTUA-2.2-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient generates a consultation request",
+            "Doctor gives a diagnosis",
+            "Prescription is generated",
+            "Prescription is sent to lab"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the lab delivers the report"
+          ],
+          "expected": [
+            "Lab delivers report"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Admin sets up specialties",
+          "req_ids": [
+            "VIRTUA-2.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged in"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the admin sets up specialties"
+          ],
+          "expected": [
+            "Admin sets up specialties"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Admin adds doctors",
+          "req_ids": [
+            "VIRTUA-2.3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged in"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the admin adds doctors"
+          ],
+          "expected": [
+            "Admin adds doctors"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Admin adds labs",
+          "req_ids": [
+            "VIRTUA-2.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged in"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the admin adds labs"
+          ],
+          "expected": [
+            "Admin adds labs"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Admin adds pharmacy",
+          "req_ids": [
+            "VIRTUA-2.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged in"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the admin adds pharmacy"
+          ],
+          "expected": [
+            "Admin adds pharmacy"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Admin edits doctor info",
+          "req_ids": [
+            "VIRTUA-2.3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin is logged in"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "Verify that the admin edits doctor info"
+          ],
+          "expected": [
+            "Admin edits doctor info"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.4,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0714,
+        "hallucinated": [
+          {
+            "value": "Diagnosis given by doctor",
+            "context": "doctor.diagnosis string",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "doctor.prescription_generated flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "doctor.prescription_sent_to_patient flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "doctor.prescription_sent_to_chemist flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "doctor.prescription_sent_to_lab flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "chemist.delivers_medicines flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "lab.collects_specimen flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "lab.delivers_report flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "admin.sets_up_specialties flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "admin.adds_doctors flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "admin.adds_labs flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "admin.adds_pharmacy flag",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "admin.edits_doctor_info flag",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 14,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test cases to cover error scenarios (e.g., missing prescription, unauthorized access).",
+          "Replace hardcoded boolean assertions with checks against expected system state changes.",
+          "Remove reliance on internal boolean flags; instead verify observable outcomes (e.g., messages, logs).",
+          "Use mock objects to simulate external services (chemist, lab) and verify interactions.",
+          "Ensure test suite covers boundary conditions such as empty prescription or null request ID."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.5707,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,750 @@
+{
+  "unit_id": "U13_4",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 0.5,
+    "representation_score": 1.0,
+    "sfv_score": 0.75,
+    "threshold": 1.0,
+    "sfv_pass": false,
+    "issues": [
+      "test case #2 (TC-002): [] should be non-empty",
+      "test case #4 (TC-004): [] should be non-empty",
+      "test case #6 (TC-006): [] should be non-empty",
+      "test case #7 (TC-007): [] should be non-empty"
+    ]
+  },
+  "fsa": null,
+  "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\n\nclass SymptomManager:\n    def __init__(self):\n        self.symptoms = {}\n\n    def add_symptom(self, name, description):\n        if name in self.symptoms:\n            raise ValueError(\"Symptom already exists\")\n        self.symptoms[name] = description\n\n    def get_symptom(self, name):\n        return self.symptoms.get(name)\n\n    def update_symptom(self, name, description):\n        if name not in self.symptoms:\n            raise ValueError(\"Symptom does not exist\")\n        self.symptoms[name] = description\n\n    def delete_symptom(self, name):\n        if name not in self.symptoms:\n            raise ValueError(\"Symptom does not exist\")\n        if any(symptom == name for consultation in self.consultations.values()):\n            raise ValueError(\"Symptom is used in a consultation request\")\n        del self.symptoms[name]\n\n    def add_consultation(self, consultation_id, symptoms):\n        self.consultations[consultation_id] = symptoms\n\nclass TestSymptomManager(unittest.TestCase):\n    def setUp(self):\n        self.manager = SymptomManager()\n\n    def test_add_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.assertIn(\"fever\", self.manager.symptoms)\n\n    def test_add_symptom_negative_duplicate(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        with self.assertRaises(ValueError):\n            self.manager.add_symptom(\"fever\", \"High body temperature\")\n\n    def test_get_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.assertEqual(self.manager.get_symptom(\"fever\"), \"High body temperature\")\n\n    def test_get_symptom_negative_nonexistent(self):\n        with self.assertRaises(ValueError):\n            self.manager.get_symptom(\"fever\")\n\n    def test_update_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.manager.update_symptom(\"fever\", \"Increased body temperature\")\n        self.assertEqual(self.manager.get_symptom(\"fever\"), \"Increased body temperature\")\n\n    def test_update_symptom_negative_nonexistent(self):\n        with self.assertRaises(ValueError):\n            self.manager.update_symptom(\"fever\", \"Increased body temperature\")\n\n    def test_delete_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.manager.delete_symptom(\"fever\")\n        self.assertNotIn(\"fever\", self.manager.symptoms)\n\n    def test_delete_symptom_negative_nonexistent(self):\n        with self.assertRaises(ValueError):\n            self.manager.delete_symptom(\"fever\")\n\n    def test_delete_symptom_negative_used_in_consultation(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.manager.add_consultation(\"1\", [\"fever\"])\n        with self.assertRaises(ValueError):\n            self.manager.delete_symptom(\"fever\")\n\n    def test_add_consultation_positive(self):\n        self.manager.add_consultation(\"1\", [\"fever\"])\n        self.assertIn(\"1\", self.manager.consultations)\n\nif __name__ == '__main__':\n    unittest.main()",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Add a new Symptom - Positive",
+      "req_ids": [
+        "Req-4/1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "name": "fever",
+        "description": "High body temperature"
+      },
+      "steps": [
+        "self.manager.add_symptom('fever', 'High body temperature')"
+      ],
+      "expected": [
+        "self.assertIn('fever', self.manager.symptoms)"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Add a new Symptom - Negative (Duplicate)",
+      "req_ids": [
+        "Req-4/1"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "name": "fever",
+        "description": "High body temperature"
+      },
+      "steps": [
+        "self.manager.add_symptom('fever', 'High body temperature')",
+        "self.assertRaises(ValueError, self.manager.add_symptom, 'fever', 'High body temperature')"
+      ],
+      "expected": []
+    },
+    {
+      "id": "TC-003",
+      "title": "View and Update the details of an existing Symptom - Positive",
+      "req_ids": [
+        "Req-4/2"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "name": "fever",
+        "description": "High body temperature"
+      },
+      "steps": [
+        "self.manager.add_symptom('fever', 'High body temperature')",
+        "self.manager.update_symptom('fever', 'Increased body temperature')"
+      ],
+      "expected": [
+        "self.assertEqual(self.manager.get_symptom('fever'), 'Increased body temperature')"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "View and Update the details of an existing Symptom - Negative (Nonexistent)",
+      "req_ids": [
+        "Req-4/2"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "name": "fever",
+        "description": "High body temperature"
+      },
+      "steps": [
+        "self.assertRaises(ValueError, self.manager.update_symptom, 'fever', 'Increased body temperature')"
+      ],
+      "expected": []
+    },
+    {
+      "id": "TC-005",
+      "title": "Delete the Symptom Details - Positive",
+      "req_ids": [
+        "Req-4/3"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "name": "fever"
+      },
+      "steps": [
+        "self.manager.add_symptom('fever', 'High body temperature')",
+        "self.manager.delete_symptom('fever')"
+      ],
+      "expected": [
+        "self.assertNotIn('fever', self.manager.symptoms)"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Delete the Symptom Details - Negative (Nonexistent)",
+      "req_ids": [
+        "Req-4/3"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "name": "fever"
+      },
+      "steps": [
+        "self.assertRaises(ValueError, self.manager.delete_symptom, 'fever')"
+      ],
+      "expected": []
+    },
+    {
+      "id": "TC-007",
+      "title": "Delete the Symptom Details - Negative (Used in Consultation)",
+      "req_ids": [
+        "Req-4/3"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "name": "fever"
+      },
+      "steps": [
+        "self.manager.add_symptom('fever', 'High body temperature')",
+        "self.manager.add_consultation('1', ['fever'])",
+        "self.assertRaises(ValueError, self.manager.delete_symptom, 'fever')"
+      ],
+      "expected": []
+    },
+    {
+      "id": "TC-008",
+      "title": "Add Consultation - Positive",
+      "req_ids": [
+        "Req-4/3"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "consultation_id": "1",
+        "symptoms": [
+          "fever"
+        ]
+      },
+      "steps": [
+        "self.manager.add_consultation('1', ['fever'])"
+      ],
+      "expected": [
+        "self.assertIn('1', self.manager.consultations)"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "using Xunit;\n\npublic class SymptomTest\n{\n    [Fact]\n    public void TC_001_AddNewSymptom()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptom = new Symptom { Name = \"Cough\", Description = \"Dry cough\" };\n\n        // Act\n        symptomService.AddSymptom(symptom);\n\n        // Assert\n        Assert.Contains(symptom, symptomService.GetSymptoms());\n    }\n\n    [Fact]\n    public void TC_002_ViewAndUpdateSymptom()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptom = new Symptom { Name = \"Cough\", Description = \"Dry cough\" };\n        symptomService.AddSymptom(symptom);\n\n        // Act\n        symptom.Description = \"Dry cough with phlegm\";\n        symptomService.UpdateSymptom(symptom);\n\n        // Assert\n        var updatedSymptom = symptomService.GetSymptomByName(\"Cough\");\n        Assert.Equal(\"Dry cough with phlegm\", updatedSymptom.Description);\n    }\n\n    [Fact]\n    public void TC_003_DeleteSymptom()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptom = new Symptom { Name = \"Cough\", Description = \"Dry cough\" };\n        symptomService.AddSymptom(symptom);\n\n        // Act\n        symptomService.DeleteSymptom(symptom);\n\n        // Assert\n        Assert.DoesNotContain(symptom, symptomService.GetSymptoms());\n    }\n\n    [Fact]\n    public void TC_004_DeleteSymptomWithConsultationRequest()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptom = new Symptom { Name = \"Cough\", Description = \"Dry cough\" };\n        symptomService.AddSymptom(symptom);\n\n        var consultationService = new ConsultationService();\n        var consultation = new Consultation { Symptom = symptom };\n        consultationService.AddConsultation(consultation);\n\n        // Act & Assert\n        Assert.Throws<InvalidOperationException>(() => symptomService.DeleteSymptom(symptom));\n    }\n}",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new Symptom",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "SymptomService is initialized"
+          ],
+          "inputs": {
+            "name": "Cough",
+            "description": "Dry cough"
+          },
+          "steps": [
+            "SymptomService.AddSymptom(symptom)"
+          ],
+          "expected": [
+            "Symptom is added to the list of symptoms"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update the details of an existing Symptom",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "SymptomService is initialized with a symptom"
+          ],
+          "inputs": {
+            "name": "Cough",
+            "new_description": "Dry cough with phlegm"
+          },
+          "steps": [
+            "symptom.Description = new_description",
+            "SymptomService.UpdateSymptom(symptom)"
+          ],
+          "expected": [
+            "Symptom description is updated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete the Symptom Details",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "SymptomService is initialized with a symptom"
+          ],
+          "inputs": {
+            "name": "Cough"
+          },
+          "steps": [
+            "SymptomService.DeleteSymptom(symptom)"
+          ],
+          "expected": [
+            "Symptom is removed from the list of symptoms"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete the Symptom Details with Consultation Request",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "SymptomService is initialized with a symptom",
+            "ConsultationService is initialized with a consultation using the symptom"
+          ],
+          "inputs": {
+            "name": "Cough"
+          },
+          "steps": [
+            "SymptomService.DeleteSymptom(symptom)"
+          ],
+          "expected": [
+            "InvalidOperationException is thrown"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "Python syntax error: invalid syntax",
+          "No xUnit-style test definitions found."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Python syntax error: invalid syntax\n- No xUnit-style test definitions found.",
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\n\nclass SymptomManager:\n    def __init__(self):\n        self.symptoms = {}\n\n    def add_symptom(self, name, description):\n        if name in self.symptoms:\n            raise ValueError(\"Symptom already exists\")\n        self.symptoms[name] = description\n\n    def get_symptom(self, name):\n        return self.symptoms.get(name)\n\n    def update_symptom(self, name, description):\n        if name not in self.symptoms:\n            raise ValueError(\"Symptom does not exist\")\n        self.symptoms[name] = description\n\n    def delete_symptom(self, name):\n        if name not in self.symptoms:\n            raise ValueError(\"Symptom does not exist\")\n        if any(symptom == name for consultation in self.consultations.values()):\n            raise ValueError(\"Symptom is used in a consultation request\")\n        del self.symptoms[name]\n\n    def add_consultation(self, consultation_id, symptoms):\n        self.consultations[consultation_id] = symptoms\n\nclass TestSymptomManager(unittest.TestCase):\n    def setUp(self):\n        self.manager = SymptomManager()\n\n    def test_add_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.assertIn(\"fever\", self.manager.symptoms)\n\n    def test_add_symptom_negative_duplicate(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        with self.assertRaises(ValueError):\n            self.manager.add_symptom(\"fever\", \"High body temperature\")\n\n    def test_get_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.assertEqual(self.manager.get_symptom(\"fever\"), \"High body temperature\")\n\n    def test_get_symptom_negative_nonexistent(self):\n        with self.assertRaises(ValueError):\n            self.manager.get_symptom(\"fever\")\n\n    def test_update_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.manager.update_symptom(\"fever\", \"Increased body temperature\")\n        self.assertEqual(self.manager.get_symptom(\"fever\"), \"Increased body temperature\")\n\n    def test_update_symptom_negative_nonexistent(self):\n        with self.assertRaises(ValueError):\n            self.manager.update_symptom(\"fever\", \"Increased body temperature\")\n\n    def test_delete_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.manager.delete_symptom(\"fever\")\n        self.assertNotIn(\"fever\", self.manager.symptoms)\n\n    def test_delete_symptom_negative_nonexistent(self):\n        with self.assertRaises(ValueError):\n            self.manager.delete_symptom(\"fever\")\n\n    def test_delete_symptom_negative_used_in_consultation(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.manager.add_consultation(\"1\", [\"fever\"])\n        with self.assertRaises(ValueError):\n            self.manager.delete_symptom(\"fever\")\n\n    def test_add_consultation_positive(self):\n        self.manager.add_consultation(\"1\", [\"fever\"])\n        self.assertIn(\"1\", self.manager.consultations)\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new Symptom - Positive",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "self.manager.add_symptom('fever', 'High body temperature')"
+          ],
+          "expected": [
+            "self.assertIn('fever', self.manager.symptoms)"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Add a new Symptom - Negative (Duplicate)",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "self.manager.add_symptom('fever', 'High body temperature')",
+            "self.assertRaises(ValueError, self.manager.add_symptom, 'fever', 'High body temperature')"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-003",
+          "title": "View and Update the details of an existing Symptom - Positive",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "self.manager.add_symptom('fever', 'High body temperature')",
+            "self.manager.update_symptom('fever', 'Increased body temperature')"
+          ],
+          "expected": [
+            "self.assertEqual(self.manager.get_symptom('fever'), 'Increased body temperature')"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "View and Update the details of an existing Symptom - Negative (Nonexistent)",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "self.assertRaises(ValueError, self.manager.update_symptom, 'fever', 'Increased body temperature')"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete the Symptom Details - Positive",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever"
+          },
+          "steps": [
+            "self.manager.add_symptom('fever', 'High body temperature')",
+            "self.manager.delete_symptom('fever')"
+          ],
+          "expected": [
+            "self.assertNotIn('fever', self.manager.symptoms)"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete the Symptom Details - Negative (Nonexistent)",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever"
+          },
+          "steps": [
+            "self.assertRaises(ValueError, self.manager.delete_symptom, 'fever')"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-007",
+          "title": "Delete the Symptom Details - Negative (Used in Consultation)",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever"
+          },
+          "steps": [
+            "self.manager.add_symptom('fever', 'High body temperature')",
+            "self.manager.add_consultation('1', ['fever'])",
+            "self.assertRaises(ValueError, self.manager.delete_symptom, 'fever')"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-008",
+          "title": "Add Consultation - Positive",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "consultation_id": "1",
+            "symptoms": [
+              "fever"
+            ]
+          },
+          "steps": [
+            "self.manager.add_consultation('1', ['fever'])"
+          ],
+          "expected": [
+            "self.assertIn('1', self.manager.consultations)"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.5,
+        "representation_score": 1.0,
+        "sfv_score": 0.75,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "test case #2 (TC-002): [] should be non-empty",
+          "test case #4 (TC-004): [] should be non-empty",
+          "test case #6 (TC-006): [] should be non-empty",
+          "test case #7 (TC-007): [] should be non-empty"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.75). Fix these problems and output the full corrected suite:\n- test case #2 (TC-002): [] should be non-empty\n- test case #4 (TC-004): [] should be non-empty\n- test case #6 (TC-006): [] should be non-empty\n- test case #7 (TC-007): [] should be non-empty",
+      "artifact": "using Xunit;\n\npublic class SymptomTest\n{\n    [Fact]\n    public void TC_001_AddNewSymptom()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptomName = \"Cough\";\n        var symptomDescription = \"Dry cough\";\n\n        // Act\n        symptomService.AddSymptom(symptomName, symptomDescription);\n\n        // Assert\n        var symptom = symptomService.GetSymptomByName(symptomName);\n        Assert.NotNull(symptom);\n        Assert.Equal(symptomName, symptom.Name);\n        Assert.Equal(symptomDescription, symptom.Description);\n    }\n\n    [Fact]\n    public void TC_002_ViewAndUpdateSymptom()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptomName = \"Cough\";\n        var symptomDescription = \"Dry cough\";\n        symptomService.AddSymptom(symptomName, symptomDescription);\n\n        var updatedDescription = \"Dry cough with phlegm\";\n\n        // Act\n        symptomService.UpdateSymptom(symptomName, updatedDescription);\n\n        // Assert\n        var symptom = symptomService.GetSymptomByName(symptomName);\n        Assert.NotNull(symptom);\n        Assert.Equal(symptomName, symptom.Name);\n        Assert.Equal(updatedDescription, symptom.Description);\n    }\n\n    [Fact]\n    public void TC_003_DeleteSymptom()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var symptomName = \"Cough\";\n        var symptomDescription = \"Dry cough\";\n        symptomService.AddSymptom(symptomName, symptomDescription);\n\n        // Act\n        symptomService.DeleteSymptom(symptomName);\n\n        // Assert\n        var symptom = symptomService.GetSymptomByName(symptomName);\n        Assert.Null(symptom);\n    }\n\n    [Fact]\n    public void TC_004_DeleteSymptomWithConsultationRequest()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var consultationService = new ConsultationService();\n        var symptomName = \"Cough\";\n        var symptomDescription = \"Dry cough\";\n        symptomService.AddSymptom(symptomName, symptomDescription);\n\n        var consultation = new Consultation { Symptom = symptomService.GetSymptomByName(symptomName) };\n        consultationService.AddConsultation(consultation);\n\n        // Act & Assert\n        Assert.Throws<InvalidOperationException>(() => symptomService.DeleteSymptom(symptomName));\n    }\n\n    [Fact]\n    public void TC_005_DeleteSymptomWithMultipleConsultationRequests()\n    {\n        // Arrange\n        var symptomService = new SymptomService();\n        var consultationService = new ConsultationService();\n        var symptomName = \"Cough\";\n        var symptomDescription = \"Dry cough\";\n        symptomService.AddSymptom(symptomName, symptomDescription);\n\n        var consultation1 = new Consultation { Symptom = symptomService.GetSymptomByName(symptomName) };\n        var consultation2 = new Consultation { Symptom = symptomService.GetSymptomByName(symptomName) };\n        consultationService.AddConsultation(consultation1);\n        consultationService.AddConsultation(consultation2);\n\n        // Act & Assert\n        Assert.Throws<InvalidOperationException>(() => symptomService.DeleteSymptom(symptomName));\n    }\n}",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new Symptom",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "Cough",
+            "description": "Dry cough"
+          },
+          "steps": [
+            "Add a new symptom with name 'Cough' and description 'Dry cough'"
+          ],
+          "expected": [
+            "The symptom 'Cough' with description 'Dry cough' should be added successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "View and Update the details of an existing Symptom",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A symptom with name 'Cough' and description 'Dry cough' exists"
+          ],
+          "inputs": {
+            "name": "Cough",
+            "description": "Dry cough with phlegm"
+          },
+          "steps": [
+            "Update the description of the symptom 'Cough' to 'Dry cough with phlegm'"
+          ],
+          "expected": [
+            "The description of the symptom 'Cough' should be updated to 'Dry cough with phlegm'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Delete the Symptom Details",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "A symptom with name 'Cough' and description 'Dry cough' exists"
+          ],
+          "inputs": {
+            "name": "Cough"
+          },
+          "steps": [
+            "Delete the symptom 'Cough'"
+          ],
+          "expected": [
+            "The symptom 'Cough' should be deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Delete the Symptom Details with Consultation Request",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A symptom with name 'Cough' and description 'Dry cough' exists",
+            "A consultation request has been raised using the symptom 'Cough'"
+          ],
+          "inputs": {
+            "name": "Cough"
+          },
+          "steps": [
+            "Attempt to delete the symptom 'Cough'"
+          ],
+          "expected": [
+            "An InvalidOperationException should be thrown because the symptom 'Cough' has been used in a consultation request"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete the Symptom Details with Multiple Consultation Requests",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A symptom with name 'Cough' and description 'Dry cough' exists",
+            "Multiple consultation requests have been raised using the symptom 'Cough'"
+          ],
+          "inputs": {
+            "name": "Cough"
+          },
+          "steps": [
+            "Attempt to delete the symptom 'Cough'"
+          ],
+          "expected": [
+            "An InvalidOperationException should be thrown because the symptom 'Cough' has been used in multiple consultation requests"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "Python syntax error: invalid syntax",
+          "No xUnit-style test definitions found."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Python syntax error: invalid syntax\n- No xUnit-style test definitions found.",
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\n\nclass SymptomManager:\n    def __init__(self):\n        self.symptoms = {}\n\n    def add_symptom(self, name, description):\n        if name in self.symptoms:\n            raise ValueError(\"Symptom already exists\")\n        self.symptoms[name] = description\n\n    def get_symptom(self, name):\n        return self.symptoms.get(name)\n\n    def update_symptom(self, name, description):\n        if name not in self.symptoms:\n            raise ValueError(\"Symptom does not exist\")\n        self.symptoms[name] = description\n\n    def delete_symptom(self, name):\n        if name not in self.symptoms:\n            raise ValueError(\"Symptom does not exist\")\n        if any(symptom == name for consultation in self.consultations.values()):\n            raise ValueError(\"Symptom is used in a consultation request\")\n        del self.symptoms[name]\n\n    def add_consultation(self, consultation_id, symptoms):\n        self.consultations[consultation_id] = symptoms\n\nclass TestSymptomManager(unittest.TestCase):\n    def setUp(self):\n        self.manager = SymptomManager()\n\n    def test_add_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.assertIn(\"fever\", self.manager.symptoms)\n\n    def test_add_symptom_negative_duplicate(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        with self.assertRaises(ValueError):\n            self.manager.add_symptom(\"fever\", \"High body temperature\")\n\n    def test_get_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.assertEqual(self.manager.get_symptom(\"fever\"), \"High body temperature\")\n\n    def test_get_symptom_negative_nonexistent(self):\n        with self.assertRaises(ValueError):\n            self.manager.get_symptom(\"fever\")\n\n    def test_update_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.manager.update_symptom(\"fever\", \"Increased body temperature\")\n        self.assertEqual(self.manager.get_symptom(\"fever\"), \"Increased body temperature\")\n\n    def test_update_symptom_negative_nonexistent(self):\n        with self.assertRaises(ValueError):\n            self.manager.update_symptom(\"fever\", \"Increased body temperature\")\n\n    def test_delete_symptom_positive(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.manager.delete_symptom(\"fever\")\n        self.assertNotIn(\"fever\", self.manager.symptoms)\n\n    def test_delete_symptom_negative_nonexistent(self):\n        with self.assertRaises(ValueError):\n            self.manager.delete_symptom(\"fever\")\n\n    def test_delete_symptom_negative_used_in_consultation(self):\n        self.manager.add_symptom(\"fever\", \"High body temperature\")\n        self.manager.add_consultation(\"1\", [\"fever\"])\n        with self.assertRaises(ValueError):\n            self.manager.delete_symptom(\"fever\")\n\n    def test_add_consultation_positive(self):\n        self.manager.add_consultation(\"1\", [\"fever\"])\n        self.assertIn(\"1\", self.manager.consultations)\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a new Symptom - Positive",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "self.manager.add_symptom('fever', 'High body temperature')"
+          ],
+          "expected": [
+            "self.assertIn('fever', self.manager.symptoms)"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Add a new Symptom - Negative (Duplicate)",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "self.manager.add_symptom('fever', 'High body temperature')",
+            "self.assertRaises(ValueError, self.manager.add_symptom, 'fever', 'High body temperature')"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-003",
+          "title": "View and Update the details of an existing Symptom - Positive",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "self.manager.add_symptom('fever', 'High body temperature')",
+            "self.manager.update_symptom('fever', 'Increased body temperature')"
+          ],
+          "expected": [
+            "self.assertEqual(self.manager.get_symptom('fever'), 'Increased body temperature')"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "View and Update the details of an existing Symptom - Negative (Nonexistent)",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "self.assertRaises(ValueError, self.manager.update_symptom, 'fever', 'Increased body temperature')"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete the Symptom Details - Positive",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever"
+          },
+          "steps": [
+            "self.manager.add_symptom('fever', 'High body temperature')",
+            "self.manager.delete_symptom('fever')"
+          ],
+          "expected": [
+            "self.assertNotIn('fever', self.manager.symptoms)"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Delete the Symptom Details - Negative (Nonexistent)",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever"
+          },
+          "steps": [
+            "self.assertRaises(ValueError, self.manager.delete_symptom, 'fever')"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-007",
+          "title": "Delete the Symptom Details - Negative (Used in Consultation)",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "fever"
+          },
+          "steps": [
+            "self.manager.add_symptom('fever', 'High body temperature')",
+            "self.manager.add_consultation('1', ['fever'])",
+            "self.assertRaises(ValueError, self.manager.delete_symptom, 'fever')"
+          ],
+          "expected": []
+        },
+        {
+          "id": "TC-008",
+          "title": "Add Consultation - Positive",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "consultation_id": "1",
+            "symptoms": [
+              "fever"
+            ]
+          },
+          "steps": [
+            "self.manager.add_consultation('1', ['fever'])"
+          ],
+          "expected": [
+            "self.assertIn('1', self.manager.consultations)"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 0.5,
+        "representation_score": 1.0,
+        "sfv_score": 0.75,
+        "threshold": 1.0,
+        "sfv_pass": false,
+        "issues": [
+          "test case #2 (TC-002): [] should be non-empty",
+          "test case #4 (TC-004): [] should be non-empty",
+          "test case #6 (TC-006): [] should be non-empty",
+          "test case #7 (TC-007): [] should be non-empty"
+        ]
+      }
+    }
+  ]
+}

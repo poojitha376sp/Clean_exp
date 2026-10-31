@@ -1,0 +1,582 @@
+{
+  "unit_id": "U08_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.8,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 34,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No negative test cases for invalid pressure values or thresholds",
+      "No tests for low/high pressure threshold values",
+      "No test for cancellation of pressure high alarm",
+      "No verification of log content or timestamps",
+      "No tests for audible vs silent state transitions"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.745,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Alarm Management for Pressure Monitoring\n\n  Scenario: GUI logs onset and reset of low pressure alarm\n    Given the system is monitoring inspiratory pressure\n    When the inspiratory pressure falls below the low pressure threshold\n    Then the GUI logs the onset of the low pressure alarm\n    And when the inspiratory pressure rises above the low pressure threshold\n    Then the GUI logs the reset of the low pressure alarm\n\n  Scenario: Low pressure alarm triggers and resets automatically\n    Given the inspiratory pressure is below the low pressure threshold\n    When the system detects low inspiratory pressure\n    Then the low pressure alarm is triggered with high priority\n    And when the first breath with inspiration pressure above the threshold is detected\n    Then the low pressure alarm is automatically reset\n\n  Scenario Outline: Pressure high alarm activates and deactivates based on breath count\n    Given the system is monitoring inspiratory pressure\n    When the inspiratory pressure exceeds the specified threshold for <breath_count> consecutive breaths\n    Then the pressure high alarm becomes active\n    And when the inspiratory pressure does not exceed the specified threshold for one breath\n    Then the pressure high alarm becomes inactive\n    Examples:\n      | breath_count |\n      | 3            |\n      | 4            |\n      | 2            | # edge case: below threshold\n\n  Scenario: GUI emits sound when pressure high alarm is active\n    Given the pressure high alarm is active\n    When the system detects the alarm state\n    Then the GUI emits a sound\n\n  Scenario: Pressure high alarm remains displayed until cancelled\n    Given the pressure high alarm is active\n    When the inspiratory pressure does not exceed the specified threshold for one breath\n    Then the pressure high alarm becomes inactive\n    And the pressure high alarm remains displayed\n\n  Scenario: Alarm management supports visible but not audible alarm state\n    Given the system is in alarm management mode\n    When the user sets the alarm to visible but not audible\n    Then the alarm is visible but no sound is emitted\n\n  Scenario: PIP too high alarm has high priority\n    Given the inspiratory pressure exceeds the PIP too high threshold\n    When the system detects the high pressure\n    Then the PIP too high alarm is triggered with high priority\n\n  Scenario: Default value for PIP too high alarm is calculated correctly\n    Given the commanded PIP value is <commanded_pip>\n    When the system calculates the default PIP too high threshold\n    Then the default PIP too high threshold is <commanded_pip> + 5cm H2O\n    Examples:\n      | commanded_pip | commanded_pip + 5cm H2O |\n      | 10            | 15                    |\n      | 20            | 25                    |\n      | 0             | 5                     | # edge case: zero value",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "GUI logs onset and reset of low pressure alarm",
+      "req_ids": [
+        "RW-SW-85"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is monitoring inspiratory pressure"
+      ],
+      "inputs": {},
+      "steps": [
+        "the inspiratory pressure falls below the low pressure threshold",
+        "the inspiratory pressure rises above the low pressure threshold"
+      ],
+      "expected": [
+        "the GUI logs the onset of the low pressure alarm",
+        "the GUI logs the reset of the low pressure alarm"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Low pressure alarm triggers and resets automatically",
+      "req_ids": [
+        "RW-SW-86"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the inspiratory pressure is below the low pressure threshold"
+      ],
+      "inputs": {},
+      "steps": [
+        "the system detects low inspiratory pressure",
+        "the first breath with inspiration pressure above the threshold is detected"
+      ],
+      "expected": [
+        "the low pressure alarm is triggered with high priority",
+        "the low pressure alarm is automatically reset"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Pressure high alarm activates and deactivates based on breath count",
+      "req_ids": [
+        "RW-SW-88"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is monitoring inspiratory pressure"
+      ],
+      "inputs": {
+        "breath_count": 3
+      },
+      "steps": [
+        "the inspiratory pressure exceeds the specified threshold for <breath_count> consecutive breaths",
+        "the inspiratory pressure does not exceed the specified threshold for one breath"
+      ],
+      "expected": [
+        "the pressure high alarm becomes active",
+        "the pressure high alarm becomes inactive"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Pressure high alarm activates and deactivates based on breath count",
+      "req_ids": [
+        "RW-SW-88"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is monitoring inspiratory pressure"
+      ],
+      "inputs": {
+        "breath_count": 4
+      },
+      "steps": [
+        "the inspiratory pressure exceeds the specified threshold for <breath_count> consecutive breaths",
+        "the inspiratory pressure does not exceed the specified threshold for one breath"
+      ],
+      "expected": [
+        "the pressure high alarm becomes active",
+        "the pressure high alarm becomes inactive"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Pressure high alarm activates and deactivates based on breath count",
+      "req_ids": [
+        "RW-SW-88"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the system is monitoring inspiratory pressure"
+      ],
+      "inputs": {
+        "breath_count": 2
+      },
+      "steps": [
+        "the inspiratory pressure exceeds the specified threshold for <breath_count> consecutive breaths",
+        "the inspiratory pressure does not exceed the specified threshold for one breath"
+      ],
+      "expected": [
+        "the pressure high alarm does not become active",
+        "the pressure high alarm remains inactive"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "GUI emits sound when pressure high alarm is active",
+      "req_ids": [
+        "RW-SW-89"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the pressure high alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the system detects the alarm state"
+      ],
+      "expected": [
+        "the GUI emits a sound"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Pressure high alarm remains displayed until cancelled",
+      "req_ids": [
+        "RW-SW-90"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the pressure high alarm is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "the inspiratory pressure does not exceed the specified threshold for one breath"
+      ],
+      "expected": [
+        "the pressure high alarm becomes inactive",
+        "the pressure high alarm remains displayed"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Alarm management supports visible but not audible alarm state",
+      "req_ids": [
+        "RW-SW-91"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the system is in alarm management mode"
+      ],
+      "inputs": {},
+      "steps": [
+        "the user sets the alarm to visible but not audible"
+      ],
+      "expected": [
+        "the alarm is visible but no sound is emitted"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "PIP too high alarm has high priority",
+      "req_ids": [
+        "RW-SW-93"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the inspiratory pressure exceeds the PIP too high threshold"
+      ],
+      "inputs": {},
+      "steps": [
+        "the system detects the high pressure"
+      ],
+      "expected": [
+        "the PIP too high alarm is triggered with high priority"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Default value for PIP too high alarm is calculated correctly",
+      "req_ids": [
+        "RW-SW-94"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the commanded PIP value is 10"
+      ],
+      "inputs": {
+        "commanded_pip": 10
+      },
+      "steps": [
+        "the system calculates the default PIP too high threshold"
+      ],
+      "expected": [
+        "the default PIP too high threshold is 15cm H2O"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Default value for PIP too high alarm is calculated correctly",
+      "req_ids": [
+        "RW-SW-94"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the commanded PIP value is 20"
+      ],
+      "inputs": {
+        "commanded_pip": 20
+      },
+      "steps": [
+        "the system calculates the default PIP too high threshold"
+      ],
+      "expected": [
+        "the default PIP too high threshold is 25cm H2O"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Default value for PIP too high alarm is calculated correctly",
+      "req_ids": [
+        "RW-SW-94"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the commanded PIP value is 0"
+      ],
+      "inputs": {
+        "commanded_pip": 0
+      },
+      "steps": [
+        "the system calculates the default PIP too high threshold"
+      ],
+      "expected": [
+        "the default PIP too high threshold is 5cm H2O"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarm Management for Pressure Monitoring\n\n  Scenario: GUI logs onset and reset of low pressure alarm\n    Given the system is monitoring inspiratory pressure\n    When the inspiratory pressure falls below the low pressure threshold\n    Then the GUI logs the onset of the low pressure alarm\n    And when the inspiratory pressure rises above the low pressure threshold\n    Then the GUI logs the reset of the low pressure alarm\n\n  Scenario: Low pressure alarm triggers and resets automatically\n    Given the inspiratory pressure is below the low pressure threshold\n    When the system detects low inspiratory pressure\n    Then the low pressure alarm is triggered with high priority\n    And when the first breath with inspiration pressure above the threshold is detected\n    Then the low pressure alarm is automatically reset\n\n  Scenario Outline: Pressure high alarm activates and deactivates based on breath count\n    Given the system is monitoring inspiratory pressure\n    When the inspiratory pressure exceeds the specified threshold for <breath_count> consecutive breaths\n    Then the pressure high alarm becomes active\n    And when the inspiratory pressure does not exceed the specified threshold for one breath\n    Then the pressure high alarm becomes inactive\n    Examples:\n      | breath_count |\n      | 3            |\n      | 4            |\n      | 2            | # edge case: below threshold\n\n  Scenario: GUI emits sound when pressure high alarm is active\n    Given the pressure high alarm is active\n    When the system detects the alarm state\n    Then the GUI emits a sound\n\n  Scenario: Pressure high alarm remains displayed until cancelled\n    Given the pressure high alarm is active\n    When the inspiratory pressure does not exceed the specified threshold for one breath\n    Then the pressure high alarm becomes inactive\n    And the pressure high alarm remains displayed\n\n  Scenario: Alarm management supports visible but not audible alarm state\n    Given the system is in alarm management mode\n    When the user sets the alarm to visible but not audible\n    Then the alarm is visible but no sound is emitted\n\n  Scenario: PIP too high alarm has high priority\n    Given the inspiratory pressure exceeds the PIP too high threshold\n    When the system detects the high pressure\n    Then the PIP too high alarm is triggered with high priority\n\n  Scenario: Default value for PIP too high alarm is calculated correctly\n    Given the commanded PIP value is <commanded_pip>\n    When the system calculates the default PIP too high threshold\n    Then the default PIP too high threshold is <commanded_pip> + 5cm H2O\n    Examples:\n      | commanded_pip | commanded_pip + 5cm H2O |\n      | 10            | 15                    |\n      | 20            | 25                    |\n      | 0             | 5                     | # edge case: zero value",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI logs onset and reset of low pressure alarm",
+          "req_ids": [
+            "RW-SW-85"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is monitoring inspiratory pressure"
+          ],
+          "inputs": {},
+          "steps": [
+            "the inspiratory pressure falls below the low pressure threshold",
+            "the inspiratory pressure rises above the low pressure threshold"
+          ],
+          "expected": [
+            "the GUI logs the onset of the low pressure alarm",
+            "the GUI logs the reset of the low pressure alarm"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Low pressure alarm triggers and resets automatically",
+          "req_ids": [
+            "RW-SW-86"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the inspiratory pressure is below the low pressure threshold"
+          ],
+          "inputs": {},
+          "steps": [
+            "the system detects low inspiratory pressure",
+            "the first breath with inspiration pressure above the threshold is detected"
+          ],
+          "expected": [
+            "the low pressure alarm is triggered with high priority",
+            "the low pressure alarm is automatically reset"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Pressure high alarm activates and deactivates based on breath count",
+          "req_ids": [
+            "RW-SW-88"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is monitoring inspiratory pressure"
+          ],
+          "inputs": {
+            "breath_count": 3
+          },
+          "steps": [
+            "the inspiratory pressure exceeds the specified threshold for <breath_count> consecutive breaths",
+            "the inspiratory pressure does not exceed the specified threshold for one breath"
+          ],
+          "expected": [
+            "the pressure high alarm becomes active",
+            "the pressure high alarm becomes inactive"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Pressure high alarm activates and deactivates based on breath count",
+          "req_ids": [
+            "RW-SW-88"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is monitoring inspiratory pressure"
+          ],
+          "inputs": {
+            "breath_count": 4
+          },
+          "steps": [
+            "the inspiratory pressure exceeds the specified threshold for <breath_count> consecutive breaths",
+            "the inspiratory pressure does not exceed the specified threshold for one breath"
+          ],
+          "expected": [
+            "the pressure high alarm becomes active",
+            "the pressure high alarm becomes inactive"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Pressure high alarm activates and deactivates based on breath count",
+          "req_ids": [
+            "RW-SW-88"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the system is monitoring inspiratory pressure"
+          ],
+          "inputs": {
+            "breath_count": 2
+          },
+          "steps": [
+            "the inspiratory pressure exceeds the specified threshold for <breath_count> consecutive breaths",
+            "the inspiratory pressure does not exceed the specified threshold for one breath"
+          ],
+          "expected": [
+            "the pressure high alarm does not become active",
+            "the pressure high alarm remains inactive"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI emits sound when pressure high alarm is active",
+          "req_ids": [
+            "RW-SW-89"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the pressure high alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the system detects the alarm state"
+          ],
+          "expected": [
+            "the GUI emits a sound"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Pressure high alarm remains displayed until cancelled",
+          "req_ids": [
+            "RW-SW-90"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the pressure high alarm is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "the inspiratory pressure does not exceed the specified threshold for one breath"
+          ],
+          "expected": [
+            "the pressure high alarm becomes inactive",
+            "the pressure high alarm remains displayed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Alarm management supports visible but not audible alarm state",
+          "req_ids": [
+            "RW-SW-91"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the system is in alarm management mode"
+          ],
+          "inputs": {},
+          "steps": [
+            "the user sets the alarm to visible but not audible"
+          ],
+          "expected": [
+            "the alarm is visible but no sound is emitted"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "PIP too high alarm has high priority",
+          "req_ids": [
+            "RW-SW-93"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the inspiratory pressure exceeds the PIP too high threshold"
+          ],
+          "inputs": {},
+          "steps": [
+            "the system detects the high pressure"
+          ],
+          "expected": [
+            "the PIP too high alarm is triggered with high priority"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Default value for PIP too high alarm is calculated correctly",
+          "req_ids": [
+            "RW-SW-94"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the commanded PIP value is 10"
+          ],
+          "inputs": {
+            "commanded_pip": 10
+          },
+          "steps": [
+            "the system calculates the default PIP too high threshold"
+          ],
+          "expected": [
+            "the default PIP too high threshold is 15cm H2O"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Default value for PIP too high alarm is calculated correctly",
+          "req_ids": [
+            "RW-SW-94"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the commanded PIP value is 20"
+          ],
+          "inputs": {
+            "commanded_pip": 20
+          },
+          "steps": [
+            "the system calculates the default PIP too high threshold"
+          ],
+          "expected": [
+            "the default PIP too high threshold is 25cm H2O"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Default value for PIP too high alarm is calculated correctly",
+          "req_ids": [
+            "RW-SW-94"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the commanded PIP value is 0"
+          ],
+          "inputs": {
+            "commanded_pip": 0
+          },
+          "steps": [
+            "the system calculates the default PIP too high threshold"
+          ],
+          "expected": [
+            "the default PIP too high threshold is 5cm H2O"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 34,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No negative test cases for invalid pressure values or thresholds",
+          "No tests for low/high pressure threshold values",
+          "No test for cancellation of pressure high alarm",
+          "No verification of log content or timestamps",
+          "No tests for audible vs silent state transitions"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.745,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

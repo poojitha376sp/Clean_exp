@@ -1,0 +1,977 @@
+{
+  "unit_id": "U03_2",
+  "representation": "Decision Tables",
+  "generator": "ollama:codegemma:7b",
+  "system_type": "safety_critical",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.8,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "123",
+        "context": "prescription_id",
+        "grounded": false
+      },
+      {
+        "value": "John Doe",
+        "context": "patient_name",
+        "grounded": false
+      },
+      {
+        "value": "johndoe@example.com",
+        "context": "patient_email",
+        "grounded": false
+      },
+      {
+        "value": "Cardiology",
+        "context": "speciality",
+        "grounded": false
+      },
+      {
+        "value": "Dr. Smith",
+        "context": "doctor_name",
+        "grounded": false
+      },
+      {
+        "value": "ABC Lab",
+        "context": "lab_name",
+        "grounded": false
+      },
+      {
+        "value": "123 Main Street",
+        "context": "lab_address",
+        "grounded": false
+      },
+      {
+        "value": "John Smith",
+        "context": "chemist_name",
+        "grounded": false
+      },
+      {
+        "value": "456 Elm Street",
+        "context": "chemist_address",
+        "grounded": false
+      },
+      {
+        "value": "Restricted",
+        "context": "access_level",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 10,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "TC-002 references wrong requirement ID (VIRTUA-2.1-4 instead of VIRTUA-2.1-2)",
+      "TC-002 does not verify confidentiality constraint for chemist",
+      "TC-009 uses undefined access_level value 'Restricted'",
+      "No tests cover error paths such as missing or invalid prescription",
+      "No tests for delivery or lab test failures"
+    ],
+    "traceability": 0.875,
+    "untraced_reqs": [
+      "VIRTUA-2.1-2"
+    ],
+    "fsa_score": 0.86,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "## Decision Table Test Suite for U03_2\n\n| Condition | Action |\n|---|---|\n| Patient receives prescription | Display prescription information |\n| Patient receives prescription | Send prescription to chemist |\n| Patient receives prescription | Send prescription to lab |\n| Chemist receives prescription | Deliver medicines to patient |\n| Lab receives prescription | Collect specimen from patient |\n| Lab receives prescription | Generate lab report |\n| Lab receives prescription | Update report on system |\n| Patient registers in system | Create patient account |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Patient receives prescription",
+      "req_ids": [
+        "VIRTUA-2.1-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient has a valid prescription"
+      ],
+      "inputs": {
+        "prescription_id": "123"
+      },
+      "steps": [
+        "Patient receives prescription"
+      ],
+      "expected": [
+        "Prescription information is displayed",
+        "Prescription is sent to chemist",
+        "Prescription is sent to lab"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Chemist receives prescription",
+      "req_ids": [
+        "VIRTUA-2.1-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient has a valid prescription"
+      ],
+      "inputs": {
+        "prescription_id": "123"
+      },
+      "steps": [
+        "Chemist receives prescription"
+      ],
+      "expected": [
+        "Medicines are delivered to patient"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Lab receives prescription",
+      "req_ids": [
+        "VIRTUA-2.1-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient has a valid prescription"
+      ],
+      "inputs": {
+        "prescription_id": "123"
+      },
+      "steps": [
+        "Lab receives prescription"
+      ],
+      "expected": [
+        "Specimen is collected from patient",
+        "Lab report is generated",
+        "Report is updated on system"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Patient registers in system",
+      "req_ids": [
+        "VIRTUA-2.2-4"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "name": "John Doe",
+        "email": "johndoe@example.com"
+      },
+      "steps": [
+        "Patient registers in system"
+      ],
+      "expected": [
+        "Patient account is created"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Admin populates speciality database",
+      "req_ids": [
+        "VIRTUA-2.2-1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "speciality": "Cardiology"
+      },
+      "steps": [
+        "Admin populates speciality database"
+      ],
+      "expected": [
+        "Speciality is added to database"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Admin links speciality to doctor",
+      "req_ids": [
+        "VIRTUA-2.2-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Speciality is added to database"
+      ],
+      "inputs": {
+        "doctor_name": "Dr. Smith",
+        "speciality": "Cardiology"
+      },
+      "steps": [
+        "Admin links speciality to doctor"
+      ],
+      "expected": [
+        "Doctor is linked to speciality"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Labs populates database",
+      "req_ids": [
+        "VIRTUA-2.2-3"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "lab_name": "ABC Lab",
+        "address": "123 Main Street"
+      },
+      "steps": [
+        "Labs populates database"
+      ],
+      "expected": [
+        "Lab is added to database"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Chemists populates database",
+      "req_ids": [
+        "VIRTUA-2.2-3"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "chemist_name": "John Smith",
+        "address": "456 Elm Street"
+      },
+      "steps": [
+        "Chemists populates database"
+      ],
+      "expected": [
+        "Chemist is added to database"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Confidentiality violation",
+      "req_ids": [
+        "VIRTUA-2.1-4"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "prescription_id": "123",
+        "access_level": "Restricted"
+      },
+      "steps": [
+        "Attempt to access prescription information"
+      ],
+      "expected": [
+        "Access denied"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "## Decision Table Test Suite for U03_2\n\n| Condition | Action |\n|---|---|\n| Patient receives prescription | Display prescription information |\n| Patient receives prescription | Offline delivery of medicines |\n| Patient receives prescription | Lab collects specimen |\n| Patient receives prescription | Lab updates report on system |\n| Chemist receives prescription | Displays patient information |\n| Lab receives prescription | Displays patient information |\n| Admin populates speciality database | Links specialities to doctors |\n| Admin populates speciality database | Populates doctor database |\n| Admin populates speciality database | Populates lab and chemist databases |\n| Patient registers | Creates account with details |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient receives prescription",
+          "req_ids": [
+            "VIRTUA-2.1-1",
+            "VIRTUA-2.1-2",
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient receives prescription"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "Prescription information displayed",
+            "Medicines delivered offline",
+            "Lab report updated"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Confidentiality of patient information",
+          "req_ids": [
+            "VIRTUA-2.1-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemists and Labs receive prescription"
+          ],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "Patient information not displayed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Admin populates speciality database",
+          "req_ids": [
+            "VIRTUA-2.2-1",
+            "VIRTUA-2.2-2",
+            "VIRTUA-2.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin accesses system"
+          ],
+          "inputs": {},
+          "steps": [
+            "Admin populates speciality database"
+          ],
+          "expected": [
+            "Specialities linked to doctors",
+            "Doctor database populated",
+            "Lab and chemist databases populated"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Patient registration",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient accesses registration form"
+          ],
+          "inputs": {
+            "name": "John Doe"
+          },
+          "steps": [
+            "Patient registers"
+          ],
+          "expected": [
+            "Account created with name John Doe"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.5,
+        "representation_score": 1.0,
+        "sfv_score": 0.75,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): [] should be non-empty",
+          "test case #2 (TC-002): [] should be non-empty"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.75). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): [] should be non-empty\n- test case #2 (TC-002): [] should be non-empty",
+      "artifact": "## Decision Table Test Suite for U03_2\n\n| Condition | Action |\n|---|---|\n| Patient receives prescription | Display prescription details |\n| Patient receives prescription | Send prescription to local chemist |\n| Patient receives prescription | Send prescription to local lab |\n| Chemist receives prescription | Receive prescription details |\n| Chemist receives prescription | Send medicines to patient |\n| Lab receives prescription | Receive prescription details |\n| Lab receives prescription | Collect specimen from patient |\n| Lab receives prescription | Generate lab report |\n| Lab receives prescription | Update report on system |\n| Admin populates speciality database | Add new specialities |\n| Admin populates doctor database | Link specialities to doctors |\n| Admin populates lab database | Add new labs |\n| Admin populates chemist database | Add new chemists |\n| Patient registers in system | Create new patient account |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient receives prescription",
+          "req_ids": [
+            "VIRTUA-2.1-1",
+            "VIRTUA-2.1-2",
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "patient"
+          },
+          "steps": [],
+          "expected": [
+            "Display prescription details",
+            "Send prescription to local chemist",
+            "Send prescription to local lab"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Chemist receives prescription",
+          "req_ids": [
+            "VIRTUA-2.1-1",
+            "VIRTUA-2.1-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient receives prescription"
+          ],
+          "inputs": {
+            "name": "chemist"
+          },
+          "steps": [],
+          "expected": [
+            "Receive prescription details",
+            "Send medicines to patient"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Lab receives prescription",
+          "req_ids": [
+            "VIRTUA-2.1-1",
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient receives prescription"
+          ],
+          "inputs": {
+            "name": "lab"
+          },
+          "steps": [],
+          "expected": [
+            "Receive prescription details",
+            "Collect specimen from patient",
+            "Generate lab report",
+            "Update report on system"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Admin populates speciality database",
+          "req_ids": [
+            "VIRTUA-2.2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "specialities"
+          },
+          "steps": [],
+          "expected": [
+            "Add new specialities"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Admin populates doctor database",
+          "req_ids": [
+            "VIRTUA-2.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin populates speciality database"
+          ],
+          "inputs": {
+            "name": "doctors"
+          },
+          "steps": [],
+          "expected": [
+            "Link specialities to doctors"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin populates lab database",
+          "req_ids": [
+            "VIRTUA-2.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "labs"
+          },
+          "steps": [],
+          "expected": [
+            "Add new labs"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Admin populates chemist database",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "chemists"
+          },
+          "steps": [],
+          "expected": [
+            "Add new chemists"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient registers in system",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "patient"
+          },
+          "steps": [],
+          "expected": [
+            "Create new patient account"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): [] should be non-empty",
+          "test case #2 (TC-002): [] should be non-empty",
+          "test case #3 (TC-003): [] should be non-empty",
+          "test case #4 (TC-004): [] should be non-empty",
+          "test case #5 (TC-005): [] should be non-empty",
+          "test case #6 (TC-006): [] should be non-empty",
+          "test case #7 (TC-007): [] should be non-empty",
+          "test case #8 (TC-008): [] should be non-empty"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): [] should be non-empty\n- test case #2 (TC-002): [] should be non-empty\n- test case #3 (TC-003): [] should be non-empty\n- test case #4 (TC-004): [] should be non-empty\n- test case #5 (TC-005): [] should be non-empty\n- test case #6 (TC-006): [] should be non-empty\n- test case #7 (TC-007): [] should be non-empty\n- test case #8 (TC-008): [] should be non-empty",
+      "artifact": "## Decision Table Test Suite for U03_2\n\n| Condition | Action |\n|---|---|\n| Patient receives prescription | Display prescription details |\n| Patient receives prescription | Send prescription to chemist |\n| Patient receives prescription | Send prescription to lab |\n| Chemist receives prescription | Deliver medicines to patient |\n| Lab receives prescription | Collect specimen from patient |\n| Lab receives prescription | Generate lab report |\n| Lab receives prescription | Update report on system |\n| Patient registers | Create patient account |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient receives prescription",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient receives prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "Display prescription details",
+            "Send prescription to chemist",
+            "Send prescription to lab"
+          ],
+          "expected": [
+            "Prescription details are displayed",
+            "Medicines are delivered to patient",
+            "Lab report is generated and updated"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Chemist receives prescription",
+          "req_ids": [
+            "VIRTUA-2.1-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient receives prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "Deliver medicines to patient"
+          ],
+          "expected": [
+            "Medicines are delivered to patient"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Lab receives prescription",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient receives prescription"
+          ],
+          "inputs": {},
+          "steps": [
+            "Collect specimen from patient",
+            "Generate lab report",
+            "Update report on system"
+          ],
+          "expected": [
+            "Specimen is collected",
+            "Lab report is generated",
+            "Report is updated on system"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Patient registers",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient wants to register"
+          ],
+          "inputs": {},
+          "steps": [
+            "Create patient account"
+          ],
+          "expected": [
+            "Patient account is created"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.375,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 0,
+        "uncovered_clauses": [
+          "VIRTUA-2.1-1",
+          "VIRTUA-2.1-4",
+          "VIRTUA-2.2-1",
+          "VIRTUA-2.2-2",
+          "VIRTUA-2.2-3"
+        ],
+        "weaknesses": [
+          "Add tests for chemist and lab receipt of prescription to fully cover VIRTUA-2.1-1.",
+          "Include negative test cases for confidentiality constraint VIRTUA-2.1-4.",
+          "Add tests for admin populating speciality and doctor databases (VIRTUA-2.2-1, VIRTUA-2.2-2).",
+          "Add tests for labs and chemists populating their databases (VIRTUA-2.2-3).",
+          "Improve oracle assertions to check concrete values such as prescription ID, delivery status codes."
+        ],
+        "traceability": 0.5,
+        "untraced_reqs": [
+          "VIRTUA-2.1-4",
+          "VIRTUA-2.2-1",
+          "VIRTUA-2.2-2",
+          "VIRTUA-2.2-3"
+        ],
+        "fsa_score": 0.4337,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.4337; sub-scores {'clause_coverage': 0.375, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 1.0, 'groundedness_mg': 1.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-2.1-4', 'VIRTUA-2.2-1', 'VIRTUA-2.2-2', 'VIRTUA-2.2-3'] (add at least one each)\n- uncovered clause: VIRTUA-2.1-1\n- uncovered clause: VIRTUA-2.1-4\n- uncovered clause: VIRTUA-2.2-1\n- uncovered clause: VIRTUA-2.2-2\n- uncovered clause: VIRTUA-2.2-3\n- Add tests for chemist and lab receipt of prescription to fully cover VIRTUA-2.1-1.\n- Include negative test cases for confidentiality constraint VIRTUA-2.1-4.\n- Add tests for admin populating speciality and doctor databases (VIRTUA-2.2-1, VIRTUA-2.2-2).\n- Add tests for labs and chemists populating their databases (VIRTUA-2.2-3).\n- Improve oracle assertions to check concrete values such as prescription ID, delivery status codes.",
+      "artifact": "## Decision Table Test Suite for U03_2\n\n| Condition | Action |\n|---|---|\n| Patient receives prescription | Display prescription information |\n| Patient receives prescription | Send prescription to chemist |\n| Patient receives prescription | Send prescription to lab |\n| Chemist receives prescription | Deliver medicines to patient |\n| Lab receives prescription | Collect specimen from patient |\n| Lab receives prescription | Generate lab report |\n| Lab receives prescription | Update report on system |\n| Patient registers in system | Create patient account |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient receives prescription",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has a valid prescription"
+          ],
+          "inputs": {
+            "prescription_id": "123"
+          },
+          "steps": [
+            "Patient receives prescription"
+          ],
+          "expected": [
+            "Prescription information is displayed",
+            "Prescription is sent to chemist",
+            "Prescription is sent to lab"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Chemist receives prescription",
+          "req_ids": [
+            "VIRTUA-2.1-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has a valid prescription"
+          ],
+          "inputs": {
+            "prescription_id": "123"
+          },
+          "steps": [
+            "Chemist receives prescription"
+          ],
+          "expected": [
+            "Medicines are delivered to patient"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Lab receives prescription",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has a valid prescription"
+          ],
+          "inputs": {
+            "prescription_id": "123"
+          },
+          "steps": [
+            "Lab receives prescription"
+          ],
+          "expected": [
+            "Specimen is collected from patient",
+            "Lab report is generated",
+            "Report is updated on system"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Patient registers in system",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "John Doe",
+            "email": "johndoe@example.com"
+          },
+          "steps": [
+            "Patient registers in system"
+          ],
+          "expected": [
+            "Patient account is created"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Admin populates speciality database",
+          "req_ids": [
+            "VIRTUA-2.2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Admin populates speciality database"
+          ],
+          "expected": [
+            "Speciality is added to database"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin links speciality to doctor",
+          "req_ids": [
+            "VIRTUA-2.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Speciality is added to database"
+          ],
+          "inputs": {
+            "doctor_name": "Dr. Smith",
+            "speciality": "Cardiology"
+          },
+          "steps": [
+            "Admin links speciality to doctor"
+          ],
+          "expected": [
+            "Doctor is linked to speciality"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Labs populates database",
+          "req_ids": [
+            "VIRTUA-2.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "lab_name": "ABC Lab",
+            "address": "123 Main Street"
+          },
+          "steps": [
+            "Labs populates database"
+          ],
+          "expected": [
+            "Lab is added to database"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Chemists populates database",
+          "req_ids": [
+            "VIRTUA-2.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "chemist_name": "John Smith",
+            "address": "456 Elm Street"
+          },
+          "steps": [
+            "Chemists populates database"
+          ],
+          "expected": [
+            "Chemist is added to database"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Confidentiality violation",
+          "req_ids": [
+            "VIRTUA-2.1-4"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "prescription_id": "123",
+            "access_level": "Restricted"
+          },
+          "steps": [
+            "Attempt to access prescription information"
+          ],
+          "expected": [
+            "Access denied"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "123",
+            "context": "prescription_id",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "patient_name",
+            "grounded": false
+          },
+          {
+            "value": "johndoe@example.com",
+            "context": "patient_email",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "speciality",
+            "grounded": false
+          },
+          {
+            "value": "Dr. Smith",
+            "context": "doctor_name",
+            "grounded": false
+          },
+          {
+            "value": "ABC Lab",
+            "context": "lab_name",
+            "grounded": false
+          },
+          {
+            "value": "123 Main Street",
+            "context": "lab_address",
+            "grounded": false
+          },
+          {
+            "value": "John Smith",
+            "context": "chemist_name",
+            "grounded": false
+          },
+          {
+            "value": "456 Elm Street",
+            "context": "chemist_address",
+            "grounded": false
+          },
+          {
+            "value": "Restricted",
+            "context": "access_level",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 10,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "TC-002 references wrong requirement ID (VIRTUA-2.1-4 instead of VIRTUA-2.1-2)",
+          "TC-002 does not verify confidentiality constraint for chemist",
+          "TC-009 uses undefined access_level value 'Restricted'",
+          "No tests cover error paths such as missing or invalid prescription",
+          "No tests for delivery or lab test failures"
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "VIRTUA-2.1-2"
+        ],
+        "fsa_score": 0.86,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

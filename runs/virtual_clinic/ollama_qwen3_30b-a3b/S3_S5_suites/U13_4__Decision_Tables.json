@@ -1,0 +1,473 @@
+{
+  "unit_id": "U13_4",
+  "representation": "Decision Tables",
+  "generator": "ollama:qwen3:30b-a3b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "error": "ollama:gpt-oss:20b returned an empty response",
+    "fsa_pass": false,
+    "fsa_score": 0.0
+  },
+  "artifact": "| Operation | Name provided | Name unique | Symptom exists | Description provided | No references | Action |\n|-----------|---------------|-------------|----------------|----------------------|---------------|--------|\n| Add       | Y             | Y           | N              | N                    | N             | Success |\n| Add       | Y             | N           | N              | N                    | N             | Failure: duplicate name |\n| Add       | N             | -           | N              | N                    | N             | Failure: name required |\n| Update    | -             | -           | Y              | Y                    | N             | Success |\n| Update    | -             | -           | Y              | N                    | N             | Failure: description required |\n| Update    | -             | -           | N              | -                    | N             | Failure: symptom not found |\n| Delete    | -             | -           | Y              | -                    | Y             | Success |\n| Delete    | -             | -           | Y              | -                    | N             | Failure: symptom in use |\n| Delete    | -             | -           | N              | -                    | -             | Failure: symptom not found |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Add new symptom (success)",
+      "req_ids": [
+        "Req-4/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "No symptom with the same name exists"
+      ],
+      "inputs": {
+        "name": "Fever",
+        "description": "Elevated body temperature"
+      },
+      "steps": [
+        "Attempt to add a symptom with name 'Fever' and description 'Elevated body temperature'"
+      ],
+      "expected": [
+        "Symptom 'Fever' is added successfully"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Add new symptom (duplicate name)",
+      "req_ids": [
+        "Req-4/1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "A symptom named 'Fever' already exists"
+      ],
+      "inputs": {
+        "name": "Fever",
+        "description": "Elevated body temperature"
+      },
+      "steps": [
+        "Attempt to add a symptom with name 'Fever' (which already exists)"
+      ],
+      "expected": [
+        "Error: Symptom name must be unique"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Add new symptom (missing name)",
+      "req_ids": [
+        "Req-4/1"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "name": "",
+        "description": "Elevated body temperature"
+      },
+      "steps": [
+        "Attempt to add a symptom with empty name"
+      ],
+      "expected": [
+        "Error: Symptom name is required"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Update symptom (success)",
+      "req_ids": [
+        "Req-4/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Symptom 'Fever' exists with description 'Elevated body temperature'"
+      ],
+      "inputs": {
+        "name": "Fever",
+        "description": "High body temperature"
+      },
+      "steps": [
+        "Attempt to update symptom 'Fever' with new description 'High body temperature'"
+      ],
+      "expected": [
+        "Symptom 'Fever' description updated successfully"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Update symptom (missing description)",
+      "req_ids": [
+        "Req-4/2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Symptom 'Fever' exists"
+      ],
+      "inputs": {
+        "name": "Fever",
+        "description": ""
+      },
+      "steps": [
+        "Attempt to update symptom 'Fever' with empty description"
+      ],
+      "expected": [
+        "Error: Description is required"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Update symptom (symptom not found)",
+      "req_ids": [
+        "Req-4/2"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "name": "Headache",
+        "description": "Pain in head"
+      },
+      "steps": [
+        "Attempt to update symptom 'Headache' which does not exist"
+      ],
+      "expected": [
+        "Error: Symptom 'Headache' not found"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Delete symptom (success)",
+      "req_ids": [
+        "Req-4/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Symptom 'Fever' exists and no consultation request has used it"
+      ],
+      "inputs": {
+        "name": "Fever"
+      },
+      "steps": [
+        "Attempt to delete symptom 'Fever'"
+      ],
+      "expected": [
+        "Symptom 'Fever' deleted successfully"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Delete symptom (symptom in use)",
+      "req_ids": [
+        "Req-4/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Symptom 'Fever' exists and at least one consultation request has used it"
+      ],
+      "inputs": {
+        "name": "Fever"
+      },
+      "steps": [
+        "Attempt to delete symptom 'Fever' which is in use"
+      ],
+      "expected": [
+        "Error: Symptom cannot be deleted because it is used in consultation requests"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Delete symptom (symptom not found)",
+      "req_ids": [
+        "Req-4/3"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "name": "Headache"
+      },
+      "steps": [
+        "Attempt to delete symptom 'Headache' which does not exist"
+      ],
+      "expected": [
+        "Error: Symptom 'Headache' not found"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "| Operation | Name provided | Name unique | Symptom exists | Description provided | No references | Action |\n|-----------|---------------|-------------|----------------|----------------------|---------------|--------|\n| Add       | Y             | Y           | N              | N                    | N             | Success |\n| Add       | Y             | N           | N              | N                    | N             | Failure: duplicate name |\n| Add       | N             | -           | N              | N                    | N             | Failure: name required |\n| Update    | -             | -           | Y              | Y                    | N             | Success |\n| Update    | -             | -           | Y              | N                    | N             | Failure: description required |\n| Update    | -             | -           | N              | -                    | N             | Failure: symptom not found |\n| Delete    | -             | -           | Y              | -                    | Y             | Success |\n| Delete    | -             | -           | Y              | -                    | N             | Failure: symptom in use |\n| Delete    | -             | -           | N              | -                    | -             | Failure: symptom not found |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add new symptom (success)",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "No symptom with the same name exists"
+          ],
+          "inputs": {
+            "name": "Fever",
+            "description": "Elevated body temperature"
+          },
+          "steps": [
+            "Attempt to add a symptom with name 'Fever' and description 'Elevated body temperature'"
+          ],
+          "expected": [
+            "Symptom 'Fever' is added successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Add new symptom (duplicate name)",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "A symptom named 'Fever' already exists"
+          ],
+          "inputs": {
+            "name": "Fever",
+            "description": "Elevated body temperature"
+          },
+          "steps": [
+            "Attempt to add a symptom with name 'Fever' (which already exists)"
+          ],
+          "expected": [
+            "Error: Symptom name must be unique"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Add new symptom (missing name)",
+          "req_ids": [
+            "Req-4/1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "",
+            "description": "Elevated body temperature"
+          },
+          "steps": [
+            "Attempt to add a symptom with empty name"
+          ],
+          "expected": [
+            "Error: Symptom name is required"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Update symptom (success)",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom 'Fever' exists with description 'Elevated body temperature'"
+          ],
+          "inputs": {
+            "name": "Fever",
+            "description": "High body temperature"
+          },
+          "steps": [
+            "Attempt to update symptom 'Fever' with new description 'High body temperature'"
+          ],
+          "expected": [
+            "Symptom 'Fever' description updated successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Update symptom (missing description)",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom 'Fever' exists"
+          ],
+          "inputs": {
+            "name": "Fever",
+            "description": ""
+          },
+          "steps": [
+            "Attempt to update symptom 'Fever' with empty description"
+          ],
+          "expected": [
+            "Error: Description is required"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Update symptom (symptom not found)",
+          "req_ids": [
+            "Req-4/2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "Headache",
+            "description": "Pain in head"
+          },
+          "steps": [
+            "Attempt to update symptom 'Headache' which does not exist"
+          ],
+          "expected": [
+            "Error: Symptom 'Headache' not found"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Delete symptom (success)",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Symptom 'Fever' exists and no consultation request has used it"
+          ],
+          "inputs": {
+            "name": "Fever"
+          },
+          "steps": [
+            "Attempt to delete symptom 'Fever'"
+          ],
+          "expected": [
+            "Symptom 'Fever' deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Delete symptom (symptom in use)",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Symptom 'Fever' exists and at least one consultation request has used it"
+          ],
+          "inputs": {
+            "name": "Fever"
+          },
+          "steps": [
+            "Attempt to delete symptom 'Fever' which is in use"
+          ],
+          "expected": [
+            "Error: Symptom cannot be deleted because it is used in consultation requests"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Delete symptom (symptom not found)",
+          "req_ids": [
+            "Req-4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "Headache"
+          },
+          "steps": [
+            "Attempt to delete symptom 'Headache' which does not exist"
+          ],
+          "expected": [
+            "Error: Symptom 'Headache' not found"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "error": "ollama:gpt-oss:20b returned an empty response",
+        "fsa_pass": false,
+        "fsa_score": 0.0
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.0; sub-scores {'clause_coverage': None, 'negative_coverage': None, 'oracle_assertiveness': None, 'boundary_coverage': None, 'groundedness_mg': None}). Output the full improved suite addressing:",
+      "artifact": "| Operation | Symptom exists | Symptom used | Action |\n|-----------|----------------|--------------|--------|\n| Add       | No             | -            | Add symptom |\n| Add       | Yes            | -            | Error: symptom already exists |\n| Update    | Yes            | -            | Update symptom description |\n| Update    | No             | -            | Error: symptom not found |\n| Delete    | Yes            | No           | Delete symptom |\n| Delete    | Yes            | Yes          | Error: symptom is used in consultation |\n| Delete    | No             | -            | Error: symptom not found |",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given requirements for a \"Maintain Symptoms\" feature (U13_4) with sub-requirements.\n We are to write a test suite in two parts: \n   1. A Decision Table representation (in the artifact block)\n   2. A JSON array of test cases (in the json block)\n\n The requirements:\n   [Req-4] (functional) Maintain Symptoms. (master list of Symptoms)\n   [Req-4/1] (functional) Add a new Symptom\n   [Req-4/2] (functional) View and Update the details of an existing Symptom (description)\n   [Req-4/3] (constraint) Delete the Symptom Details - A Symptom can be deleted if and only if no Consultation request ever raised has used this symptom\n\n We are to cover:\n   - 100% rule coverage (every requirement id must be traced by at least one test case)\n   - Negative/error paths and boundary values (at and around every limit, threshold, count, etc.)\n   - Oracle assertiveness: concrete, checkable outcomes\n   - Groundedness: use values from requirements, if unspecified say \"as specified\"\n\n Previous attempt failed because:\n   - No canonical test cases found (expected a JSON list)\n\n We must output exactly two fenced blocks.\n\n Steps for the Decision Table:\n   We'll create a decision table that lists conditions and actions for the operations (Add, Update, Delete) and the constraints.\n\n Conditions we might consider:\n   For Add (Req-4/1):\n     - Condition: Symptom name is provided and unique (within the system)\n     - Condition: Symptom name is not provided (invalid)\n     - Condition: Symptom name is already in use (duplicate)\n\n   For Update (Req-4/2):\n     - Condition: Symptom exists and new description is provided (and valid)\n     - Condition: Symptom exists but no new description provided (invalid)\n     - Condition: Symptom does not exist (invalid)\n\n   For Delete (Req-4/3):\n     - Condition: Symptom exists and has no associated consultation requests (valid deletion)\n     - Condition: Symptom exists but has at least one associated consultation request (invalid deletion)\n     - Condition: Symptom does not exist (invalid)\n\n However, note that the requirement [Req-4/3] says: \"A Symptom can be deleted if and only if no Consultation request ever raised has used this symptom\"\n\n We must also consider:\n   - Boundary: for the count of consultation requests (0 vs >0)\n\n We are to cover all requirements with test cases.\n\n Let's plan the test cases (to be represented in the JSON and also in the decision table as columns):\n\n   TC-001: Add a new symptom (positive) - [Req-4/1]\n   TC-002: Attempt to add a symptom with duplicate name (negative) - [Req-4/1]\n   TC-003: Attempt to add a symptom without a name (negative) - [Req-4/1]\n\n   TC-004: Update an existing symptom (positive) - [Req-4/2]\n   TC-005: Attempt to update a symptom that doesn't exist (negative) - [Req-4/2]\n   TC-006: Attempt to update a symptom without providing a new description (negative) - [Req-4/2]\n\n   TC-007: Delete a symptom that has no consultation requests (positive) - [Req-4/3]\n   TC-008: Attempt to delete a symptom that has a",
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "We are given requirements for a \"Maintain Symptoms\" feature (U13_4) with three main functional requirements and one constraint.\n\nRequirements:\n[Req-4] (functional) Maintain Symptoms. This is a master list of Symptoms that can be selected by Patient during Consultation Request.\n[Req-4/1] (functional) Add a new Symptom\n[Req-4/2] (functional) View and Update the details of an existing Symptom i.e. description\n[Req-4/3] (constraint) Delete the Symptom Details - A Symptom can be deleted if and only if no Consultation request ever raised has used this symptom\n\nWe are to write a test suite in two parts:\n1. A Decision Table representation (as the artifact)\n2. A JSON list of test cases (with specific structure)\n\nThe previous attempt failed because:\n- No canonical test cases found (expected a JSON list)\n- Representation artifact is empty.\n\nWe must fix that.\n\nApproach for Decision Tables:\n\nWe'll create a decision table that covers the conditions and actions for the requirements.\n\nConditions we need to consider:\n- For adding a symptom (Req-4/1): \n   Condition: Symptom name is provided and unique (we assume the system checks uniqueness, but note: requirement doesn't specify uniqueness, but typically a master list would require unique names). However, the requirement doesn't specify uniqueness, so we must not assume. But note: the requirement says \"Add a new Symptom\", so we assume the symptom name must be provided and not duplicate? But the requirement doesn't say. However, the constraint for deletion (Req-4/3) is about usage in consultation requests.\n\nBut note: the requirement for adding doesn't specify validation, so we have to be cautious. However, the problem says: \"groundedness: every concrete value ... must come from the requirement text\". Since the requirement doesn't specify uniqueness, we cannot assume it. But in reality, we would have to have a unique name. However, the requirement text does not say \"unique\", so we cannot test for uniqueness? But note: the requirement is for a master list, so it's implied. However, the problem says: \"if a value is unspecified, say 'as specified' rather than making one up.\"\n\nSo for the purpose of this test, we will not test for uniqueness in the add because it's not specified. But note: the requirement says \"Add a new Symptom\", so we assume the symptom name is provided and the system will accept it (unless there's a duplicate, but the requirement doesn't say). However, the problem says: \"Do not invent specifics\". Therefore, we will not include a condition for uniqueness in the decision table because it's not in the requirement.\n\nBut wait: the requirement for deletion (Req-4/3) is a constraint that we must test. So we have to consider the state of the symptom (whether it has been used in a consultation request).\n\nSo let's break down the conditions for the operations:\n\n1. Adding a symptom (Req-4/1):\n   - Condition: We are trying to add a symptom (with a name and description? The requirement doesn't specify what fields, ",
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    }
+  ]
+}

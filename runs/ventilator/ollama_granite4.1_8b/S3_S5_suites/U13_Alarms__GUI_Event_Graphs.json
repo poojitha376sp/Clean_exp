@@ -1,0 +1,1562 @@
+{
+  "unit_id": "U13_Alarms",
+  "representation": "GUI Event Graphs",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "GUI Event Graphs",
+    "group": 3,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 1.0,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.6923,
+    "hallucinated": [
+      {
+        "value": 150,
+        "context": "flow_sensor_data value",
+        "grounded": false
+      },
+      {
+        "value": "Threshold must be between 5 and 30",
+        "context": "error message for high/low RR",
+        "grounded": false
+      },
+      {
+        "value": "Threshold must be between 1 and 30",
+        "context": "error message for apnea",
+        "grounded": false
+      },
+      {
+        "value": true,
+        "context": "alarm_relief_valve_open flag",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 13,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Missing explicit negative test cases for invalid threshold values in canonical test cases",
+      "No verification that slider increments are exactly 1",
+      "Error message texts are not grounded; tests should verify actual UI messages",
+      "Relief valve alarm test uses arbitrary flow value (150) without realistic expected flow context",
+      "No test to confirm normal flow increases do not trigger the relief valve alarm"
+    ],
+    "traceability": 0.5714,
+    "untraced_reqs": [
+      "RW-SW-145",
+      "RW-SW-147",
+      "RW-SW-149"
+    ],
+    "fsa_score": 0.9538,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "GUI_EVENT_GRAPH:\n  START\n    -\n    -> SET_HIGH_RR_THRESHOLD\n  SET_HIGH_RR_THRESHOLD\n    INPUT: slider_threshold_high_rr (5-30, step 1)\n    VALIDATE: slider_threshold_high_rr ∈ [5, 30]\n    -> IF_VALID_SET_HIGH_RR_THRESHOLD\n    -> IF_INVALID_SET_HIGH_RR_THRESHOLD\n  IF_VALID_SET_HIGH_RR_THRESHOLD\n    ASSERT: threshold_high_rr = slider_threshold_high_rr\n    -> SET_LOW_RR_THRESHOLD\n  IF_INVALID_SET_HIGH_RR_THRESHOLD\n    ASSERT: error_message_shown = \"Threshold must be between 5 and 30\"\n    -> SET_HIGH_RR_THRESHOLD\n  SET_LOW_RR_THRESHOLD\n    INPUT: slider_threshold_low_rr (5-30, step 1)\n    VALIDATE: slider_threshold_low_rr ∈ [5, 30]\n    -> IF_VALID_SET_LOW_RR_THRESHOLD\n    -> IF_INVALID_SET_LOW_RR_THRESHOLD\n  IF_VALID_SET_LOW_RR_THRESHOLD\n    ASSERT: threshold_low_rr = slider_threshold_low_rr\n    -> SET_Apnea_THRESHOLD\n  IF_INVALID_SET_LOW_RR_THRESHOLD\n    ASSERT: error_message_shown = \"Threshold must be between 5 and 30\"\n    -> SET_LOW_RR_THRESHOLD\n  SET_Apnea_THRESHOLD\n    INPUT: slider_threshold_apnea (1-30, step 1)\n    VALIDATE: slider_threshold_apnea ∈ [1, 30]\n    -> IF_VALID_SET_Apnea_THRESHOLD\n    -> IF_INVALID_SET_Apnea_THRESHOLD\n  IF_VALID_SET_Apnea_THRESHOLD\n    ASSERT: threshold_apnea = slider_threshold_apnea\n    -> DETECT_RELIEF_VALVE_OPEN\n  IF_INVALID_SET_Apnea_THRESHOLD\n    ASSERT: error_message_shown = \"Threshold must be between 1 and 30\"\n    -> SET_Apnea_THRESHOLD\n  DETECT_RELIEF_VALVE_OPEN\n    INPUT: flow_sensor_data (unexpected increase)\n    VALIDATE: flow_sensor_data > expected_flow_rate\n    ASSERT: alarm_relief_valve_open = true\n    -> END",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Set HIGH RR alarm threshold within valid range",
+      "req_ids": [
+        "RW-SW-144"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "name": "slider_threshold_high_rr",
+        "value": 15
+      },
+      "steps": [
+        "Navigate to the alarm settings screen",
+        "Locate the HIGH RR alarm threshold control",
+        "Set the threshold to 15",
+        "Confirm the setting is applied"
+      ],
+      "expected": [
+        "threshold_high_rr == 15",
+        "No error message displayed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Set HIGH RR alarm threshold at lower boundary",
+      "req_ids": [
+        "RW-SW-144"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "name": "slider_threshold_high_rr",
+        "value": 5
+      },
+      "steps": [
+        "Navigate to the alarm settings screen",
+        "Locate the HIGH RR alarm threshold control",
+        "Set the threshold to 5",
+        "Confirm the setting is applied"
+      ],
+      "expected": [
+        "threshold_high_rr == 5",
+        "No error message displayed"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Set HIGH RR alarm threshold at upper boundary",
+      "req_ids": [
+        "RW-SW-144"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "name": "slider_threshold_high_rr",
+        "value": 30
+      },
+      "steps": [
+        "Navigate to the alarm settings screen",
+        "Locate the HIGH RR alarm threshold control",
+        "Set the threshold to 30",
+        "Confirm the setting is applied"
+      ],
+      "expected": [
+        "threshold_high_rr == 30",
+        "No error message displayed"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Set LOW RR alarm threshold within valid range",
+      "req_ids": [
+        "RW-SW-146"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "name": "slider_threshold_low_rr",
+        "value": 20
+      },
+      "steps": [
+        "Navigate to the alarm settings screen",
+        "Locate the LOW RR alarm threshold control",
+        "Set the threshold to 20",
+        "Confirm the setting is applied"
+      ],
+      "expected": [
+        "threshold_low_rr == 20",
+        "No error message displayed"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Set LOW RR alarm threshold at lower boundary",
+      "req_ids": [
+        "RW-SW-146"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "name": "slider_threshold_low_rr",
+        "value": 5
+      },
+      "steps": [
+        "Navigate to the alarm settings screen",
+        "Locate the LOW RR alarm threshold control",
+        "Set the threshold to 5",
+        "Confirm the setting is applied"
+      ],
+      "expected": [
+        "threshold_low_rr == 5",
+        "No error message displayed"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Set LOW RR alarm threshold at upper boundary",
+      "req_ids": [
+        "RW-SW-146"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "name": "slider_threshold_low_rr",
+        "value": 30
+      },
+      "steps": [
+        "Navigate to the alarm settings screen",
+        "Locate the LOW RR alarm threshold control",
+        "Set the threshold to 30",
+        "Confirm the setting is applied"
+      ],
+      "expected": [
+        "threshold_low_rr == 30",
+        "No error message displayed"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Set apnea alarm threshold within valid range",
+      "req_ids": [
+        "RW-SW-148"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "name": "slider_threshold_apnea",
+        "value": 10
+      },
+      "steps": [
+        "Navigate to the alarm settings screen",
+        "Locate the apnea alarm threshold control",
+        "Set the threshold to 10 seconds",
+        "Confirm the setting is applied"
+      ],
+      "expected": [
+        "threshold_apnea == 10",
+        "No error message displayed"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Set apnea alarm threshold at lower boundary",
+      "req_ids": [
+        "RW-SW-148"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "name": "slider_threshold_apnea",
+        "value": 1
+      },
+      "steps": [
+        "Navigate to the alarm settings screen",
+        "Locate the apnea alarm threshold control",
+        "Set the threshold to 1 second",
+        "Confirm the setting is applied"
+      ],
+      "expected": [
+        "threshold_apnea == 1",
+        "No error message displayed"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Set apnea alarm threshold at upper boundary",
+      "req_ids": [
+        "RW-SW-148"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "name": "slider_threshold_apnea",
+        "value": 30
+      },
+      "steps": [
+        "Navigate to the alarm settings screen",
+        "Locate the apnea alarm threshold control",
+        "Set the threshold to 30 seconds",
+        "Confirm the setting is applied"
+      ],
+      "expected": [
+        "threshold_apnea == 30",
+        "No error message displayed"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Detect relief valve open alarm on unexpected flow increase",
+      "req_ids": [
+        "RW-SW-158"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "name": "flow_sensor_data",
+        "value": 150
+      },
+      "steps": [
+        "Simulate flow sensor data indicating an unexpected increase",
+        "Monitor system for alarm_relief_valve_open flag"
+      ],
+      "expected": [
+        "alarm_relief_valve_open == true"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "// GUI Event Graph for Alarms Configuration\n\n// Nodes\nStart\n  |\n  v\nOpen Alarms Configuration Screen\n  |\n  v\nSet HIGH RR Alarm Threshold (5-30, increment 1)\n  |\n  v\nSet LOW RR Alarm Threshold (5-30, increment 1)\n  |\n  v\nSet Apnea Alarm Threshold (1-30 seconds, increment 1)\n  |\n  v\nDetect Relief Valve Open Alarm (unexpected flow increase)\n  |\n  v\nSave Settings / Exit",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Set HIGH RR Alarm Threshold within range",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Alarms Configuration Screen is open"
+          ],
+          "inputs": {
+            "name": "high_rr_threshold",
+            "value": 15
+          },
+          "steps": [
+            "Navigate to Alarms Configuration Screen",
+            "Select HIGH RR Alarm Threshold control",
+            "Enter value 15",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "HIGH RR Alarm Threshold is set to 15"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Set HIGH RR Alarm Threshold at lower boundary",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Alarms Configuration Screen is open"
+          ],
+          "inputs": {
+            "name": "high_rr_threshold",
+            "value": 5
+          },
+          "steps": [
+            "Navigate to Alarms Configuration Screen",
+            "Select HIGH RR Alarm Threshold control",
+            "Enter value 5",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "HIGH RR Alarm Threshold is set to 5"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Set HIGH RR Alarm Threshold at upper boundary",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Alarms Configuration Screen is open"
+          ],
+          "inputs": {
+            "name": "high_rr_threshold",
+            "value": 30
+          },
+          "steps": [
+            "Navigate to Alarms Configuration Screen",
+            "Select HIGH RR Alarm Threshold control",
+            "Enter value 30",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "HIGH RR Alarm Threshold is set to 30"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Set LOW RR Alarm Threshold within range",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Alarms Configuration Screen is open"
+          ],
+          "inputs": {
+            "name": "low_rr_threshold",
+            "value": 20
+          },
+          "steps": [
+            "Navigate to Alarms Configuration Screen",
+            "Select LOW RR Alarm Threshold control",
+            "Enter value 20",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "LOW RR Alarm Threshold is set to 20"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Set LOW RR Alarm Threshold at lower boundary",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Alarms Configuration Screen is open"
+          ],
+          "inputs": {
+            "name": "low_rr_threshold",
+            "value": 5
+          },
+          "steps": [
+            "Navigate to Alarms Configuration Screen",
+            "Select LOW RR Alarm Threshold control",
+            "Enter value 5",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "LOW RR Alarm Threshold is set to 5"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Set LOW RR Alarm Threshold at upper boundary",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Alarms Configuration Screen is open"
+          ],
+          "inputs": {
+            "name": "low_rr_threshold",
+            "value": 30
+          },
+          "steps": [
+            "Navigate to Alarms Configuration Screen",
+            "Select LOW RR Alarm Threshold control",
+            "Enter value 30",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "LOW RR Alarm Threshold is set to 30"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Set Apnea Alarm Threshold within range",
+          "req_ids": [
+            "RW-SW-148"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Alarms Configuration Screen is open"
+          ],
+          "inputs": {
+            "name": "apnea_threshold",
+            "value": 10
+          },
+          "steps": [
+            "Navigate to Alarms Configuration Screen",
+            "Select Apnea Alarm Threshold control",
+            "Enter value 10 seconds",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "Apnea Alarm Threshold is set to 10 seconds"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Set Apnea Alarm Threshold at lower boundary",
+          "req_ids": [
+            "RW-SW-148"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Alarms Configuration Screen is open"
+          ],
+          "inputs": {
+            "name": "apnea_threshold",
+            "value": 1
+          },
+          "steps": [
+            "Navigate to Alarms Configuration Screen",
+            "Select Apnea Alarm Threshold control",
+            "Enter value 1 second",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "Apnea Alarm Threshold is set to 1 second"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Set Apnea Alarm Threshold at upper boundary",
+          "req_ids": [
+            "RW-SW-148"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Alarms Configuration Screen is open"
+          ],
+          "inputs": {
+            "name": "apnea_threshold",
+            "value": 30
+          },
+          "steps": [
+            "Navigate to Alarms Configuration Screen",
+            "Select Apnea Alarm Threshold control",
+            "Enter value 30 seconds",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "Apnea Alarm Threshold is set to 30 seconds"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Alarm detection when relief valve opens (unexpected flow increase)",
+          "req_ids": [
+            "RW-SW-158"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Normal operation with no relief valve open"
+          ],
+          "inputs": {
+            "name": "flow_rate",
+            "value": "increase unexpectedly"
+          },
+          "steps": [
+            "Simulate unexpected increase in flow rate",
+            "Observe system response"
+          ],
+          "expected": [
+            "Alarm is triggered indicating relief valve open"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "GUI Event Graphs",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No tests for invalid or out‑of‑range threshold values",
+          "No tests for non‑integer or step‑size violations",
+          "No persistence or reload verification after saving settings",
+          "No modal dialog blocking background interactions verified",
+          "No negative test for flow increase within normal range to ensure no false alarm"
+        ],
+        "traceability": 0.5714,
+        "untraced_reqs": [
+          "RW-SW-145",
+          "RW-SW-147",
+          "RW-SW-149"
+        ],
+        "fsa_score": 0.82,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.82; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.8, 'boundary_coverage': 1.0, 'groundedness_mg': 1.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-145', 'RW-SW-147', 'RW-SW-149'] (add at least one each)\n- No tests for invalid or out‑of‑range threshold values\n- No tests for non‑integer or step‑size violations\n- No persistence or reload verification after saving settings\n- No modal dialog blocking background interactions verified\n- No negative test for flow increase within normal range to ensure no false alarm",
+      "artifact": "# GUI Event Graphs for Unit U13_Alarms\n\n# Graph 1: Setting HIGH RR Alarm Threshold\nStart -> OpenSettingsScreen\nOpenSettingsScreen -> SelectHighRRAlarmControl\nSelectHighRRAlarmControl -> InputThresholdValue\nInputThresholdValue -> ValidateThreshold\nValidateThreshold --valid (5-30, integer)--> SaveThreshold\nValidateThreshold --invalid (out_of_range, non_integer, step_violation)--> ShowErrorMessage\nShowErrorMessage -> ReturnToSettings\n\n# Graph 2: Setting LOW RR Alarm Threshold\nStart -> OpenSettingsScreen\nOpenSettingsScreen -> SelectLowRRAlarmControl\nSelectLowRRAlarmControl -> InputThresholdValue\nInputThresholdValue -> ValidateThreshold\nValidateThreshold --valid (5-30, integer)--> SaveThreshold\nValidateThreshold --invalid (out_of_range, non_integer, step_violation)--> ShowErrorMessage\nShowErrorMessage -> ReturnToSettings\n\n# Graph 3: Setting Apnea Alarm Threshold\nStart -> OpenSettingsScreen\nOpenSettingsScreen -> SelectApneaAlarmControl\nSelectApneaAlarmControl -> InputThresholdValue\nInputThresholdValue -> ValidateThreshold\nValidateThreshold --valid (1-30, integer)--> SaveThreshold\nValidateThreshold --invalid (out_of_range, non_integer, step_violation)--> ShowErrorMessage\nShowErrorMessage -> ReturnToSettings\n\n# Graph 4: Alarm on Relief Valve Open (Flow Increase)\nStart -> MonitorFlow\nMonitorFlow -> DetectFlowIncrease\nDetectFlowIncrease --unexpected_increase (outside_normal_range)--> TriggerApneaAlarm\nDetectFlowIncrease --normal_range--> ContinueMonitoring\n\n# Modal Dialog Blocking Background Interactions\nOpenSettingsScreen -> ShowSaveConfirmationModal\nShowSaveConfirmationModal --user_confirms--> SaveSettings\nShowSaveConfirmationModal --user_cancels--> CancelSave\nDuring ShowSaveConfirmationModal, background interactions (e.g., NavigateAway) --> Blocked",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Set HIGH RR alarm threshold to valid value (e.g., 15)",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Settings screen is open"
+          ],
+          "inputs": {
+            "name": "thresholdValue",
+            "value": 15
+          },
+          "steps": [
+            "Navigate to Settings screen",
+            "Select HIGH RR alarm control",
+            "Enter threshold value 15",
+            "Validate input",
+            "Save threshold"
+          ],
+          "expected": [
+            "Threshold set to 15",
+            "No error messages"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Set HIGH RR alarm threshold to invalid out‑of‑range value (e.g., 31)",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Settings screen is open"
+          ],
+          "inputs": {
+            "name": "thresholdValue",
+            "value": 31
+          },
+          "steps": [
+            "Navigate to Settings screen",
+            "Select HIGH RR alarm control",
+            "Enter threshold value 31",
+            "Validate input"
+          ],
+          "expected": [
+            "Error message indicating out‑of‑range",
+            "Threshold unchanged"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Set HIGH RR alarm threshold to non‑integer value (e.g., 12.5)",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Settings screen is open"
+          ],
+          "inputs": {
+            "name": "thresholdValue",
+            "value": 12.5
+          },
+          "steps": [
+            "Navigate to Settings screen",
+            "Select HIGH RR alarm control",
+            "Enter threshold value 12.5",
+            "Validate input"
+          ],
+          "expected": [
+            "Error message indicating non‑integer",
+            "Threshold unchanged"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Set HIGH RR alarm threshold with step‑size violation (e.g., 5.5)",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Settings screen is open"
+          ],
+          "inputs": {
+            "name": "thresholdValue",
+            "value": 5.5
+          },
+          "steps": [
+            "Navigate to Settings screen",
+            "Select HIGH RR alarm control",
+            "Enter threshold value 5.5",
+            "Validate input"
+          ],
+          "expected": [
+            "Error message indicating invalid increment",
+            "Threshold unchanged"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Verify persistence of HIGH RR alarm threshold after reload",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Threshold set to 15",
+            "Application reloaded"
+          ],
+          "inputs": {},
+          "steps": [
+            "Set HIGH RR alarm threshold to 15",
+            "Close and reopen application",
+            "Navigate to Settings screen"
+          ],
+          "expected": [
+            "Threshold displayed as 15"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Modal dialog blocks background interaction while saving",
+          "req_ids": [],
+          "kind": "negative",
+          "preconditions": [
+            "Settings screen is open",
+            "Save confirmation modal displayed"
+          ],
+          "inputs": {},
+          "steps": [
+            "Select option to save settings",
+            "Modal confirmation dialog appears",
+            "Attempt to navigate away or perform other actions"
+          ],
+          "expected": [
+            "Background actions are blocked",
+            "Only modal dialog response is accepted"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Set LOW RR alarm threshold to valid value (e.g., 20)",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Settings screen is open"
+          ],
+          "inputs": {
+            "name": "thresholdValue",
+            "value": 20
+          },
+          "steps": [
+            "Navigate to Settings screen",
+            "Select LOW RR alarm control",
+            "Enter threshold value 20",
+            "Validate input",
+            "Save threshold"
+          ],
+          "expected": [
+            "Threshold set to 20",
+            "No error messages"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Set LOW RR alarm threshold to invalid out‑of‑range value (e.g., 40)",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Settings screen is open"
+          ],
+          "inputs": {
+            "name": "thresholdValue",
+            "value": 40
+          },
+          "steps": [
+            "Navigate to Settings screen",
+            "Select LOW RR alarm control",
+            "Enter threshold value 40",
+            "Validate input"
+          ],
+          "expected": [
+            "Error message indicating out‑of‑range",
+            "Threshold unchanged"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Set LOW RR alarm threshold to non‑integer value (e.g., 18.2)",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Settings screen is open"
+          ],
+          "inputs": {
+            "name": "thresholdValue",
+            "value": 18.2
+          },
+          "steps": [
+            "Navigate to Settings screen",
+            "Select LOW RR alarm control",
+            "Enter threshold value 18.2",
+            "Validate input"
+          ],
+          "expected": [
+            "Error message indicating non‑integer",
+            "Threshold unchanged"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Set LOW RR alarm threshold with step‑size violation (e.g., 5.3)",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Settings screen is open"
+          ],
+          "inputs": {
+            "name": "thresholdValue",
+            "value": 5.3
+          },
+          "steps": [
+            "Navigate to Settings screen",
+            "Select LOW RR alarm control",
+            "Enter threshold value 5.3",
+            "Validate input"
+          ],
+          "expected": [
+            "Error message indicating invalid increment",
+            "Threshold unchanged"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Set Apnea alarm threshold to valid value (e.g., 10 seconds)",
+          "req_ids": [
+            "RW-SW-148"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Settings screen is open"
+          ],
+          "inputs": {
+            "name": "thresholdValue",
+            "value": 10
+          },
+          "steps": [
+            "Navigate to Settings screen",
+            "Select Apnea alarm control",
+            "Enter threshold value 10",
+            "Validate input",
+            "Save threshold"
+          ],
+          "expected": [
+            "Threshold set to 10 seconds",
+            "No error messages"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Set Apnea alarm threshold to invalid out‑of‑range value (e.g., 31 seconds)",
+          "req_ids": [
+            "RW-SW-148"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Settings screen is open"
+          ],
+          "inputs": {
+            "name": "thresholdValue",
+            "value": 31
+          },
+          "steps": [
+            "Navigate to Settings screen",
+            "Select Apnea alarm control",
+            "Enter threshold value 31",
+            "Validate input"
+          ],
+          "expected": [
+            "Error message indicating out‑of‑range",
+            "Threshold unchanged"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Set Apnea alarm threshold to non‑integer value (e.g., 10.5 seconds)",
+          "req_ids": [
+            "RW-SW-148"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Settings screen is open"
+          ],
+          "inputs": {
+            "name": "thresholdValue",
+            "value": 10.5
+          },
+          "steps": [
+            "Navigate to Settings screen",
+            "Select Apnea alarm control",
+            "Enter threshold value 10.5",
+            "Validate input"
+          ],
+          "expected": [
+            "Error message indicating non‑integer",
+            "Threshold unchanged"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Trigger apnea alarm due to unexpected flow increase (e.g., 5 L/min increase)",
+          "req_ids": [
+            "RW-SW-158"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Normal flow range established"
+          ],
+          "inputs": {
+            "name": "flowIncrease",
+            "value": 5
+          },
+          "steps": [
+            "Monitor flow within normal range",
+            "Detect unexpected flow increase of 5 L/min",
+            "Verify apnea alarm is triggered"
+          ],
+          "expected": [
+            "Apnea alarm activated",
+            "No false alarm if increase within normal range"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Verify no false alarm when flow increase is within normal range (e.g., 0.5 L/min)",
+          "req_ids": [
+            "RW-SW-158"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Normal flow range established"
+          ],
+          "inputs": {
+            "name": "flowIncrease",
+            "value": 0.5
+          },
+          "steps": [
+            "Monitor flow within normal range",
+            "Detect flow increase of 0.5 L/min",
+            "Verify no alarm is triggered"
+          ],
+          "expected": [
+            "No alarm activation",
+            "System remains idle"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "GUI Event Graphs",
+        "group": 3,
+        "schema_score": 0.9333,
+        "representation_score": 1.0,
+        "sfv_score": 0.9667,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #6 (TC-006): [] should be non-empty"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.97). Fix these problems and output the full corrected suite:\n- test case #6 (TC-006): [] should be non-empty",
+      "artifact": "{\n  \"test_cases\": [\n    {\n      \"id\": \"TC-001\",\n      \"title\": \"Set HIGH RR alarm threshold within valid range\",\n      \"req_ids\": [\"RW-SW-144\"],\n      \"kind\": \"positive\",\n      \"preconditions\": [\"GUI loaded\", \"Alarm settings screen visible\"],\n      \"inputs\": {\"name\": \"threshold_value\", \"value\": \"15\"},\n      \"steps\": [\n        \"Navigate to Alarm settings screen\",\n        \"Locate HIGH RR alarm threshold control\",\n        \"Enter value 15\",\n        \"Confirm or apply setting\"\n      ],\n      \"expected\": [\"HIGH RR alarm threshold displayed as 15\"]\n    },\n    {\n      \"id\": \"TC-002\",\n      \"title\": \"Set HIGH RR alarm threshold at lower boundary\",\n      \"req_ids\": [\"RW-SW-144\"],\n      \"kind\": \"boundary\",\n      \"preconditions\": [\"GUI loaded\", \"Alarm settings screen visible\"],\n      \"inputs\": {\"name\": \"threshold_value\", \"value\": \"5\"},\n      \"steps\": [\n        \"Navigate to Alarm settings screen\",\n        \"Locate HIGH RR alarm threshold control\",\n        \"Enter value 5\",\n        \"Confirm or apply setting\"\n      ],\n      \"expected\": [\"HIGH RR alarm threshold displayed as 5\"]\n    },\n    {\n      \"id\": \"TC-003\",\n      \"title\": \"Set HIGH RR alarm threshold at upper boundary\",\n      \"req_ids\": [\"RW-SW-144\"],\n      \"kind\": \"boundary\",\n      \"preconditions\": [\"GUI loaded\", \"Alarm settings screen visible\"],\n      \"inputs\": {\"name\": \"threshold_value\", \"value\": \"30\"},\n      \"steps\": [\n        \"Navigate to Alarm settings screen\",\n        \"Locate HIGH RR alarm threshold control\",\n        \"Enter value 30\",\n        \"Confirm or apply setting\"\n      ],\n      \"expected\": [\"HIGH RR alarm threshold displayed as 30\"]\n    },\n    {\n      \"id\": \"TC-004\",\n      \"title\": \"Set LOW RR alarm threshold within valid range\",\n      \"req_ids\": [\"RW-SW-146\"],\n      \"kind\": \"positive\",\n      \"preconditions\": [\"GUI loaded\", \"Alarm settings screen visible\"],\n      \"inputs\": {\"name\": \"threshold_value\", \"value\": \"20\"},\n      \"steps\": [\n        \"Navigate to Alarm settings screen\",\n        \"Locate LOW RR alarm threshold control\",\n        \"Enter value 20\",\n        \"Confirm or apply setting\"\n      ],\n      \"expected\": [\"LOW RR alarm threshold displayed as 20\"]\n    },\n    {\n      \"id\": \"TC-005\",\n      \"title\": \"Set LOW RR alarm threshold at lower boundary\",\n      \"req_ids\": [\"RW-SW-146\"],\n      \"kind\": \"boundary\",\n      \"preconditions\": [\"GUI loaded\", \"Alarm settings screen visible\"],\n      \"inputs\": {\"name\": \"threshold_value\", \"value\": \"5\"},\n      \"steps\": [\n        \"Navigate to Alarm settings screen\",\n        \"Locate LOW RR alarm threshold control\",\n        \"Enter value 5\",\n        \"Confirm or apply setting\"\n      ],\n      \"expected\": [\"LOW RR alarm threshold displayed as 5\"]\n    },\n    {\n      \"id\": \"TC-006\",\n      \"title\": \"Set LOW RR alarm threshold at upper boundary\",\n      \"req_ids\": [\"RW-SW-146\"],\n      \"kind\": \"boundary\",\n      \"preconditions\": [\"GUI loaded\", \"Alarm settings screen visible\"],\n      \"inputs\": {\"name\": \"threshold_value\", \"value\": \"30\"},\n      \"steps\": [\n        \"Navigate to Alarm settings screen\",\n        \"Locate LOW RR alarm threshold control\",\n        \"Enter value 30\",\n        \"Confirm or apply setting\"\n      ],\n      \"expected\": [\"LOW RR alarm threshold displayed as 30\"]\n    },\n    {\n      \"id\": \"TC-007\",\n      \"title\": \"Set apnea alarm threshold within valid range\",\n      \"req_ids\": [\"RW-SW-148\"],\n      \"kind\": \"positive\",\n      \"preconditions\": [\"GUI loaded\", \"Alarm settings screen visible\"],\n      \"inputs\": {\"name\": \"apnea_threshold\", \"value\": \"10\"},\n      \"steps\": [\n        \"Navigate to Alarm settings screen\",\n        \"Locate apnea alarm threshold control\",\n        \"Enter value 10\",\n        \"Confirm or apply setting\"\n      ],\n      \"expected\": [\"Apnea alarm threshold displayed as 10 seconds\"]\n    },\n    {\n      \"id\": \"TC-008\",\n      \"title\": \"Set apnea alarm threshold at lower boundary\",\n      \"req_ids\": [\"RW-SW-149\"],\n      \"kind\": \"boundary\",\n      \"preconditions\": [\"GUI loaded\", \"Alarm settings screen visible\"],\n      \"inputs\": {\"name\": \"apnea_threshold\", \"value\": \"1\"},\n      \"steps\": [\n        \"Navigate to Alarm settings screen\",\n        \"Locate apnea alarm threshold control\",\n        \"Enter value 1\",\n        \"Confirm or apply setting\"\n      ],\n      \"expected\": [\"Apnea alarm threshold displayed as 1 second\"]\n    },\n    {\n      \"id\": \"TC-009\",\n      \"title\": \"Set apnea alarm threshold at upper boundary\",\n      \"req_ids\": [\"RW-SW-149\"],\n      \"kind\": \"boundary\",\n      \"preconditions\": [\"GUI loaded\", \"Alarm settings screen visible\"],\n      \"inputs\": {\"name\": \"apnea_threshold\", \"value\": \"30\"},\n      \"steps\": [\n        \"Navigate to Alarm settings screen\",\n        \"Locate apnea alarm threshold control\",\n        \"Enter value 30\",\n        \"Confirm or apply setting\"\n      ],\n      \"expected\": [\"Apnea alarm threshold displayed as 30 seconds\"]\n    },\n    {\n      \"id\": \"TC-010\",\n      \"title\": \"Trigger alarm when relief valve opens due to unexpected flow increase\",\n      \"req_ids\": [\"RW-SW-158\"],\n      \"kind\": \"negative\",\n      \"preconditions\": [\"GUI loaded\", \"System in normal operation\"],\n      \"inputs\": {\"name\": \"flow_rate\", \"value\": \"increase_to_unexpected_level\"},\n      \"steps\": [\n        \"Simulate unexpected increase in flow rate\",\n        \"Observe system response\"\n      ],\n      \"expected\": [\"Alarm triggered indicating relief valve opening\"]\n    }\n  ]\n}",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Set HIGH RR alarm threshold within valid range",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI loaded",
+            "Alarm settings screen visible"
+          ],
+          "inputs": {
+            "name": "threshold_value",
+            "value": "15"
+          },
+          "steps": [
+            "Navigate to Alarm settings screen",
+            "Locate HIGH RR alarm threshold control",
+            "Enter value 15",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "HIGH RR alarm threshold displayed as 15"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Set HIGH RR alarm threshold at lower boundary",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI loaded",
+            "Alarm settings screen visible"
+          ],
+          "inputs": {
+            "name": "threshold_value",
+            "value": "5"
+          },
+          "steps": [
+            "Navigate to Alarm settings screen",
+            "Locate HIGH RR alarm threshold control",
+            "Enter value 5",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "HIGH RR alarm threshold displayed as 5"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Set HIGH RR alarm threshold at upper boundary",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI loaded",
+            "Alarm settings screen visible"
+          ],
+          "inputs": {
+            "name": "threshold_value",
+            "value": "30"
+          },
+          "steps": [
+            "Navigate to Alarm settings screen",
+            "Locate HIGH RR alarm threshold control",
+            "Enter value 30",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "HIGH RR alarm threshold displayed as 30"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Set LOW RR alarm threshold within valid range",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI loaded",
+            "Alarm settings screen visible"
+          ],
+          "inputs": {
+            "name": "threshold_value",
+            "value": "20"
+          },
+          "steps": [
+            "Navigate to Alarm settings screen",
+            "Locate LOW RR alarm threshold control",
+            "Enter value 20",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "LOW RR alarm threshold displayed as 20"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Set LOW RR alarm threshold at lower boundary",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI loaded",
+            "Alarm settings screen visible"
+          ],
+          "inputs": {
+            "name": "threshold_value",
+            "value": "5"
+          },
+          "steps": [
+            "Navigate to Alarm settings screen",
+            "Locate LOW RR alarm threshold control",
+            "Enter value 5",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "LOW RR alarm threshold displayed as 5"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Set LOW RR alarm threshold at upper boundary",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI loaded",
+            "Alarm settings screen visible"
+          ],
+          "inputs": {
+            "name": "threshold_value",
+            "value": "30"
+          },
+          "steps": [
+            "Navigate to Alarm settings screen",
+            "Locate LOW RR alarm threshold control",
+            "Enter value 30",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "LOW RR alarm threshold displayed as 30"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Set apnea alarm threshold within valid range",
+          "req_ids": [
+            "RW-SW-148"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI loaded",
+            "Alarm settings screen visible"
+          ],
+          "inputs": {
+            "name": "apnea_threshold",
+            "value": "10"
+          },
+          "steps": [
+            "Navigate to Alarm settings screen",
+            "Locate apnea alarm threshold control",
+            "Enter value 10",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "Apnea alarm threshold displayed as 10 seconds"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Set apnea alarm threshold at lower boundary",
+          "req_ids": [
+            "RW-SW-149"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI loaded",
+            "Alarm settings screen visible"
+          ],
+          "inputs": {
+            "name": "apnea_threshold",
+            "value": "1"
+          },
+          "steps": [
+            "Navigate to Alarm settings screen",
+            "Locate apnea alarm threshold control",
+            "Enter value 1",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "Apnea alarm threshold displayed as 1 second"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Set apnea alarm threshold at upper boundary",
+          "req_ids": [
+            "RW-SW-149"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "GUI loaded",
+            "Alarm settings screen visible"
+          ],
+          "inputs": {
+            "name": "apnea_threshold",
+            "value": "30"
+          },
+          "steps": [
+            "Navigate to Alarm settings screen",
+            "Locate apnea alarm threshold control",
+            "Enter value 30",
+            "Confirm or apply setting"
+          ],
+          "expected": [
+            "Apnea alarm threshold displayed as 30 seconds"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Trigger alarm when relief valve opens due to unexpected flow increase",
+          "req_ids": [
+            "RW-SW-158"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "GUI loaded",
+            "System in normal operation"
+          ],
+          "inputs": {
+            "name": "flow_rate",
+            "value": "increase_to_unexpected_level"
+          },
+          "steps": [
+            "Simulate unexpected increase in flow rate",
+            "Observe system response"
+          ],
+          "expected": [
+            "Alarm triggered indicating relief valve opening"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "GUI Event Graphs",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "error": "judge output not parseable",
+        "raw": "{\"clause_coverage\":0.5714285714285714,\"negative_coverage\":1.0,\"oracle_assertiveness\":1.0,\"boundary_coverage\":1.0,\"concrete_elements\":[{\"value\":\"15\",\"context\":\"HIGH RR alarm threshold value\",\"grounded\":true},{\"value\":\"5\",\"context\":\"HIGH RR alarm threshold lower boundary\",\"grounded\":true},{\"value\":\"30\",\"context\":\"HIGH RR alarm threshold upper boundary\",\"grounded\":true},{\"value\":\"20\",\"context\":\"LOW RR alarm threshold value\",\"grounded\":true},{\"value\":\"10\",\"context\":\"Apnea alarm threshold value\",\"grounded\":true},{\"value\":\"1\",\"context\":\"Apnea alarm threshold lower boundary\",\"grounded\":true},{\"value\":\"30\",\"context\":\"Apnea alarm threshold upper boundary\",\"grounded\":true},{\"value\":\"GUI loaded\",\"context\":\"system state\",\"grounded\":true},{\"value\":\"Alarm settings screen visible\",\"context\":\"system state\",\"grounded\":true},{\"value\":\"System in normal operation\",\"context\":\"system state\",\"grounded\":true},{\"value\":\"increase_to_unexpected_level\",\"context\":\"flow_rate input\",\"grounded\":false},{\"value\":\"HIGH RR alarm threshold displayed as 15\",\"context\":\"display message\",\"grounded\":false},{\"value\":\"HIGH RR alarm threshold displayed as 5\",\"context\":\"display message\",\"grounded\":false},{\"value\":\"HIGH RR alarm threshold displayed as 30\",\"context\":\"display message\",\"grounded\":false},{\"value\":\"LOW RR alarm threshold displayed as 20\",\"context\":\"display message\",\"grounded\":false},{\"value\":\"LOW RR alarm threshold displayed as 5\",\"context\":\"display message\",\"grounded\":false},{\"value\":\"LOW RR alarm threshold displayed as 30\",\"context\":\"display message\",\"grounded\":false},{\"value\":\"Apnea alarm threshold displayed as 10 seconds\",\"context\":\"display message\",\"grounded\":false},{\"value\":\"Apnea alarm threshold displayed as 1 second\",\"context\":\"display message\",\"grounded\":false},{\"value\":\"Apnea alarm threshold displayed as 30 seconds\",\"context\":\"display message\",\"grounded\":false},{\"value\":\"Alarm triggered indicating relief valve opening\",\"context\":\"alarm message\",\"grounded\":false}],\"uncovered_clauses\":[\"RW-SW",
+        "traceability": 0.7143,
+        "untraced_reqs": [
+          "RW-SW-145",
+          "RW-SW-147"
+        ],
+        "fsa_score": 0.0,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.0; sub-scores {'clause_coverage': None, 'negative_coverage': None, 'oracle_assertiveness': None, 'boundary_coverage': None, 'groundedness_mg': None}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-145', 'RW-SW-147'] (add at least one each)",
+      "artifact": "GUI_EVENT_GRAPH:\n  START\n    -\n    -> SET_HIGH_RR_THRESHOLD\n  SET_HIGH_RR_THRESHOLD\n    INPUT: slider_threshold_high_rr (5-30, step 1)\n    VALIDATE: slider_threshold_high_rr ∈ [5, 30]\n    -> IF_VALID_SET_HIGH_RR_THRESHOLD\n    -> IF_INVALID_SET_HIGH_RR_THRESHOLD\n  IF_VALID_SET_HIGH_RR_THRESHOLD\n    ASSERT: threshold_high_rr = slider_threshold_high_rr\n    -> SET_LOW_RR_THRESHOLD\n  IF_INVALID_SET_HIGH_RR_THRESHOLD\n    ASSERT: error_message_shown = \"Threshold must be between 5 and 30\"\n    -> SET_HIGH_RR_THRESHOLD\n  SET_LOW_RR_THRESHOLD\n    INPUT: slider_threshold_low_rr (5-30, step 1)\n    VALIDATE: slider_threshold_low_rr ∈ [5, 30]\n    -> IF_VALID_SET_LOW_RR_THRESHOLD\n    -> IF_INVALID_SET_LOW_RR_THRESHOLD\n  IF_VALID_SET_LOW_RR_THRESHOLD\n    ASSERT: threshold_low_rr = slider_threshold_low_rr\n    -> SET_Apnea_THRESHOLD\n  IF_INVALID_SET_LOW_RR_THRESHOLD\n    ASSERT: error_message_shown = \"Threshold must be between 5 and 30\"\n    -> SET_LOW_RR_THRESHOLD\n  SET_Apnea_THRESHOLD\n    INPUT: slider_threshold_apnea (1-30, step 1)\n    VALIDATE: slider_threshold_apnea ∈ [1, 30]\n    -> IF_VALID_SET_Apnea_THRESHOLD\n    -> IF_INVALID_SET_Apnea_THRESHOLD\n  IF_VALID_SET_Apnea_THRESHOLD\n    ASSERT: threshold_apnea = slider_threshold_apnea\n    -> DETECT_RELIEF_VALVE_OPEN\n  IF_INVALID_SET_Apnea_THRESHOLD\n    ASSERT: error_message_shown = \"Threshold must be between 1 and 30\"\n    -> SET_Apnea_THRESHOLD\n  DETECT_RELIEF_VALVE_OPEN\n    INPUT: flow_sensor_data (unexpected increase)\n    VALIDATE: flow_sensor_data > expected_flow_rate\n    ASSERT: alarm_relief_valve_open = true\n    -> END",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Set HIGH RR alarm threshold within valid range",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "slider_threshold_high_rr",
+            "value": 15
+          },
+          "steps": [
+            "Navigate to the alarm settings screen",
+            "Locate the HIGH RR alarm threshold control",
+            "Set the threshold to 15",
+            "Confirm the setting is applied"
+          ],
+          "expected": [
+            "threshold_high_rr == 15",
+            "No error message displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Set HIGH RR alarm threshold at lower boundary",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "name": "slider_threshold_high_rr",
+            "value": 5
+          },
+          "steps": [
+            "Navigate to the alarm settings screen",
+            "Locate the HIGH RR alarm threshold control",
+            "Set the threshold to 5",
+            "Confirm the setting is applied"
+          ],
+          "expected": [
+            "threshold_high_rr == 5",
+            "No error message displayed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Set HIGH RR alarm threshold at upper boundary",
+          "req_ids": [
+            "RW-SW-144"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "name": "slider_threshold_high_rr",
+            "value": 30
+          },
+          "steps": [
+            "Navigate to the alarm settings screen",
+            "Locate the HIGH RR alarm threshold control",
+            "Set the threshold to 30",
+            "Confirm the setting is applied"
+          ],
+          "expected": [
+            "threshold_high_rr == 30",
+            "No error message displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Set LOW RR alarm threshold within valid range",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "slider_threshold_low_rr",
+            "value": 20
+          },
+          "steps": [
+            "Navigate to the alarm settings screen",
+            "Locate the LOW RR alarm threshold control",
+            "Set the threshold to 20",
+            "Confirm the setting is applied"
+          ],
+          "expected": [
+            "threshold_low_rr == 20",
+            "No error message displayed"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Set LOW RR alarm threshold at lower boundary",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "name": "slider_threshold_low_rr",
+            "value": 5
+          },
+          "steps": [
+            "Navigate to the alarm settings screen",
+            "Locate the LOW RR alarm threshold control",
+            "Set the threshold to 5",
+            "Confirm the setting is applied"
+          ],
+          "expected": [
+            "threshold_low_rr == 5",
+            "No error message displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Set LOW RR alarm threshold at upper boundary",
+          "req_ids": [
+            "RW-SW-146"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "name": "slider_threshold_low_rr",
+            "value": 30
+          },
+          "steps": [
+            "Navigate to the alarm settings screen",
+            "Locate the LOW RR alarm threshold control",
+            "Set the threshold to 30",
+            "Confirm the setting is applied"
+          ],
+          "expected": [
+            "threshold_low_rr == 30",
+            "No error message displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Set apnea alarm threshold within valid range",
+          "req_ids": [
+            "RW-SW-148"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "name": "slider_threshold_apnea",
+            "value": 10
+          },
+          "steps": [
+            "Navigate to the alarm settings screen",
+            "Locate the apnea alarm threshold control",
+            "Set the threshold to 10 seconds",
+            "Confirm the setting is applied"
+          ],
+          "expected": [
+            "threshold_apnea == 10",
+            "No error message displayed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Set apnea alarm threshold at lower boundary",
+          "req_ids": [
+            "RW-SW-148"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "name": "slider_threshold_apnea",
+            "value": 1
+          },
+          "steps": [
+            "Navigate to the alarm settings screen",
+            "Locate the apnea alarm threshold control",
+            "Set the threshold to 1 second",
+            "Confirm the setting is applied"
+          ],
+          "expected": [
+            "threshold_apnea == 1",
+            "No error message displayed"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Set apnea alarm threshold at upper boundary",
+          "req_ids": [
+            "RW-SW-148"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "name": "slider_threshold_apnea",
+            "value": 30
+          },
+          "steps": [
+            "Navigate to the alarm settings screen",
+            "Locate the apnea alarm threshold control",
+            "Set the threshold to 30 seconds",
+            "Confirm the setting is applied"
+          ],
+          "expected": [
+            "threshold_apnea == 30",
+            "No error message displayed"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Detect relief valve open alarm on unexpected flow increase",
+          "req_ids": [
+            "RW-SW-158"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "name": "flow_sensor_data",
+            "value": 150
+          },
+          "steps": [
+            "Simulate flow sensor data indicating an unexpected increase",
+            "Monitor system for alarm_relief_valve_open flag"
+          ],
+          "expected": [
+            "alarm_relief_valve_open == true"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "GUI Event Graphs",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.6923,
+        "hallucinated": [
+          {
+            "value": 150,
+            "context": "flow_sensor_data value",
+            "grounded": false
+          },
+          {
+            "value": "Threshold must be between 5 and 30",
+            "context": "error message for high/low RR",
+            "grounded": false
+          },
+          {
+            "value": "Threshold must be between 1 and 30",
+            "context": "error message for apnea",
+            "grounded": false
+          },
+          {
+            "value": true,
+            "context": "alarm_relief_valve_open flag",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 13,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Missing explicit negative test cases for invalid threshold values in canonical test cases",
+          "No verification that slider increments are exactly 1",
+          "Error message texts are not grounded; tests should verify actual UI messages",
+          "Relief valve alarm test uses arbitrary flow value (150) without realistic expected flow context",
+          "No test to confirm normal flow increases do not trigger the relief valve alarm"
+        ],
+        "traceability": 0.5714,
+        "untraced_reqs": [
+          "RW-SW-145",
+          "RW-SW-147",
+          "RW-SW-149"
+        ],
+        "fsa_score": 0.9538,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

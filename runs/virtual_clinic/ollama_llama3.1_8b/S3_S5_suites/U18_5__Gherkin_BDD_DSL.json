@@ -1,0 +1,1127 @@
+{
+  "unit_id": "U18_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "standard",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.4,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 3,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add assertions to verify exactly one prescription is generated per consultation request.",
+      "Include checks that prescription IDs are unique and correctly mapped to the originating request.",
+      "Validate that chemist and lab receive only the required fields of prescriptions.",
+      "Add boundary tests for zero prescriptions and very large numbers to ensure system handles limits.",
+      "Assert specific error codes or messages when mapping to multiple entities is attempted."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.91,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Prescription Management\n\n  Scenario: Patient Consultation Request Generates One Prescription\n    Given a patient consultation request exists\n    When the request is processed\n    Then one prescription is generated\n    And the prescription is mapped to the request\n\n  Scenario: Prescription is Mapped to One and Only One Patient Consultation Request\n    Given a prescription exists\n    When the prescription is mapped to a patient consultation request\n    Then the prescription is mapped to one and only one patient consultation request\n\n  Scenario: Chemist Receives One or More Prescriptions\n    Given a chemist exists\n    When one or more prescriptions are sent to the chemist\n    Then the chemist receives the prescriptions\n\n  Scenario: Prescription is Mapped to One and Only One Chemist\n    Given a prescription exists\n    When the prescription is mapped to a chemist\n    Then the prescription is mapped to one and only one chemist\n    And the mapping is unique\n\n  Scenario: Lab Receives One or More Prescriptions\n    Given a lab exists\n    When one or more prescriptions are sent to the lab\n    Then the lab receives the prescriptions\n\n  Scenario: Prescription is Mapped to One and Only One Lab\n    Given a prescription exists\n    When the prescription is mapped to a lab\n    Then the prescription is mapped to one and only one lab\n    And the mapping is unique\n\n  Scenario Outline: Multiple Prescriptions for One Patient Consultation Request\n    Given a patient consultation request exists\n    And <num_prescriptions> prescriptions are generated\n    When the prescriptions are processed\n    Then the prescriptions are mapped to the request\n    Examples:\n      | num_prescriptions |\n      | 1                 |\n      | 2                 |\n      | 3                 |\n\n  Scenario Outline: Multiple Prescriptions for One Chemist\n    Given a chemist exists\n    And <num_prescriptions> prescriptions are sent to the chemist\n    When the prescriptions are processed\n    Then the prescriptions are received by the chemist\n    Examples:\n      | num_prescriptions |\n      | 1                 |\n      | 2                 |\n      | 3                 |\n\n  Scenario Outline: Multiple Prescriptions for One Lab\n    Given a lab exists\n    And <num_prescriptions> prescriptions are sent to the lab\n    When the prescriptions are processed\n    Then the prescriptions are received by the lab\n    Examples:\n      | num_prescriptions |\n      | 1                 |\n      | 2                 |\n      | 3                 |\n\n  Scenario: Mapping Error - Prescription Mapped to Multiple Requests\n    Given a prescription exists\n    And the prescription is mapped to multiple patient consultation requests\n    When the mapping is processed\n    Then an error is raised\n\n  Scenario: Mapping Error - Prescription Mapped to Multiple Chemists\n    Given a prescription exists\n    And the prescription is mapped to multiple chemists\n    When the mapping is processed\n    Then an error is raised\n\n  Scenario: Mapping Error - Prescription Mapped to Multiple Labs\n    Given a prescription exists\n    And the prescription is mapped to multiple labs\n    When the mapping is processed\n    Then an error is raised",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Patient Consultation Request Generates One Prescription",
+      "req_ids": [
+        "BR-8-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "patient consultation request exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a patient consultation request exists",
+        "when the request is processed",
+        "then one prescription is generated",
+        "and the prescription is mapped to the request"
+      ],
+      "expected": [
+        "prescription ID is generated",
+        "prescription is mapped to request"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Prescription is Mapped to One and Only One Patient Consultation Request",
+      "req_ids": [
+        "BR-8-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "prescription exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a prescription exists",
+        "when the prescription is mapped to a patient consultation request",
+        "then the prescription is mapped to one and only one patient consultation request"
+      ],
+      "expected": [
+        "prescription is mapped to one request",
+        "prescription is not mapped to multiple requests"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Chemist Receives One or More Prescriptions",
+      "req_ids": [
+        "BR-9-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "chemist exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a chemist exists",
+        "when one or more prescriptions are sent to the chemist",
+        "then the chemist receives the prescriptions"
+      ],
+      "expected": [
+        "prescriptions are received by chemist",
+        "prescriptions are valid"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Prescription is Mapped to One and Only One Chemist",
+      "req_ids": [
+        "BR-9-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "prescription exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a prescription exists",
+        "when the prescription is mapped to a chemist",
+        "then the prescription is mapped to one and only one chemist",
+        "and the mapping is unique"
+      ],
+      "expected": [
+        "prescription is mapped to one chemist",
+        "mapping is unique"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Lab Receives One or More Prescriptions",
+      "req_ids": [
+        "BR-10-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "lab exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a lab exists",
+        "when one or more prescriptions are sent to the lab",
+        "then the lab receives the prescriptions"
+      ],
+      "expected": [
+        "prescriptions are received by lab",
+        "prescriptions are valid"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Prescription is Mapped to One and Only One Lab",
+      "req_ids": [
+        "BR-10-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "prescription exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a prescription exists",
+        "when the prescription is mapped to a lab",
+        "then the prescription is mapped to one and only one lab",
+        "and the mapping is unique"
+      ],
+      "expected": [
+        "prescription is mapped to one lab",
+        "mapping is unique"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Multiple Prescriptions for One Patient Consultation Request",
+      "req_ids": [
+        "BR-8-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "patient consultation request exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a patient consultation request exists",
+        "and <num_prescriptions> prescriptions are generated",
+        "when the prescriptions are processed",
+        "then the prescriptions are mapped to the request"
+      ],
+      "expected": [
+        "prescriptions are mapped to request",
+        "prescriptions are valid"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Multiple Prescriptions for One Chemist",
+      "req_ids": [
+        "BR-9-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "chemist exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a chemist exists",
+        "and <num_prescriptions> prescriptions are sent to the chemist",
+        "when the prescriptions are processed",
+        "then the prescriptions are received by the chemist"
+      ],
+      "expected": [
+        "prescriptions are received by chemist",
+        "prescriptions are valid"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Multiple Prescriptions for One Lab",
+      "req_ids": [
+        "BR-10-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "lab exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a lab exists",
+        "and <num_prescriptions> prescriptions are sent to the lab",
+        "when the prescriptions are processed",
+        "then the prescriptions are received by the lab"
+      ],
+      "expected": [
+        "prescriptions are received by lab",
+        "prescriptions are valid"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Mapping Error - Prescription Mapped to Multiple Requests",
+      "req_ids": [
+        "BR-8-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "prescription exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a prescription exists",
+        "and the prescription is mapped to multiple patient consultation requests",
+        "when the mapping is processed",
+        "then an error is raised"
+      ],
+      "expected": [
+        "error is raised",
+        "prescription is not mapped to multiple requests"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Mapping Error - Prescription Mapped to Multiple Chemists",
+      "req_ids": [
+        "BR-9-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "prescription exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a prescription exists",
+        "and the prescription is mapped to multiple chemists",
+        "when the mapping is processed",
+        "then an error is raised"
+      ],
+      "expected": [
+        "error is raised",
+        "prescription is not mapped to multiple chemists"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Mapping Error - Prescription Mapped to Multiple Labs",
+      "req_ids": [
+        "BR-10-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "prescription exists"
+      ],
+      "inputs": {
+        "name": "value"
+      },
+      "steps": [
+        "given a prescription exists",
+        "and the prescription is mapped to multiple labs",
+        "when the mapping is processed",
+        "then an error is raised"
+      ],
+      "expected": [
+        "error is raised",
+        "prescription is not mapped to multiple labs"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Prescription Management\n\n  Scenario: One Prescription per Patient Consultation Request\n    Given a Patient Consultation Request exists\n    When the request is processed\n    Then exactly one prescription is generated\n\n  Scenario: One Prescription per Patient Consultation Request (Edge Case)\n    Given a Patient Consultation Request with no medication exists\n    When the request is processed\n    Then no prescription is generated\n\n  Scenario: One Prescription per Patient Consultation Request (Invalid Case)\n    Given a Patient Consultation Request with invalid medication exists\n    When the request is processed\n    Then an error is raised\n\n  Scenario: One Prescription per Patient Consultation Request (Boundary Case)\n    Given a Patient Consultation Request with maximum allowed medication exists\n    When the request is processed\n    Then exactly one prescription is generated\n\n  Scenario: One Prescription per Patient Consultation Request (Normal Case)\n    Given a Patient Consultation Request with valid medication exists\n    When the request is processed\n    Then exactly one prescription is generated\n\n  Scenario: One Prescription per Patient Consultation Request (Multiple Requests)\n    Given multiple Patient Consultation Requests exist\n    When the requests are processed\n    Then each request generates exactly one prescription\n\n  Scenario: Prescription Mapping to Patient Consultation Request\n    Given a Patient Consultation Request and a Prescription exist\n    When the prescription is mapped to the request\n    Then the prescription is mapped to the request\n\n  Scenario: Prescription Mapping to Patient Consultation Request (Edge Case)\n    Given a Patient Consultation Request and a Prescription with no mapping exist\n    When the prescription is mapped to the request\n    Then an error is raised\n\n  Scenario: Prescription Mapping to Patient Consultation Request (Invalid Case)\n    Given a Patient Consultation Request and a Prescription with invalid mapping exist\n    When the prescription is mapped to the request\n    Then an error is raised\n\n  Scenario: Prescription Mapping to Patient Consultation Request (Boundary Case)\n    Given a Patient Consultation Request and a Prescription with maximum allowed mapping exist\n    When the prescription is mapped to the request\n    Then the prescription is mapped to the request\n\n  Scenario: Prescription Mapping to Patient Consultation Request (Normal Case)\n    Given a Patient Consultation Request and a Prescription with valid mapping exist\n    When the prescription is mapped to the request\n    Then the prescription is mapped to the request\n\n  Scenario: Multiple Prescriptions per Patient Consultation Request\n    Given a Patient Consultation Request and multiple Prescriptions exist\n    When the prescriptions are mapped to the request\n    Then each prescription is mapped to the request\n\n  Scenario: Multiple Prescriptions per Patient Consultation Request (Edge Case)\n    Given a Patient Consultation Request and multiple Prescriptions with no mapping exist\n    When the prescriptions are mapped to the request\n    Then an error is raised\n\n  Scenario: Multiple Prescriptions per Patient Consultation Request (Invalid Case)\n    Given a Patient Consultation Request and multiple Prescriptions with invalid mapping exist\n    When the prescriptions are mapped to the request\n    Then an error is raised\n\n  Scenario: Multiple Prescriptions per Patient Consultation Request (Boundary Case)\n    Given a Patient Consultation Request and multiple Prescriptions with maximum allowed mapping exist\n    When the prescriptions are mapped to the request\n    Then each prescription is mapped to the request\n\n  Scenario: Multiple Prescriptions per Patient Consultation Request (Normal Case)\n    Given a Patient Consultation Request and multiple Prescriptions with valid mapping exist\n    When the prescriptions are mapped to the request\n    Then each prescription is mapped to the request\n\n  Scenario Outline: Chemist Receives Prescriptions\n    Given a Chemist exists\n    And a Prescription exists\n    When the prescription is received by the Chemist\n    Then the Chemist receives the prescription\n\n    Examples:\n      | Chemist ID | Prescription ID |\n      | 1          | 1              |\n      | 1          | 2              |\n      | 2          | 1              |\n      | 2          | 2              |\n      | 3          | 1              |\n      | 3          | 2              |\n\n  Scenario Outline: Lab Receives Prescriptions\n    Given a Lab exists\n    And a Prescription exists\n    When the prescription is received by the Lab\n    Then the Lab receives the prescription\n\n    Examples:\n      | Lab ID | Prescription ID |\n      | 1      | 1              |\n      | 1      | 2              |\n      | 2      | 1              |\n      | 2      | 2              |\n      | 3      | 1              |\n      | 3      | 2              |\n\n  Scenario Outline: Prescription Mapping to Chemist\n    Given a Chemist exists\n    And a Prescription exists\n    When the prescription is mapped to the Chemist\n    Then the prescription is mapped to the Chemist\n\n    Examples:\n      | Chemist ID | Prescription ID |\n      | 1          | 1              |\n      | 1          | 2              |\n      | 2          | 1              |\n      | 2          | 2              |\n      | 3          | 1              |\n      | 3          | 2              |\n\n  Scenario Outline: Prescription Mapping to Lab\n    Given a Lab exists\n    And a Prescription exists\n    When the prescription is mapped to the Lab\n    Then the prescription is mapped to the Lab\n\n    Examples:\n      | Lab ID | Prescription ID |\n      | 1      | 1              |\n      | 1      | 2              |\n      | 2      | 1              |\n      | 2      | 2              |\n      | 3      | 1              |\n      | 3      | 2              |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "One Prescription per Patient Consultation Request",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Consultation Request exists"
+          ],
+          "inputs": {
+            "medication": "valid"
+          },
+          "steps": [
+            "Given a Patient Consultation Request exists",
+            "When the request is processed",
+            "Then exactly one prescription is generated"
+          ],
+          "expected": [
+            "prescription generated"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "One Prescription per Patient Consultation Request (Edge Case)",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Consultation Request with no medication exists"
+          ],
+          "inputs": {
+            "medication": "none"
+          },
+          "steps": [
+            "Given a Patient Consultation Request with no medication exists",
+            "When the request is processed",
+            "Then no prescription is generated"
+          ],
+          "expected": [
+            "no prescription generated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "One Prescription per Patient Consultation Request (Invalid Case)",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient Consultation Request with invalid medication exists"
+          ],
+          "inputs": {
+            "medication": "invalid"
+          },
+          "steps": [
+            "Given a Patient Consultation Request with invalid medication exists",
+            "When the request is processed",
+            "Then an error is raised"
+          ],
+          "expected": [
+            "error raised"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "One Prescription per Patient Consultation Request (Boundary Case)",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Consultation Request with maximum allowed medication exists"
+          ],
+          "inputs": {
+            "medication": "max"
+          },
+          "steps": [
+            "Given a Patient Consultation Request with maximum allowed medication exists",
+            "When the request is processed",
+            "Then exactly one prescription is generated"
+          ],
+          "expected": [
+            "prescription generated"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "One Prescription per Patient Consultation Request (Normal Case)",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Consultation Request with valid medication exists"
+          ],
+          "inputs": {
+            "medication": "valid"
+          },
+          "steps": [
+            "Given a Patient Consultation Request with valid medication exists",
+            "When the request is processed",
+            "Then exactly one prescription is generated"
+          ],
+          "expected": [
+            "prescription generated"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Multiple Prescriptions per Patient Consultation Request",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Consultation Request and multiple Prescriptions exist"
+          ],
+          "inputs": {
+            "medication": "valid"
+          },
+          "steps": [
+            "Given a Patient Consultation Request and multiple Prescriptions exist",
+            "When the prescriptions are mapped to the request",
+            "Then each prescription is mapped to the request"
+          ],
+          "expected": [
+            "prescriptions mapped"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Multiple Prescriptions per Patient Consultation Request (Edge Case)",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Consultation Request and multiple Prescriptions with no mapping exist"
+          ],
+          "inputs": {
+            "medication": "none"
+          },
+          "steps": [
+            "Given a Patient Consultation Request and multiple Prescriptions with no mapping exist",
+            "When the prescriptions are mapped to the request",
+            "Then an error is raised"
+          ],
+          "expected": [
+            "error raised"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Multiple Prescriptions per Patient Consultation Request (Invalid Case)",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient Consultation Request and multiple Prescriptions with invalid mapping exist"
+          ],
+          "inputs": {
+            "medication": "invalid"
+          },
+          "steps": [
+            "Given a Patient Consultation Request and multiple Prescriptions with invalid mapping exist",
+            "When the prescriptions are mapped to the request",
+            "Then an error is raised"
+          ],
+          "expected": [
+            "error raised"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Multiple Prescriptions per Patient Consultation Request (Boundary Case)",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Consultation Request and multiple Prescriptions with maximum allowed mapping exist"
+          ],
+          "inputs": {
+            "medication": "max"
+          },
+          "steps": [
+            "Given a Patient Consultation Request and multiple Prescriptions with maximum allowed mapping exist",
+            "When the prescriptions are mapped to the request",
+            "Then each prescription is mapped to the request"
+          ],
+          "expected": [
+            "prescriptions mapped"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Multiple Prescriptions per Patient Consultation Request (Normal Case)",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient Consultation Request and multiple Prescriptions with valid mapping exist"
+          ],
+          "inputs": {
+            "medication": "valid"
+          },
+          "steps": [
+            "Given a Patient Consultation Request and multiple Prescriptions with valid mapping exist",
+            "When the prescriptions are mapped to the request",
+            "Then each prescription is mapped to the request"
+          ],
+          "expected": [
+            "prescriptions mapped"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Chemist Receives Prescriptions",
+          "req_ids": [
+            "BR-9-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist and Prescription exist"
+          ],
+          "inputs": {
+            "medication": "valid"
+          },
+          "steps": [
+            "Given a Chemist exists",
+            "And a Prescription exists",
+            "When the prescription is received by the Chemist",
+            "Then the Chemist receives the prescription"
+          ],
+          "expected": [
+            "prescription received"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Lab Receives Prescriptions",
+          "req_ids": [
+            "BR-10-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab and Prescription exist"
+          ],
+          "inputs": {
+            "medication": "valid"
+          },
+          "steps": [
+            "Given a Lab exists",
+            "And a Prescription exists",
+            "When the prescription is received by the Lab",
+            "Then the Lab receives the prescription"
+          ],
+          "expected": [
+            "prescription received"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Prescription Mapping to Chemist",
+          "req_ids": [
+            "BR-9-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist and Prescription exist"
+          ],
+          "inputs": {
+            "medication": "valid"
+          },
+          "steps": [
+            "Given a Chemist exists",
+            "And a Prescription exists",
+            "When the prescription is mapped to the Chemist",
+            "Then the prescription is mapped to the Chemist"
+          ],
+          "expected": [
+            "prescription mapped"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Prescription Mapping to Lab",
+          "req_ids": [
+            "BR-10-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab and Prescription exist"
+          ],
+          "inputs": {
+            "medication": "valid"
+          },
+          "steps": [
+            "Given a Lab exists",
+            "And a Prescription exists",
+            "When the prescription is mapped to the Lab",
+            "Then the prescription is mapped to the Lab"
+          ],
+          "expected": [
+            "prescription mapped"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.17,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "valid",
+            "context": "medication value",
+            "grounded": false
+          },
+          {
+            "value": "none",
+            "context": "medication value",
+            "grounded": false
+          },
+          {
+            "value": "invalid",
+            "context": "medication value",
+            "grounded": false
+          },
+          {
+            "value": "max",
+            "context": "medication value",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "Chemist ID",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "Chemist ID",
+            "grounded": false
+          },
+          {
+            "value": "3",
+            "context": "Chemist ID",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "Prescription ID",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "Prescription ID",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "Lab ID",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "Lab ID",
+            "grounded": false
+          },
+          {
+            "value": "3",
+            "context": "Lab ID",
+            "grounded": false
+          },
+          {
+            "value": "prescription generated",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "no prescription generated",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "error raised",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "prescription mapped",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "prescriptions mapped",
+            "context": "system state",
+            "grounded": false
+          },
+          {
+            "value": "prescription received",
+            "context": "system state",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 18,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test cases for BR-9-2 and BR-10-2 to cover mapping errors",
+          "Replace vague expected results with concrete assertions (e.g., check prescription ID, status code)",
+          "Ensure each requirement has a dedicated scenario rather than multiple overlapping scenarios",
+          "Remove invented boundary values; use values defined in SRS or document them",
+          "Include explicit checks for mapping uniqueness (e.g., assert prescription is not mapped to multiple requests)"
+        ],
+        "traceability": 0.8333,
+        "untraced_reqs": [
+          "BR-8-2"
+        ],
+        "fsa_score": 0.364,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.364; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.17, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- requirements with NO test case: ['BR-8-2'] (add at least one each)\n- ungrounded value 'valid' (medication value): remove or use the SRS value\n- ungrounded value 'none' (medication value): remove or use the SRS value\n- ungrounded value 'invalid' (medication value): remove or use the SRS value\n- ungrounded value 'max' (medication value): remove or use the SRS value\n- ungrounded value '1' (Chemist ID): remove or use the SRS value\n- ungrounded value '2' (Chemist ID): remove or use the SRS value\n- Add negative test cases for BR-9-2 and BR-10-2 to cover mapping errors\n- Replace vague expected results with concrete assertions (e.g., check prescription ID, status code)\n- Ensure each requirement has a dedicated scenario rather than multiple overlapping scenarios\n- Remove invented boundary values; use values defined in SRS or document them\n- Include explicit checks for mapping uniqueness (e.g., assert prescription is not mapped to multiple requests)",
+      "artifact": "Feature: Prescription Management\n\n  Scenario: Patient Consultation Request Generates One Prescription\n    Given a patient consultation request exists\n    When the request is processed\n    Then one prescription is generated\n    And the prescription is mapped to the request\n\n  Scenario: Prescription is Mapped to One and Only One Patient Consultation Request\n    Given a prescription exists\n    When the prescription is mapped to a patient consultation request\n    Then the prescription is mapped to one and only one patient consultation request\n\n  Scenario: Chemist Receives One or More Prescriptions\n    Given a chemist exists\n    When one or more prescriptions are sent to the chemist\n    Then the chemist receives the prescriptions\n\n  Scenario: Prescription is Mapped to One and Only One Chemist\n    Given a prescription exists\n    When the prescription is mapped to a chemist\n    Then the prescription is mapped to one and only one chemist\n    And the mapping is unique\n\n  Scenario: Lab Receives One or More Prescriptions\n    Given a lab exists\n    When one or more prescriptions are sent to the lab\n    Then the lab receives the prescriptions\n\n  Scenario: Prescription is Mapped to One and Only One Lab\n    Given a prescription exists\n    When the prescription is mapped to a lab\n    Then the prescription is mapped to one and only one lab\n    And the mapping is unique\n\n  Scenario Outline: Multiple Prescriptions for One Patient Consultation Request\n    Given a patient consultation request exists\n    And <num_prescriptions> prescriptions are generated\n    When the prescriptions are processed\n    Then the prescriptions are mapped to the request\n    Examples:\n      | num_prescriptions |\n      | 1                 |\n      | 2                 |\n      | 3                 |\n\n  Scenario Outline: Multiple Prescriptions for One Chemist\n    Given a chemist exists\n    And <num_prescriptions> prescriptions are sent to the chemist\n    When the prescriptions are processed\n    Then the prescriptions are received by the chemist\n    Examples:\n      | num_prescriptions |\n      | 1                 |\n      | 2                 |\n      | 3                 |\n\n  Scenario Outline: Multiple Prescriptions for One Lab\n    Given a lab exists\n    And <num_prescriptions> prescriptions are sent to the lab\n    When the prescriptions are processed\n    Then the prescriptions are received by the lab\n    Examples:\n      | num_prescriptions |\n      | 1                 |\n      | 2                 |\n      | 3                 |\n\n  Scenario: Mapping Error - Prescription Mapped to Multiple Requests\n    Given a prescription exists\n    And the prescription is mapped to multiple patient consultation requests\n    When the mapping is processed\n    Then an error is raised\n\n  Scenario: Mapping Error - Prescription Mapped to Multiple Chemists\n    Given a prescription exists\n    And the prescription is mapped to multiple chemists\n    When the mapping is processed\n    Then an error is raised\n\n  Scenario: Mapping Error - Prescription Mapped to Multiple Labs\n    Given a prescription exists\n    And the prescription is mapped to multiple labs\n    When the mapping is processed\n    Then an error is raised",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient Consultation Request Generates One Prescription",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient consultation request exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a patient consultation request exists",
+            "when the request is processed",
+            "then one prescription is generated",
+            "and the prescription is mapped to the request"
+          ],
+          "expected": [
+            "prescription ID is generated",
+            "prescription is mapped to request"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Prescription is Mapped to One and Only One Patient Consultation Request",
+          "req_ids": [
+            "BR-8-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "prescription exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a prescription exists",
+            "when the prescription is mapped to a patient consultation request",
+            "then the prescription is mapped to one and only one patient consultation request"
+          ],
+          "expected": [
+            "prescription is mapped to one request",
+            "prescription is not mapped to multiple requests"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Chemist Receives One or More Prescriptions",
+          "req_ids": [
+            "BR-9-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "chemist exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a chemist exists",
+            "when one or more prescriptions are sent to the chemist",
+            "then the chemist receives the prescriptions"
+          ],
+          "expected": [
+            "prescriptions are received by chemist",
+            "prescriptions are valid"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Prescription is Mapped to One and Only One Chemist",
+          "req_ids": [
+            "BR-9-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "prescription exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a prescription exists",
+            "when the prescription is mapped to a chemist",
+            "then the prescription is mapped to one and only one chemist",
+            "and the mapping is unique"
+          ],
+          "expected": [
+            "prescription is mapped to one chemist",
+            "mapping is unique"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Lab Receives One or More Prescriptions",
+          "req_ids": [
+            "BR-10-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "lab exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a lab exists",
+            "when one or more prescriptions are sent to the lab",
+            "then the lab receives the prescriptions"
+          ],
+          "expected": [
+            "prescriptions are received by lab",
+            "prescriptions are valid"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Prescription is Mapped to One and Only One Lab",
+          "req_ids": [
+            "BR-10-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "prescription exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a prescription exists",
+            "when the prescription is mapped to a lab",
+            "then the prescription is mapped to one and only one lab",
+            "and the mapping is unique"
+          ],
+          "expected": [
+            "prescription is mapped to one lab",
+            "mapping is unique"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Multiple Prescriptions for One Patient Consultation Request",
+          "req_ids": [
+            "BR-8-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient consultation request exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a patient consultation request exists",
+            "and <num_prescriptions> prescriptions are generated",
+            "when the prescriptions are processed",
+            "then the prescriptions are mapped to the request"
+          ],
+          "expected": [
+            "prescriptions are mapped to request",
+            "prescriptions are valid"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Multiple Prescriptions for One Chemist",
+          "req_ids": [
+            "BR-9-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "chemist exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a chemist exists",
+            "and <num_prescriptions> prescriptions are sent to the chemist",
+            "when the prescriptions are processed",
+            "then the prescriptions are received by the chemist"
+          ],
+          "expected": [
+            "prescriptions are received by chemist",
+            "prescriptions are valid"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Multiple Prescriptions for One Lab",
+          "req_ids": [
+            "BR-10-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "lab exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a lab exists",
+            "and <num_prescriptions> prescriptions are sent to the lab",
+            "when the prescriptions are processed",
+            "then the prescriptions are received by the lab"
+          ],
+          "expected": [
+            "prescriptions are received by lab",
+            "prescriptions are valid"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Mapping Error - Prescription Mapped to Multiple Requests",
+          "req_ids": [
+            "BR-8-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "prescription exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a prescription exists",
+            "and the prescription is mapped to multiple patient consultation requests",
+            "when the mapping is processed",
+            "then an error is raised"
+          ],
+          "expected": [
+            "error is raised",
+            "prescription is not mapped to multiple requests"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Mapping Error - Prescription Mapped to Multiple Chemists",
+          "req_ids": [
+            "BR-9-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "prescription exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a prescription exists",
+            "and the prescription is mapped to multiple chemists",
+            "when the mapping is processed",
+            "then an error is raised"
+          ],
+          "expected": [
+            "error is raised",
+            "prescription is not mapped to multiple chemists"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Mapping Error - Prescription Mapped to Multiple Labs",
+          "req_ids": [
+            "BR-10-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "prescription exists"
+          ],
+          "inputs": {
+            "name": "value"
+          },
+          "steps": [
+            "given a prescription exists",
+            "and the prescription is mapped to multiple labs",
+            "when the mapping is processed",
+            "then an error is raised"
+          ],
+          "expected": [
+            "error is raised",
+            "prescription is not mapped to multiple labs"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.4,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 3,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add assertions to verify exactly one prescription is generated per consultation request.",
+          "Include checks that prescription IDs are unique and correctly mapped to the originating request.",
+          "Validate that chemist and lab receive only the required fields of prescriptions.",
+          "Add boundary tests for zero prescriptions and very large numbers to ensure system handles limits.",
+          "Assert specific error codes or messages when mapping to multiple entities is attempted."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.91,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

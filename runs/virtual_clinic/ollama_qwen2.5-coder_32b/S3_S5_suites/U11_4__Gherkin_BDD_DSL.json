@@ -1,0 +1,1581 @@
+{
+  "unit_id": "U11_4",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 0.0,
+    "sfv_score": 0.5,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "Gherkin parse error: Parser errors:"
+    ]
+  },
+  "fsa": null,
+  "artifact": "Feature: Admin Management of Labs, Chemists, Specialities, and Doctors\n\n  @VIRTUA-4.2-4\n  Scenario: Admin adds a lab and a chemist into the system\n    Given the admin is logged into the system\n    When the admin adds a new lab with name \"Lab A\"\n    And the admin adds a new chemist with name \"Chemist X\"\n    Then the system should display \"Lab A\" in the list of labs\n    And the system should display \"Chemist X\" in the list of chemists\n\n  @VIRTUA-4.2-5\n  Scenario: Admin updates doctor information\n    Given the admin is logged into the system\n    And there is a doctor with name \"Doctor Y\"\n    When the admin updates the doctor's name to \"Doctor YY\"\n    Then the system should display \"Doctor YY\" in the list of doctors\n\n  @Req-1/1\n  Scenario Outline: Admin adds a new speciality\n    Given the admin is logged into the system\n    When the admin adds a new speciality with name \"<speciality_name>\"\n    Then the system should display \"<speciality_name>\" in the list of specialities\n    Examples:\n      | speciality_name |\n      | Cardiology      |\n      | Dermatology     |\n      | |               | # Invalid case with empty name\n\n  @Req-1/2\n  Scenario Outline: Admin views and updates the details of an existing speciality\n    Given the admin is logged into the system\n    And there is a speciality with name \"<original_speciality_name>\"\n    When the admin updates the speciality name to \"<updated_speciality_name>\"\n    Then the system should display \"<updated_speciality_name>\" in the list of specialities\n    Examples:\n      | original_speciality_name | updated_speciality_name |\n      | Cardiology               | Cardiovascular          |\n      | Dermatology              | Dermatology             | # No change\n      | |                        | New Speciality          | # Invalid case with empty original name\n\n  @Req-1/3\n  Scenario Outline: Admin deletes a speciality\n    Given the admin is logged into the system\n    And there is a speciality with name \"<speciality_name>\"\n    And there are \"<number_of_doctors>\" doctors associated with the speciality\n    When the admin attempts to delete the speciality\n    Then the system should \"<expected_result>\"\n    Examples:\n      | speciality_name | number_of_doctors | expected_result                         |\n      | Cardiology      | 0                 | display a success message and remove it |\n      | Dermatology     | 1                 | display an error message                |\n\n  @Req-2\n  Scenario Outline: Admin maintains doctors and associates them with a speciality\n    Given the admin is logged into the system\n    And there is a speciality with name \"<speciality_name>\"\n    When the admin adds a new doctor with name \"<doctor_name>\" and associates with \"<speciality_name>\"\n    Then the system should display \"<doctor_name>\" associated with \"<speciality_name>\"\n    Examples:\n      | speciality_name | doctor_name |\n      | Cardiology      | Doctor Z    |\n      | Dermatology     | Doctor ZZ   |\n      | |               | Doctor ZZZ  | # Invalid case with empty speciality name",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Admin adds a lab and a chemist into the system",
+      "req_ids": [
+        "VIRTUA-4.2-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged into the system"
+      ],
+      "inputs": {
+        "lab_name": "Lab A",
+        "chemist_name": "Chemist X"
+      },
+      "steps": [
+        "add a new lab",
+        "add a new chemist"
+      ],
+      "expected": [
+        "Lab A in the list of labs",
+        "Chemist X in the list of chemists"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Admin updates doctor information",
+      "req_ids": [
+        "VIRTUA-4.2-5"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged into the system",
+        "there is a doctor with name 'Doctor Y'"
+      ],
+      "inputs": {
+        "new_doctor_name": "Doctor YY"
+      },
+      "steps": [
+        "update the doctor's name"
+      ],
+      "expected": [
+        "Doctor YY in the list of doctors"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Admin adds a new speciality",
+      "req_ids": [
+        "Req-1/1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged into the system"
+      ],
+      "inputs": {
+        "speciality_name": "Cardiology"
+      },
+      "steps": [
+        "add a new speciality"
+      ],
+      "expected": [
+        "Cardiology in the list of specialities"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Admin adds a new speciality with empty name",
+      "req_ids": [
+        "Req-1/1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the admin is logged into the system"
+      ],
+      "inputs": {
+        "speciality_name": ""
+      },
+      "steps": [
+        "add a new speciality"
+      ],
+      "expected": [
+        "error message"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Admin updates the details of an existing speciality",
+      "req_ids": [
+        "Req-1/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged into the system",
+        "there is a speciality with name 'Cardiology'"
+      ],
+      "inputs": {
+        "original_speciality_name": "Cardiology",
+        "updated_speciality_name": "Cardiovascular"
+      },
+      "steps": [
+        "update the speciality name"
+      ],
+      "expected": [
+        "Cardiovascular in the list of specialities"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Admin updates the details of an existing speciality with no change",
+      "req_ids": [
+        "Req-1/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged into the system",
+        "there is a speciality with name 'Dermatology'"
+      ],
+      "inputs": {
+        "original_speciality_name": "Dermatology",
+        "updated_speciality_name": "Dermatology"
+      },
+      "steps": [
+        "update the speciality name"
+      ],
+      "expected": [
+        "Dermatology in the list of specialities"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Admin updates the details of an existing speciality with empty original name",
+      "req_ids": [
+        "Req-1/2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the admin is logged into the system"
+      ],
+      "inputs": {
+        "original_speciality_name": "",
+        "updated_speciality_name": "New Speciality"
+      },
+      "steps": [
+        "update the speciality name"
+      ],
+      "expected": [
+        "error message"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Admin deletes a speciality with no doctors associated",
+      "req_ids": [
+        "Req-1/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged into the system",
+        "there is a speciality with name 'Cardiology'",
+        "there are 0 doctors associated with the speciality"
+      ],
+      "inputs": {
+        "speciality_name": "Cardiology",
+        "number_of_doctors": 0
+      },
+      "steps": [
+        "attempt to delete the speciality"
+      ],
+      "expected": [
+        "success message and remove it"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Admin deletes a speciality with doctors associated",
+      "req_ids": [
+        "Req-1/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the admin is logged into the system",
+        "there is a speciality with name 'Dermatology'",
+        "there are 1 doctors associated with the speciality"
+      ],
+      "inputs": {
+        "speciality_name": "Dermatology",
+        "number_of_doctors": 1
+      },
+      "steps": [
+        "attempt to delete the speciality"
+      ],
+      "expected": [
+        "error message"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Admin maintains doctors and associates them with a speciality",
+      "req_ids": [
+        "Req-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged into the system",
+        "there is a speciality with name 'Cardiology'"
+      ],
+      "inputs": {
+        "speciality_name": "Cardiology",
+        "doctor_name": "Doctor Z"
+      },
+      "steps": [
+        "add a new doctor and associate with speciality"
+      ],
+      "expected": [
+        "Doctor Z associated with Cardiology"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Admin maintains doctors and associates them with a speciality with empty speciality name",
+      "req_ids": [
+        "Req-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the admin is logged into the system"
+      ],
+      "inputs": {
+        "speciality_name": "",
+        "doctor_name": "Doctor ZZZ"
+      },
+      "steps": [
+        "add a new doctor and associate with speciality"
+      ],
+      "expected": [
+        "error message"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Admin Management of Labs, Chemists, Specialities, and Doctors\n\n  @VIRTUA-4.2-4\n  Scenario: Admin adds a lab and a chemist into the system\n    Given the admin is logged into the system\n    When the admin adds a new lab with name \"Lab A\"\n    And the admin adds a new chemist with name \"Chemist X\"\n    Then the system should display \"Lab A\" in the list of labs\n    And the system should display \"Chemist X\" in the list of chemists\n\n  @VIRTUA-4.2-5\n  Scenario: Admin updates doctor information\n    Given the admin is logged into the system\n    And there is a doctor with name \"Doctor Y\"\n    When the admin updates the doctor's name to \"Doctor YY\"\n    Then the system should display \"Doctor YY\" in the list of doctors\n\n  @Req-1/1\n  Scenario Outline: Admin adds a new speciality\n    Given the admin is logged into the system\n    When the admin adds a new speciality with name \"<speciality_name>\"\n    Then the system should display \"<speciality_name>\" in the list of specialities\n    Examples:\n      | speciality_name |\n      | Cardiology      |\n      | Dermatology     |\n      | |               | # Invalid case with empty name\n\n  @Req-1/2\n  Scenario Outline: Admin views and updates the details of an existing speciality\n    Given the admin is logged into the system\n    And there is a speciality with name \"<original_speciality_name>\"\n    When the admin updates the speciality name to \"<updated_speciality_name>\"\n    Then the system should display \"<updated_speciality_name>\" in the list of specialities\n    Examples:\n      | original_speciality_name | updated_speciality_name |\n      | Cardiology               | Cardiovascular          |\n      | Dermatology              | Dermatology             | # No change\n      | |                        | New Speciality          | # Invalid case with empty original name\n\n  @Req-1/3\n  Scenario Outline: Admin deletes a speciality\n    Given the admin is logged into the system\n    And there is a speciality with name \"<speciality_name>\"\n    And there are \"<number_of_doctors>\" doctors associated with the speciality\n    When the admin attempts to delete the speciality\n    Then the system should \"<expected_result>\"\n    Examples:\n      | speciality_name | number_of_doctors | expected_result                         |\n      | Cardiology      | 0                 | display a success message and remove it |\n      | Dermatology     | 1                 | display an error message                |\n\n  @Req-2\n  Scenario Outline: Admin maintains doctors and associates them with a speciality\n    Given the admin is logged into the system\n    And there is a speciality with name \"<speciality_name>\"\n    When the admin adds a new doctor with name \"<doctor_name>\" and associates with \"<speciality_name>\"\n    Then the system should display \"<doctor_name>\" associated with \"<speciality_name>\"\n    Examples:\n      | speciality_name | doctor_name |\n      | Cardiology      | Doctor Z    |\n      | Dermatology     | Doctor ZZ   |\n      | |               | Doctor ZZZ  | # Invalid case with empty speciality name",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Admin adds a lab and a chemist into the system",
+          "req_ids": [
+            "VIRTUA-4.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "lab_name": "Lab A",
+            "chemist_name": "Chemist X"
+          },
+          "steps": [
+            "add a new lab",
+            "add a new chemist"
+          ],
+          "expected": [
+            "Lab A in the list of labs",
+            "Chemist X in the list of chemists"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Admin updates doctor information",
+          "req_ids": [
+            "VIRTUA-4.2-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system",
+            "there is a doctor with name 'Doctor Y'"
+          ],
+          "inputs": {
+            "new_doctor_name": "Doctor YY"
+          },
+          "steps": [
+            "update the doctor's name"
+          ],
+          "expected": [
+            "Doctor YY in the list of doctors"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Admin adds a new speciality",
+          "req_ids": [
+            "Req-1/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology"
+          },
+          "steps": [
+            "add a new speciality"
+          ],
+          "expected": [
+            "Cardiology in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Admin adds a new speciality with empty name",
+          "req_ids": [
+            "Req-1/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": ""
+          },
+          "steps": [
+            "add a new speciality"
+          ],
+          "expected": [
+            "error message"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Admin updates the details of an existing speciality",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system",
+            "there is a speciality with name 'Cardiology'"
+          ],
+          "inputs": {
+            "original_speciality_name": "Cardiology",
+            "updated_speciality_name": "Cardiovascular"
+          },
+          "steps": [
+            "update the speciality name"
+          ],
+          "expected": [
+            "Cardiovascular in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin updates the details of an existing speciality with no change",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system",
+            "there is a speciality with name 'Dermatology'"
+          ],
+          "inputs": {
+            "original_speciality_name": "Dermatology",
+            "updated_speciality_name": "Dermatology"
+          },
+          "steps": [
+            "update the speciality name"
+          ],
+          "expected": [
+            "Dermatology in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Admin updates the details of an existing speciality with empty original name",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "original_speciality_name": "",
+            "updated_speciality_name": "New Speciality"
+          },
+          "steps": [
+            "update the speciality name"
+          ],
+          "expected": [
+            "error message"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Admin deletes a speciality with no doctors associated",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system",
+            "there is a speciality with name 'Cardiology'",
+            "there are 0 doctors associated with the speciality"
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology",
+            "number_of_doctors": 0
+          },
+          "steps": [
+            "attempt to delete the speciality"
+          ],
+          "expected": [
+            "success message and remove it"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Admin deletes a speciality with doctors associated",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the admin is logged into the system",
+            "there is a speciality with name 'Dermatology'",
+            "there are 1 doctors associated with the speciality"
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology",
+            "number_of_doctors": 1
+          },
+          "steps": [
+            "attempt to delete the speciality"
+          ],
+          "expected": [
+            "error message"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Admin maintains doctors and associates them with a speciality",
+          "req_ids": [
+            "Req-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system",
+            "there is a speciality with name 'Cardiology'"
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology",
+            "doctor_name": "Doctor Z"
+          },
+          "steps": [
+            "add a new doctor and associate with speciality"
+          ],
+          "expected": [
+            "Doctor Z associated with Cardiology"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Admin maintains doctors and associates them with a speciality with empty speciality name",
+          "req_ids": [
+            "Req-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": "",
+            "doctor_name": "Doctor ZZZ"
+          },
+          "steps": [
+            "add a new doctor and associate with speciality"
+          ],
+          "expected": [
+            "error message"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Gherkin parse error: Parser errors:",
+      "artifact": "Feature: Admin Functionalities for Managing Labs, Chemists, Specialities, and Doctors\n\n  Background:\n    Given the admin is logged into the system\n\n  @VIRTUA-4.2-4\n  Scenario: Admin adds a new lab\n    When the admin adds a new lab with name \"Lab A\"\n    Then the system should display \"Lab A\" in the list of labs\n\n  @VIRTUA-4.2-4\n  Scenario: Admin adds a new chemist\n    When the admin adds a new chemist with name \"Chemist X\"\n    Then the system should display \"Chemist X\" in the list of chemists\n\n  @VIRTUA-4.2-5\n  Scenario: Admin updates doctor information\n    Given there is a doctor with name \"Doctor Y\"\n    When the admin updates the doctor's name to \"Doctor YY\"\n    Then the system should display \"Doctor YY\" in the list of doctors\n\n  @Req-1/1\n  Scenario Outline: Admin adds a new speciality\n    When the admin adds a new speciality with name \"<speciality_name>\"\n    Then the system should display \"<speciality_name>\" in the list of specialities\n    Examples:\n      | speciality_name |\n      | Cardiology      |\n      | Dermatology     |\n      | |               |  # Edge case: empty name\n\n  @Req-1/2\n  Scenario Outline: Admin views and updates an existing speciality\n    Given there is a speciality with name \"<speciality_name>\"\n    When the admin updates the speciality's name to \"<updated_speciality_name>\"\n    Then the system should display \"<updated_speciality_name>\" in the list of specialities\n    Examples:\n      | speciality_name | updated_speciality_name |\n      | Cardiology      | Cardio                |\n      | Dermatology     | Dermato               |\n      | |               | NewSpeciality         |  # Edge case: empty original name\n      | NewSpeciality   | |                     |  # Edge case: empty updated name\n\n  @Req-1/3\n  Scenario Outline: Admin deletes a speciality\n    Given there is a speciality with name \"<speciality_name>\"\n    And no doctors are associated with \"<speciality_name>\"\n    When the admin deletes the speciality with name \"<speciality_name>\"\n    Then the system should not display \"<speciality_name>\" in the list of specialities\n    Examples:\n      | speciality_name |\n      | Cardiology      |\n      | Dermatology     |\n\n  @Req-1/3\n  Scenario Outline: Admin attempts to delete a speciality with associated doctors\n    Given there is a speciality with name \"<speciality_name>\"\n    And a doctor is associated with \"<speciality_name>\"\n    When the admin deletes the speciality with name \"<speciality_name>\"\n    Then the system should display an error message \"Cannot delete speciality as it has associated doctors\"\n    Examples:\n      | speciality_name |\n      | Cardiology      |\n      | Dermatology     |\n\n  @Req-2\n  Scenario Outline: Admin maintains doctors and associates them with specialities\n    Given there is a speciality with name \"<speciality_name>\"\n    And there is a doctor with name \"<doctor_name>\"\n    When the admin associates \"<doctor_name>\" with \"<speciality_name>\"\n    Then the system should display \"<doctor_name>\" associated with \"<speciality_name>\"\n    Examples:\n      | speciality_name | doctor_name |\n      | Cardiology      | Doctor A    |\n      | Dermatology     | Doctor B    |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Admin adds a new lab",
+          "req_ids": [
+            "VIRTUA-4.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "name": "Lab A"
+          },
+          "steps": [
+            "the admin adds a new lab with name \"Lab A\""
+          ],
+          "expected": [
+            "the system should display \"Lab A\" in the list of labs"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Admin adds a new chemist",
+          "req_ids": [
+            "VIRTUA-4.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "name": "Chemist X"
+          },
+          "steps": [
+            "the admin adds a new chemist with name \"Chemist X\""
+          ],
+          "expected": [
+            "the system should display \"Chemist X\" in the list of chemists"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Admin updates doctor information",
+          "req_ids": [
+            "VIRTUA-4.2-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a doctor with name \"Doctor Y\""
+          ],
+          "inputs": {
+            "name": "Doctor YY"
+          },
+          "steps": [
+            "the admin updates the doctor's name to \"Doctor YY\""
+          ],
+          "expected": [
+            "the system should display \"Doctor YY\" in the list of doctors"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Admin adds a new speciality",
+          "req_ids": [
+            "Req-1/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology"
+          },
+          "steps": [
+            "the admin adds a new speciality with name \"Cardiology\""
+          ],
+          "expected": [
+            "the system should display \"Cardiology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Admin adds a new speciality",
+          "req_ids": [
+            "Req-1/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology"
+          },
+          "steps": [
+            "the admin adds a new speciality with name \"Dermatology\""
+          ],
+          "expected": [
+            "the system should display \"Dermatology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin adds a new speciality with empty name",
+          "req_ids": [
+            "Req-1/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": ""
+          },
+          "steps": [
+            "the admin adds a new speciality with name \"\""
+          ],
+          "expected": [
+            "the system should display \"\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Admin updates an existing speciality",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology",
+            "updated_speciality_name": "Cardio"
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"Cardio\""
+          ],
+          "expected": [
+            "the system should display \"Cardio\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Admin updates an existing speciality",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology",
+            "updated_speciality_name": "Dermato"
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"Dermato\""
+          ],
+          "expected": [
+            "the system should display \"Dermato\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Admin updates an existing speciality with empty original name",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"\""
+          ],
+          "inputs": {
+            "speciality_name": "",
+            "updated_speciality_name": "NewSpeciality"
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"NewSpeciality\""
+          ],
+          "expected": [
+            "the system should display \"NewSpeciality\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Admin updates an existing speciality with empty updated name",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"NewSpeciality\""
+          ],
+          "inputs": {
+            "speciality_name": "NewSpeciality",
+            "updated_speciality_name": ""
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"\""
+          ],
+          "expected": [
+            "the system should display \"\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Admin deletes a speciality",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\"",
+            "no doctors are associated with \"Cardiology\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Cardiology\""
+          ],
+          "expected": [
+            "the system should not display \"Cardiology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Admin deletes a speciality",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\"",
+            "no doctors are associated with \"Dermatology\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Dermatology\""
+          ],
+          "expected": [
+            "the system should not display \"Dermatology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Admin attempts to delete a speciality with associated doctors",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\"",
+            "a doctor is associated with \"Cardiology\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Cardiology\""
+          ],
+          "expected": [
+            "the system should display an error message \"Cannot delete speciality as it has associated doctors\""
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Admin attempts to delete a speciality with associated doctors",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\"",
+            "a doctor is associated with \"Dermatology\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Dermatology\""
+          ],
+          "expected": [
+            "the system should display an error message \"Cannot delete speciality as it has associated doctors\""
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Admin associates a doctor with a speciality",
+          "req_ids": [
+            "Req-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\"",
+            "there is a doctor with name \"Doctor A\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology",
+            "doctor_name": "Doctor A"
+          },
+          "steps": [
+            "the admin associates \"Doctor A\" with \"Cardiology\""
+          ],
+          "expected": [
+            "the system should display \"Doctor A\" associated with \"Cardiology\""
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Admin associates a doctor with a speciality",
+          "req_ids": [
+            "Req-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\"",
+            "there is a doctor with name \"Doctor B\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology",
+            "doctor_name": "Doctor B"
+          },
+          "steps": [
+            "the admin associates \"Doctor B\" with \"Dermatology\""
+          ],
+          "expected": [
+            "the system should display \"Doctor B\" associated with \"Dermatology\""
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Gherkin parse error: Parser errors:",
+      "artifact": "Feature: Admin Functionalities for Managing Labs, Chemists, Specialities, and Doctors\n\n  Background:\n    Given the admin is logged into the system\n\n  @VIRTUA-4.2-4\n  Scenario: Admin adds a new lab\n    When the admin adds a new lab with name \"Lab A\"\n    Then the system should display \"Lab A\" in the list of labs\n\n  @VIRTUA-4.2-4\n  Scenario: Admin adds a new chemist\n    When the admin adds a new chemist with name \"Chemist X\"\n    Then the system should display \"Chemist X\" in the list of chemists\n\n  @VIRTUA-4.2-5\n  Scenario: Admin updates doctor information\n    Given there is a doctor with name \"Doctor Y\"\n    When the admin updates the doctor's name to \"Doctor YY\"\n    Then the system should display \"Doctor YY\" in the list of doctors\n\n  @Req-1/1\n  Scenario Outline: Admin adds a new speciality\n    When the admin adds a new speciality with name \"<speciality_name>\"\n    Then the system should display \"<speciality_name>\" in the list of specialities\n    Examples:\n      | speciality_name |\n      | Cardiology      |\n      | Dermatology     |\n      | |               |  # Edge case: empty name\n\n  @Req-1/2\n  Scenario Outline: Admin views and updates an existing speciality\n    Given there is a speciality with name \"<speciality_name>\"\n    When the admin updates the speciality's name to \"<updated_speciality_name>\"\n    Then the system should display \"<updated_speciality_name>\" in the list of specialities\n    Examples:\n      | speciality_name | updated_speciality_name |\n      | Cardiology      | Cardio                |\n      | Dermatology     | Dermato               |\n      | |               | NewSpeciality         |  # Edge case: empty original name\n      | NewSpeciality   | |                     |  # Edge case: empty updated name\n\n  @Req-1/3\n  Scenario Outline: Admin deletes a speciality\n    Given there is a speciality with name \"<speciality_name>\"\n    And no doctors are associated with \"<speciality_name>\"\n    When the admin deletes the speciality with name \"<speciality_name>\"\n    Then the system should not display \"<speciality_name>\" in the list of specialities\n    Examples:\n      | speciality_name |\n      | Cardiology      |\n      | Dermatology     |\n\n  @Req-1/3\n  Scenario Outline: Admin attempts to delete a speciality with associated doctors\n    Given there is a speciality with name \"<speciality_name>\"\n    And a doctor is associated with \"<speciality_name>\"\n    When the admin deletes the speciality with name \"<speciality_name>\"\n    Then the system should display an error message \"Cannot delete speciality as it has associated doctors\"\n    Examples:\n      | speciality_name |\n      | Cardiology      |\n      | Dermatology     |\n\n  @Req-2\n  Scenario Outline: Admin maintains doctors and associates them with specialities\n    Given there is a speciality with name \"<speciality_name>\"\n    And there is a doctor with name \"<doctor_name>\"\n    When the admin associates \"<doctor_name>\" with \"<speciality_name>\"\n    Then the system should display \"<doctor_name>\" associated with \"<speciality_name>\"\n    Examples:\n      | speciality_name | doctor_name |\n      | Cardiology      | Doctor A    |\n      | Dermatology     | Doctor B    |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Admin adds a new lab",
+          "req_ids": [
+            "VIRTUA-4.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "name": "Lab A"
+          },
+          "steps": [
+            "the admin adds a new lab with name \"Lab A\""
+          ],
+          "expected": [
+            "the system should display \"Lab A\" in the list of labs"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Admin adds a new chemist",
+          "req_ids": [
+            "VIRTUA-4.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "name": "Chemist X"
+          },
+          "steps": [
+            "the admin adds a new chemist with name \"Chemist X\""
+          ],
+          "expected": [
+            "the system should display \"Chemist X\" in the list of chemists"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Admin updates doctor information",
+          "req_ids": [
+            "VIRTUA-4.2-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a doctor with name \"Doctor Y\""
+          ],
+          "inputs": {
+            "name": "Doctor YY"
+          },
+          "steps": [
+            "the admin updates the doctor's name to \"Doctor YY\""
+          ],
+          "expected": [
+            "the system should display \"Doctor YY\" in the list of doctors"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Admin adds a new speciality",
+          "req_ids": [
+            "Req-1/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology"
+          },
+          "steps": [
+            "the admin adds a new speciality with name \"Cardiology\""
+          ],
+          "expected": [
+            "the system should display \"Cardiology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Admin adds a new speciality",
+          "req_ids": [
+            "Req-1/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology"
+          },
+          "steps": [
+            "the admin adds a new speciality with name \"Dermatology\""
+          ],
+          "expected": [
+            "the system should display \"Dermatology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin adds a new speciality with empty name",
+          "req_ids": [
+            "Req-1/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": ""
+          },
+          "steps": [
+            "the admin adds a new speciality with name \"\""
+          ],
+          "expected": [
+            "the system should display \"\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Admin updates an existing speciality",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology",
+            "updated_speciality_name": "Cardio"
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"Cardio\""
+          ],
+          "expected": [
+            "the system should display \"Cardio\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Admin updates an existing speciality",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology",
+            "updated_speciality_name": "Dermato"
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"Dermato\""
+          ],
+          "expected": [
+            "the system should display \"Dermato\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Admin updates an existing speciality with empty original name",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"\""
+          ],
+          "inputs": {
+            "speciality_name": "",
+            "updated_speciality_name": "NewSpeciality"
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"NewSpeciality\""
+          ],
+          "expected": [
+            "the system should display \"NewSpeciality\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Admin updates an existing speciality with empty updated name",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"NewSpeciality\""
+          ],
+          "inputs": {
+            "speciality_name": "NewSpeciality",
+            "updated_speciality_name": ""
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"\""
+          ],
+          "expected": [
+            "the system should display \"\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Admin deletes a speciality",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\"",
+            "no doctors are associated with \"Cardiology\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Cardiology\""
+          ],
+          "expected": [
+            "the system should not display \"Cardiology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Admin deletes a speciality",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\"",
+            "no doctors are associated with \"Dermatology\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Dermatology\""
+          ],
+          "expected": [
+            "the system should not display \"Dermatology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Admin attempts to delete a speciality with associated doctors",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\"",
+            "a doctor is associated with \"Cardiology\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Cardiology\""
+          ],
+          "expected": [
+            "the system should display an error message \"Cannot delete speciality as it has associated doctors\""
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Admin attempts to delete a speciality with associated doctors",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\"",
+            "a doctor is associated with \"Dermatology\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Dermatology\""
+          ],
+          "expected": [
+            "the system should display an error message \"Cannot delete speciality as it has associated doctors\""
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Admin associates a doctor with a speciality",
+          "req_ids": [
+            "Req-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\"",
+            "there is a doctor with name \"Doctor A\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology",
+            "doctor_name": "Doctor A"
+          },
+          "steps": [
+            "the admin associates \"Doctor A\" with \"Cardiology\""
+          ],
+          "expected": [
+            "the system should display \"Doctor A\" associated with \"Cardiology\""
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Admin associates a doctor with a speciality",
+          "req_ids": [
+            "Req-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\"",
+            "there is a doctor with name \"Doctor B\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology",
+            "doctor_name": "Doctor B"
+          },
+          "steps": [
+            "the admin associates \"Doctor B\" with \"Dermatology\""
+          ],
+          "expected": [
+            "the system should display \"Doctor B\" associated with \"Dermatology\""
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- Gherkin parse error: Parser errors:",
+      "artifact": "Feature: Admin Functionalities for Managing Labs, Chemists, Specialities, and Doctors\n\n  Background:\n    Given the admin is logged into the system\n\n  @VIRTUA-4.2-4\n  Scenario: Admin adds a new lab\n    When the admin adds a new lab with name \"Lab A\"\n    Then the system should display \"Lab A\" in the list of labs\n\n  @VIRTUA-4.2-4\n  Scenario: Admin adds a new chemist\n    When the admin adds a new chemist with name \"Chemist X\"\n    Then the system should display \"Chemist X\" in the list of chemists\n\n  @VIRTUA-4.2-5\n  Scenario: Admin updates doctor information\n    Given there is a doctor with name \"Doctor Y\"\n    When the admin updates the doctor's name to \"Doctor YY\"\n    Then the system should display \"Doctor YY\" in the list of doctors\n\n  @Req-1/1\n  Scenario Outline: Admin adds a new speciality\n    When the admin adds a new speciality with name \"<speciality_name>\"\n    Then the system should display \"<speciality_name>\" in the list of specialities\n    Examples:\n      | speciality_name |\n      | Cardiology      |\n      | Dermatology     |\n      | |               |  # Edge case: empty name\n\n  @Req-1/2\n  Scenario Outline: Admin views and updates an existing speciality\n    Given there is a speciality with name \"<speciality_name>\"\n    When the admin updates the speciality's name to \"<updated_speciality_name>\"\n    Then the system should display \"<updated_speciality_name>\" in the list of specialities\n    Examples:\n      | speciality_name | updated_speciality_name |\n      | Cardiology      | Cardio                |\n      | Dermatology     | Dermato               |\n      | |               | NewSpeciality         |  # Edge case: empty original name\n      | NewSpeciality   | |                     |  # Edge case: empty updated name\n\n  @Req-1/3\n  Scenario Outline: Admin deletes a speciality\n    Given there is a speciality with name \"<speciality_name>\"\n    And no doctors are associated with \"<speciality_name>\"\n    When the admin deletes the speciality with name \"<speciality_name>\"\n    Then the system should not display \"<speciality_name>\" in the list of specialities\n    Examples:\n      | speciality_name |\n      | Cardiology      |\n      | Dermatology     |\n\n  @Req-1/3\n  Scenario Outline: Admin attempts to delete a speciality with associated doctors\n    Given there is a speciality with name \"<speciality_name>\"\n    And a doctor is associated with \"<speciality_name>\"\n    When the admin deletes the speciality with name \"<speciality_name>\"\n    Then the system should display an error message \"Cannot delete speciality as it has associated doctors\"\n    Examples:\n      | speciality_name |\n      | Cardiology      |\n      | Dermatology     |\n\n  @Req-2\n  Scenario Outline: Admin maintains doctors and associates them with specialities\n    Given there is a speciality with name \"<speciality_name>\"\n    And there is a doctor with name \"<doctor_name>\"\n    When the admin associates \"<doctor_name>\" with \"<speciality_name>\"\n    Then the system should display \"<doctor_name>\" associated with \"<speciality_name>\"\n    Examples:\n      | speciality_name | doctor_name |\n      | Cardiology      | Doctor A    |\n      | Dermatology     | Doctor B    |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Admin adds a new lab",
+          "req_ids": [
+            "VIRTUA-4.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "name": "Lab A"
+          },
+          "steps": [
+            "the admin adds a new lab with name \"Lab A\""
+          ],
+          "expected": [
+            "the system should display \"Lab A\" in the list of labs"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Admin adds a new chemist",
+          "req_ids": [
+            "VIRTUA-4.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "name": "Chemist X"
+          },
+          "steps": [
+            "the admin adds a new chemist with name \"Chemist X\""
+          ],
+          "expected": [
+            "the system should display \"Chemist X\" in the list of chemists"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Admin updates doctor information",
+          "req_ids": [
+            "VIRTUA-4.2-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a doctor with name \"Doctor Y\""
+          ],
+          "inputs": {
+            "name": "Doctor YY"
+          },
+          "steps": [
+            "the admin updates the doctor's name to \"Doctor YY\""
+          ],
+          "expected": [
+            "the system should display \"Doctor YY\" in the list of doctors"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Admin adds a new speciality",
+          "req_ids": [
+            "Req-1/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology"
+          },
+          "steps": [
+            "the admin adds a new speciality with name \"Cardiology\""
+          ],
+          "expected": [
+            "the system should display \"Cardiology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Admin adds a new speciality",
+          "req_ids": [
+            "Req-1/1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology"
+          },
+          "steps": [
+            "the admin adds a new speciality with name \"Dermatology\""
+          ],
+          "expected": [
+            "the system should display \"Dermatology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Admin adds a new speciality with empty name",
+          "req_ids": [
+            "Req-1/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "speciality_name": ""
+          },
+          "steps": [
+            "the admin adds a new speciality with name \"\""
+          ],
+          "expected": [
+            "the system should display \"\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Admin updates an existing speciality",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology",
+            "updated_speciality_name": "Cardio"
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"Cardio\""
+          ],
+          "expected": [
+            "the system should display \"Cardio\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Admin updates an existing speciality",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology",
+            "updated_speciality_name": "Dermato"
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"Dermato\""
+          ],
+          "expected": [
+            "the system should display \"Dermato\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Admin updates an existing speciality with empty original name",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"\""
+          ],
+          "inputs": {
+            "speciality_name": "",
+            "updated_speciality_name": "NewSpeciality"
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"NewSpeciality\""
+          ],
+          "expected": [
+            "the system should display \"NewSpeciality\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Admin updates an existing speciality with empty updated name",
+          "req_ids": [
+            "Req-1/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"NewSpeciality\""
+          ],
+          "inputs": {
+            "speciality_name": "NewSpeciality",
+            "updated_speciality_name": ""
+          },
+          "steps": [
+            "the admin updates the speciality's name to \"\""
+          ],
+          "expected": [
+            "the system should display \"\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Admin deletes a speciality",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\"",
+            "no doctors are associated with \"Cardiology\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Cardiology\""
+          ],
+          "expected": [
+            "the system should not display \"Cardiology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Admin deletes a speciality",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\"",
+            "no doctors are associated with \"Dermatology\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Dermatology\""
+          ],
+          "expected": [
+            "the system should not display \"Dermatology\" in the list of specialities"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Admin attempts to delete a speciality with associated doctors",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\"",
+            "a doctor is associated with \"Cardiology\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Cardiology\""
+          ],
+          "expected": [
+            "the system should display an error message \"Cannot delete speciality as it has associated doctors\""
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Admin attempts to delete a speciality with associated doctors",
+          "req_ids": [
+            "Req-1/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\"",
+            "a doctor is associated with \"Dermatology\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology"
+          },
+          "steps": [
+            "the admin deletes the speciality with name \"Dermatology\""
+          ],
+          "expected": [
+            "the system should display an error message \"Cannot delete speciality as it has associated doctors\""
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Admin associates a doctor with a speciality",
+          "req_ids": [
+            "Req-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Cardiology\"",
+            "there is a doctor with name \"Doctor A\""
+          ],
+          "inputs": {
+            "speciality_name": "Cardiology",
+            "doctor_name": "Doctor A"
+          },
+          "steps": [
+            "the admin associates \"Doctor A\" with \"Cardiology\""
+          ],
+          "expected": [
+            "the system should display \"Doctor A\" associated with \"Cardiology\""
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Admin associates a doctor with a speciality",
+          "req_ids": [
+            "Req-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "there is a speciality with name \"Dermatology\"",
+            "there is a doctor with name \"Doctor B\""
+          ],
+          "inputs": {
+            "speciality_name": "Dermatology",
+            "doctor_name": "Doctor B"
+          },
+          "steps": [
+            "the admin associates \"Doctor B\" with \"Dermatology\""
+          ],
+          "expected": [
+            "the system should display \"Doctor B\" associated with \"Dermatology\""
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "Gherkin parse error: Parser errors:"
+        ]
+      }
+    }
+  ]
+}

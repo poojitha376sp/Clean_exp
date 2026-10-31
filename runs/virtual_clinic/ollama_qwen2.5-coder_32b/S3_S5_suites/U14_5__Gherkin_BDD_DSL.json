@@ -1,0 +1,1333 @@
+{
+  "unit_id": "U14_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 3,
+  "repairs_used": 2,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.75,
+    "boundary_coverage": 0.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "Dr. John Doe",
+        "context": "doctor name",
+        "grounded": false
+      },
+      {
+        "value": "Cardiology",
+        "context": "specialty",
+        "grounded": false
+      },
+      {
+        "value": "LabTech Inc.",
+        "context": "lab name",
+        "grounded": false
+      },
+      {
+        "value": "City Hospital",
+        "context": "location",
+        "grounded": false
+      },
+      {
+        "value": "John Doe",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": "john.doe@example.com",
+        "context": "patient email",
+        "grounded": false
+      },
+      {
+        "value": "Jane Smith",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": "jane.smith@example.com",
+        "context": "patient email",
+        "grounded": false
+      },
+      {
+        "value": "Invalid Name",
+        "context": "patient name",
+        "grounded": false
+      },
+      {
+        "value": "invalid-email",
+        "context": "patient email",
+        "grounded": false
+      },
+      {
+        "value": "Doctor not found",
+        "context": "error message",
+        "grounded": false
+      },
+      {
+        "value": "Lab/Chemist not found",
+        "context": "error message",
+        "grounded": false
+      },
+      {
+        "value": "Invalid email format",
+        "context": "error message",
+        "grounded": false
+      },
+      {
+        "value": "Appointment date must be in the future",
+        "context": "error message",
+        "grounded": false
+      },
+      {
+        "value": "as specified",
+        "context": "appointment date placeholder",
+        "grounded": false
+      },
+      {
+        "value": "2023-10-01",
+        "context": "appointment date",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 16,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Replace placeholder values with concrete test data grounded in the SRS",
+      "Add explicit boundary values for appointment dates (e.g., today, tomorrow)",
+      "Ensure error messages match system specifications",
+      "Use unique identifiers for doctors/labs instead of names",
+      "Include tests for successful update of patient details with valid email format"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.6125,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Admin and Patient Information Management\n\n  Scenario: Admin updates doctor's information\n    Given the admin is logged into the system\n    When the admin updates the doctor's information with name \"Dr. John Doe\" and specialty \"Cardiology\"\n    Then the doctor's information in the system should be updated to name \"Dr. John Doe\" and specialty \"Cardiology\"\n\n  Scenario: Admin updates lab/chemist information\n    Given the admin is logged into the system\n    When the admin updates the lab/chemist information with name \"LabTech Inc.\" and location \"City Hospital\"\n    Then the lab/chemist information in the system should be updated to name \"LabTech Inc.\" and location \"City Hospital\"\n\n  Scenario Outline: Patient updates personal details\n    Given the patient is logged into the system\n    When the patient updates their personal details with <name> and <email>\n    Then the patient's personal details in the system should be updated to name \"<name>\" and email \"<email>\"\n\n    Examples:\n      | name          | email                | kind     |\n      | John Doe      | john.doe@example.com | positive |\n      | Jane Smith    | jane.smith@example.com | positive |\n      | Invalid Name  | invalid-email        | negative |\n      |               | jane.smith@example.com | negative |\n\n  Scenario Outline: Patient creates an appointment\n    Given the patient is logged into the system\n    When the patient creates an appointment with doctor \"Dr. John Doe\" on <appointment_date>\n    Then the appointment should be created and listed in the appointments tab with doctor \"Dr. John Doe\" on <appointment_date>\n\n    Examples:\n      | appointment_date | kind     |\n      | as specified     | positive |\n      | as specified     | boundary |\n      | as specified     | negative |\n\n  Scenario: Admin attempts to update non-existent doctor's information\n    Given the admin is logged into the system\n    When the admin attempts to update the doctor's information with non-existent ID\n    Then the system should display an error message \"Doctor not found\"\n\n  Scenario: Admin attempts to update non-existent lab/chemist information\n    Given the admin is logged into the system\n    When the admin attempts to update the lab/chemist information with non-existent ID\n    Then the system should display an error message \"Lab/Chemist not found\"\n\n  Scenario: Patient attempts to update with invalid email\n    Given the patient is logged into the system\n    When the patient updates their personal details with name \"John Doe\" and email \"invalid-email\"\n    Then the system should display an error message \"Invalid email format\"\n\n  Scenario: Patient attempts to create an appointment on a past date\n    Given the patient is logged into the system\n    When the patient creates an appointment with doctor \"Dr. John Doe\" on \"2023-10-01\"\n    Then the system should display an error message \"Appointment date must be in the future\"",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Admin updates doctor's information",
+      "req_ids": [
+        "VIRTUA-5-1",
+        "VIRTUA-5-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged into the system"
+      ],
+      "inputs": {
+        "name": "Dr. John Doe",
+        "specialty": "Cardiology"
+      },
+      "steps": [
+        "the admin updates the doctor's information with name 'Dr. John Doe' and specialty 'Cardiology'"
+      ],
+      "expected": [
+        "the doctor's information in the system should be updated to name 'Dr. John Doe' and specialty 'Cardiology'"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Admin updates lab/chemist information",
+      "req_ids": [
+        "VIRTUA-5-3",
+        "VIRTUA-5-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the admin is logged into the system"
+      ],
+      "inputs": {
+        "name": "LabTech Inc.",
+        "location": "City Hospital"
+      },
+      "steps": [
+        "the admin updates the lab/chemist information with name 'LabTech Inc.' and location 'City Hospital'"
+      ],
+      "expected": [
+        "the lab/chemist information in the system should be updated to name 'LabTech Inc.' and location 'City Hospital'"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Patient updates personal details",
+      "req_ids": [
+        "VIRTUA-5-5",
+        "VIRTUA-5-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient is logged into the system"
+      ],
+      "inputs": {
+        "name": "John Doe",
+        "email": "john.doe@example.com"
+      },
+      "steps": [
+        "the patient updates their personal details with name 'John Doe' and email 'john.doe@example.com'"
+      ],
+      "expected": [
+        "the patient's personal details in the system should be updated to name 'John Doe' and email 'john.doe@example.com'"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Patient updates personal details",
+      "req_ids": [
+        "VIRTUA-5-5",
+        "VIRTUA-5-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient is logged into the system"
+      ],
+      "inputs": {
+        "name": "Jane Smith",
+        "email": "jane.smith@example.com"
+      },
+      "steps": [
+        "the patient updates their personal details with name 'Jane Smith' and email 'jane.smith@example.com'"
+      ],
+      "expected": [
+        "the patient's personal details in the system should be updated to name 'Jane Smith' and email 'jane.smith@example.com'"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Patient updates personal details with invalid email",
+      "req_ids": [
+        "VIRTUA-5-5",
+        "VIRTUA-5-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the patient is logged into the system"
+      ],
+      "inputs": {
+        "name": "Invalid Name",
+        "email": "invalid-email"
+      },
+      "steps": [
+        "the patient updates their personal details with name 'Invalid Name' and email 'invalid-email'"
+      ],
+      "expected": [
+        "the system should display an error message 'Invalid email format'"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Patient updates personal details with empty name",
+      "req_ids": [
+        "VIRTUA-5-5",
+        "VIRTUA-5-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the patient is logged into the system"
+      ],
+      "inputs": {
+        "name": "",
+        "email": "jane.smith@example.com"
+      },
+      "steps": [
+        "the patient updates their personal details with name '' and email 'jane.smith@example.com'"
+      ],
+      "expected": [
+        "the system should display an error message 'Invalid email format'"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Patient creates an appointment",
+      "req_ids": [
+        "VIRTUA-5-7",
+        "VIRTUA-5-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "the patient is logged into the system"
+      ],
+      "inputs": {
+        "doctor": "Dr. John Doe",
+        "appointment_date": "as specified"
+      },
+      "steps": [
+        "the patient creates an appointment with doctor 'Dr. John Doe' on 'as specified'"
+      ],
+      "expected": [
+        "the appointment should be created and listed in the appointments tab with doctor 'Dr. John Doe' on 'as specified'"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Patient creates an appointment on boundary date",
+      "req_ids": [
+        "VIRTUA-5-7",
+        "VIRTUA-5-8"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "the patient is logged into the system"
+      ],
+      "inputs": {
+        "doctor": "Dr. John Doe",
+        "appointment_date": "as specified"
+      },
+      "steps": [
+        "the patient creates an appointment with doctor 'Dr. John Doe' on 'as specified'"
+      ],
+      "expected": [
+        "the appointment should be created and listed in the appointments tab with doctor 'Dr. John Doe' on 'as specified'"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Patient creates an appointment on past date",
+      "req_ids": [
+        "VIRTUA-5-7",
+        "VIRTUA-5-8"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the patient is logged into the system"
+      ],
+      "inputs": {
+        "doctor": "Dr. John Doe",
+        "appointment_date": "2023-10-01"
+      },
+      "steps": [
+        "the patient creates an appointment with doctor 'Dr. John Doe' on '2023-10-01'"
+      ],
+      "expected": [
+        "the system should display an error message 'Appointment date must be in the future'"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Admin attempts to update non-existent doctor's information",
+      "req_ids": [
+        "VIRTUA-5-1",
+        "VIRTUA-5-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the admin is logged into the system"
+      ],
+      "inputs": {},
+      "steps": [
+        "the admin attempts to update the doctor's information with non-existent ID"
+      ],
+      "expected": [
+        "the system should display an error message 'Doctor not found'"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Admin attempts to update non-existent lab/chemist information",
+      "req_ids": [
+        "VIRTUA-5-3",
+        "VIRTUA-5-4"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "the admin is logged into the system"
+      ],
+      "inputs": {},
+      "steps": [
+        "the admin attempts to update the lab/chemist information with non-existent ID"
+      ],
+      "expected": [
+        "the system should display an error message 'Lab/Chemist not found'"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Admin and Patient Information Management and Appointment Creation\n\n  @VIRTUA-5-1\n  Scenario: Admin updates doctor's information\n    Given the admin is logged into the system\n    When the admin updates the doctor's information\n    Then the doctor's information is updated in the system\n\n  @VIRTUA-5-2\n  Scenario: Doctor's profile information is updated via admin\n    Given the admin is logged into the system\n    When the admin updates the doctor's profile information\n    Then the doctor's profile information is successfully updated in the system\n\n  @VIRTUA-5-3\n  Scenario: Admin updates labs and chemists information\n    Given the admin is logged into the system\n    When the admin updates the labs and chemists information\n    Then the labs and chemists information is updated in the system\n\n  @VIRTUA-5-4\n  Scenario: Lab/Chemist information is successfully updated via admin\n    Given the admin is logged into the system\n    When the admin updates the lab/chemist information\n    Then the lab/chemist information is successfully updated in the system\n\n  @VIRTUA-5-5\n  Scenario: Patient updates their personal details\n    Given the patient is logged into the system\n    When the patient updates their personal details\n    Then the patient's personal details are updated in the system\n\n  @VIRTUA-5-6\n  Scenario: Patient's details are successfully updated\n    Given the patient is logged into the system\n    When the patient updates their details\n    Then the patient's details are successfully updated in the system\n\n  @VIRTUA-5-7\n  Scenario Outline: Patient creates an appointment to visit the doctor on a future date\n    Given the patient is logged into the system\n    When the patient creates an appointment for <appointment_date>\n    Then the appointment is created and can be viewed in the appointments tab\n\n    Examples:\n      | appointment_date |\n      | 2023-12-31       |  # Normal value\n      | 2024-01-01       |  # Edge value (next year)\n      | 2023-11-01       |  # Edge value (past month)\n      | 2023-11-30       |  # Edge value (end of month)\n      | 2023-02-28       |  # Edge value (end of February in non-leap year)\n      | 2024-02-29       |  # Edge value (end of February in leap year)\n      | 2023-11-32       |  # Invalid value (non-existent date)\n      | 2023-04-31       |  # Invalid value (non-existent date)\n      | 2023-02-30       |  # Invalid value (non-existent date)\n\n  @VIRTUA-5-8\n  Scenario: Appointment is created and can be viewed in appointments tab via Patient Appointment File\n    Given the patient is logged into the system\n    When the patient creates an appointment for 2023-12-31\n    Then the appointment is created and can be viewed in the appointments tab",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Admin updates doctor's information",
+          "req_ids": [
+            "VIRTUA-5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the admin updates the doctor's information"
+          ],
+          "expected": [
+            "the doctor's information is updated in the system"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Doctor's profile information is updated via admin",
+          "req_ids": [
+            "VIRTUA-5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the admin updates the doctor's profile information"
+          ],
+          "expected": [
+            "the doctor's profile information is successfully updated in the system"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Admin updates labs and chemists information",
+          "req_ids": [
+            "VIRTUA-5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the admin updates the labs and chemists information"
+          ],
+          "expected": [
+            "the labs and chemists information is updated in the system"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Lab/Chemist information is successfully updated via admin",
+          "req_ids": [
+            "VIRTUA-5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the admin updates the lab/chemist information"
+          ],
+          "expected": [
+            "the lab/chemist information is successfully updated in the system"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Patient updates their personal details",
+          "req_ids": [
+            "VIRTUA-5-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the patient updates their personal details"
+          ],
+          "expected": [
+            "the patient's personal details are updated in the system"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient's details are successfully updated",
+          "req_ids": [
+            "VIRTUA-5-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the patient updates their details"
+          ],
+          "expected": [
+            "the patient's details are successfully updated in the system"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient creates an appointment to visit the doctor on a future date",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2023-12-31"
+          },
+          "steps": [
+            "the patient creates an appointment for 2023-12-31"
+          ],
+          "expected": [
+            "the appointment is created and can be viewed in the appointments tab"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient creates an appointment to visit the doctor on a future date",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2024-01-01"
+          },
+          "steps": [
+            "the patient creates an appointment for 2024-01-01"
+          ],
+          "expected": [
+            "the appointment is created and can be viewed in the appointments tab"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Patient creates an appointment to visit the doctor on a future date",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2023-11-01"
+          },
+          "steps": [
+            "the patient creates an appointment for 2023-11-01"
+          ],
+          "expected": [
+            "the appointment is created and can be viewed in the appointments tab"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Patient creates an appointment to visit the doctor on a future date",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2023-11-30"
+          },
+          "steps": [
+            "the patient creates an appointment for 2023-11-30"
+          ],
+          "expected": [
+            "the appointment is created and can be viewed in the appointments tab"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Patient creates an appointment to visit the doctor on a future date",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2023-02-28"
+          },
+          "steps": [
+            "the patient creates an appointment for 2023-02-28"
+          ],
+          "expected": [
+            "the appointment is created and can be viewed in the appointments tab"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Patient creates an appointment to visit the doctor on a future date",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "edge",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2024-02-29"
+          },
+          "steps": [
+            "the patient creates an appointment for 2024-02-29"
+          ],
+          "expected": [
+            "the appointment is created and can be viewed in the appointments tab"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Patient creates an appointment to visit the doctor on a future date",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2023-11-32"
+          },
+          "steps": [
+            "the patient creates an appointment for 2023-11-32"
+          ],
+          "expected": [
+            "the appointment is not created due to invalid date"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Patient creates an appointment to visit the doctor on a future date",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2023-04-31"
+          },
+          "steps": [
+            "the patient creates an appointment for 2023-04-31"
+          ],
+          "expected": [
+            "the appointment is not created due to invalid date"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Patient creates an appointment to visit the doctor on a future date",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2023-02-30"
+          },
+          "steps": [
+            "the patient creates an appointment for 2023-02-30"
+          ],
+          "expected": [
+            "the appointment is not created due to invalid date"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Appointment is created and can be viewed in appointments tab via Patient Appointment File",
+          "req_ids": [
+            "VIRTUA-5-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the patient creates an appointment for 2023-12-31"
+          ],
+          "expected": [
+            "the appointment is created and can be viewed in the appointments tab"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 0.6875,
+        "representation_score": 1.0,
+        "sfv_score": 0.8438,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #8 (TC-008): 'edge' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'edge' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'edge' is not one of ['positive', 'negative', 'boundary']",
+          "test case #11 (TC-011): 'edge' is not one of ['positive', 'negative', 'boundary']",
+          "test case #12 (TC-012): 'edge' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.84). Fix these problems and output the full corrected suite:\n- test case #8 (TC-008): 'edge' is not one of ['positive', 'negative', 'boundary']\n- test case #9 (TC-009): 'edge' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'edge' is not one of ['positive', 'negative', 'boundary']\n- test case #11 (TC-011): 'edge' is not one of ['positive', 'negative', 'boundary']\n- test case #12 (TC-012): 'edge' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "Feature: Admin and Patient Information Management\n\n  @VIRTUA-5-1\n  Scenario: Admin updates doctor's information\n    Given the admin is logged into the system\n    When the admin updates the doctor's information\n    Then the doctor's information is updated in the system\n\n  @VIRTUA-5-2\n  Scenario: Doctor's profile information is updated via admin\n    Given the admin is logged into the system\n    When the admin updates the doctor's profile information\n    Then the doctor's profile information is successfully updated\n\n  @VIRTUA-5-3\n  Scenario: Admin updates labs and chemists information\n    Given the admin is logged into the system\n    When the admin updates the labs and chemists information\n    Then the labs and chemists information is updated in the system\n\n  @VIRTUA-5-4\n  Scenario: Lab/Chemist information is successfully updated via admin\n    Given the admin is logged into the system\n    When the admin updates the lab/chemist information\n    Then the lab/chemist information is successfully updated\n\n  @VIRTUA-5-5\n  Scenario: Patient updates their personal details\n    Given the patient is logged into the system\n    When the patient updates their personal details\n    Then the patient's personal details are updated in the system\n\n  @VIRTUA-5-6\n  Scenario: Patient's details are successfully updated\n    Given the patient is logged into the system\n    When the patient updates their details\n    Then the patient's details are successfully updated\n\n  @VIRTUA-5-7\n  Scenario Outline: Patient creates an appointment to visit the doctor\n    Given the patient is logged into the system\n    When the patient creates an appointment for <appointment_date>\n    Then the appointment is created and can be viewed in the appointments tab\n\n    Examples:\n      | appointment_date | kind     |\n      | 2023-12-15       | positive |\n      | 2023-12-31       | boundary |\n      | 2023-11-30       | negative |\n\n  @VIRTUA-5-8\n  Scenario: Appointment is created and can be viewed in appointments tab via Patient Appointment File\n    Given the patient is logged into the system\n    When the patient creates an appointment for 2023-12-15\n    Then the appointment is created and can be viewed in the appointments tab via Patient Appointment File",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Admin updates doctor's information",
+          "req_ids": [
+            "VIRTUA-5-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the admin updates the doctor's information"
+          ],
+          "expected": [
+            "the doctor's information is updated in the system"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Doctor's profile information is updated via admin",
+          "req_ids": [
+            "VIRTUA-5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the admin updates the doctor's profile information"
+          ],
+          "expected": [
+            "the doctor's profile information is successfully updated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Admin updates labs and chemists information",
+          "req_ids": [
+            "VIRTUA-5-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the admin updates the labs and chemists information"
+          ],
+          "expected": [
+            "the labs and chemists information is updated in the system"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Lab/Chemist information is successfully updated via admin",
+          "req_ids": [
+            "VIRTUA-5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the admin updates the lab/chemist information"
+          ],
+          "expected": [
+            "the lab/chemist information is successfully updated"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Patient updates their personal details",
+          "req_ids": [
+            "VIRTUA-5-5"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the patient updates their personal details"
+          ],
+          "expected": [
+            "the patient's personal details are updated in the system"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient's details are successfully updated",
+          "req_ids": [
+            "VIRTUA-5-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the patient updates their details"
+          ],
+          "expected": [
+            "the patient's details are successfully updated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient creates an appointment to visit the doctor (positive)",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2023-12-15"
+          },
+          "steps": [
+            "the patient creates an appointment for 2023-12-15"
+          ],
+          "expected": [
+            "the appointment is created and can be viewed in the appointments tab"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient creates an appointment to visit the doctor (boundary)",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2023-12-31"
+          },
+          "steps": [
+            "the patient creates an appointment for 2023-12-31"
+          ],
+          "expected": [
+            "the appointment is created and can be viewed in the appointments tab"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Patient creates an appointment to visit the doctor (negative)",
+          "req_ids": [
+            "VIRTUA-5-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "appointment_date": "2023-11-30"
+          },
+          "steps": [
+            "the patient creates an appointment for 2023-11-30"
+          ],
+          "expected": [
+            "the appointment is created and can be viewed in the appointments tab"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Appointment is created and can be viewed in appointments tab via Patient Appointment File",
+          "req_ids": [
+            "VIRTUA-5-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the patient creates an appointment for 2023-12-15"
+          ],
+          "expected": [
+            "the appointment is created and can be viewed in the appointments tab via Patient Appointment File"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.1,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "2023-12-15",
+            "context": "appointment_date",
+            "grounded": false
+          },
+          {
+            "value": "2023-12-31",
+            "context": "appointment_date",
+            "grounded": false
+          },
+          {
+            "value": "2023-11-30",
+            "context": "appointment_date",
+            "grounded": false
+          },
+          {
+            "value": "positive",
+            "context": "kind",
+            "grounded": false
+          },
+          {
+            "value": "boundary",
+            "context": "kind",
+            "grounded": false
+          },
+          {
+            "value": "negative",
+            "context": "kind",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 6,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Negative appointment test expects success instead of failure",
+          "Oracle assertions are vague; specify concrete state changes",
+          "Boundary test uses arbitrary date; clarify boundary definition",
+          "No tests for error handling when updating non-existent entities",
+          "Tests do not verify specific fields updated"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.315,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.315; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.1, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- ungrounded value '2023-12-15' (appointment_date): remove or use the SRS value\n- ungrounded value '2023-12-31' (appointment_date): remove or use the SRS value\n- ungrounded value '2023-11-30' (appointment_date): remove or use the SRS value\n- ungrounded value 'positive' (kind): remove or use the SRS value\n- ungrounded value 'boundary' (kind): remove or use the SRS value\n- ungrounded value 'negative' (kind): remove or use the SRS value\n- Negative appointment test expects success instead of failure\n- Oracle assertions are vague; specify concrete state changes\n- Boundary test uses arbitrary date; clarify boundary definition\n- No tests for error handling when updating non-existent entities\n- Tests do not verify specific fields updated",
+      "artifact": "Feature: Admin and Patient Information Management\n\n  Scenario: Admin updates doctor's information\n    Given the admin is logged into the system\n    When the admin updates the doctor's information with name \"Dr. John Doe\" and specialty \"Cardiology\"\n    Then the doctor's information in the system should be updated to name \"Dr. John Doe\" and specialty \"Cardiology\"\n\n  Scenario: Admin updates lab/chemist information\n    Given the admin is logged into the system\n    When the admin updates the lab/chemist information with name \"LabTech Inc.\" and location \"City Hospital\"\n    Then the lab/chemist information in the system should be updated to name \"LabTech Inc.\" and location \"City Hospital\"\n\n  Scenario Outline: Patient updates personal details\n    Given the patient is logged into the system\n    When the patient updates their personal details with <name> and <email>\n    Then the patient's personal details in the system should be updated to name \"<name>\" and email \"<email>\"\n\n    Examples:\n      | name          | email                | kind     |\n      | John Doe      | john.doe@example.com | positive |\n      | Jane Smith    | jane.smith@example.com | positive |\n      | Invalid Name  | invalid-email        | negative |\n      |               | jane.smith@example.com | negative |\n\n  Scenario Outline: Patient creates an appointment\n    Given the patient is logged into the system\n    When the patient creates an appointment with doctor \"Dr. John Doe\" on <appointment_date>\n    Then the appointment should be created and listed in the appointments tab with doctor \"Dr. John Doe\" on <appointment_date>\n\n    Examples:\n      | appointment_date | kind     |\n      | as specified     | positive |\n      | as specified     | boundary |\n      | as specified     | negative |\n\n  Scenario: Admin attempts to update non-existent doctor's information\n    Given the admin is logged into the system\n    When the admin attempts to update the doctor's information with non-existent ID\n    Then the system should display an error message \"Doctor not found\"\n\n  Scenario: Admin attempts to update non-existent lab/chemist information\n    Given the admin is logged into the system\n    When the admin attempts to update the lab/chemist information with non-existent ID\n    Then the system should display an error message \"Lab/Chemist not found\"\n\n  Scenario: Patient attempts to update with invalid email\n    Given the patient is logged into the system\n    When the patient updates their personal details with name \"John Doe\" and email \"invalid-email\"\n    Then the system should display an error message \"Invalid email format\"\n\n  Scenario: Patient attempts to create an appointment on a past date\n    Given the patient is logged into the system\n    When the patient creates an appointment with doctor \"Dr. John Doe\" on \"2023-10-01\"\n    Then the system should display an error message \"Appointment date must be in the future\"",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Admin updates doctor's information",
+          "req_ids": [
+            "VIRTUA-5-1",
+            "VIRTUA-5-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "name": "Dr. John Doe",
+            "specialty": "Cardiology"
+          },
+          "steps": [
+            "the admin updates the doctor's information with name 'Dr. John Doe' and specialty 'Cardiology'"
+          ],
+          "expected": [
+            "the doctor's information in the system should be updated to name 'Dr. John Doe' and specialty 'Cardiology'"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Admin updates lab/chemist information",
+          "req_ids": [
+            "VIRTUA-5-3",
+            "VIRTUA-5-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {
+            "name": "LabTech Inc.",
+            "location": "City Hospital"
+          },
+          "steps": [
+            "the admin updates the lab/chemist information with name 'LabTech Inc.' and location 'City Hospital'"
+          ],
+          "expected": [
+            "the lab/chemist information in the system should be updated to name 'LabTech Inc.' and location 'City Hospital'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Patient updates personal details",
+          "req_ids": [
+            "VIRTUA-5-5",
+            "VIRTUA-5-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "name": "John Doe",
+            "email": "john.doe@example.com"
+          },
+          "steps": [
+            "the patient updates their personal details with name 'John Doe' and email 'john.doe@example.com'"
+          ],
+          "expected": [
+            "the patient's personal details in the system should be updated to name 'John Doe' and email 'john.doe@example.com'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Patient updates personal details",
+          "req_ids": [
+            "VIRTUA-5-5",
+            "VIRTUA-5-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "name": "Jane Smith",
+            "email": "jane.smith@example.com"
+          },
+          "steps": [
+            "the patient updates their personal details with name 'Jane Smith' and email 'jane.smith@example.com'"
+          ],
+          "expected": [
+            "the patient's personal details in the system should be updated to name 'Jane Smith' and email 'jane.smith@example.com'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Patient updates personal details with invalid email",
+          "req_ids": [
+            "VIRTUA-5-5",
+            "VIRTUA-5-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "name": "Invalid Name",
+            "email": "invalid-email"
+          },
+          "steps": [
+            "the patient updates their personal details with name 'Invalid Name' and email 'invalid-email'"
+          ],
+          "expected": [
+            "the system should display an error message 'Invalid email format'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient updates personal details with empty name",
+          "req_ids": [
+            "VIRTUA-5-5",
+            "VIRTUA-5-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "name": "",
+            "email": "jane.smith@example.com"
+          },
+          "steps": [
+            "the patient updates their personal details with name '' and email 'jane.smith@example.com'"
+          ],
+          "expected": [
+            "the system should display an error message 'Invalid email format'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient creates an appointment",
+          "req_ids": [
+            "VIRTUA-5-7",
+            "VIRTUA-5-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "doctor": "Dr. John Doe",
+            "appointment_date": "as specified"
+          },
+          "steps": [
+            "the patient creates an appointment with doctor 'Dr. John Doe' on 'as specified'"
+          ],
+          "expected": [
+            "the appointment should be created and listed in the appointments tab with doctor 'Dr. John Doe' on 'as specified'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient creates an appointment on boundary date",
+          "req_ids": [
+            "VIRTUA-5-7",
+            "VIRTUA-5-8"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "doctor": "Dr. John Doe",
+            "appointment_date": "as specified"
+          },
+          "steps": [
+            "the patient creates an appointment with doctor 'Dr. John Doe' on 'as specified'"
+          ],
+          "expected": [
+            "the appointment should be created and listed in the appointments tab with doctor 'Dr. John Doe' on 'as specified'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Patient creates an appointment on past date",
+          "req_ids": [
+            "VIRTUA-5-7",
+            "VIRTUA-5-8"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the patient is logged into the system"
+          ],
+          "inputs": {
+            "doctor": "Dr. John Doe",
+            "appointment_date": "2023-10-01"
+          },
+          "steps": [
+            "the patient creates an appointment with doctor 'Dr. John Doe' on '2023-10-01'"
+          ],
+          "expected": [
+            "the system should display an error message 'Appointment date must be in the future'"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Admin attempts to update non-existent doctor's information",
+          "req_ids": [
+            "VIRTUA-5-1",
+            "VIRTUA-5-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the admin attempts to update the doctor's information with non-existent ID"
+          ],
+          "expected": [
+            "the system should display an error message 'Doctor not found'"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Admin attempts to update non-existent lab/chemist information",
+          "req_ids": [
+            "VIRTUA-5-3",
+            "VIRTUA-5-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "the admin is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "the admin attempts to update the lab/chemist information with non-existent ID"
+          ],
+          "expected": [
+            "the system should display an error message 'Lab/Chemist not found'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.75,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "Dr. John Doe",
+            "context": "doctor name",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "specialty",
+            "grounded": false
+          },
+          {
+            "value": "LabTech Inc.",
+            "context": "lab name",
+            "grounded": false
+          },
+          {
+            "value": "City Hospital",
+            "context": "location",
+            "grounded": false
+          },
+          {
+            "value": "John Doe",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "john.doe@example.com",
+            "context": "patient email",
+            "grounded": false
+          },
+          {
+            "value": "Jane Smith",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "jane.smith@example.com",
+            "context": "patient email",
+            "grounded": false
+          },
+          {
+            "value": "Invalid Name",
+            "context": "patient name",
+            "grounded": false
+          },
+          {
+            "value": "invalid-email",
+            "context": "patient email",
+            "grounded": false
+          },
+          {
+            "value": "Doctor not found",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Lab/Chemist not found",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Invalid email format",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Appointment date must be in the future",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "as specified",
+            "context": "appointment date placeholder",
+            "grounded": false
+          },
+          {
+            "value": "2023-10-01",
+            "context": "appointment date",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 16,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Replace placeholder values with concrete test data grounded in the SRS",
+          "Add explicit boundary values for appointment dates (e.g., today, tomorrow)",
+          "Ensure error messages match system specifications",
+          "Use unique identifiers for doctors/labs instead of names",
+          "Include tests for successful update of patient details with valid email format"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.6125,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

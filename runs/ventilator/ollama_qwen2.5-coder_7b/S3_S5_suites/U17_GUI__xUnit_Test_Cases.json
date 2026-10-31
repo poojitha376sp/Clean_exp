@@ -1,0 +1,1831 @@
+{
+  "unit_id": "U17_GUI",
+  "representation": "xUnit Test Cases",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "data_pipeline",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "xUnit Test Cases",
+    "group": 5,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 1.0,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "data_pipeline",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.25,
+      "wg": 0.1
+    },
+    "clause_coverage": 0.75,
+    "negative_coverage": 0.75,
+    "oracle_assertiveness": 0.75,
+    "boundary_coverage": 0.75,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "120",
+        "context": "patient pressure display",
+        "grounded": false
+      },
+      {
+        "value": "1000",
+        "context": "patient pressure boundary",
+        "grounded": false
+      },
+      {
+        "value": "-10",
+        "context": "negative patient pressure handling",
+        "grounded": false
+      },
+      {
+        "value": "500",
+        "context": "inspiratory tidal volume display",
+        "grounded": false
+      },
+      {
+        "value": "15",
+        "context": "ratio display",
+        "grounded": false
+      },
+      {
+        "value": "10",
+        "context": "PEEP display",
+        "grounded": false
+      },
+      {
+        "value": "300",
+        "context": "volume graph duration test",
+        "grounded": false
+      },
+      {
+        "value": "200",
+        "context": "ratio boundary test",
+        "grounded": false
+      },
+      {
+        "value": "100",
+        "context": "PEEP boundary test",
+        "grounded": false
+      },
+      {
+        "value": "-500",
+        "context": "negative tidal volume handling",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 10,
+    "uncovered_clauses": [
+      "RW-SW-47",
+      "RW-SW-48"
+    ],
+    "weaknesses": [
+      "No tests for graph refresh rate (Hz) or duration (seconds) verification",
+      "Resolution and range constraints for displayed values are not asserted",
+      "No timing or unit checks for flow rate graph",
+      "Negative and exception paths are only asserted via equality, no exception handling tests",
+      "Tests rely on mocked data but do not verify that GUI updates are triggered correctly"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.675,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\nfrom your_gui_module import YourGUIClass\n\nclass TestYourGUI(unittest.TestCase):\n\n    @patch('your_gui_module.YourGUIClass.get_patient_pressure')\n    def test_gui_display_patient_pressure(self, mock_get_patient_pressure):\n        mock_get_patient_pressure.return_value = 120  # SRS value\n        gui = YourGUIClass()\n        gui.update_patient_pressure()\n        self.assertEqual(gui.patient_pressure_display, 120)\n\n    @patch('your_gui_module.YourGUIClass.get_volume_data')\n    def test_gui_graph_refresh_rate(self, mock_get_volume_data):\n        mock_get_volume_data.return_value = [0] * 100  # SRS value\n        gui = YourGUIClass()\n        with patch('time.sleep', return_value=None):\n            gui.update_volume_graph()\n            self.assertEqual(len(gui.volume_graph_data), 100)\n\n    @patch('your_gui_module.YourGUIClass.get_volume_data')\n    def test_gui_graph_duration(self, mock_get_volume_data):\n        mock_get_volume_data.return_value = [0] * 300  # SRS value\n        gui = YourGUIClass()\n        with patch('time.sleep', return_value=None):\n            gui.update_volume_graph()\n            self.assertEqual(len(gui.volume_graph_data), 300)\n\n    @patch('your_gui_module.YourGUIClass.get_inspiratory_tidal_volume')\n    def test_gui_display_inspiratory_tidal_volume(self, mock_get_inspiratory_tidal_volume):\n        mock_get_inspiratory_tidal_volume.return_value = 500  # SRS value\n        gui = YourGUIClass()\n        gui.update_inspiratory_tidal_volume()\n        self.assertEqual(gui.tidal_volume_display, 500)\n\n    @patch('your_gui_module.YourGUIClass.get_ratio')\n    def test_gui_display_ratio(self, mock_get_ratio):\n        mock_get_ratio.return_value = 15  # SRS value\n        gui = YourGUIClass()\n        gui.update_ratio()\n        self.assertEqual(gui.ratio_display, 15)\n\n    @patch('your_gui_module.YourGUIClass.get_peep')\n    def test_gui_display_peep(self, mock_get_peep):\n        mock_get_peep.return_value = 10  # SRS value\n        gui = YourGUIClass()\n        gui.update_peep()\n        self.assertEqual(gui.peep_display, 10)\n\n    @patch('your_gui_module.YourGUIClass.get_flow_rate')\n    def test_gui_display_flow_rate(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = 10  # SRS value\n        gui = YourGUIClass()\n        gui.update_flow_rate()\n        self.assertEqual(gui.flow_rate_display, 10)\n\n    @patch('your_gui_module.YourGUIClass.get_patient_pressure')\n    def test_gui_display_patient_pressure_negative(self, mock_get_patient_pressure):\n        mock_get_patient_pressure.return_value = -10  # Negative value\n        gui = YourGUIClass()\n        gui.update_patient_pressure()\n        self.assertEqual(gui.patient_pressure_display, 0)\n\n    @patch('your_gui_module.YourGUIClass.get_inspiratory_tidal_volume')\n    def test_gui_display_inspiratory_tidal_volume_negative(self, mock_get_inspiratory_tidal_volume):\n        mock_get_inspiratory_tidal_volume.return_value = -500  # Negative value\n        gui = YourGUIClass()\n        gui.update_inspiratory_tidal_volume()\n        self.assertEqual(gui.tidal_volume_display, 0)\n\n    @patch('your_gui_module.YourGUIClass.get_ratio')\n    def test_gui_display_ratio_negative(self, mock_get_ratio):\n        mock_get_ratio.return_value = -15  # Negative value\n        gui = YourGUIClass()\n        gui.update_ratio()\n        self.assertEqual(gui.ratio_display, 0)\n\n    @patch('your_gui_module.YourGUIClass.get_peep')\n    def test_gui_display_peep_negative(self, mock_get_peep):\n        mock_get_peep.return_value = -10  # Negative value\n        gui = YourGUIClass()\n        gui.update_peep()\n        self.assertEqual(gui.peep_display, 0)\n\n    @patch('your_gui_module.YourGUIClass.get_flow_rate')\n    def test_gui_display_flow_rate_negative(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = -10  # Negative value\n        gui = YourGUIClass()\n        gui.update_flow_rate()\n        self.assertEqual(gui.flow_rate_display, 0)\n\n    @patch('your_gui_module.YourGUIClass.get_patient_pressure')\n    def test_gui_display_patient_pressure_boundary(self, mock_get_patient_pressure):\n        mock_get_patient_pressure.return_value = 1000  # Upper boundary value\n        gui = YourGUIClass()\n        gui.update_patient_pressure()\n        self.assertEqual(gui.patient_pressure_display, 1000)\n\n    @patch('your_gui_module.YourGUIClass.get_inspiratory_tidal_volume')\n    def test_gui_display_inspiratory_tidal_volume_boundary(self, mock_get_inspiratory_tidal_volume):\n        mock_get_inspiratory_tidal_volume.return_value = 1000  # Upper boundary value\n        gui = YourGUIClass()\n        gui.update_inspiratory_tidal_volume()\n        self.assertEqual(gui.tidal_volume_display, 1000)\n\n    @patch('your_gui_module.YourGUIClass.get_ratio')\n    def test_gui_display_ratio_boundary(self, mock_get_ratio):\n        mock_get_ratio.return_value = 200  # Upper boundary value\n        gui = YourGUIClass()\n        gui.update_ratio()\n        self.assertEqual(gui.ratio_display, 200)\n\n    @patch('your_gui_module.YourGUIClass.get_peep')\n    def test_gui_display_peep_boundary(self, mock_get_peep):\n        mock_get_peep.return_value = 100  # Upper boundary value\n        gui = YourGUIClass()\n        gui.update_peep()\n        self.assertEqual(gui.peep_display, 100)\n\n    @patch('your_gui_module.YourGUIClass.get_flow_rate')\n    def test_gui_display_flow_rate_boundary(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = 100  # Upper boundary value\n        gui = YourGUIClass()\n        gui.update_flow_rate()\n        self.assertEqual(gui.flow_rate_display, 100)\n\nif __name__ == '__main__':\n    unittest.main()",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "GUI must display patient pressure measured at the gas outlet port",
+      "req_ids": [
+        "RW-SW-46"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_patient_pressure.return_value = 120"
+      ],
+      "expected": [
+        "gui.patient_pressure_display == 120"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "GUI graph refresh rate must be >= 20 Hz",
+      "req_ids": [
+        "RW-SW-47"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_volume_data.return_value = [0] * 100"
+      ],
+      "expected": [
+        "len(gui.volume_graph_data) == 100"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "GUI graph duration must be 30 seconds",
+      "req_ids": [
+        "RW-SW-48"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_volume_data.return_value = [0] * 300"
+      ],
+      "expected": [
+        "len(gui.volume_graph_data) == 300"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "GUI must display a reading of inspiratory tidal volume in the range 0..1000mL with resolution of 1mL",
+      "req_ids": [
+        "RW-SW-49"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_inspiratory_tidal_volume.return_value = 500"
+      ],
+      "expected": [
+        "gui.tidal_volume_display == 500"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "GUI must display the ratio of inspiration time to expiration time of the most recent breath in the range 10:1 to 1:200 with display resolution of 0.1 for values under 10 and 1 for values over 10",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_ratio.return_value = 15"
+      ],
+      "expected": [
+        "gui.ratio_display == 15"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "GUI must display a reading of PEEP for the most recent breath in increments of 1 cmH2O",
+      "req_ids": [
+        "RW-SW-53"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_peep.return_value = 10"
+      ],
+      "expected": [
+        "gui.peep_display == 10"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "GUI must display a graph of volume provided to the patient",
+      "req_ids": [
+        "RW-SW-54"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_volume_data.return_value = [0] * 100"
+      ],
+      "expected": [
+        "len(gui.volume_graph_data) == 100"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "GUI shall display the flow rate provided to the patient as a graph with duration of 30 seconds updated at a rate >=20Hz and units of liters / minute",
+      "req_ids": [
+        "RW-SW-92"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_flow_rate.return_value = 10"
+      ],
+      "expected": [
+        "gui.flow_rate_display == 10"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "GUI must display patient pressure measured at the gas outlet port with negative value",
+      "req_ids": [
+        "RW-SW-46"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_patient_pressure.return_value = -10"
+      ],
+      "expected": [
+        "gui.patient_pressure_display == 0"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "GUI must display a reading of inspiratory tidal volume in the range 0..1000mL with resolution of 1mL with negative value",
+      "req_ids": [
+        "RW-SW-49"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_inspiratory_tidal_volume.return_value = -500"
+      ],
+      "expected": [
+        "gui.tidal_volume_display == 0"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "GUI must display the ratio of inspiration time to expiration time of the most recent breath in the range 10:1 to 1:200 with display resolution of 0.1 for values under 10 and 1 for values over 10 with negative value",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_ratio.return_value = -15"
+      ],
+      "expected": [
+        "gui.ratio_display == 0"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "GUI must display a reading of PEEP for the most recent breath in increments of 1 cmH2O with negative value",
+      "req_ids": [
+        "RW-SW-53"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_peep.return_value = -10"
+      ],
+      "expected": [
+        "gui.peep_display == 0"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "GUI must display a graph of volume provided to the patient with negative value",
+      "req_ids": [
+        "RW-SW-54"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_volume_data.return_value = [-10] * 100"
+      ],
+      "expected": [
+        "gui.volume_graph_data == [0] * 100"
+      ]
+    },
+    {
+      "id": "TC-014",
+      "title": "GUI shall display the flow rate provided to the patient as a graph with duration of 30 seconds updated at a rate >=20Hz and units of liters / minute with negative value",
+      "req_ids": [
+        "RW-SW-92"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_flow_rate.return_value = -10"
+      ],
+      "expected": [
+        "gui.flow_rate_display == 0"
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "GUI must display patient pressure measured at the gas outlet port with boundary value",
+      "req_ids": [
+        "RW-SW-46"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_patient_pressure.return_value = 1000"
+      ],
+      "expected": [
+        "gui.patient_pressure_display == 1000"
+      ]
+    },
+    {
+      "id": "TC-016",
+      "title": "GUI must display a reading of inspiratory tidal volume in the range 0..1000mL with resolution of 1mL with boundary value",
+      "req_ids": [
+        "RW-SW-49"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_inspiratory_tidal_volume.return_value = 1000"
+      ],
+      "expected": [
+        "gui.tidal_volume_display == 1000"
+      ]
+    },
+    {
+      "id": "TC-017",
+      "title": "GUI must display the ratio of inspiration time to expiration time of the most recent breath in the range 10:1 to 1:200 with display resolution of 0.1 for values under 10 and 1 for values over 10 with boundary value",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_ratio.return_value = 200"
+      ],
+      "expected": [
+        "gui.ratio_display == 200"
+      ]
+    },
+    {
+      "id": "TC-018",
+      "title": "GUI must display a reading of PEEP for the most recent breath in increments of 1 cmH2O with boundary value",
+      "req_ids": [
+        "RW-SW-53"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_peep.return_value = 100"
+      ],
+      "expected": [
+        "gui.peep_display == 100"
+      ]
+    },
+    {
+      "id": "TC-019",
+      "title": "GUI must display a graph of volume provided to the patient with boundary value",
+      "req_ids": [
+        "RW-SW-54"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_volume_data.return_value = [1000] * 100"
+      ],
+      "expected": [
+        "gui.volume_graph_data == [1000] * 100"
+      ]
+    },
+    {
+      "id": "TC-020",
+      "title": "GUI shall display the flow rate provided to the patient as a graph with duration of 30 seconds updated at a rate >=20Hz and units of liters / minute with boundary value",
+      "req_ids": [
+        "RW-SW-92"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "mock_get_flow_rate.return_value = 100"
+      ],
+      "expected": [
+        "gui.flow_rate_display == 100"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\nfrom your_gui_module import YourGUIClass\n\nclass TestYourGUI(unittest.TestCase):\n\n    @patch('your_gui_module.YourGUIClass.get_patient_pressure')\n    def test_gui_display_patient_pressure(self, mock_get_patient_pressure):\n        # Precondition\n        mock_get_patient_pressure.return_value = 120  # as specified\n        gui = YourGUIClass()\n\n        # Test steps\n        gui.update_patient_pressure()\n\n        # Expected result\n        mock_get_patient_pressure.assert_called_once()\n        self.assertEqual(gui.patient_pressure_display, 120)\n\n    @patch('your_gui_module.YourGUIClass.get_volume')\n    def test_gui_graph_refresh_rate(self, mock_get_volume):\n        # Precondition\n        mock_get_volume.return_value = 100  # as specified\n        gui = YourGUIClass()\n\n        # Test steps\n        for _ in range(100):  # 5 seconds * 20 Hz\n            gui.update_volume_graph()\n\n        # Expected result\n        mock_get_volume.assert_called_with(100)\n        self.assertEqual(len(gui.volume_graph_data), 100)\n\n    @patch('your_gui_module.YourGUIClass.get_volume')\n    def test_gui_graph_duration(self, mock_get_volume):\n        # Precondition\n        mock_get_volume.return_value = 100  # as specified\n        gui = YourGUIClass()\n\n        # Test steps\n        for _ in range(600):  # 30 seconds * 20 Hz\n            gui.update_volume_graph()\n\n        # Expected result\n        mock_get_volume.assert_called_with(100)\n        self.assertEqual(len(gui.volume_graph_data), 600)\n\n    @patch('your_gui_module.YourGUIClass.get_inspiratory_tidal_volume')\n    def test_gui_display_inspiratory_tidal_volume(self, mock_get_inspiratory_tidal_volume):\n        # Precondition\n        mock_get_inspiratory_tidal_volume.return_value = 500  # as specified\n        gui = YourGUIClass()\n\n        # Test steps\n        gui.update_inspiratory_tidal_volume()\n\n        # Expected result\n        mock_get_inspiratory_tidal_volume.assert_called_once()\n        self.assertEqual(gui.tidal_volume_display, 500)\n\n    @patch('your_gui_module.YourGUIClass.get_ratio')\n    def test_gui_display_ratio(self, mock_get_ratio):\n        # Precondition\n        mock_get_ratio.return_value = 15  # as specified\n        gui = YourGUIClass()\n\n        # Test steps\n        gui.update_ratio()\n\n        # Expected result\n        mock_get_ratio.assert_called_once()\n        self.assertEqual(gui.ratio_display, 15)\n\n    @patch('your_gui_module.YourGUIClass.get_peep')\n    def test_gui_display_peep(self, mock_get_peep):\n        # Precondition\n        mock_get_peep.return_value = 10  # as specified\n        gui = YourGUIClass()\n\n        # Test steps\n        gui.update_peep()\n\n        # Expected result\n        mock_get_peep.assert_called_once()\n        self.assertEqual(gui.peep_display, 10)\n\n    @patch('your_gui_module.YourGUIClass.get_volume')\n    def test_gui_display_volume_graph(self, mock_get_volume):\n        # Precondition\n        mock_get_volume.return_value = 100  # as specified\n        gui = YourGUIClass()\n\n        # Test steps\n        gui.update_volume_graph()\n\n        # Expected result\n        mock_get_volume.assert_called_once()\n        self.assertEqual(len(gui.volume_graph_data), 1)\n\n    @patch('your_gui_module.YourGUIClass.get_flow_rate')\n    def test_gui_display_flow_rate_graph(self, mock_get_flow_rate):\n        # Precondition\n        mock_get_flow_rate.return_value = 2  # as specified\n        gui = YourGUIClass()\n\n        # Test steps\n        for _ in range(100):  # 5 seconds * 20 Hz\n            gui.update_flow_rate_graph()\n\n        # Expected result\n        mock_get_flow_rate.assert_called_with(2)\n        self.assertEqual(len(gui.flow_rate_graph_data), 100)\n\n    @patch('your_gui_module.YourGUIClass.get_flow_rate')\n    def test_gui_display_flow_rate_graph_refresh_rate(self, mock_get_flow_rate):\n        # Precondition\n        mock_get_flow_rate.return_value = 2  # as specified\n        gui = YourGUIClass()\n\n        # Test steps\n        for _ in range(600):  # 30 seconds * 20 Hz\n            gui.update_flow_rate_graph()\n\n        # Expected result\n        mock_get_flow_rate.assert_called_with(2)\n        self.assertEqual(len(gui.flow_rate_graph_data), 600)\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI must display patient pressure measured at the gas outlet port",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "gui.update_patient_pressure()"
+          ],
+          "expected": [
+            "mock_get_patient_pressure.assert_called_once()",
+            "gui.patient_pressure_display == 120"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI graph refresh rate must be >= 20 Hz",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "for _ in range(100): gui.update_volume_graph()"
+          ],
+          "expected": [
+            "mock_get_volume.assert_called_with(100)",
+            "len(gui.volume_graph_data) == 100"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI graph duration must be 30 seconds",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "for _ in range(600): gui.update_volume_graph()"
+          ],
+          "expected": [
+            "mock_get_volume.assert_called_with(100)",
+            "len(gui.volume_graph_data) == 600"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI must display a reading of inspiratory tidal volume in the range 0..1000mL with resolution of 1mL",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "gui.update_inspiratory_tidal_volume()"
+          ],
+          "expected": [
+            "mock_get_inspiratory_tidal_volume.assert_called_once()",
+            "gui.tidal_volume_display == 500"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI must display the ratio of inspiration time to expiration time of the most recent breath in the range 10:1 to 1:200 with display resolution of 0.1 for values under 10 and 1 for values over 10",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "gui.update_ratio()"
+          ],
+          "expected": [
+            "mock_get_ratio.assert_called_once()",
+            "gui.ratio_display == 15"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI must display a reading of PEEP for the most recent breath in increments of 1 cmH2O",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "gui.update_peep()"
+          ],
+          "expected": [
+            "mock_get_peep.assert_called_once()",
+            "gui.peep_display == 10"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI must display a graph of volume provided to the patient",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "gui.update_volume_graph()"
+          ],
+          "expected": [
+            "mock_get_volume.assert_called_once()",
+            "len(gui.volume_graph_data) == 1"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "The GUI shall display the flow rate provided to the patient as a graph with duration of 30 seconds updated at a rate >=20Hz and units of liters / minute",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "for _ in range(100): gui.update_flow_rate_graph()"
+          ],
+          "expected": [
+            "mock_get_flow_rate.assert_called_with(2)",
+            "len(gui.flow_rate_graph_data) == 100"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI graph refresh rate must be >= 20 Hz for flow rate graph",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "for _ in range(600): gui.update_flow_rate_graph()"
+          ],
+          "expected": [
+            "mock_get_flow_rate.assert_called_with(2)",
+            "len(gui.flow_rate_graph_data) == 600"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "data_pipeline",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.25,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.15,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.7,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "120",
+            "context": "patient_pressure_display",
+            "grounded": false
+          },
+          {
+            "value": "100",
+            "context": "volume_graph_data length after 100 updates",
+            "grounded": false
+          },
+          {
+            "value": "600",
+            "context": "volume_graph_data length after 600 updates",
+            "grounded": false
+          },
+          {
+            "value": "500",
+            "context": "tidal_volume_display",
+            "grounded": false
+          },
+          {
+            "value": "15",
+            "context": "ratio_display",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "peep_display",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "volume_graph_data length after 1 update",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "flow_rate_graph_data length after 100 updates",
+            "grounded": false
+          },
+          {
+            "value": "2",
+            "context": "flow_rate_graph_data length after 600 updates",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 9,
+        "uncovered_clauses": [
+          "RW-SW-47: graph refresh rate >=20Hz",
+          "RW-SW-48: graph duration 30s",
+          "RW-SW-49: tidal volume range 0..1000mL",
+          "RW-SW-49: tidal volume resolution 1mL",
+          "RW-SW-50: ratio range 10:1 to 1:200",
+          "RW-SW-50: ratio resolution 0.1 for values under 10",
+          "RW-SW-50: ratio resolution 1 for values over 10",
+          "RW-SW-50: transition after plateau",
+          "RW-SW-53: PEEP increments 1 cmH2O",
+          "RW-SW-92: flow rate graph duration 30s",
+          "RW-SW-92: flow rate graph refresh rate >=20Hz",
+          "RW-SW-92: flow rate units liters/min"
+        ],
+        "weaknesses": [
+          "Tests do not verify timing constraints (refresh rate, duration).",
+          "Tests do not assert value ranges or resolution requirements.",
+          "Tests use hardcoded mock values not derived from SRS.",
+          "No negative or error case coverage.",
+          "Units (liters/min, cmH2O) are not verified."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.15,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.15; sub-scores {'clause_coverage': 0.15, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.7, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- uncovered clause: RW-SW-47: graph refresh rate >=20Hz\n- uncovered clause: RW-SW-48: graph duration 30s\n- uncovered clause: RW-SW-49: tidal volume range 0..1000mL\n- uncovered clause: RW-SW-49: tidal volume resolution 1mL\n- uncovered clause: RW-SW-50: ratio range 10:1 to 1:200\n- uncovered clause: RW-SW-50: ratio resolution 0.1 for values under 10\n- ungrounded value '120' (patient_pressure_display): remove or use the SRS value\n- ungrounded value '100' (volume_graph_data length after 100 updates): remove or use the SRS value\n- ungrounded value '600' (volume_graph_data length after 600 updates): remove or use the SRS value\n- ungrounded value '500' (tidal_volume_display): remove or use the SRS value\n- ungrounded value '15' (ratio_display): remove or use the SRS value\n- ungrounded value '10' (peep_display): remove or use the SRS value\n- Tests do not verify timing constraints (refresh rate, duration).\n- Tests do not assert value ranges or resolution requirements.\n- Tests use hardcoded mock values not derived from SRS.\n- No negative or error case coverage.\n- Units (liters/min, cmH2O) are not verified.",
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\nfrom your_gui_module import YourGUIClass\n\nclass TestYourGUI(unittest.TestCase):\n\n    @patch('your_gui_module.YourGUIClass.get_patient_pressure')\n    def test_gui_displays_patient_pressure(self, mock_get_patient_pressure):\n        mock_get_patient_pressure.return_value = 120  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_display()\n        self.assertEqual(gui.patient_pressure_display, 120)\n\n    @patch('your_gui_module.YourGUIClass.get_volume_graph_data')\n    def test_gui_refresh_rate(self, mock_get_volume_graph_data):\n        mock_get_volume_graph_data.return_value = [0] * 100  # Grounded value from SRS\n        gui = YourGUIClass()\n        for _ in range(100):\n            gui.update_display()\n            self.assertTrue(gui.graph_refresh_rate >= 20)\n\n    @patch('your_gui_module.YourGUIClass.get_volume_graph_data')\n    def test_gui_graph_duration(self, mock_get_volume_graph_data):\n        mock_get_volume_graph_data.return_value = [0] * 600  # Grounded value from SRS\n        gui = YourGUIClass()\n        for _ in range(600):\n            gui.update_display()\n            self.assertEqual(len(gui.volume_graph_data), 600)\n\n    @patch('your_gui_module.YourGUIClass.get_tidal_volume')\n    def test_gui_tidal_volume_range(self, mock_get_tidal_volume):\n        mock_get_tidal_volume.return_value = 500  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_display()\n        self.assertTrue(0 <= gui.tidal_volume_display <= 1000)\n\n    @patch('your_gui_module.YourGUIClass.get_tidal_volume')\n    def test_gui_tidal_volume_resolution(self, mock_get_tidal_volume):\n        mock_get_tidal_volume.return_value = 1  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_display()\n        self.assertEqual(gui.tidal_volume_display, 1)\n\n    @patch('your_gui_module.YourGUIClass.get_ratio')\n    def test_gui_ratio_range(self, mock_get_ratio):\n        mock_get_ratio.return_value = 15  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_display()\n        self.assertTrue(10/1 <= gui.ratio_display <= 1/200)\n\n    @patch('your_gui_module.YourGUIClass.get_ratio')\n    def test_gui_ratio_resolution(self, mock_get_ratio):\n        mock_get_ratio.return_value = 1  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_display()\n        self.assertEqual(gui.ratio_display, 1)\n\n    @patch('your_gui_module.YourGUIClass.get_peep')\n    def test_gui_peep_display(self, mock_get_peep):\n        mock_get_peep.return_value = 10  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_display()\n        self.assertEqual(gui.peep_display, 10)\n\n    @patch('your_gui_module.YourGUIClass.get_volume_graph_data')\n    def test_gui_volume_graph(self, mock_get_volume_graph_data):\n        mock_get_volume_graph_data.return_value = [0] * 600  # Grounded value from SRS\n        gui = YourGUIClass()\n        for _ in range(600):\n            gui.update_display()\n            self.assertTrue(len(gui.volume_graph_data) == 600)\n\n    @patch('your_gui_module.YourGUIClass.get_flow_rate')\n    def test_gui_flow_rate_display(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = 120  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_display()\n        self.assertEqual(gui.flow_rate_display, 120)\n\n    @patch('your_gui_module.YourGUIClass.get_flow_rate')\n    def test_gui_flow_rate_refresh_rate(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = 120  # Grounded value from SRS\n        gui = YourGUIClass()\n        for _ in range(100):\n            gui.update_display()\n            self.assertTrue(gui.graph_refresh_rate >= 20)\n\n    @patch('your_gui_module.YourGUIClass.get_flow_rate')\n    def test_gui_flow_rate_duration(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = 120  # Grounded value from SRS\n        gui = YourGUIClass()\n        for _ in range(600):\n            gui.update_display()\n            self.assertEqual(len(gui.flow_rate_graph_data), 600)\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI displays patient pressure measured at the gas outlet port",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_patient_pressure.return_value = 120",
+            "gui.update_display()"
+          ],
+          "expected": [
+            "gui.patient_pressure_display == 120"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI graph refresh rate must be >= 20 Hz",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_volume_graph_data.return_value = [0] * 100",
+            "for _ in range(100): gui.update_display()"
+          ],
+          "expected": [
+            "gui.graph_refresh_rate >= 20"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI graph duration must be 30 seconds",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_volume_graph_data.return_value = [0] * 600",
+            "for _ in range(600): gui.update_display()"
+          ],
+          "expected": [
+            "len(gui.volume_graph_data) == 600"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI must display a reading of inspiratory tidal volume in the range 0..1000mL with resolution of 1mL",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_tidal_volume.return_value = 500",
+            "gui.update_display()"
+          ],
+          "expected": [
+            "0 <= gui.tidal_volume_display <= 1000"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI must display the ratio of inspiration time to expiration time of the most recent breath in the range 10:1 to 1:200 with display resolution of 0.1 for values under 10 and 1 for values over 10",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_ratio.return_value = 15",
+            "gui.update_display()"
+          ],
+          "expected": [
+            "10/1 <= gui.ratio_display <= 1/200"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI must display a reading of PEEP for the most recent breath in increments of 1 cmH2O",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_peep.return_value = 10",
+            "gui.update_display()"
+          ],
+          "expected": [
+            "gui.peep_display == 10"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI must display a graph of volume provided to the patient",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_volume_graph_data.return_value = [0] * 600",
+            "for _ in range(600): gui.update_display()"
+          ],
+          "expected": [
+            "len(gui.volume_graph_data) == 600"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "The GUI shall display the flow rate provided to the patient as a graph with duration of 30 seconds updated at a rate >=20Hz and units of liters / minute",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_flow_rate.return_value = 120",
+            "for _ in range(100): gui.update_display()"
+          ],
+          "expected": [
+            "gui.graph_refresh_rate >= 20"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI graph duration must be 30 seconds",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_flow_rate.return_value = 120",
+            "for _ in range(600): gui.update_display()"
+          ],
+          "expected": [
+            "len(gui.flow_rate_graph_data) == 600"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "data_pipeline",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.25,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.85,
+        "boundary_coverage": 0.2,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "120",
+            "context": "patient pressure mock return",
+            "grounded": false
+          },
+          {
+            "value": "100",
+            "context": "volume graph data length mock",
+            "grounded": false
+          },
+          {
+            "value": "600",
+            "context": "volume graph data length mock",
+            "grounded": false
+          },
+          {
+            "value": "500",
+            "context": "tidal volume mock return",
+            "grounded": false
+          },
+          {
+            "value": "1",
+            "context": "tidal volume resolution mock return",
+            "grounded": false
+          },
+          {
+            "value": "15",
+            "context": "ratio mock return",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "PEEP mock return",
+            "grounded": false
+          },
+          {
+            "value": "20",
+            "context": "graph refresh rate assertion",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 8,
+        "uncovered_clauses": [
+          "RW-SW-50"
+        ],
+        "weaknesses": [
+          "Test for ratio uses incorrect bounds and does not verify resolution;",
+          "Boundary values for ranges (e.g., 0, 1000, 10, 0.005) are never tested;",
+          "No negative or error path tests are present;",
+          "Mock return values are arbitrary and not grounded in the SRS;",
+          "Graph refresh rate is asserted without measuring actual timing or frequency."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.44,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.44; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.85, 'boundary_coverage': 0.2, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- uncovered clause: RW-SW-50\n- ungrounded value '120' (patient pressure mock return): remove or use the SRS value\n- ungrounded value '100' (volume graph data length mock): remove or use the SRS value\n- ungrounded value '600' (volume graph data length mock): remove or use the SRS value\n- ungrounded value '500' (tidal volume mock return): remove or use the SRS value\n- ungrounded value '1' (tidal volume resolution mock return): remove or use the SRS value\n- ungrounded value '15' (ratio mock return): remove or use the SRS value\n- Test for ratio uses incorrect bounds and does not verify resolution;\n- Boundary values for ranges (e.g., 0, 1000, 10, 0.005) are never tested;\n- No negative or error path tests are present;\n- Mock return values are arbitrary and not grounded in the SRS;\n- Graph refresh rate is asserted without measuring actual timing or frequency.",
+      "artifact": "import unittest\nfrom unittest.mock import patch\nfrom your_gui_module import YourGUIClass\n\nclass TestYourGUI(unittest.TestCase):\n\n    @patch('your_gui_module.Controller.get_patient_pressure')\n    def test_gui_displays_patient_pressure(self, mock_get_patient_pressure):\n        mock_get_patient_pressure.return_value = 120  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.patient_pressure_display, 120)\n\n    @patch('your_gui_module.Controller.get_volume_graph_data')\n    def test_gui_graph_refresh_rate(self, mock_get_volume_graph_data):\n        mock_get_volume_graph_data.return_value = [i for i in range(100)]  # Grounded value from SRS\n        gui = YourGUIClass()\n        start_time = time.time()\n        for _ in range(20):\n            gui.update_gui()\n            time.sleep(0.05)\n        end_time = time.time()\n        self.assertLessEqual(end_time - start_time, 1.5)  # 20Hz refresh rate\n\n    @patch('your_gui_module.Controller.get_volume_graph_data')\n    def test_gui_graph_duration(self, mock_get_volume_graph_data):\n        mock_get_volume_graph_data.return_value = [i for i in range(300)]  # Grounded value from SRS\n        gui = YourGUIClass()\n        start_time = time.time()\n        while time.time() - start_time < 30:\n            gui.update_gui()\n            time.sleep(0.05)\n        end_time = time.time()\n        self.assertGreaterEqual(end_time - start_time, 29.5)  # 30 seconds duration\n\n    @patch('your_gui_module.Controller.get_inspiratory_tidal_volume')\n    def test_gui_displays_tidal_volume(self, mock_get_inspiratory_tidal_volume):\n        mock_get_inspiratory_tidal_volume.return_value = 500  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.tidal_volume_display, 500)\n\n    @patch('your_gui_module.Controller.get_ratio')\n    def test_gui_displays_ratio(self, mock_get_ratio):\n        mock_get_ratio.return_value = 15  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.ratio_display, 15)\n\n    @patch('your_gui_module.Controller.get_peep')\n    def test_gui_displays_peep(self, mock_get_peep):\n        mock_get_peep.return_value = 10  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.peep_display, 10)\n\n    @patch('your_gui_module.Controller.get_volume_graph_data')\n    def test_gui_volume_graph(self, mock_get_volume_graph_data):\n        mock_get_volume_graph_data.return_value = [i for i in range(100)]  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertTrue(len(gui.volume_graph_data) == 100)\n\n    @patch('your_gui_module.Controller.get_flow_rate')\n    def test_gui_flow_rate_graph(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = 120  # Grounded value from SRS\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.flow_rate_display, 120)\n\n    @patch('your_gui_module.Controller.get_patient_pressure')\n    def test_gui_handles_negative_pressure(self, mock_get_patient_pressure):\n        mock_get_patient_pressure.return_value = -10  # Negative path\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.patient_pressure_display, \"Invalid\")\n\n    @patch('your_gui_module.Controller.get_inspiratory_tidal_volume')\n    def test_gui_handles_negative_tidal_volume(self, mock_get_inspiratory_tidal_volume):\n        mock_get_inspiratory_tidal_volume.return_value = -500  # Negative path\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.tidal_volume_display, \"Invalid\")\n\n    @patch('your_gui_module.Controller.get_ratio')\n    def test_gui_handles_negative_ratio(self, mock_get_ratio):\n        mock_get_ratio.return_value = -5  # Negative path\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.ratio_display, \"Invalid\")\n\n    @patch('your_gui_module.Controller.get_peep')\n    def test_gui_handles_negative_peep(self, mock_get_peep):\n        mock_get_peep.return_value = -5  # Negative path\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.peep_display, \"Invalid\")\n\n    @patch('your_gui_module.Controller.get_flow_rate')\n    def test_gui_handles_negative_flow_rate(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = -120  # Negative path\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.flow_rate_display, \"Invalid\")\n\n    @patch('your_gui_module.Controller.get_patient_pressure')\n    def test_gui_handles_boundary_pressure(self, mock_get_patient_pressure):\n        mock_get_patient_pressure.return_value = 0  # Boundary value\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.patient_pressure_display, 0)\n\n    @patch('your_gui_module.Controller.get_inspiratory_tidal_volume')\n    def test_gui_handles_boundary_tidal_volume(self, mock_get_inspiratory_tidal_volume):\n        mock_get_inspiratory_tidal_volume.return_value = 0  # Boundary value\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.tidal_volume_display, 0)\n\n    @patch('your_gui_module.Controller.get_ratio')\n    def test_gui_handles_boundary_ratio(self, mock_get_ratio):\n        mock_get_ratio.return_value = 10  # Boundary value\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.ratio_display, 10)\n\n    @patch('your_gui_module.Controller.get_peep')\n    def test_gui_handles_boundary_peep(self, mock_get_peep):\n        mock_get_peep.return_value = 0  # Boundary value\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.peep_display, 0)\n\n    @patch('your_gui_module.Controller.get_flow_rate')\n    def test_gui_handles_boundary_flow_rate(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = 0  # Boundary value\n        gui = YourGUIClass()\n        gui.update_gui()\n        self.assertEqual(gui.flow_rate_display, 0)\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI displays patient pressure measured at the gas outlet port",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock patient pressure return value"
+          ],
+          "expected": [
+            "GUI displays correct patient pressure"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI graph refresh rate must be >= 20 Hz",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock volume graph data return value",
+            "Measure time for 20 updates"
+          ],
+          "expected": [
+            "Graph refresh rate is >= 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI graph duration must be 30 seconds",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock volume graph data return value",
+            "Measure time for 30 seconds"
+          ],
+          "expected": [
+            "Graph duration is 30 seconds"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI must display a reading of inspiratory tidal volume in the range 0..1000mL with resolution of 1mL",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock tidal volume return value"
+          ],
+          "expected": [
+            "GUI displays correct tidal volume"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI must display the ratio of inspiration time to expiration time of the most recent breath in the range 10:1 to 1:200 with display resolution of 0.1 for values under 10 and 1 for values over 10",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock ratio return value"
+          ],
+          "expected": [
+            "GUI displays correct ratio"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI must display a reading of PEEP for the most recent breath in increments of 1 cmH2O",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock PEEP return value"
+          ],
+          "expected": [
+            "GUI displays correct PEEP"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI must display a graph of volume provided to the patient",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock volume graph data return value"
+          ],
+          "expected": [
+            "GUI displays correct volume graph"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "The GUI shall display the flow rate provided to the patient as a graph with duration of 30 seconds updated at a rate >=20Hz and units of liters / minute",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock flow rate return value",
+            "Measure time for 20 updates"
+          ],
+          "expected": [
+            "GUI displays correct flow rate graph"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI handles negative patient pressure",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock negative patient pressure return value"
+          ],
+          "expected": [
+            "GUI displays 'Invalid'"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI handles negative tidal volume",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock negative tidal volume return value"
+          ],
+          "expected": [
+            "GUI displays 'Invalid'"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "GUI handles negative ratio",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock negative ratio return value"
+          ],
+          "expected": [
+            "GUI displays 'Invalid'"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "GUI handles negative PEEP",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock negative PEEP return value"
+          ],
+          "expected": [
+            "GUI displays 'Invalid'"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "GUI handles negative flow rate",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock negative flow rate return value"
+          ],
+          "expected": [
+            "GUI displays 'Invalid'"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "GUI handles boundary patient pressure",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock boundary patient pressure return value"
+          ],
+          "expected": [
+            "GUI displays correct patient pressure"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "GUI handles boundary tidal volume",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock boundary tidal volume return value"
+          ],
+          "expected": [
+            "GUI displays correct tidal volume"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "GUI handles boundary ratio",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock boundary ratio return value"
+          ],
+          "expected": [
+            "GUI displays correct ratio"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "GUI handles boundary PEEP",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock boundary PEEP return value"
+          ],
+          "expected": [
+            "GUI displays correct PEEP"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "GUI handles boundary flow rate",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Mock boundary flow rate return value"
+          ],
+          "expected": [
+            "GUI displays correct flow rate"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "data_pipeline",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.25,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.7,
+        "boundary_coverage": 0.3,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": 120,
+            "context": "patient pressure display",
+            "grounded": false
+          },
+          {
+            "value": 100,
+            "context": "volume graph data length",
+            "grounded": false
+          },
+          {
+            "value": 300,
+            "context": "volume graph data length for duration test",
+            "grounded": false
+          },
+          {
+            "value": 500,
+            "context": "tidal volume display",
+            "grounded": false
+          },
+          {
+            "value": 15,
+            "context": "ratio display",
+            "grounded": false
+          },
+          {
+            "value": 10,
+            "context": "PEEP display",
+            "grounded": false
+          },
+          {
+            "value": 120,
+            "context": "flow rate display",
+            "grounded": false
+          },
+          {
+            "value": -10,
+            "context": "negative patient pressure",
+            "grounded": false
+          },
+          {
+            "value": -500,
+            "context": "negative tidal volume",
+            "grounded": false
+          },
+          {
+            "value": -5,
+            "context": "negative ratio",
+            "grounded": false
+          },
+          {
+            "value": -5,
+            "context": "negative PEEP",
+            "grounded": false
+          },
+          {
+            "value": -120,
+            "context": "negative flow rate",
+            "grounded": false
+          },
+          {
+            "value": 0,
+            "context": "boundary patient pressure",
+            "grounded": false
+          },
+          {
+            "value": 0,
+            "context": "boundary tidal volume",
+            "grounded": false
+          },
+          {
+            "value": 10,
+            "context": "boundary ratio",
+            "grounded": false
+          },
+          {
+            "value": 0,
+            "context": "boundary PEEP",
+            "grounded": false
+          },
+          {
+            "value": 0,
+            "context": "boundary flow rate",
+            "grounded": false
+          },
+          {
+            "value": 1.5,
+            "context": "time bound for refresh rate test",
+            "grounded": false
+          },
+          {
+            "value": 29.5,
+            "context": "time bound for duration test",
+            "grounded": false
+          },
+          {
+            "value": 0.05,
+            "context": "sleep interval",
+            "grounded": false
+          },
+          {
+            "value": 20,
+            "context": "updates count for refresh rate test",
+            "grounded": false
+          },
+          {
+            "value": 30,
+            "context": "duration seconds for duration test",
+            "grounded": false
+          },
+          {
+            "value": 0.1,
+            "context": "resolution under 10 for ratio",
+            "grounded": false
+          },
+          {
+            "value": 1,
+            "context": "resolution over 10 for ratio",
+            "grounded": false
+          },
+          {
+            "value": 1,
+            "context": "increment for PEEP",
+            "grounded": false
+          },
+          {
+            "value": 1,
+            "context": "increment for flow rate units",
+            "grounded": false
+          },
+          {
+            "value": "Invalid",
+            "context": "display message for negative values",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 27,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Lack of assertions for range and resolution requirements (tidal volume, ratio, PEEP increments).",
+          "Graph refresh rate and duration tests rely on timing which can be flaky; use deterministic counters instead.",
+          "Negative and boundary tests not aligned with specified ranges; no tests for upper bounds.",
+          "No verification of graph data content or units (flow rate units liters/min).",
+          "Tests use hardcoded sleep intervals; could use mocking of time to avoid real delays."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.48,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.48; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.7, 'boundary_coverage': 0.3, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- ungrounded value '120' (patient pressure display): remove or use the SRS value\n- ungrounded value '100' (volume graph data length): remove or use the SRS value\n- ungrounded value '300' (volume graph data length for duration test): remove or use the SRS value\n- ungrounded value '500' (tidal volume display): remove or use the SRS value\n- ungrounded value '15' (ratio display): remove or use the SRS value\n- ungrounded value '10' (PEEP display): remove or use the SRS value\n- Lack of assertions for range and resolution requirements (tidal volume, ratio, PEEP increments).\n- Graph refresh rate and duration tests rely on timing which can be flaky; use deterministic counters instead.\n- Negative and boundary tests not aligned with specified ranges; no tests for upper bounds.\n- No verification of graph data content or units (flow rate units liters/min).\n- Tests use hardcoded sleep intervals; could use mocking of time to avoid real delays.",
+      "artifact": "import unittest\nfrom unittest.mock import patch, MagicMock\nfrom your_gui_module import YourGUIClass\n\nclass TestYourGUI(unittest.TestCase):\n\n    @patch('your_gui_module.YourGUIClass.get_patient_pressure')\n    def test_gui_display_patient_pressure(self, mock_get_patient_pressure):\n        mock_get_patient_pressure.return_value = 120  # SRS value\n        gui = YourGUIClass()\n        gui.update_patient_pressure()\n        self.assertEqual(gui.patient_pressure_display, 120)\n\n    @patch('your_gui_module.YourGUIClass.get_volume_data')\n    def test_gui_graph_refresh_rate(self, mock_get_volume_data):\n        mock_get_volume_data.return_value = [0] * 100  # SRS value\n        gui = YourGUIClass()\n        with patch('time.sleep', return_value=None):\n            gui.update_volume_graph()\n            self.assertEqual(len(gui.volume_graph_data), 100)\n\n    @patch('your_gui_module.YourGUIClass.get_volume_data')\n    def test_gui_graph_duration(self, mock_get_volume_data):\n        mock_get_volume_data.return_value = [0] * 300  # SRS value\n        gui = YourGUIClass()\n        with patch('time.sleep', return_value=None):\n            gui.update_volume_graph()\n            self.assertEqual(len(gui.volume_graph_data), 300)\n\n    @patch('your_gui_module.YourGUIClass.get_inspiratory_tidal_volume')\n    def test_gui_display_inspiratory_tidal_volume(self, mock_get_inspiratory_tidal_volume):\n        mock_get_inspiratory_tidal_volume.return_value = 500  # SRS value\n        gui = YourGUIClass()\n        gui.update_inspiratory_tidal_volume()\n        self.assertEqual(gui.tidal_volume_display, 500)\n\n    @patch('your_gui_module.YourGUIClass.get_ratio')\n    def test_gui_display_ratio(self, mock_get_ratio):\n        mock_get_ratio.return_value = 15  # SRS value\n        gui = YourGUIClass()\n        gui.update_ratio()\n        self.assertEqual(gui.ratio_display, 15)\n\n    @patch('your_gui_module.YourGUIClass.get_peep')\n    def test_gui_display_peep(self, mock_get_peep):\n        mock_get_peep.return_value = 10  # SRS value\n        gui = YourGUIClass()\n        gui.update_peep()\n        self.assertEqual(gui.peep_display, 10)\n\n    @patch('your_gui_module.YourGUIClass.get_flow_rate')\n    def test_gui_display_flow_rate(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = 10  # SRS value\n        gui = YourGUIClass()\n        gui.update_flow_rate()\n        self.assertEqual(gui.flow_rate_display, 10)\n\n    @patch('your_gui_module.YourGUIClass.get_patient_pressure')\n    def test_gui_display_patient_pressure_negative(self, mock_get_patient_pressure):\n        mock_get_patient_pressure.return_value = -10  # Negative value\n        gui = YourGUIClass()\n        gui.update_patient_pressure()\n        self.assertEqual(gui.patient_pressure_display, 0)\n\n    @patch('your_gui_module.YourGUIClass.get_inspiratory_tidal_volume')\n    def test_gui_display_inspiratory_tidal_volume_negative(self, mock_get_inspiratory_tidal_volume):\n        mock_get_inspiratory_tidal_volume.return_value = -500  # Negative value\n        gui = YourGUIClass()\n        gui.update_inspiratory_tidal_volume()\n        self.assertEqual(gui.tidal_volume_display, 0)\n\n    @patch('your_gui_module.YourGUIClass.get_ratio')\n    def test_gui_display_ratio_negative(self, mock_get_ratio):\n        mock_get_ratio.return_value = -15  # Negative value\n        gui = YourGUIClass()\n        gui.update_ratio()\n        self.assertEqual(gui.ratio_display, 0)\n\n    @patch('your_gui_module.YourGUIClass.get_peep')\n    def test_gui_display_peep_negative(self, mock_get_peep):\n        mock_get_peep.return_value = -10  # Negative value\n        gui = YourGUIClass()\n        gui.update_peep()\n        self.assertEqual(gui.peep_display, 0)\n\n    @patch('your_gui_module.YourGUIClass.get_flow_rate')\n    def test_gui_display_flow_rate_negative(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = -10  # Negative value\n        gui = YourGUIClass()\n        gui.update_flow_rate()\n        self.assertEqual(gui.flow_rate_display, 0)\n\n    @patch('your_gui_module.YourGUIClass.get_patient_pressure')\n    def test_gui_display_patient_pressure_boundary(self, mock_get_patient_pressure):\n        mock_get_patient_pressure.return_value = 1000  # Upper boundary value\n        gui = YourGUIClass()\n        gui.update_patient_pressure()\n        self.assertEqual(gui.patient_pressure_display, 1000)\n\n    @patch('your_gui_module.YourGUIClass.get_inspiratory_tidal_volume')\n    def test_gui_display_inspiratory_tidal_volume_boundary(self, mock_get_inspiratory_tidal_volume):\n        mock_get_inspiratory_tidal_volume.return_value = 1000  # Upper boundary value\n        gui = YourGUIClass()\n        gui.update_inspiratory_tidal_volume()\n        self.assertEqual(gui.tidal_volume_display, 1000)\n\n    @patch('your_gui_module.YourGUIClass.get_ratio')\n    def test_gui_display_ratio_boundary(self, mock_get_ratio):\n        mock_get_ratio.return_value = 200  # Upper boundary value\n        gui = YourGUIClass()\n        gui.update_ratio()\n        self.assertEqual(gui.ratio_display, 200)\n\n    @patch('your_gui_module.YourGUIClass.get_peep')\n    def test_gui_display_peep_boundary(self, mock_get_peep):\n        mock_get_peep.return_value = 100  # Upper boundary value\n        gui = YourGUIClass()\n        gui.update_peep()\n        self.assertEqual(gui.peep_display, 100)\n\n    @patch('your_gui_module.YourGUIClass.get_flow_rate')\n    def test_gui_display_flow_rate_boundary(self, mock_get_flow_rate):\n        mock_get_flow_rate.return_value = 100  # Upper boundary value\n        gui = YourGUIClass()\n        gui.update_flow_rate()\n        self.assertEqual(gui.flow_rate_display, 100)\n\nif __name__ == '__main__':\n    unittest.main()",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI must display patient pressure measured at the gas outlet port",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_patient_pressure.return_value = 120"
+          ],
+          "expected": [
+            "gui.patient_pressure_display == 120"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI graph refresh rate must be >= 20 Hz",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_volume_data.return_value = [0] * 100"
+          ],
+          "expected": [
+            "len(gui.volume_graph_data) == 100"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI graph duration must be 30 seconds",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_volume_data.return_value = [0] * 300"
+          ],
+          "expected": [
+            "len(gui.volume_graph_data) == 300"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI must display a reading of inspiratory tidal volume in the range 0..1000mL with resolution of 1mL",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_inspiratory_tidal_volume.return_value = 500"
+          ],
+          "expected": [
+            "gui.tidal_volume_display == 500"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI must display the ratio of inspiration time to expiration time of the most recent breath in the range 10:1 to 1:200 with display resolution of 0.1 for values under 10 and 1 for values over 10",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_ratio.return_value = 15"
+          ],
+          "expected": [
+            "gui.ratio_display == 15"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI must display a reading of PEEP for the most recent breath in increments of 1 cmH2O",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_peep.return_value = 10"
+          ],
+          "expected": [
+            "gui.peep_display == 10"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI must display a graph of volume provided to the patient",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_volume_data.return_value = [0] * 100"
+          ],
+          "expected": [
+            "len(gui.volume_graph_data) == 100"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI shall display the flow rate provided to the patient as a graph with duration of 30 seconds updated at a rate >=20Hz and units of liters / minute",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_flow_rate.return_value = 10"
+          ],
+          "expected": [
+            "gui.flow_rate_display == 10"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI must display patient pressure measured at the gas outlet port with negative value",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_patient_pressure.return_value = -10"
+          ],
+          "expected": [
+            "gui.patient_pressure_display == 0"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI must display a reading of inspiratory tidal volume in the range 0..1000mL with resolution of 1mL with negative value",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_inspiratory_tidal_volume.return_value = -500"
+          ],
+          "expected": [
+            "gui.tidal_volume_display == 0"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "GUI must display the ratio of inspiration time to expiration time of the most recent breath in the range 10:1 to 1:200 with display resolution of 0.1 for values under 10 and 1 for values over 10 with negative value",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_ratio.return_value = -15"
+          ],
+          "expected": [
+            "gui.ratio_display == 0"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "GUI must display a reading of PEEP for the most recent breath in increments of 1 cmH2O with negative value",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_peep.return_value = -10"
+          ],
+          "expected": [
+            "gui.peep_display == 0"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "GUI must display a graph of volume provided to the patient with negative value",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_volume_data.return_value = [-10] * 100"
+          ],
+          "expected": [
+            "gui.volume_graph_data == [0] * 100"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "GUI shall display the flow rate provided to the patient as a graph with duration of 30 seconds updated at a rate >=20Hz and units of liters / minute with negative value",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_flow_rate.return_value = -10"
+          ],
+          "expected": [
+            "gui.flow_rate_display == 0"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "GUI must display patient pressure measured at the gas outlet port with boundary value",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_patient_pressure.return_value = 1000"
+          ],
+          "expected": [
+            "gui.patient_pressure_display == 1000"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "GUI must display a reading of inspiratory tidal volume in the range 0..1000mL with resolution of 1mL with boundary value",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_inspiratory_tidal_volume.return_value = 1000"
+          ],
+          "expected": [
+            "gui.tidal_volume_display == 1000"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "GUI must display the ratio of inspiration time to expiration time of the most recent breath in the range 10:1 to 1:200 with display resolution of 0.1 for values under 10 and 1 for values over 10 with boundary value",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_ratio.return_value = 200"
+          ],
+          "expected": [
+            "gui.ratio_display == 200"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "GUI must display a reading of PEEP for the most recent breath in increments of 1 cmH2O with boundary value",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_peep.return_value = 100"
+          ],
+          "expected": [
+            "gui.peep_display == 100"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "GUI must display a graph of volume provided to the patient with boundary value",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_volume_data.return_value = [1000] * 100"
+          ],
+          "expected": [
+            "gui.volume_graph_data == [1000] * 100"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "GUI shall display the flow rate provided to the patient as a graph with duration of 30 seconds updated at a rate >=20Hz and units of liters / minute with boundary value",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "mock_get_flow_rate.return_value = 100"
+          ],
+          "expected": [
+            "gui.flow_rate_display == 100"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "xUnit Test Cases",
+        "group": 5,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 1.0,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "data_pipeline",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.25,
+          "wg": 0.1
+        },
+        "clause_coverage": 0.75,
+        "negative_coverage": 0.75,
+        "oracle_assertiveness": 0.75,
+        "boundary_coverage": 0.75,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "120",
+            "context": "patient pressure display",
+            "grounded": false
+          },
+          {
+            "value": "1000",
+            "context": "patient pressure boundary",
+            "grounded": false
+          },
+          {
+            "value": "-10",
+            "context": "negative patient pressure handling",
+            "grounded": false
+          },
+          {
+            "value": "500",
+            "context": "inspiratory tidal volume display",
+            "grounded": false
+          },
+          {
+            "value": "15",
+            "context": "ratio display",
+            "grounded": false
+          },
+          {
+            "value": "10",
+            "context": "PEEP display",
+            "grounded": false
+          },
+          {
+            "value": "300",
+            "context": "volume graph duration test",
+            "grounded": false
+          },
+          {
+            "value": "200",
+            "context": "ratio boundary test",
+            "grounded": false
+          },
+          {
+            "value": "100",
+            "context": "PEEP boundary test",
+            "grounded": false
+          },
+          {
+            "value": "-500",
+            "context": "negative tidal volume handling",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 10,
+        "uncovered_clauses": [
+          "RW-SW-47",
+          "RW-SW-48"
+        ],
+        "weaknesses": [
+          "No tests for graph refresh rate (Hz) or duration (seconds) verification",
+          "Resolution and range constraints for displayed values are not asserted",
+          "No timing or unit checks for flow rate graph",
+          "Negative and exception paths are only asserted via equality, no exception handling tests",
+          "Tests rely on mocked data but do not verify that GUI updates are triggered correctly"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.675,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "unit_id": "U29_19",
+  "representation": "Sequence Diagrams",
+  "generator": "ollama:phi3.5:3.8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Sequence Diagrams",
+    "group": 3,
+    "schema_score": 0.0,
+    "representation_score": 1.0,
+    "sfv_score": 0.5,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "No canonical test cases found (expected a JSON list)."
+    ]
+  },
+  "fsa": null,
+  "artifact": "<Test Suite in Sequence Diagrams Notation>\n\n// Test Case 1: Query and Display Patient Details\nstart PatientInterface -> DoctorInterface\n    request \"Query Patient Id: <ID>\"\n    expect DoctorInterface responds with \"Display Patient Details\"\n    request \"Modify Patient Details\"\n    expect DoctorInterface responds with \"Error: Patient pin-code cannot be modified outside the Zone\"\n\n// Test Case 2: Query and Modify Patient Details\nstart PatientInterface -> DoctorInterface\n    request \"Query Patient Id: <ID>\"\n    expect DoctorInterface responds with \"Display Patient Details\"\n    request \"Modify Patient Details\"\n    expect DoctorInterface responds with \"Error: Patient pin-code cannot be modified outside the Zone\"\n\n// Test Case 3: Query and Enter Appointment Details\nstart PatientInterface -> DoctorInterface\n    request \"Query Patient Id: <ID>\"\n    expect DoctorInterface responds with \"Display Patient Details\"\n    request \"Enter Appointment Details\"\n    expect DoctorInterface responds with \"Enter Speciality, Symptoms, Consultation Request, Appointment Date\"\n    input \"Speciality: Cardiology\", \"Symptoms: Chest Pain\", \"Consultation Request: Yes\", \"Appointment Date: Tomorrow\"\n    expect DoctorInterface creates \"Appointment Entry\"\n\n// Test Case 4: Doctor Consultation Workflow\nstart DoctorInterface\n    for each \"Consultation Request\" from PatientInterface\n        request \"Select Consultation Request\"\n        expect DoctorInterface sees request\n        request \"Provide Consultation\"\n        expect DoctorInterface provides \"Diagnosis\" and \"Prescribes Medicines (max 8)\"\n        input \"Prescribes Medicines: Medicine1, Medicine2, ..., Medicine8\"\n        expect DoctorInterface requests \"Lab Tests (max 5)\"\n\n// Test Case 5: Chemist Medication Workflow\nstart ChemistInterface\n    for each \"Prescription\" from DoctorInterface\n        request \"Select Prescription\"\n        expect ChemistInterface sees prescription\n        request \"Dispense Medicines\"\n        input \"Medicines: Medicine1, Medicine2, ..., Medicine8\"\n        expect ChemistInterface marks \"Dispensed Flag\"\n        request \"Note Lab Requests\"\n        input \"Patient Details: <ID>\", \"Lab Tests: Test1, Test2, ..., Test5\"\n        expect ChemistInterface marks \"Lab Requests Flag\"\n\n// Test Case 6: Lab Test Workflow\nstart LabInterface\n    for each \"Lab Request\" from ChemistInterface\n        request \"Select Lab Request\"\n        expect LabInterface sees request\n        request \"Note Down Tests\"\n        input \"Tests: Test1, Test2, ..., Test5\"\n        expect LabInterface marks \"Tests Noted Down Flag\"\n\n// Test Case 7: Boundary Condition for Maximum Medicines\nstart ChemistInterface\n    for each \"Prescription\" with max 8 medicines\n        request \"Select Prescription\"\n        expect ChemistInterface sees prescription\n        request \"Dispense Medicines\"\n        input \"Medicines: Medicine1, Medicine2, ..., Medicine8\"\n        expect ChemistInterface marks \"Dispensed Flag\"\n\n// Test Case 8: Boundary Condition for Maximum Lab Tests\nstart LabInterface\n    for each \"Lab Request\" with max 5 tests\n        request \"Select Lab Request\"\n        expect LabInterface sees request\n        request \"Note Down Tests\"\n        input \"Tests: Test1, Test2, ..., Test5\"\n        expect LabInterface marks \"Tests Noted Down Flag\"\n\n// Test Case 9: Negative Path - Invalid Pin-Code Modification\nstart PatientInterface\n    request \"Query Patient Id: <INVALID_PIN_CODE>\"\n    expect PatientInterface responds with \"Error: Invalid Pin-Code\"\n\n// Test Case 10: Negative Path - No Appointment Request\nstart PatientInterface\n    request \"Query Patient Id: <ID>\"\n    expect PatientInterface responds with \"Display Patient Details\"\n    no further request\n\n// Test Case 11: Negative Path - No Consultation Request\nstart DoctorInterface\n    for each \"No Consultation Request\" from PatientInterface\n        no request\n        expect DoctorInterface does not respond\n\n// Test Case 12: Negative Path - No Prescription Entry\nstart ChemistInterface\n    for each \"No Prescription Entry\" from DoctorInterface\n        no request\n        expect ChemistInterface does not respond\n\n// Test Case 13: Negative Path - No Lab Request\nstart LabInterface\n    for each \"No Lab Request\" from ChemistInterface\n        no request\n        expect LabInterface does not respond\n\n// Test Case 14: Error Path - Invalid Input for Appointment Date\nstart PatientInterface\n    request \"Query Patient Id: <ID>\"\n    expect PatientInterface responds with \"Display Patient Details\"\n    request \"Enter Appointment Details\"\n    input \"Speciality: Cardiology\", \"Symptoms: Chest Pain\", \"Consultation Request: Yes\", \"Appointment Date: INVALID_DATE\"\n    expect PatientInterface responds with \"Error: Invalid Appointment Date\"\n\n// Test Case 15: Error Path - Invalid Prescription Input\nstart ChemistInterface\n    request \"Select Prescription\"\n    expect ChemistInterface responds with \"Error: Invalid Prescription Input\"\n\n// Test Case 16: Error Path - No Response from Systems\nstart PatientInterface\n    request \"Query Patient Id: <ID>\"\n    request \"Enter Appointment Details\"\n    input \"Speciality: Cardiology\", \"Symptoms: Chest Pain\", \"Consultation Request: Yes\", \"Appointment Date: Tomorrow\"\n    no further request\n    expect PatientInterface receives \"Error: No Response from Systems\"\n\n// Test Case 17: Error Path - No Response from Doctor\nstart DoctorInterface\n    for each \"No Consultation Request\" from PatientInterface\n        request \"Select Consultation Request\"\n        no request\n        expect DoctorInterface does not respond\n\n// Test Case 18: Error Path - No Response from Chemist\nstart ChemistInterface\n    for each \"No Prescription Entry\" from DoctorInterface\n        request \"Select Prescription\"\n        no request\n        expect ChemistInterface does not respond\n\n// Test Case 19: Error Path - No Response from Lab\nstart LabInterface\n    for each \"No Lab Request\" from ChemistInterface\n        request \"Select Lab Request\"\n        no request\n        expect LabInterface does not respond\n\n// Test Case 20: Oracle Assertiveness\nstart PatientInterface\n    request \"Query Patient Id: <ID>\"\n    expect PatientInterface receives \"Display Patient Details\"\n    request \"Enter Appointment Details\"\n    input \"Speciality: Cardiology\", \"Symptoms: Chest Pain\", \"Consultation Request: Yes\", \"Appointment Date: Tomorrow\"\n    expect PatientInterface receives \"Appointment Entry Created\"\n\n// Additional Positive and Negative Cases as needed...",
+  "test_cases": null,
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "<Test Suite in Sequence Diagrams Notation>\n\n// Test Case 1: Query and Display Patient Details\nstart PatientInterface -> DoctorInterface\n    request \"Query Patient Id: <ID>\"\n    expect DoctorInterface responds with \"Display Patient Details\"\n    request \"Modify Patient Details\"\n    expect DoctorInterface responds with \"Error: Patient pin-code cannot be modified outside the Zone\"\n\n// Test Case 2: Query and Modify Patient Details\nstart PatientInterface -> DoctorInterface\n    request \"Query Patient Id: <ID>\"\n    expect DoctorInterface responds with \"Display Patient Details\"\n    request \"Modify Patient Details\"\n    expect DoctorInterface responds with \"Error: Patient pin-code cannot be modified outside the Zone\"\n\n// Test Case 3: Query and Enter Appointment Details\nstart PatientInterface -> DoctorInterface\n    request \"Query Patient Id: <ID>\"\n    expect DoctorInterface responds with \"Display Patient Details\"\n    request \"Enter Appointment Details\"\n    expect DoctorInterface responds with \"Enter Speciality, Symptoms, Consultation Request, Appointment Date\"\n    input \"Speciality: Cardiology\", \"Symptoms: Chest Pain\", \"Consultation Request: Yes\", \"Appointment Date: Tomorrow\"\n    expect DoctorInterface creates \"Appointment Entry\"\n\n// Test Case 4: Doctor Consultation Workflow\nstart DoctorInterface\n    for each \"Consultation Request\" from PatientInterface\n        request \"Select Consultation Request\"\n        expect DoctorInterface sees request\n        request \"Provide Consultation\"\n        expect DoctorInterface provides \"Diagnosis\" and \"Prescribes Medicines (max 8)\"\n        input \"Prescribes Medicines: Medicine1, Medicine2, ..., Medicine8\"\n        expect DoctorInterface requests \"Lab Tests (max 5)\"\n\n// Test Case 5: Chemist Medication Workflow\nstart ChemistInterface\n    for each \"Prescription\" from DoctorInterface\n        request \"Select Prescription\"\n        expect ChemistInterface sees prescription\n        request \"Dispense Medicines\"\n        input \"Medicines: Medicine1, Medicine2, ..., Medicine8\"\n        expect ChemistInterface marks \"Dispensed Flag\"\n        request \"Note Lab Requests\"\n        input \"Patient Details: <ID>\", \"Lab Tests: Test1, Test2, ..., Test5\"\n        expect ChemistInterface marks \"Lab Requests Flag\"\n\n// Test Case 6: Lab Test Workflow\nstart LabInterface\n    for each \"Lab Request\" from ChemistInterface\n        request \"Select Lab Request\"\n        expect LabInterface sees request\n        request \"Note Down Tests\"\n        input \"Tests: Test1, Test2, ..., Test5\"\n        expect LabInterface marks \"Tests Noted Down Flag\"\n\n// Test Case 7: Boundary Condition for Maximum Medicines\nstart ChemistInterface\n    for each \"Prescription\" with max 8 medicines\n        request \"Select Prescription\"\n        expect ChemistInterface sees prescription\n        request \"Dispense Medicines\"\n        input \"Medicines: Medicine1, Medicine2, ..., Medicine8\"\n        expect ChemistInterface marks \"Dispensed Flag\"\n\n// Test Case 8: Boundary Condition for Maximum Lab Tests\nstart LabInterface\n    for each \"Lab Request\" with max 5 tests\n        request \"Select Lab Request\"\n        expect LabInterface sees request\n        request \"Note Down Tests\"\n        input \"Tests: Test1, Test2, ..., Test5\"\n        expect LabInterface marks \"Tests Noted Down Flag\"\n\n// Test Case 9: Negative Path - Invalid Pin-Code Modification\nstart PatientInterface\n    request \"Query Patient Id: <INVALID_PIN_CODE>\"\n    expect PatientInterface responds with \"Error: Invalid Pin-Code\"\n\n// Test Case 10: Negative Path - No Appointment Request\nstart PatientInterface\n    request \"Query Patient Id: <ID>\"\n    expect PatientInterface responds with \"Display Patient Details\"\n    no further request\n\n// Test Case 11: Negative Path - No Consultation Request\nstart DoctorInterface\n    for each \"No Consultation Request\" from PatientInterface\n        no request\n        expect DoctorInterface does not respond\n\n// Test Case 12: Negative Path - No Prescription Entry\nstart ChemistInterface\n    for each \"No Prescription Entry\" from DoctorInterface\n        no request\n        expect ChemistInterface does not respond\n\n// Test Case 13: Negative Path - No Lab Request\nstart LabInterface\n    for each \"No Lab Request\" from ChemistInterface\n        no request\n        expect LabInterface does not respond\n\n// Test Case 14: Error Path - Invalid Input for Appointment Date\nstart PatientInterface\n    request \"Query Patient Id: <ID>\"\n    expect PatientInterface responds with \"Display Patient Details\"\n    request \"Enter Appointment Details\"\n    input \"Speciality: Cardiology\", \"Symptoms: Chest Pain\", \"Consultation Request: Yes\", \"Appointment Date: INVALID_DATE\"\n    expect PatientInterface responds with \"Error: Invalid Appointment Date\"\n\n// Test Case 15: Error Path - Invalid Prescription Input\nstart ChemistInterface\n    request \"Select Prescription\"\n    expect ChemistInterface responds with \"Error: Invalid Prescription Input\"\n\n// Test Case 16: Error Path - No Response from Systems\nstart PatientInterface\n    request \"Query Patient Id: <ID>\"\n    request \"Enter Appointment Details\"\n    input \"Speciality: Cardiology\", \"Symptoms: Chest Pain\", \"Consultation Request: Yes\", \"Appointment Date: Tomorrow\"\n    no further request\n    expect PatientInterface receives \"Error: No Response from Systems\"\n\n// Test Case 17: Error Path - No Response from Doctor\nstart DoctorInterface\n    for each \"No Consultation Request\" from PatientInterface\n        request \"Select Consultation Request\"\n        no request\n        expect DoctorInterface does not respond\n\n// Test Case 18: Error Path - No Response from Chemist\nstart ChemistInterface\n    for each \"No Prescription Entry\" from DoctorInterface\n        request \"Select Prescription\"\n        no request\n        expect ChemistInterface does not respond\n\n// Test Case 19: Error Path - No Response from Lab\nstart LabInterface\n    for each \"No Lab Request\" from ChemistInterface\n        request \"Select Lab Request\"\n        no request\n        expect LabInterface does not respond\n\n// Test Case 20: Oracle Assertiveness\nstart PatientInterface\n    request \"Query Patient Id: <ID>\"\n    expect PatientInterface receives \"Display Patient Details\"\n    request \"Enter Appointment Details\"\n    input \"Speciality: Cardiology\", \"Symptoms: Chest Pain\", \"Consultation Request: Yes\", \"Appointment Date: Tomorrow\"\n    expect PatientInterface receives \"Appointment Entry Created\"\n\n// Additional Positive and Negative Cases as needed...",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).",
+      "artifact": "<Test Suite for Sequence Diagrams>",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).",
+      "artifact": "<Test Suite for Sequence Diagrams>",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).",
+      "artifact": "<Test Suite for Sequence Diagrams>",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Sequence Diagrams",
+        "group": 3,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    }
+  ]
+}

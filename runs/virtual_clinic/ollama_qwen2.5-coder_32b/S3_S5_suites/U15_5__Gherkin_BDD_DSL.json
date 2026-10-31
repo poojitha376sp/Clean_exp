@@ -1,0 +1,1140 @@
+{
+  "unit_id": "U15_5",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:32b",
+  "system_type": "standard",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 1.0,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.0,
+    "hallucinated": [
+      {
+        "value": "3 pending appointments",
+        "context": "count of pending appointments",
+        "grounded": false
+      },
+      {
+        "value": "consultation ID C001",
+        "context": "consultation ID",
+        "grounded": false
+      },
+      {
+        "value": "appointment ID A001",
+        "context": "appointment ID",
+        "grounded": false
+      },
+      {
+        "value": "appointment ID A002",
+        "context": "appointment ID",
+        "grounded": false
+      },
+      {
+        "value": "appointment ID A003",
+        "context": "appointment ID",
+        "grounded": false
+      },
+      {
+        "value": "medicine name Paracetamol",
+        "context": "medicine name",
+        "grounded": false
+      },
+      {
+        "value": "medicine name Aspirin",
+        "context": "medicine name",
+        "grounded": false
+      },
+      {
+        "value": "medicine name Invalid Medicine",
+        "context": "medicine name",
+        "grounded": false
+      },
+      {
+        "value": "dosage 500mg",
+        "context": "dosage",
+        "grounded": false
+      },
+      {
+        "value": "dosage 300mg",
+        "context": "dosage",
+        "grounded": false
+      },
+      {
+        "value": "dosage 200mg",
+        "context": "dosage",
+        "grounded": false
+      },
+      {
+        "value": "prescription ID P001",
+        "context": "prescription ID",
+        "grounded": false
+      },
+      {
+        "value": "prescription ID P002",
+        "context": "prescription ID",
+        "grounded": false
+      },
+      {
+        "value": "prescription ID P003",
+        "context": "prescription ID",
+        "grounded": false
+      },
+      {
+        "value": "lab test name Blood Test",
+        "context": "lab test name",
+        "grounded": false
+      },
+      {
+        "value": "lab test name Urine Test",
+        "context": "lab test name",
+        "grounded": false
+      },
+      {
+        "value": "lab test name Invalid Test",
+        "context": "lab test name",
+        "grounded": false
+      },
+      {
+        "value": "lab test ID L001",
+        "context": "lab test ID",
+        "grounded": false
+      },
+      {
+        "value": "lab test ID L002",
+        "context": "lab test ID",
+        "grounded": false
+      },
+      {
+        "value": "lab test ID L003",
+        "context": "lab test ID",
+        "grounded": false
+      },
+      {
+        "value": "request ID R001",
+        "context": "request ID",
+        "grounded": false
+      },
+      {
+        "value": "request ID R002",
+        "context": "request ID",
+        "grounded": false
+      },
+      {
+        "value": "report ID RP001",
+        "context": "report ID",
+        "grounded": false
+      },
+      {
+        "value": "status code 200",
+        "context": "HTTP status code",
+        "grounded": false
+      },
+      {
+        "value": "message No pending appointments",
+        "context": "empty list message",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 25,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No boundary tests for appointment counts (e.g., zero, one, maximum).",
+      "Negative tests use hardcoded invalid values but do not verify system error messages or codes.",
+      "Test IDs and status codes are arbitrary and not grounded in requirements.",
+      "Lack of concurrency or overlapping consultation scenarios.",
+      "No tests for offline state transitions or timing constraints."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.65,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Doctor Consultation and Prescription Management\n\n  Scenario: Doctor views pending appointments and provides consultation\n    Given the doctor has 3 pending appointments in the list\n    When the doctor views the pending appointments\n    Then the doctor sees the list of 3 pending appointments\n    And the doctor selects the first appointment\n    When the doctor provides consultation for the selected appointment\n    Then the consultation is successfully recorded with consultation ID C001\n\n  Scenario Outline: Doctor provides consultation and generates prescription\n    Given the doctor has provided consultation for appointment with ID <appointment_id>\n    When the doctor prescribes <medicine_name> with dosage <dosage>\n    Then the prescription is generated with prescription ID <prescription_id>\n    And the prescription includes <medicine_name> with dosage <dosage>\n\n    Examples:\n      | appointment_id | medicine_name | dosage | prescription_id |\n      | A001           | Paracetamol   | 500mg  | P001            |\n      | A002           | Aspirin       | 300mg  | P002            |\n      | A003           | Invalid Medicine | 200mg | P003            | # Invalid case\n\n  Scenario Outline: Doctor prescribes lab tests during consultation\n    Given the doctor has provided consultation for appointment with ID <appointment_id>\n    When the doctor prescribes <lab_test_name>\n    Then the lab test is created with lab test ID <lab_test_id>\n    And the lab is requested to perform the lab test\n\n    Examples:\n      | appointment_id | lab_test_name | lab_test_id |\n      | A001           | Blood Test    | L001        |\n      | A002           | Urine Test    | L002        |\n      | A003           | Invalid Test  | L003        | # Invalid case\n\n  Scenario: Doctor requests lab test to be performed\n    Given the doctor has prescribed a lab test with ID L001\n    When the doctor requests the lab to perform the lab test\n    Then the lab test request is successfully sent with request ID R001\n\n  Scenario: Doctor prescribes medicines during consultation\n    Given the doctor has provided consultation for appointment with ID A001\n    When the doctor prescribes Paracetamol with dosage 500mg\n    Then the medicine prescription is generated with prescription ID P001\n    And the concerned chemist is requested to deliver Paracetamol with dosage 500mg\n\n  Scenario: Doctor requests medicine delivery\n    Given the doctor has prescribed Paracetamol with dosage 500mg\n    When the doctor requests the chemist to deliver Paracetamol\n    Then the medicine delivery request is successfully sent with request ID R002\n\n  Scenario: Lab test is performed and report is updated (Offline)\n    Given the lab has performed the lab test with ID L001\n    When the lab updates the report for the patient\n    Then the lab report is updated with report ID RP001\n\n  Scenario: Lab report is released to view (Offline)\n    Given the lab report with ID RP001 is updated\n    When the doctor releases the lab report to the patient\n    Then the lab report is released with status code 200\n\n  Scenario: Doctor views no pending appointments\n    Given the doctor has no pending appointments in the list\n    When the doctor views the pending appointments\n    Then the doctor sees an empty list with message \"No pending appointments\"\n\n  Scenario: Prescription generation failure\n    Given the doctor has provided consultation for appointment with ID A003\n    When the doctor prescribes Invalid Medicine with dosage 200mg\n    Then the prescription generation fails with error code 400",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Doctor views pending appointments and provides consultation",
+      "req_ids": [
+        "VIRTUA-5-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor has 3 pending appointments"
+      ],
+      "inputs": {},
+      "steps": [
+        "Doctor views the pending appointments",
+        "Doctor selects the first appointment",
+        "Doctor provides consultation for the selected appointment"
+      ],
+      "expected": [
+        "Doctor sees the list of 3 pending appointments",
+        "Consultation is successfully recorded with consultation ID C001"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Doctor provides consultation and generates prescription",
+      "req_ids": [
+        "VIRTUA-5-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor has provided consultation for appointment with ID A001"
+      ],
+      "inputs": {
+        "appointment_id": "A001",
+        "medicine_name": "Paracetamol",
+        "dosage": "500mg"
+      },
+      "steps": [
+        "Doctor prescribes Paracetamol with dosage 500mg"
+      ],
+      "expected": [
+        "Prescription is generated with prescription ID P001",
+        "Prescription includes Paracetamol with dosage 500mg"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Doctor provides consultation and generates prescription",
+      "req_ids": [
+        "VIRTUA-5-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor has provided consultation for appointment with ID A002"
+      ],
+      "inputs": {
+        "appointment_id": "A002",
+        "medicine_name": "Aspirin",
+        "dosage": "300mg"
+      },
+      "steps": [
+        "Doctor prescribes Aspirin with dosage 300mg"
+      ],
+      "expected": [
+        "Prescription is generated with prescription ID P002",
+        "Prescription includes Aspirin with dosage 300mg"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Doctor provides consultation and generates prescription",
+      "req_ids": [
+        "VIRTUA-5-10"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Doctor has provided consultation for appointment with ID A003"
+      ],
+      "inputs": {
+        "appointment_id": "A003",
+        "medicine_name": "Invalid Medicine",
+        "dosage": "200mg"
+      },
+      "steps": [
+        "Doctor prescribes Invalid Medicine with dosage 200mg"
+      ],
+      "expected": [
+        "Prescription generation fails with error code 400"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Doctor prescribes lab tests during consultation",
+      "req_ids": [
+        "VIRTUA-5-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor has provided consultation for appointment with ID A001"
+      ],
+      "inputs": {
+        "appointment_id": "A001",
+        "lab_test_name": "Blood Test"
+      },
+      "steps": [
+        "Doctor prescribes Blood Test"
+      ],
+      "expected": [
+        "Lab test is created with lab test ID L001",
+        "Lab is requested to perform the lab test"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Doctor prescribes lab tests during consultation",
+      "req_ids": [
+        "VIRTUA-5-11"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor has provided consultation for appointment with ID A002"
+      ],
+      "inputs": {
+        "appointment_id": "A002",
+        "lab_test_name": "Urine Test"
+      },
+      "steps": [
+        "Doctor prescribes Urine Test"
+      ],
+      "expected": [
+        "Lab test is created with lab test ID L002",
+        "Lab is requested to perform the lab test"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Doctor prescribes lab tests during consultation",
+      "req_ids": [
+        "VIRTUA-5-11"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Doctor has provided consultation for appointment with ID A003"
+      ],
+      "inputs": {
+        "appointment_id": "A003",
+        "lab_test_name": "Invalid Test"
+      },
+      "steps": [
+        "Doctor prescribes Invalid Test"
+      ],
+      "expected": [
+        "Lab test is created with lab test ID L003",
+        "Lab is requested to perform the lab test"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Doctor requests lab test to be performed",
+      "req_ids": [
+        "VIRTUA-5-12"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor has prescribed a lab test with ID L001"
+      ],
+      "inputs": {},
+      "steps": [
+        "Doctor requests the lab to perform the lab test"
+      ],
+      "expected": [
+        "Lab test request is successfully sent with request ID R001"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Doctor prescribes medicines during consultation",
+      "req_ids": [
+        "VIRTUA-5-13"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor has provided consultation for appointment with ID A001"
+      ],
+      "inputs": {
+        "appointment_id": "A001",
+        "medicine_name": "Paracetamol",
+        "dosage": "500mg"
+      },
+      "steps": [
+        "Doctor prescribes Paracetamol with dosage 500mg"
+      ],
+      "expected": [
+        "Medicine prescription is generated with prescription ID P001",
+        "Concerned chemist is requested to deliver Paracetamol with dosage 500mg"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Doctor requests medicine delivery",
+      "req_ids": [
+        "VIRTUA-5-14"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor has prescribed Paracetamol with dosage 500mg"
+      ],
+      "inputs": {},
+      "steps": [
+        "Doctor requests the chemist to deliver Paracetamol"
+      ],
+      "expected": [
+        "Medicine delivery request is successfully sent with request ID R002"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Lab test is performed and report is updated (Offline)",
+      "req_ids": [
+        "VIRTUA-5-15"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Lab has performed the lab test with ID L001"
+      ],
+      "inputs": {},
+      "steps": [
+        "Lab updates the report for the patient"
+      ],
+      "expected": [
+        "Lab report is updated with report ID RP001"
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Lab report is released to view (Offline)",
+      "req_ids": [
+        "VIRTUA-5-16"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Lab report with ID RP001 is updated"
+      ],
+      "inputs": {},
+      "steps": [
+        "Doctor releases the lab report to the patient"
+      ],
+      "expected": [
+        "Lab report is released with status code 200"
+      ]
+    },
+    {
+      "id": "TC-013",
+      "title": "Doctor views no pending appointments",
+      "req_ids": [
+        "VIRTUA-5-9"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Doctor has no pending appointments"
+      ],
+      "inputs": {},
+      "steps": [
+        "Doctor views the pending appointments"
+      ],
+      "expected": [
+        "Doctor sees an empty list with message \"No pending appointments\""
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Doctor Consultation and Prescription Management\n\n  Scenario: Doctor views pending appointments and provides consultation\n    Given the doctor is logged into the system\n    When the doctor accesses the pending appointments list\n    Then the doctor can see a list of pending appointments/consultation requests\n    And the doctor can select an appointment to provide consultation\n\n  Scenario: Doctor provides consultation and generates a prescription\n    Given the doctor is providing consultation to a patient\n    When the doctor completes the consultation\n    Then a prescription is generated for the patient\n\n  Scenario Outline: Doctor prescribes lab tests during consultation\n    Given the doctor is providing consultation to a patient\n    When the doctor prescribes a lab test with name <test_name>\n    Then a lab test request is created for the patient\n    And the lab is requested to perform the lab test\n    Examples:\n      | test_name       |\n      | Blood Test      |\n      | Urine Test      |\n      | Invalid Test    |\n\n  Scenario Outline: Doctor prescribes medicines during consultation\n    Given the doctor is providing consultation to a patient\n    When the doctor prescribes a medicine with name <medicine_name>\n    Then a medicine request is created for the patient\n    And the concerned chemist is requested to deliver the medicine\n    Examples:\n      | medicine_name   |\n      | Paracetamol     |\n      | Aspirin         |\n      | Invalid Medicine|\n\n  Scenario: Lab tests are performed and reports are updated (Offline)\n    Given the lab has received a request for a lab test\n    When the lab performs the test\n    Then the lab report for the patient is updated (Offline)\n\n  Scenario: Lab report is released to view (Offline)\n    Given the lab report for the patient is updated (Offline)\n    When the doctor accesses the patient's lab reports\n    Then the doctor can view the lab report (Offline)",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Doctor views pending appointments and provides consultation",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is logged into the system"
+          ],
+          "inputs": {},
+          "steps": [
+            "Access pending appointments list",
+            "Select an appointment"
+          ],
+          "expected": [
+            "List of pending appointments",
+            "Consultation provided"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Doctor provides consultation and generates a prescription",
+          "req_ids": [
+            "VIRTUA-5-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is providing consultation to a patient"
+          ],
+          "inputs": {},
+          "steps": [
+            "Complete consultation"
+          ],
+          "expected": [
+            "Prescription generated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor prescribes a valid lab test during consultation",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is providing consultation to a patient"
+          ],
+          "inputs": {
+            "test_name": "Blood Test"
+          },
+          "steps": [
+            "Prescribe lab test"
+          ],
+          "expected": [
+            "Lab test request created",
+            "Lab requested to perform test"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Doctor prescribes an invalid lab test during consultation",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor is providing consultation to a patient"
+          ],
+          "inputs": {
+            "test_name": "Invalid Test"
+          },
+          "steps": [
+            "Prescribe lab test"
+          ],
+          "expected": [
+            "Error message for invalid test"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor prescribes a valid medicine during consultation",
+          "req_ids": [
+            "VIRTUA-5-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor is providing consultation to a patient"
+          ],
+          "inputs": {
+            "medicine_name": "Paracetamol"
+          },
+          "steps": [
+            "Prescribe medicine"
+          ],
+          "expected": [
+            "Medicine request created",
+            "Chemist requested to deliver medicine"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Doctor prescribes an invalid medicine during consultation",
+          "req_ids": [
+            "VIRTUA-5-13"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor is providing consultation to a patient"
+          ],
+          "inputs": {
+            "medicine_name": "Invalid Medicine"
+          },
+          "steps": [
+            "Prescribe medicine"
+          ],
+          "expected": [
+            "Error message for invalid medicine"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Lab tests are performed and reports are updated (Offline)",
+          "req_ids": [
+            "VIRTUA-5-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab has received a request for a lab test"
+          ],
+          "inputs": {},
+          "steps": [
+            "Perform lab test"
+          ],
+          "expected": [
+            "Lab report updated (Offline)"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Lab report is released to view (Offline)",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab report for the patient is updated (Offline)"
+          ],
+          "inputs": {},
+          "steps": [
+            "Access patient's lab reports"
+          ],
+          "expected": [
+            "Doctor can view lab report (Offline)"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.5,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.5294,
+        "hallucinated": [
+          {
+            "value": "Blood Test",
+            "context": "lab test name",
+            "grounded": false
+          },
+          {
+            "value": "Urine Test",
+            "context": "lab test name",
+            "grounded": false
+          },
+          {
+            "value": "Invalid Test",
+            "context": "lab test name",
+            "grounded": false
+          },
+          {
+            "value": "Paracetamol",
+            "context": "medicine name",
+            "grounded": false
+          },
+          {
+            "value": "Aspirin",
+            "context": "medicine name",
+            "grounded": false
+          },
+          {
+            "value": "Invalid Medicine",
+            "context": "medicine name",
+            "grounded": false
+          },
+          {
+            "value": "Error message for invalid test",
+            "context": "error message",
+            "grounded": false
+          },
+          {
+            "value": "Error message for invalid medicine",
+            "context": "error message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test cases for VIRTUA-5-9 (e.g., no pending appointments).",
+          "Add negative test cases for VIRTUA-5-10 (e.g., prescription generation failure).",
+          "Assert concrete values such as prescription ID, lab test ID, medicine ID, etc. to increase oracle assertiveness.",
+          "Include boundary tests for number of pending appointments (e.g., maximum list size).",
+          "Use explicit status codes or error messages in assertions instead of vague descriptions."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VIRTUA-5-12",
+          "VIRTUA-5-14"
+        ],
+        "fsa_score": 0.7094,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.7094; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.5, 'oracle_assertiveness': 0.2, 'boundary_coverage': 1.0, 'groundedness_mg': 0.5294}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-5-12', 'VIRTUA-5-14'] (add at least one each)\n- ungrounded value 'Blood Test' (lab test name): remove or use the SRS value\n- ungrounded value 'Urine Test' (lab test name): remove or use the SRS value\n- ungrounded value 'Invalid Test' (lab test name): remove or use the SRS value\n- ungrounded value 'Paracetamol' (medicine name): remove or use the SRS value\n- ungrounded value 'Aspirin' (medicine name): remove or use the SRS value\n- ungrounded value 'Invalid Medicine' (medicine name): remove or use the SRS value\n- Add negative test cases for VIRTUA-5-9 (e.g., no pending appointments).\n- Add negative test cases for VIRTUA-5-10 (e.g., prescription generation failure).\n- Assert concrete values such as prescription ID, lab test ID, medicine ID, etc. to increase oracle assertiveness.\n- Include boundary tests for number of pending appointments (e.g., maximum list size).\n- Use explicit status codes or error messages in assertions instead of vague descriptions.",
+      "artifact": "Feature: Doctor Consultation and Prescription Management\n\n  Scenario: Doctor views pending appointments and provides consultation\n    Given the doctor has 3 pending appointments in the list\n    When the doctor views the pending appointments\n    Then the doctor sees the list of 3 pending appointments\n    And the doctor selects the first appointment\n    When the doctor provides consultation for the selected appointment\n    Then the consultation is successfully recorded with consultation ID C001\n\n  Scenario Outline: Doctor provides consultation and generates prescription\n    Given the doctor has provided consultation for appointment with ID <appointment_id>\n    When the doctor prescribes <medicine_name> with dosage <dosage>\n    Then the prescription is generated with prescription ID <prescription_id>\n    And the prescription includes <medicine_name> with dosage <dosage>\n\n    Examples:\n      | appointment_id | medicine_name | dosage | prescription_id |\n      | A001           | Paracetamol   | 500mg  | P001            |\n      | A002           | Aspirin       | 300mg  | P002            |\n      | A003           | Invalid Medicine | 200mg | P003            | # Invalid case\n\n  Scenario Outline: Doctor prescribes lab tests during consultation\n    Given the doctor has provided consultation for appointment with ID <appointment_id>\n    When the doctor prescribes <lab_test_name>\n    Then the lab test is created with lab test ID <lab_test_id>\n    And the lab is requested to perform the lab test\n\n    Examples:\n      | appointment_id | lab_test_name | lab_test_id |\n      | A001           | Blood Test    | L001        |\n      | A002           | Urine Test    | L002        |\n      | A003           | Invalid Test  | L003        | # Invalid case\n\n  Scenario: Doctor requests lab test to be performed\n    Given the doctor has prescribed a lab test with ID L001\n    When the doctor requests the lab to perform the lab test\n    Then the lab test request is successfully sent with request ID R001\n\n  Scenario: Doctor prescribes medicines during consultation\n    Given the doctor has provided consultation for appointment with ID A001\n    When the doctor prescribes Paracetamol with dosage 500mg\n    Then the medicine prescription is generated with prescription ID P001\n    And the concerned chemist is requested to deliver Paracetamol with dosage 500mg\n\n  Scenario: Doctor requests medicine delivery\n    Given the doctor has prescribed Paracetamol with dosage 500mg\n    When the doctor requests the chemist to deliver Paracetamol\n    Then the medicine delivery request is successfully sent with request ID R002\n\n  Scenario: Lab test is performed and report is updated (Offline)\n    Given the lab has performed the lab test with ID L001\n    When the lab updates the report for the patient\n    Then the lab report is updated with report ID RP001\n\n  Scenario: Lab report is released to view (Offline)\n    Given the lab report with ID RP001 is updated\n    When the doctor releases the lab report to the patient\n    Then the lab report is released with status code 200\n\n  Scenario: Doctor views no pending appointments\n    Given the doctor has no pending appointments in the list\n    When the doctor views the pending appointments\n    Then the doctor sees an empty list with message \"No pending appointments\"\n\n  Scenario: Prescription generation failure\n    Given the doctor has provided consultation for appointment with ID A003\n    When the doctor prescribes Invalid Medicine with dosage 200mg\n    Then the prescription generation fails with error code 400",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Doctor views pending appointments and provides consultation",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor has 3 pending appointments"
+          ],
+          "inputs": {},
+          "steps": [
+            "Doctor views the pending appointments",
+            "Doctor selects the first appointment",
+            "Doctor provides consultation for the selected appointment"
+          ],
+          "expected": [
+            "Doctor sees the list of 3 pending appointments",
+            "Consultation is successfully recorded with consultation ID C001"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Doctor provides consultation and generates prescription",
+          "req_ids": [
+            "VIRTUA-5-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor has provided consultation for appointment with ID A001"
+          ],
+          "inputs": {
+            "appointment_id": "A001",
+            "medicine_name": "Paracetamol",
+            "dosage": "500mg"
+          },
+          "steps": [
+            "Doctor prescribes Paracetamol with dosage 500mg"
+          ],
+          "expected": [
+            "Prescription is generated with prescription ID P001",
+            "Prescription includes Paracetamol with dosage 500mg"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor provides consultation and generates prescription",
+          "req_ids": [
+            "VIRTUA-5-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor has provided consultation for appointment with ID A002"
+          ],
+          "inputs": {
+            "appointment_id": "A002",
+            "medicine_name": "Aspirin",
+            "dosage": "300mg"
+          },
+          "steps": [
+            "Doctor prescribes Aspirin with dosage 300mg"
+          ],
+          "expected": [
+            "Prescription is generated with prescription ID P002",
+            "Prescription includes Aspirin with dosage 300mg"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Doctor provides consultation and generates prescription",
+          "req_ids": [
+            "VIRTUA-5-10"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor has provided consultation for appointment with ID A003"
+          ],
+          "inputs": {
+            "appointment_id": "A003",
+            "medicine_name": "Invalid Medicine",
+            "dosage": "200mg"
+          },
+          "steps": [
+            "Doctor prescribes Invalid Medicine with dosage 200mg"
+          ],
+          "expected": [
+            "Prescription generation fails with error code 400"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Doctor prescribes lab tests during consultation",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor has provided consultation for appointment with ID A001"
+          ],
+          "inputs": {
+            "appointment_id": "A001",
+            "lab_test_name": "Blood Test"
+          },
+          "steps": [
+            "Doctor prescribes Blood Test"
+          ],
+          "expected": [
+            "Lab test is created with lab test ID L001",
+            "Lab is requested to perform the lab test"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Doctor prescribes lab tests during consultation",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor has provided consultation for appointment with ID A002"
+          ],
+          "inputs": {
+            "appointment_id": "A002",
+            "lab_test_name": "Urine Test"
+          },
+          "steps": [
+            "Doctor prescribes Urine Test"
+          ],
+          "expected": [
+            "Lab test is created with lab test ID L002",
+            "Lab is requested to perform the lab test"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Doctor prescribes lab tests during consultation",
+          "req_ids": [
+            "VIRTUA-5-11"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor has provided consultation for appointment with ID A003"
+          ],
+          "inputs": {
+            "appointment_id": "A003",
+            "lab_test_name": "Invalid Test"
+          },
+          "steps": [
+            "Doctor prescribes Invalid Test"
+          ],
+          "expected": [
+            "Lab test is created with lab test ID L003",
+            "Lab is requested to perform the lab test"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Doctor requests lab test to be performed",
+          "req_ids": [
+            "VIRTUA-5-12"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor has prescribed a lab test with ID L001"
+          ],
+          "inputs": {},
+          "steps": [
+            "Doctor requests the lab to perform the lab test"
+          ],
+          "expected": [
+            "Lab test request is successfully sent with request ID R001"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Doctor prescribes medicines during consultation",
+          "req_ids": [
+            "VIRTUA-5-13"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor has provided consultation for appointment with ID A001"
+          ],
+          "inputs": {
+            "appointment_id": "A001",
+            "medicine_name": "Paracetamol",
+            "dosage": "500mg"
+          },
+          "steps": [
+            "Doctor prescribes Paracetamol with dosage 500mg"
+          ],
+          "expected": [
+            "Medicine prescription is generated with prescription ID P001",
+            "Concerned chemist is requested to deliver Paracetamol with dosage 500mg"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Doctor requests medicine delivery",
+          "req_ids": [
+            "VIRTUA-5-14"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor has prescribed Paracetamol with dosage 500mg"
+          ],
+          "inputs": {},
+          "steps": [
+            "Doctor requests the chemist to deliver Paracetamol"
+          ],
+          "expected": [
+            "Medicine delivery request is successfully sent with request ID R002"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Lab test is performed and report is updated (Offline)",
+          "req_ids": [
+            "VIRTUA-5-15"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab has performed the lab test with ID L001"
+          ],
+          "inputs": {},
+          "steps": [
+            "Lab updates the report for the patient"
+          ],
+          "expected": [
+            "Lab report is updated with report ID RP001"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Lab report is released to view (Offline)",
+          "req_ids": [
+            "VIRTUA-5-16"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Lab report with ID RP001 is updated"
+          ],
+          "inputs": {},
+          "steps": [
+            "Doctor releases the lab report to the patient"
+          ],
+          "expected": [
+            "Lab report is released with status code 200"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Doctor views no pending appointments",
+          "req_ids": [
+            "VIRTUA-5-9"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor has no pending appointments"
+          ],
+          "inputs": {},
+          "steps": [
+            "Doctor views the pending appointments"
+          ],
+          "expected": [
+            "Doctor sees an empty list with message \"No pending appointments\""
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "3 pending appointments",
+            "context": "count of pending appointments",
+            "grounded": false
+          },
+          {
+            "value": "consultation ID C001",
+            "context": "consultation ID",
+            "grounded": false
+          },
+          {
+            "value": "appointment ID A001",
+            "context": "appointment ID",
+            "grounded": false
+          },
+          {
+            "value": "appointment ID A002",
+            "context": "appointment ID",
+            "grounded": false
+          },
+          {
+            "value": "appointment ID A003",
+            "context": "appointment ID",
+            "grounded": false
+          },
+          {
+            "value": "medicine name Paracetamol",
+            "context": "medicine name",
+            "grounded": false
+          },
+          {
+            "value": "medicine name Aspirin",
+            "context": "medicine name",
+            "grounded": false
+          },
+          {
+            "value": "medicine name Invalid Medicine",
+            "context": "medicine name",
+            "grounded": false
+          },
+          {
+            "value": "dosage 500mg",
+            "context": "dosage",
+            "grounded": false
+          },
+          {
+            "value": "dosage 300mg",
+            "context": "dosage",
+            "grounded": false
+          },
+          {
+            "value": "dosage 200mg",
+            "context": "dosage",
+            "grounded": false
+          },
+          {
+            "value": "prescription ID P001",
+            "context": "prescription ID",
+            "grounded": false
+          },
+          {
+            "value": "prescription ID P002",
+            "context": "prescription ID",
+            "grounded": false
+          },
+          {
+            "value": "prescription ID P003",
+            "context": "prescription ID",
+            "grounded": false
+          },
+          {
+            "value": "lab test name Blood Test",
+            "context": "lab test name",
+            "grounded": false
+          },
+          {
+            "value": "lab test name Urine Test",
+            "context": "lab test name",
+            "grounded": false
+          },
+          {
+            "value": "lab test name Invalid Test",
+            "context": "lab test name",
+            "grounded": false
+          },
+          {
+            "value": "lab test ID L001",
+            "context": "lab test ID",
+            "grounded": false
+          },
+          {
+            "value": "lab test ID L002",
+            "context": "lab test ID",
+            "grounded": false
+          },
+          {
+            "value": "lab test ID L003",
+            "context": "lab test ID",
+            "grounded": false
+          },
+          {
+            "value": "request ID R001",
+            "context": "request ID",
+            "grounded": false
+          },
+          {
+            "value": "request ID R002",
+            "context": "request ID",
+            "grounded": false
+          },
+          {
+            "value": "report ID RP001",
+            "context": "report ID",
+            "grounded": false
+          },
+          {
+            "value": "status code 200",
+            "context": "HTTP status code",
+            "grounded": false
+          },
+          {
+            "value": "message No pending appointments",
+            "context": "empty list message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 25,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No boundary tests for appointment counts (e.g., zero, one, maximum).",
+          "Negative tests use hardcoded invalid values but do not verify system error messages or codes.",
+          "Test IDs and status codes are arbitrary and not grounded in requirements.",
+          "Lack of concurrency or overlapping consultation scenarios.",
+          "No tests for offline state transitions or timing constraints."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.65,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

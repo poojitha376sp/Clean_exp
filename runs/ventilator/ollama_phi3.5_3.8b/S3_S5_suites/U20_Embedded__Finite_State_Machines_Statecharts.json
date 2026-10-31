@@ -1,0 +1,745 @@
+{
+  "unit_id": "U20_Embedded",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:phi3.5:3.8b",
+  "system_type": "safety_critical",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 1,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.2,
+    "sfv_score": 0.6,
+    "threshold": 0.7,
+    "sfv_pass": false,
+    "issues": [
+      "missing: transitions (>=2)",
+      "missing: states declared",
+      "missing: initial state",
+      "missing: events/guards"
+    ]
+  },
+  "fsa": null,
+  "artifact": "<the test suite written in Finite State Machines / Statecharts notation>",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Verify Controller meets commanded pressure during pressure fall phase within 0.8*PEEP-1 cmH2O",
+      "req_ids": [
+        "RW-SW-63"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System initialized, at baseline pressure"
+      ],
+      "inputs": {
+        "commandedPressure": "currentPressure - 0.8*PEEP"
+      },
+      "steps": [
+        "Increase pressure to commandedPressure",
+        "Monitor system pressure",
+        "Check if system pressure reaches or falls within 0.8*PEEP of baseline"
+      ],
+      "expected": [
+        "System pressure should stabilize within 0.8*PEEP of baseline without overshoot"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Verify Controller meets commanded PEEP within +-1 H2O + 10%",
+      "req_ids": [
+        "RW-SW-64"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System initialized, at baseline PEEP"
+      ],
+      "inputs": {
+        "commandedPEEP": "baselinePEEP * 0.9",
+        "baselinePEEP": "currentPEEP"
+      },
+      "steps": [
+        "Increase PEEP to commandedPEEP",
+        "Monitor system PEEP",
+        "Check if system PEEP is within 10% of baselinePEEP"
+      ],
+      "expected": [
+        "System PEEP should stabilize within 10% of baselinePEEP"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Verify Controller achieves target FiO2 value within 0.05",
+      "req_ids": [
+        "RW-SW-95"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System initialized, with target FiO2 set"
+      ],
+      "inputs": {
+        "targetFiO2": "desiredFiO2"
+      },
+      "steps": [
+        "Set target FiO2 to desiredFiO2",
+        "Monitor system FiO2",
+        "Check if system FiO2 matches targetFiO2 within 0.05 tolerance"
+      ],
+      "expected": [
+        "System FiO2 should match desiredFiO2 within 0.05 tolerance"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Verify Controller reports FiO2 before patient inhale",
+      "req_ids": [
+        "RW-SW-97"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System initialized, patient inhale detected"
+      ],
+      "inputs": {
+        "patientInhale": true
+      },
+      "steps": [
+        "Detect patient inhale",
+        "Request FiO2 measurement",
+        "Monitor system FiO2 report"
+      ],
+      "expected": [
+        "System should report FiO2 immediately before patient inhale"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Verify Controller handles different air conditions",
+      "req_ids": [
+        "RW-SW-98"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System initialized, with varying air conditions"
+      ],
+      "inputs": {
+        "temperature": "varying",
+        "altitude": "varying",
+        "humidity": "varying"
+      },
+      "steps": [
+        "Simulate varying air conditions",
+        "Adjust system settings accordingly",
+        "Monitor system FiO2 and PEEP stability"
+      ],
+      "expected": [
+        "System should maintain FiO2 and PEEP within specified limits under varying air conditions"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Verify Controller triggers inspiration on patient inspiration detection",
+      "req_ids": [
+        "RW-SW-156"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System initialized, with pressure controlled ventilation mode enabled"
+      ],
+      "inputs": {
+        "patientInhaleDetected": true
+      },
+      "steps": [
+        "Detect patient inspiration",
+        "Trigger inspiration mode",
+        "Monitor system response"
+      ],
+      "expected": [
+        "System should trigger inspiration mode upon patient inspiration detection"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Verify Controller avoids acting on absurd commands",
+      "req_ids": [
+        "RW-SW-156"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "System initialized, with potential data corruption"
+      ],
+      "inputs": {
+        "corruptCommand": "absurdCommand"
+      },
+      "steps": [
+        "Simulate data corruption",
+        "Attempt to send absurdCommand",
+        "Monitor system response"
+      ],
+      "expected": [
+        "System should not act on corruptCommand and maintains safety measures"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": null,
+      "test_cases": null,
+      "raw_if_unparsed": "```artifact\n<<Finite State Machine / Statechart Representation>>\n\n[Initial State: Idle]\n    + (Idle)\n    |-> [Check Preconditions: None]\n    |\n    |--[True Guard for Precondition Check]--+--[False Guard for Precondition Check]\n    |                             |\n    +---------------------------+--------------------------------------------------------+\n    |                           |                                                       |\n    |--[True]                 +--> [Error State: Communication Error]                   |\n    |                           |                                                       |\n    |                           |                                                       |\n    |                           |                                                       |\n    |                           |                                                       |\n    |                           |                                                       |\n    |                           |                                                       |\n    |                           |                                                       |\n    |                           |                                                       |\n    |                           |                                                       |\n    +---------------------------+--------------------------------------------------------+\n    |                           |\n    |                           |----[Pressure Fall Phase]                             |\n    |                           |     |-----> [Measure Current Pressure]                     |\n    |                           |     |       |                                       |\n    |                           |     |       +-----> [Is Pressure Within Specified Range?]-------+   |\n    |                           |           |                                       |\n    |                           |           |                                       |\n    |                           |           +------> [True]                         |\n    |                           |      |                                       |\n    |                           |      |                                       |\n    |                           |      |                                       |\n    |                           |      |                                       |\n    |                           |      |                                       |\n    |                           |      |                                       |\n    |                           |      |                                       |\n    |                           |      |                                       |\n    |                           |      |                                       |\n    +---------------------------+--------------------------------------------------------+\n    |                           |\n    |                           |----[True]",
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "Representation artifact is empty."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).\n- Representation artifact is empty.",
+      "artifact": "<the test suite written in Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Verify Controller meets commanded pressure during pressure fall phase within 0.8*PEEP-1 cmH2O",
+          "req_ids": [
+            "RW-SW-63"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, at baseline pressure"
+          ],
+          "inputs": {
+            "commandedPressure": "currentPressure - 0.8*PEEP"
+          },
+          "steps": [
+            "Increase pressure to commandedPressure",
+            "Monitor system pressure",
+            "Check if system pressure reaches or falls within 0.8*PEEP of baseline"
+          ],
+          "expected": [
+            "System pressure should stabilize within 0.8*PEEP of baseline without overshoot"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Verify Controller meets commanded PEEP within +-1 H2O + 10%",
+          "req_ids": [
+            "RW-SW-64"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, at baseline PEEP"
+          ],
+          "inputs": {
+            "commandedPEEP": "baselinePEEP * 0.9",
+            "baselinePEEP": "currentPEEP"
+          },
+          "steps": [
+            "Increase PEEP to commandedPEEP",
+            "Monitor system PEEP",
+            "Check if system PEEP is within 10% of baselinePEEP"
+          ],
+          "expected": [
+            "System PEEP should stabilize within 10% of baselinePEEP"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Verify Controller achieves target FiO2 value within 0.05",
+          "req_ids": [
+            "RW-SW-95"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, with target FiO2 set"
+          ],
+          "inputs": {
+            "targetFiO2": "desiredFiO2"
+          },
+          "steps": [
+            "Set target FiO2 to desiredFiO2",
+            "Monitor system FiO2",
+            "Check if system FiO2 matches targetFiO2 within 0.05 tolerance"
+          ],
+          "expected": [
+            "System FiO2 should match desiredFiO2 within 0.05 tolerance"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Verify Controller reports FiO2 before patient inhale",
+          "req_ids": [
+            "RW-SW-97"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, patient inhale detected"
+          ],
+          "inputs": {
+            "patientInhale": true
+          },
+          "steps": [
+            "Detect patient inhale",
+            "Request FiO2 measurement",
+            "Monitor system FiO2 report"
+          ],
+          "expected": [
+            "System should report FiO2 immediately before patient inhale"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Verify Controller handles different air conditions",
+          "req_ids": [
+            "RW-SW-98"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, with varying air conditions"
+          ],
+          "inputs": {
+            "temperature": "varying",
+            "altitude": "varying",
+            "humidity": "varying"
+          },
+          "steps": [
+            "Simulate varying air conditions",
+            "Adjust system settings accordingly",
+            "Monitor system FiO2 and PEEP stability"
+          ],
+          "expected": [
+            "System should maintain FiO2 and PEEP within specified limits under varying air conditions"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Verify Controller triggers inspiration on patient inspiration detection",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, with pressure controlled ventilation mode enabled"
+          ],
+          "inputs": {
+            "patientInhaleDetected": true
+          },
+          "steps": [
+            "Detect patient inspiration",
+            "Trigger inspiration mode",
+            "Monitor system response"
+          ],
+          "expected": [
+            "System should trigger inspiration mode upon patient inspiration detection"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Verify Controller avoids acting on absurd commands",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System initialized, with potential data corruption"
+          ],
+          "inputs": {
+            "corruptCommand": "absurdCommand"
+          },
+          "steps": [
+            "Simulate data corruption",
+            "Attempt to send absurdCommand",
+            "Monitor system response"
+          ],
+          "expected": [
+            "System should not act on corruptCommand and maintains safety measures"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.60). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Pressure Fall Phase Within Overshoot of 0.8*PEEP-1 cmH2O",
+          "req_ids": [
+            "RW-SW-63"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, at baseline pressure"
+          ],
+          "inputs": {
+            "targetPressure": "0.8 * PEEP-1 cmH2O below current pressure"
+          },
+          "steps": [
+            "Increase pressure decrease rate",
+            "Monitor pressure change",
+            "Check if pressure falls within specified overshoot range"
+          ],
+          "expected": [
+            "Pressure falls within 0.8*PEEP-1 cmH2O of current pressure without exceeding it"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test PEEP Commanded Within +-1 H2O + 10%",
+          "req_ids": [
+            "RW-SW-64"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, at baseline PEEP"
+          ],
+          "inputs": {
+            "targetPEEP": "PEEP +/- 1 H2O + 10% of current PEEP"
+          },
+          "steps": [
+            "Set PEEP to target value",
+            "Monitor PEEP stability",
+            "Check if PEEP remains within +-1 H2O + 10% range"
+          ],
+          "expected": [
+            "PEEP remains within +-1 H2O + 10% of initial PEEP"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Achievement of Target FiO2 Value",
+          "req_ids": [
+            "RW-SW-95"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, target FiO2 set"
+          ],
+          "inputs": {
+            "targetFiO2": "Specified FiO2 value"
+          },
+          "steps": [
+            "Adjust FiO2 to target value",
+            "Monitor FiO2 stability",
+            "Check if achieved FiO2 matches target value within 0.05 tolerance"
+          ],
+          "expected": [
+            "FiO2 matches target value within 0.05 tolerance"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Reporting FiO2 Before Patient Inhale",
+          "req_ids": [
+            "RW-SW-97"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, patient inhale detected"
+          ],
+          "inputs": {
+            "reportFiO2": true
+          },
+          "steps": [
+            "Trigger FiO2 reporting mechanism",
+            "Verify FiO2 value is reported prior to patient inhale"
+          ],
+          "expected": [
+            "FiO2 value reported prior to patient inhale"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Ventilation Mode Triggered by Patient Inspiration",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, patient inspiration detected"
+          ],
+          "inputs": {
+            "triggerMode": "Pressure Controlled Ventilation"
+          },
+          "steps": [
+            "Activate pressure control mode",
+            "Monitor mode activation in response to inspiration",
+            "Check if mode triggers correctly upon patient inspiration"
+          ],
+          "expected": [
+            "Mode activates upon patient inspiration"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Safety Measures Against Absurd Commands",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System initialized, simulate data corruption"
+          ],
+          "inputs": {
+            "corruptData": true
+          },
+          "steps": [
+            "Introduce corrupt data into system",
+            "Attempt to trigger ventilation mode",
+            "Check if system rejects absurd commands"
+          ],
+          "expected": [
+            "System does not act on corrupt data, maintains safety measures"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Safety Measures Under Different Air Conditions",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System initialized, simulate varying air conditions"
+          ],
+          "inputs": {
+            "simulateTemperatureChange": true,
+            "simulateAltitudeChange": true,
+            "simulateHumidityChange": true
+          },
+          "steps": [
+            "Adjust system for different air conditions",
+            "Attempt to trigger ventilation mode",
+            "Check if system maintains correct operation"
+          ],
+          "expected": [
+            "System maintains correct operation despite varying air conditions"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.60). Fix these problems and output the full corrected suite:\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Pressure Fall Phase Within Overshoot of 0.8*PEEP-1 cmH2O",
+          "req_ids": [
+            "RW-SW-63"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, at baseline pressure"
+          ],
+          "inputs": {
+            "targetPressure": "0.8 * PEEP-1 cmH2O below current pressure"
+          },
+          "steps": [
+            "Increase pressure decrease rate",
+            "Monitor pressure change",
+            "Check if pressure falls within specified overshoot range"
+          ],
+          "expected": [
+            "Pressure falls within 0.8*PEEP-1 cmH2O of current pressure without exceeding it"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test PEEP Commanded Within +-1 H2O + 10%",
+          "req_ids": [
+            "RW-SW-64"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, at baseline PEEP"
+          ],
+          "inputs": {
+            "targetPEEP": "PEEP +/- 1 H2O + 10% of current PEEP"
+          },
+          "steps": [
+            "Set PEEP to target value",
+            "Monitor PEEP stability",
+            "Check if PEEP remains within +-1 H2O + 10% range"
+          ],
+          "expected": [
+            "PEEP remains within +-1 H2O + 10% of initial PEEP"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Achievement of Target FiO2 Value",
+          "req_ids": [
+            "RW-SW-95"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, target FiO2 set"
+          ],
+          "inputs": {
+            "targetFiO2": "Specified FiO2 value"
+          },
+          "steps": [
+            "Adjust FiO2 to target value",
+            "Monitor FiO2 stability",
+            "Check if achieved FiO2 matches target value within 0.05 tolerance"
+          ],
+          "expected": [
+            "FiO2 matches target value within 0.05 tolerance"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Reporting FiO2 Before Patient Inhale",
+          "req_ids": [
+            "RW-SW-97"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, patient inhale detected"
+          ],
+          "inputs": {
+            "reportFiO2": true
+          },
+          "steps": [
+            "Trigger FiO2 reporting mechanism",
+            "Verify FiO2 value is reported prior to patient inhale"
+          ],
+          "expected": [
+            "FiO2 value reported prior to patient inhale"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Ventilation Mode Triggered by Patient Inspiration",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, patient inspiration detected"
+          ],
+          "inputs": {
+            "triggerMode": "Pressure Controlled Ventilation"
+          },
+          "steps": [
+            "Activate pressure control mode",
+            "Monitor mode activation in response to inspiration",
+            "Check if mode triggers correctly upon patient inspiration"
+          ],
+          "expected": [
+            "Mode activates upon patient inspiration"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Safety Measures Against Absurd Commands",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System initialized, simulate data corruption"
+          ],
+          "inputs": {
+            "corruptData": true
+          },
+          "steps": [
+            "Introduce corrupt data into system",
+            "Attempt to trigger ventilation mode",
+            "Check if system rejects absurd commands"
+          ],
+          "expected": [
+            "System does not act on corrupt data, maintains safety measures"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Safety Measures Under Different Air Conditions",
+          "req_ids": [
+            "RW-SW-156"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System initialized, simulate varying air conditions"
+          ],
+          "inputs": {
+            "simulateTemperatureChange": true,
+            "simulateAltitudeChange": true,
+            "simulateHumidityChange": true
+          },
+          "steps": [
+            "Adjust system for different air conditions",
+            "Attempt to trigger ventilation mode",
+            "Check if system maintains correct operation"
+          ],
+          "expected": [
+            "System maintains correct operation despite varying air conditions"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.6,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    }
+  ]
+}

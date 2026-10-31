@@ -1,0 +1,600 @@
+{
+  "unit_id": "U22_3",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:codegemma:7b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 2,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.8,
+    "sfv_score": 0.9,
+    "threshold": 0.7,
+    "sfv_pass": true,
+    "issues": [
+      "missing: transitions (>=2)"
+    ]
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.65,
+    "negative_coverage": 0.4,
+    "oracle_assertiveness": 0.0,
+    "boundary_coverage": 0.4,
+    "groundedness_mg": 0.8889,
+    "hallucinated": [
+      {
+        "value": "Navigation is successful",
+        "context": "expected",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 9,
+    "uncovered_clauses": [
+      "VIRTUA-3.1-1",
+      "VIRTUA-3.1-1#2"
+    ],
+    "weaknesses": [
+      "No tests for PC/Laptop compatibility (VIRTUA-3.1-1).",
+      "No test for exception error message “Symptom does not exist” (VIRTUA-3.1-1#2).",
+      "Assertions are vague; need concrete state checks (e.g., assert PaymentSuccess state).",
+      "Boundary test for error message length does not test the 80-character limit exactly.",
+      "Representation-specific criteria not met: missing state and transition coverage."
+    ],
+    "traceability": 0.75,
+    "untraced_reqs": [
+      "VIRTUA-3.1-1",
+      "VIRTUA-3.1-1#2"
+    ],
+    "fsa_score": 0.4883,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "@start\nmode OfflineConsultation\n  state PaymentMethod\n    event PayWithVideo\n      guard isVideoPaymentEnabled\n      transition PaymentMethod.PaymentConfirmation\n    event PayWithCreditDebitNetBanking\n      guard isCreditDebitNetBankingEnabled\n      transition PaymentMethod.PaymentConfirmation\n  state PaymentConfirmation\n    event ConfirmPayment\n      transition PaymentConfirmation.PaymentSuccess\n    event CancelPayment\n      transition PaymentMethod.PaymentMethodSelection\n  state PaymentSuccess\n    event Close\n      transition OfflineConsultation.Completed\n  state PaymentMethodSelection\n    event SelectVideoPayment\n      transition PaymentMethod.PaymentMethodSelection\n    event SelectCreditDebitNetBanking\n      transition PaymentMethod.PaymentMethodSelection\n  state Completed\n    event Close\n      transition OfflineConsultation.Closed\n@end",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Pay with video payment method",
+      "req_ids": [
+        "VIRTUA-3-25"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Video payment is enabled"
+      ],
+      "inputs": {
+        "paymentMethod": "video"
+      },
+      "steps": [
+        "Select video payment method",
+        "Confirm payment"
+      ],
+      "expected": [
+        "Payment is successful"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Pay with credit/debit/net banking payment method",
+      "req_ids": [
+        "VIRTUA-3-26"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Credit/debit/net banking is enabled"
+      ],
+      "inputs": {
+        "paymentMethod": "creditDebitNetBanking"
+      },
+      "steps": [
+        "Select credit/debit/net banking payment method",
+        "Confirm payment"
+      ],
+      "expected": [
+        "Payment is successful"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Error message location and descriptiveness",
+      "req_ids": [
+        "VIRTUA-3.1-2"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Trigger an error"
+      ],
+      "expected": [
+        "Error message appears at the bottom of the screen",
+        "Error message is self-descriptive"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Error message length",
+      "req_ids": [
+        "VIRTUA-3.1-3"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Trigger an error with a long message"
+      ],
+      "expected": [
+        "Error message is within 80 characters"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Navigation via buttons",
+      "req_ids": [
+        "VIRTUA-3.1-4"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Navigate using buttons"
+      ],
+      "expected": [
+        "Navigation is successful"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Font size for elderly users",
+      "req_ids": [
+        "VIRTUA-3.1-5"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {},
+      "steps": [
+        "Open patient registration and consultation request screens"
+      ],
+      "expected": [
+        "Font size is larger"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "**Offline Consultation Payment Flow**\n\n**Mode:** Offline Consultation\n\n**States:**\n- Payment Selection\n- Payment Processing\n- Payment Success\n- Payment Failure\n\n**Transitions:**\n- Payment Selection -> Payment Processing (when user selects a payment method)\n- Payment Processing -> Payment Success (when payment is successful)\n- Payment Processing -> Payment Failure (when payment fails)\n\n**Event:** Payment Completed\n\n**Guard:** Payment method is valid\n\n**Error Handling:**\n- Payment Failure state displays an error message \"Payment failed. Please try again later.\"\n- Error message is limited to 80 characters.\n\n**Font Size:**\n- Patient Registration and Consultation Requests screens have a bigger font size to aid Elderly people.\n\n**Exception Handling:**\n- Symptom does not exist error message is displayed when user enters a non-existent symptom.\n\n**Test Cases:**\n\n**TC-001:**\n- **Title:** Successful Payment\n- **Req IDs:** VIRTUA-3-25, VIRTUA-3-26\n- **Kind:** Positive\n- **Preconditions:** Offline Consultation mode is active\n- **Input:** Payment method is selected\n- **Steps:** User selects a payment method and submits the form\n- **Expected:** Payment is successful and user is redirected to the Payment Success state\n\n**TC-002:**\n- **Title:** Failed Payment\n- **Req IDs:** VIRTUA-3-25, VIRTUA-3-26\n- **Kind:** Negative\n- **Preconditions:** Offline Consultation mode is active\n- **Input:** Invalid payment method is selected\n- **Steps:** User selects an invalid payment method and submits the form\n- **Expected:** Payment fails and user is redirected to the Payment Failure state with an error message\n\n**TC-003:**\n- **Title:** Error Message Length\n- **Req IDs:** VIRTUA-3.1-3\n- **Kind:** Boundary\n- **Preconditions:** Offline Consultation mode is active\n- **Input:** Error message is generated\n- **Steps:** Error message is displayed\n- **Expected:** Error message is limited to 80 characters\n\n**TC-004:**\n- **Title:** Font Size Adjustment\n- **Req IDs:** VIRTUA-3.1-5\n- **Kind:** Nonfunctional\n- **Preconditions:** Offline Consultation mode is active\n- **Input:** None\n- **Steps:** User accesses Patient Registration and Consultation Requests screens\n- **Expected:** Screens have a bigger font size\n\n**TC-005:**\n- **Title:** Symptom Validation\n- **Req IDs:** VIRTUA-3.1-1#2\n- **Kind:** Exception Handling\n- **Preconditions:** Offline Consultation mode is active\n- **Input:** Non-existent symptom is entered\n- **Steps:** User enters a non-existent symptom\n- **Expected:** Symptom does not exist error message is displayed",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Successful Payment",
+          "req_ids": [
+            "VIRTUA-3-25",
+            "VIRTUA-3-26"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Offline Consultation mode is active"
+          ],
+          "inputs": {
+            "payment_method": "valid"
+          },
+          "steps": [
+            "User selects a payment method and submits the form"
+          ],
+          "expected": [
+            "Payment is successful and user is redirected to the Payment Success state"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Failed Payment",
+          "req_ids": [
+            "VIRTUA-3-25",
+            "VIRTUA-3-26"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Offline Consultation mode is active"
+          ],
+          "inputs": {
+            "payment_method": "invalid"
+          },
+          "steps": [
+            "User selects an invalid payment method and submits the form"
+          ],
+          "expected": [
+            "Payment fails and user is redirected to the Payment Failure state with an error message"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Error Message Length",
+          "req_ids": [
+            "VIRTUA-3.1-3"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Offline Consultation mode is active"
+          ],
+          "inputs": {
+            "error_message": "a string longer than 80 characters"
+          },
+          "steps": [
+            "Error message is generated"
+          ],
+          "expected": [
+            "Error message is limited to 80 characters"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Font Size Adjustment",
+          "req_ids": [
+            "VIRTUA-3.1-5"
+          ],
+          "kind": "nonfunctional",
+          "preconditions": [
+            "Offline Consultation mode is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "User accesses Patient Registration and Consultation Requests screens"
+          ],
+          "expected": [
+            "Screens have a bigger font size"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Symptom Validation",
+          "req_ids": [
+            "VIRTUA-3.1-1#2"
+          ],
+          "kind": "exception_handling",
+          "preconditions": [
+            "Offline Consultation mode is active"
+          ],
+          "inputs": {
+            "symptom": "non-existent"
+          },
+          "steps": [
+            "User enters a non-existent symptom"
+          ],
+          "expected": [
+            "Symptom does not exist error message is displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.6,
+        "representation_score": 0.8,
+        "sfv_score": 0.7,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #4 (TC-004): 'nonfunctional' is not one of ['positive', 'negative', 'boundary']",
+          "test case #5 (TC-005): 'exception_handling' is not one of ['positive', 'negative', 'boundary']",
+          "missing: initial state"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.70). Fix these problems and output the full corrected suite:\n- test case #4 (TC-004): 'nonfunctional' is not one of ['positive', 'negative', 'boundary']\n- test case #5 (TC-005): 'exception_handling' is not one of ['positive', 'negative', 'boundary']\n- missing: initial state",
+      "artifact": "@start\nInitial -> Offline Consultation\nOffline Consultation -> Payment\nPayment -> Success\nSuccess -> Consultation Request\nConsultation Request -> Consultation\nConsultation -> End\n\n@event Payment\n@guard Credit/Debit/Net Banking enabled thru a Payment Gateway\n\n@event Exception Error\n@guard Symptom does not exist\n\n@end",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Successful Offline Consultation",
+          "req_ids": [
+            "VIRTUA-3-25",
+            "VIRTUA-3-26",
+            "VIRTUA-3.1-4"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "payment_method": "Credit/Debit/Net Banking"
+          },
+          "steps": [
+            "Make Offline Consultation Request",
+            "Make Payment",
+            "Verify Consultation"
+          ],
+          "expected": [
+            "Consultation is successful"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Exception Error Handling",
+          "req_ids": [
+            "VIRTUA-3.1-1#2"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "symptom": "Non-existent Symptom"
+          },
+          "steps": [
+            "Make Consultation Request"
+          ],
+          "expected": [
+            "Symptom does not exist error message is displayed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": [
+          "missing: states declared"
+        ]
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.375,
+        "negative_coverage": 0.333,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.7143,
+        "hallucinated": [
+          {
+            "value": "Non-existent Symptom",
+            "context": "input symptom",
+            "grounded": false
+          },
+          {
+            "value": "Consultation is successful",
+            "context": "expected result",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 7,
+        "uncovered_clauses": [
+          "VIRTUA-3.1-1",
+          "VIRTUA-3.1-2",
+          "VIRTUA-3.1-3",
+          "VIRTUA-3.1-4",
+          "VIRTUA-3.1-5"
+        ],
+        "weaknesses": [
+          "Add tests for PC/Laptop compatibility (VIRTUA-3.1-1).",
+          "Include checks for error message location and descriptiveness (VIRTUA-3.1-2).",
+          "Test error message length against 80‑character limit (VIRTUA-3.1-3).",
+          "Verify navigation via buttons (VIRTUA-3.1-4).",
+          "Ensure larger font size for elderly users (VIRTUA-3.1-5)."
+        ],
+        "traceability": 0.5,
+        "untraced_reqs": [
+          "VIRTUA-3.1-1",
+          "VIRTUA-3.1-2",
+          "VIRTUA-3.1-3",
+          "VIRTUA-3.1-5"
+        ],
+        "fsa_score": 0.3162,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.3162; sub-scores {'clause_coverage': 0.375, 'negative_coverage': 0.333, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.0, 'groundedness_mg': 0.7143}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-3.1-1', 'VIRTUA-3.1-2', 'VIRTUA-3.1-3', 'VIRTUA-3.1-5'] (add at least one each)\n- uncovered clause: VIRTUA-3.1-1\n- uncovered clause: VIRTUA-3.1-2\n- uncovered clause: VIRTUA-3.1-3\n- uncovered clause: VIRTUA-3.1-4\n- uncovered clause: VIRTUA-3.1-5\n- ungrounded value 'Non-existent Symptom' (input symptom): remove or use the SRS value\n- ungrounded value 'Consultation is successful' (expected result): remove or use the SRS value\n- Add tests for PC/Laptop compatibility (VIRTUA-3.1-1).\n- Include checks for error message location and descriptiveness (VIRTUA-3.1-2).\n- Test error message length against 80‑character limit (VIRTUA-3.1-3).\n- Verify navigation via buttons (VIRTUA-3.1-4).\n- Ensure larger font size for elderly users (VIRTUA-3.1-5).",
+      "artifact": "@start\nmode OfflineConsultation\n  state PaymentMethod\n    event PayWithVideo\n      guard isVideoPaymentEnabled\n      transition PaymentMethod.PaymentConfirmation\n    event PayWithCreditDebitNetBanking\n      guard isCreditDebitNetBankingEnabled\n      transition PaymentMethod.PaymentConfirmation\n  state PaymentConfirmation\n    event ConfirmPayment\n      transition PaymentConfirmation.PaymentSuccess\n    event CancelPayment\n      transition PaymentMethod.PaymentMethodSelection\n  state PaymentSuccess\n    event Close\n      transition OfflineConsultation.Completed\n  state PaymentMethodSelection\n    event SelectVideoPayment\n      transition PaymentMethod.PaymentMethodSelection\n    event SelectCreditDebitNetBanking\n      transition PaymentMethod.PaymentMethodSelection\n  state Completed\n    event Close\n      transition OfflineConsultation.Closed\n@end",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Pay with video payment method",
+          "req_ids": [
+            "VIRTUA-3-25"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Video payment is enabled"
+          ],
+          "inputs": {
+            "paymentMethod": "video"
+          },
+          "steps": [
+            "Select video payment method",
+            "Confirm payment"
+          ],
+          "expected": [
+            "Payment is successful"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Pay with credit/debit/net banking payment method",
+          "req_ids": [
+            "VIRTUA-3-26"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Credit/debit/net banking is enabled"
+          ],
+          "inputs": {
+            "paymentMethod": "creditDebitNetBanking"
+          },
+          "steps": [
+            "Select credit/debit/net banking payment method",
+            "Confirm payment"
+          ],
+          "expected": [
+            "Payment is successful"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Error message location and descriptiveness",
+          "req_ids": [
+            "VIRTUA-3.1-2"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Trigger an error"
+          ],
+          "expected": [
+            "Error message appears at the bottom of the screen",
+            "Error message is self-descriptive"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Error message length",
+          "req_ids": [
+            "VIRTUA-3.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Trigger an error with a long message"
+          ],
+          "expected": [
+            "Error message is within 80 characters"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Navigation via buttons",
+          "req_ids": [
+            "VIRTUA-3.1-4"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Navigate using buttons"
+          ],
+          "expected": [
+            "Navigation is successful"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Font size for elderly users",
+          "req_ids": [
+            "VIRTUA-3.1-5"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Open patient registration and consultation request screens"
+          ],
+          "expected": [
+            "Font size is larger"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": [
+          "missing: transitions (>=2)"
+        ]
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.65,
+        "negative_coverage": 0.4,
+        "oracle_assertiveness": 0.0,
+        "boundary_coverage": 0.4,
+        "groundedness_mg": 0.8889,
+        "hallucinated": [
+          {
+            "value": "Navigation is successful",
+            "context": "expected",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 9,
+        "uncovered_clauses": [
+          "VIRTUA-3.1-1",
+          "VIRTUA-3.1-1#2"
+        ],
+        "weaknesses": [
+          "No tests for PC/Laptop compatibility (VIRTUA-3.1-1).",
+          "No test for exception error message “Symptom does not exist” (VIRTUA-3.1-1#2).",
+          "Assertions are vague; need concrete state checks (e.g., assert PaymentSuccess state).",
+          "Boundary test for error message length does not test the 80-character limit exactly.",
+          "Representation-specific criteria not met: missing state and transition coverage."
+        ],
+        "traceability": 0.75,
+        "untraced_reqs": [
+          "VIRTUA-3.1-1",
+          "VIRTUA-3.1-1#2"
+        ],
+        "fsa_score": 0.4883,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.4883; sub-scores {'clause_coverage': 0.65, 'negative_coverage': 0.4, 'oracle_assertiveness': 0.0, 'boundary_coverage': 0.4, 'groundedness_mg': 0.8889}). Output the full improved suite addressing:\n- requirements with NO test case: ['VIRTUA-3.1-1', 'VIRTUA-3.1-1#2'] (add at least one each)\n- uncovered clause: VIRTUA-3.1-1\n- uncovered clause: VIRTUA-3.1-1#2\n- ungrounded value 'Navigation is successful' (expected): remove or use the SRS value\n- No tests for PC/Laptop compatibility (VIRTUA-3.1-1).\n- No test for exception error message “Symptom does not exist” (VIRTUA-3.1-1#2).\n- Assertions are vague; need concrete state checks (e.g., assert PaymentSuccess state).\n- Boundary test for error message length does not test the 80-character limit exactly.\n- Representation-specific criteria not met: missing state and transition coverage.",
+      "artifact": "@start\nmode OfflineConsultation\n  state PaymentSuccess\n  state PaymentFailure\n  state Error\n  state Navigation\n  state SymptomError\n\nevent PaymentSuccessEvent\nevent PaymentFailureEvent\nevent ErrorEvent\nevent NavigationEvent\nevent SymptomErrorEvent\n\nguard PaymentSuccessGuard(paymentStatus)\n  return paymentStatus == \"success\"\n\nguard PaymentFailureGuard(paymentStatus)\n  return paymentStatus == \"failure\"\n\nguard ErrorGuard(errorMessage)\n  return errorMessage.length > 80\n\nguard NavigationGuard(navigationStatus)\n  return navigationStatus == \"success\"\n\nguard SymptomErrorGuard(symptom)\n  return symptom.exists == false\n\n@end",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.4,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list).",
+          "missing: transitions (>=2)"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,1353 @@
+{
+  "unit_id": "U12_4",
+  "representation": "Decision Tables",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 0.0,
+    "representation_score": 0.6667,
+    "sfv_score": 0.3333,
+    "threshold": 0.6,
+    "sfv_pass": false,
+    "issues": [
+      "test case #1 (TC-001): traces to unknown requirement ids ['U12_4/1']",
+      "test case #2 (TC-002): traces to unknown requirement ids ['U12_4/1']",
+      "test case #3 (TC-003): traces to unknown requirement ids ['U12_4/2']",
+      "test case #4 (TC-004): traces to unknown requirement ids ['U12_4/2']",
+      "test case #5 (TC-005): traces to unknown requirement ids ['U12_4/3']",
+      "test case #6 (TC-006): traces to unknown requirement ids ['U12_4/3']",
+      "test case #7 (TC-007): traces to unknown requirement ids ['U12_3/1']",
+      "test case #8 (TC-008): traces to unknown requirement ids ['U12_3/1']",
+      "test case #9 (TC-009): traces to unknown requirement ids ['U12_3/2']",
+      "test case #10 (TC-010): traces to unknown requirement ids ['U12_3/2']",
+      "Table syntax is inconsistent."
+    ]
+  },
+  "fsa": null,
+  "artifact": "Decision Table for Requirement U12_4 [Req-2/1]: Add a new (unique) Doctor\nConditions:\n- Doctor Name (unique)\n- Age\n- Sex\n- Qualification\n- Experience\n- Speciality\nActions:\n- Add Doctor (Success/Failure)\n\n| Doctor Name | Age | Sex | Qualification | Experience | Speciality | Action |\n|-------------|-----|-----|---------------|------------|------------|--------|\n| UniqueName  | 30  | M   | MD            | 5          | Cardiology | Success |\n| DuplicateName| 35 | F   | DO            | 3          | Dermatology| Failure |\n\nDecision Table for Requirement U12_4 [Req-2/2]: View and Update the details of an existing Doctor\nConditions:\n- Doctor ID (exists)\n- Field to Update (Name, Age, Sex, Qualification, Experience)\n- Speciality (attempted update)\n\nActions:\n- Update Details (Success/Failure)\n\n| Doctor ID | Field to Update | Speciality Attempted | Action |\n|-----------|-----------------|----------------------|--------|\n| 1         | Name            | No                   | Success |\n| 1         | Age             | No                   | Success |\n| 1         | Sex             | No                   | Success |\n| 1         | Qualification   | No                   | Success |\n| 1         | Experience      | No                   | Success |\n| 1         | Speciality      | Yes                  | Failure |\n\nDecision Table for Requirement U12_4 [Req-2/3]: Delete the Doctor Details\nConditions:\n- Doctor ID (exists)\n- Pending Patient Consultation Request\n\nActions:\n- Delete Doctor (Success/Failure)\n\n| Doctor ID | Pending Patient Consultation Request | Action |\n|-----------|--------------------------------------|--------|\n| 1         | No                                   | Success |\n| 1         | Yes                                  | Failure |\n\nDecision Table for Requirement U12_3 [Req-3/1]: Add a new Chemist or a Lab\nConditions:\n- Pincode\n- Existing Lab in Pincode\n\nActions:\n- Add Chemist/Lab (Success/Failure)\n\n| Pincode | Existing Lab in Pincode | Action |\n|---------|--------------------------|--------|\n| 400001  | No                       | Success |\n| 400001  | Yes                      | Failure |\n\nDecision Table for Requirement U12_3 [Req-3/2]: View and Update the details of an existing Chemist/ Lab\nConditions:\n- Chemist/Lab ID (exists)\n- Pincode (attempted update)\n\nActions:\n- Update Details (Success/Failure)\n\n| Chemist/Lab ID | Pincode Attempted | Action |\n|----------------|--------------------|--------|\n| 1              | No                 | Success |\n| 1              | Yes                | Failure |\n\nDecision Table for Requirement U12_3 [Req-3/3]: Delete the Chemist / Lab Details\nConditions:\n- Chemist/Lab ID (exists)\n- Pending Prescription\n\nActions:\n- Delete Chemist/Lab (Success/Failure)\n\n| Chemist/Lab ID | Pending Prescription | Action |\n|----------------|----------------------|--------|\n| 1              | No                   | Success |\n| 1              | Yes                  | Failure |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Add a unique Doctor",
+      "req_ids": [
+        "U12_4/1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "Doctor Name": "UniqueName",
+        "Age": 30,
+        "Sex": "M",
+        "Qualification": "MD",
+        "Experience": 5,
+        "Speciality": "Cardiology"
+      },
+      "steps": [
+        "Attempt to add the doctor with the provided details."
+      ],
+      "expected": [
+        "Doctor added successfully."
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Attempt to add a duplicate Doctor",
+      "req_ids": [
+        "U12_4/1"
+      ],
+      "kind": "negative",
+      "preconditions": [],
+      "inputs": {
+        "Doctor Name": "DuplicateName",
+        "Age": 35,
+        "Sex": "F",
+        "Qualification": "DO",
+        "Experience": 3,
+        "Speciality": "Dermatology"
+      },
+      "steps": [
+        "Attempt to add the doctor with a name already existing."
+      ],
+      "expected": [
+        "Doctor addition fails due to duplicate name."
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Update existing Doctor details (except Speciality)",
+      "req_ids": [
+        "U12_4/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor ID exists"
+      ],
+      "inputs": {
+        "Doctor ID": 1,
+        "Field to Update": "Name",
+        "New Value": "UpdatedName"
+      },
+      "steps": [
+        "View existing doctor details.",
+        "Update the specified field with the new value.",
+        "Verify the update."
+      ],
+      "expected": [
+        "Doctor details updated successfully."
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Attempt to update Speciality of an existing Doctor",
+      "req_ids": [
+        "U12_4/2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Doctor ID exists"
+      ],
+      "inputs": {
+        "Doctor ID": 1,
+        "Field to Update": "Speciality",
+        "New Value": "Neurology"
+      },
+      "steps": [
+        "Attempt to update the doctor's speciality."
+      ],
+      "expected": [
+        "Update fails due to restriction on changing speciality."
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Delete an existing Doctor with no pending Patient Consultation Request",
+      "req_ids": [
+        "U12_4/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Doctor ID exists",
+        "No pending patient consultation"
+      ],
+      "inputs": {
+        "Doctor ID": 1
+      },
+      "steps": [
+        "Verify no pending patient consultation.",
+        "Delete the doctor."
+      ],
+      "expected": [
+        "Doctor deleted successfully."
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Attempt to delete an existing Doctor with a pending Patient Consultation Request",
+      "req_ids": [
+        "U12_4/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Doctor ID exists",
+        "Pending patient consultation"
+      ],
+      "inputs": {
+        "Doctor ID": 1
+      },
+      "steps": [
+        "Attempt to delete the doctor while a pending consultation exists."
+      ],
+      "expected": [
+        "Deletion fails due to pending consultation."
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Add a new Chemist or Lab with a unique Pincode",
+      "req_ids": [
+        "U12_3/1"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "Pincode": "400001",
+        "Chemist/Lab Type": "Chemist"
+      },
+      "steps": [
+        "Attempt to add a chemist with the specified pincode."
+      ],
+      "expected": [
+        "Chemist added successfully."
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Attempt to add a Chemist or Lab with an existing Pincode",
+      "req_ids": [
+        "U12_3/1"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Pincode already has a lab"
+      ],
+      "inputs": {
+        "Pincode": "400001",
+        "Chemist/Lab Type": "Lab"
+      },
+      "steps": [
+        "Attempt to add a lab with a pincode that already has a lab."
+      ],
+      "expected": [
+        "Addition fails due to existing lab in pincode."
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Update existing Chemist/Lab details (except Pincode)",
+      "req_ids": [
+        "U12_3/2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist/Lab ID exists"
+      ],
+      "inputs": {
+        "Chemist/Lab ID": 1,
+        "Field to Update": "Name",
+        "New Value": "UpdatedName"
+      },
+      "steps": [
+        "View existing chemist/lab details.",
+        "Update the specified field with the new value.",
+        "Verify the update."
+      ],
+      "expected": [
+        "Chemist/Lab details updated successfully."
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Attempt to update Pincode of an existing Chemist/Lab",
+      "req_ids": [
+        "U12_3/2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Chemist/Lab ID exists"
+      ],
+      "inputs": {
+        "Chemist/Lab ID": 1,
+        "Pincode Attempted": "400002"
+      },
+      "steps": [
+        "Attempt to update the pincode of the chemist/lab."
+      ],
+      "expected": [
+        "Update fails due to restriction on changing pincode."
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Delete an existing Chemist/Lab with no pending Prescription",
+      "req_ids": [
+        "U12_3/3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist/Lab ID exists",
+        "No pending prescription"
+      ],
+      "inputs": {
+        "Chemist/Lab ID": 1
+      },
+      "steps": [
+        "Verify no pending prescription.",
+        "Delete the chemist/lab."
+      ],
+      "expected": [
+        "Chemist/Lab deleted successfully."
+      ]
+    },
+    {
+      "id": "TC-012",
+      "title": "Attempt to delete an existing Chemist/Lab with a pending Prescription",
+      "req_ids": [
+        "U12_3/3"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Chemist/Lab ID exists",
+        "Pending prescription"
+      ],
+      "inputs": {
+        "Chemist/Lab ID": 1
+      },
+      "steps": [
+        "Attempt to delete the chemist/lab while a pending prescription exists."
+      ],
+      "expected": [
+        "Deletion fails due to pending prescription."
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Decision Table for Requirement U12_4 [Req-2/1]: Add a new (unique) Doctor\nConditions:\n- Doctor Name (unique)\n- Age\n- Sex\n- Qualification\n- Experience\n- Speciality\nActions:\n- Add Doctor (Success/Failure)\n\n| Doctor Name | Age | Sex | Qualification | Experience | Speciality | Action |\n|-------------|-----|-----|---------------|------------|------------|--------|\n| UniqueName  | 30  | M   | MD            | 5          | Cardiology | Success |\n| DuplicateName| 35 | F   | DO            | 3          | Dermatology| Failure |\n\nDecision Table for Requirement U12_4 [Req-2/2]: View and Update the details of an existing Doctor\nConditions:\n- Doctor ID (exists)\n- Field to Update (Name, Age, Sex, Qualification, Experience)\n- Speciality (attempted update)\n\nActions:\n- Update Details (Success/Failure)\n\n| Doctor ID | Field to Update | Speciality Attempted | Action |\n|-----------|-----------------|----------------------|--------|\n| 1         | Name            | No                   | Success |\n| 1         | Age             | No                   | Success |\n| 1         | Sex             | No                   | Success |\n| 1         | Qualification   | No                   | Success |\n| 1         | Experience      | No                   | Success |\n| 1         | Speciality      | Yes                  | Failure |\n\nDecision Table for Requirement U12_4 [Req-2/3]: Delete the Doctor Details\nConditions:\n- Doctor ID (exists)\n- Pending Patient Consultation Request\n\nActions:\n- Delete Doctor (Success/Failure)\n\n| Doctor ID | Pending Patient Consultation Request | Action |\n|-----------|--------------------------------------|--------|\n| 1         | No                                   | Success |\n| 1         | Yes                                  | Failure |\n\nDecision Table for Requirement U12_3 [Req-3/1]: Add a new Chemist or a Lab\nConditions:\n- Pincode\n- Existing Lab in Pincode\n\nActions:\n- Add Chemist/Lab (Success/Failure)\n\n| Pincode | Existing Lab in Pincode | Action |\n|---------|--------------------------|--------|\n| 400001  | No                       | Success |\n| 400001  | Yes                      | Failure |\n\nDecision Table for Requirement U12_3 [Req-3/2]: View and Update the details of an existing Chemist/ Lab\nConditions:\n- Chemist/Lab ID (exists)\n- Pincode (attempted update)\n\nActions:\n- Update Details (Success/Failure)\n\n| Chemist/Lab ID | Pincode Attempted | Action |\n|----------------|--------------------|--------|\n| 1              | No                 | Success |\n| 1              | Yes                | Failure |\n\nDecision Table for Requirement U12_3 [Req-3/3]: Delete the Chemist / Lab Details\nConditions:\n- Chemist/Lab ID (exists)\n- Pending Prescription\n\nActions:\n- Delete Chemist/Lab (Success/Failure)\n\n| Chemist/Lab ID | Pending Prescription | Action |\n|----------------|----------------------|--------|\n| 1              | No                   | Success |\n| 1              | Yes                  | Failure |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a unique Doctor",
+          "req_ids": [
+            "U12_4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Doctor Name": "UniqueName",
+            "Age": 30,
+            "Sex": "M",
+            "Qualification": "MD",
+            "Experience": 5,
+            "Speciality": "Cardiology"
+          },
+          "steps": [
+            "Attempt to add the doctor with the provided details."
+          ],
+          "expected": [
+            "Doctor added successfully."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Attempt to add a duplicate Doctor",
+          "req_ids": [
+            "U12_4/1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Doctor Name": "DuplicateName",
+            "Age": 35,
+            "Sex": "F",
+            "Qualification": "DO",
+            "Experience": 3,
+            "Speciality": "Dermatology"
+          },
+          "steps": [
+            "Attempt to add the doctor with a name already existing."
+          ],
+          "expected": [
+            "Doctor addition fails due to duplicate name."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Update existing Doctor details (except Speciality)",
+          "req_ids": [
+            "U12_4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor ID exists"
+          ],
+          "inputs": {
+            "Doctor ID": 1,
+            "Field to Update": "Name",
+            "New Value": "UpdatedName"
+          },
+          "steps": [
+            "View existing doctor details.",
+            "Update the specified field with the new value.",
+            "Verify the update."
+          ],
+          "expected": [
+            "Doctor details updated successfully."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Attempt to update Speciality of an existing Doctor",
+          "req_ids": [
+            "U12_4/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor ID exists"
+          ],
+          "inputs": {
+            "Doctor ID": 1,
+            "Field to Update": "Speciality",
+            "New Value": "Neurology"
+          },
+          "steps": [
+            "Attempt to update the doctor's speciality."
+          ],
+          "expected": [
+            "Update fails due to restriction on changing speciality."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete an existing Doctor with no pending Patient Consultation Request",
+          "req_ids": [
+            "U12_4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor ID exists",
+            "No pending patient consultation"
+          ],
+          "inputs": {
+            "Doctor ID": 1
+          },
+          "steps": [
+            "Verify no pending patient consultation.",
+            "Delete the doctor."
+          ],
+          "expected": [
+            "Doctor deleted successfully."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Attempt to delete an existing Doctor with a pending Patient Consultation Request",
+          "req_ids": [
+            "U12_4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor ID exists",
+            "Pending patient consultation"
+          ],
+          "inputs": {
+            "Doctor ID": 1
+          },
+          "steps": [
+            "Attempt to delete the doctor while a pending consultation exists."
+          ],
+          "expected": [
+            "Deletion fails due to pending consultation."
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Add a new Chemist or Lab with a unique Pincode",
+          "req_ids": [
+            "U12_3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Pincode": "400001",
+            "Chemist/Lab Type": "Chemist"
+          },
+          "steps": [
+            "Attempt to add a chemist with the specified pincode."
+          ],
+          "expected": [
+            "Chemist added successfully."
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Attempt to add a Chemist or Lab with an existing Pincode",
+          "req_ids": [
+            "U12_3/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Pincode already has a lab"
+          ],
+          "inputs": {
+            "Pincode": "400001",
+            "Chemist/Lab Type": "Lab"
+          },
+          "steps": [
+            "Attempt to add a lab with a pincode that already has a lab."
+          ],
+          "expected": [
+            "Addition fails due to existing lab in pincode."
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Update existing Chemist/Lab details (except Pincode)",
+          "req_ids": [
+            "U12_3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist/Lab ID exists"
+          ],
+          "inputs": {
+            "Chemist/Lab ID": 1,
+            "Field to Update": "Name",
+            "New Value": "UpdatedName"
+          },
+          "steps": [
+            "View existing chemist/lab details.",
+            "Update the specified field with the new value.",
+            "Verify the update."
+          ],
+          "expected": [
+            "Chemist/Lab details updated successfully."
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Attempt to update Pincode of an existing Chemist/Lab",
+          "req_ids": [
+            "U12_3/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist/Lab ID exists"
+          ],
+          "inputs": {
+            "Chemist/Lab ID": 1,
+            "Pincode Attempted": "400002"
+          },
+          "steps": [
+            "Attempt to update the pincode of the chemist/lab."
+          ],
+          "expected": [
+            "Update fails due to restriction on changing pincode."
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Delete an existing Chemist/Lab with no pending Prescription",
+          "req_ids": [
+            "U12_3/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist/Lab ID exists",
+            "No pending prescription"
+          ],
+          "inputs": {
+            "Chemist/Lab ID": 1
+          },
+          "steps": [
+            "Verify no pending prescription.",
+            "Delete the chemist/lab."
+          ],
+          "expected": [
+            "Chemist/Lab deleted successfully."
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Attempt to delete an existing Chemist/Lab with a pending Prescription",
+          "req_ids": [
+            "U12_3/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist/Lab ID exists",
+            "Pending prescription"
+          ],
+          "inputs": {
+            "Chemist/Lab ID": 1
+          },
+          "steps": [
+            "Attempt to delete the chemist/lab while a pending prescription exists."
+          ],
+          "expected": [
+            "Deletion fails due to pending prescription."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.0,
+        "representation_score": 0.6667,
+        "sfv_score": 0.3333,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U12_4/1']",
+          "test case #2 (TC-002): traces to unknown requirement ids ['U12_4/1']",
+          "test case #3 (TC-003): traces to unknown requirement ids ['U12_4/2']",
+          "test case #4 (TC-004): traces to unknown requirement ids ['U12_4/2']",
+          "test case #5 (TC-005): traces to unknown requirement ids ['U12_4/3']",
+          "test case #6 (TC-006): traces to unknown requirement ids ['U12_4/3']",
+          "test case #7 (TC-007): traces to unknown requirement ids ['U12_3/1']",
+          "test case #8 (TC-008): traces to unknown requirement ids ['U12_3/1']",
+          "test case #9 (TC-009): traces to unknown requirement ids ['U12_3/2']",
+          "test case #10 (TC-010): traces to unknown requirement ids ['U12_3/2']",
+          "Table syntax is inconsistent."
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.33). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): traces to unknown requirement ids ['U12_4/1']\n- test case #2 (TC-002): traces to unknown requirement ids ['U12_4/1']\n- test case #3 (TC-003): traces to unknown requirement ids ['U12_4/2']\n- test case #4 (TC-004): traces to unknown requirement ids ['U12_4/2']\n- test case #5 (TC-005): traces to unknown requirement ids ['U12_4/3']\n- test case #6 (TC-006): traces to unknown requirement ids ['U12_4/3']\n- test case #7 (TC-007): traces to unknown requirement ids ['U12_3/1']\n- test case #8 (TC-008): traces to unknown requirement ids ['U12_3/1']\n- test case #9 (TC-009): traces to unknown requirement ids ['U12_3/2']\n- test case #10 (TC-010): traces to unknown requirement ids ['U12_3/2']\n- Table syntax is inconsistent.",
+      "artifact": "Decision Table for Requirement U12_4/1: Add a new (unique) Doctor\nConditions:\n- Doctor Name (unique)\n- Age\n- Sex\n- Qualification\n- Experience\n- Speciality\nActions:\n- Add Doctor (PASS/FAIL)\nRules:\n1. Name unique, all other fields valid -> PASS\n2. Name duplicate -> FAIL\n3. Any field invalid (e.g., negative age) -> FAIL\n\nDecision Table for Requirement U12_4/2: View and Update existing Doctor details\nConditions:\n- Doctor ID exists\n- Attempted field to update (Name, Age, Sex, Qualification, Experience)\n- Speciality\nActions:\n- View Doctor Details (PASS)\n- Update fields (PASS/FAIL)\nRules:\n1. ID exists, update non-speciality field -> PASS\n2. ID exists, attempt to update Speciality -> FAIL\n3. ID does not exist -> FAIL\n\nDecision Table for Requirement U12_4/3: Delete Doctor Details\nConditions:\n- Doctor ID exists\n- Pending Patient Consultation Request\nActions:\n- Delete Doctor (PASS/FAIL)\nRules:\n1. No pending request -> PASS\n2. Pending request -> FAIL\n\nDecision Table for Requirement U12_3/1: Add a new Chemist or Lab\nConditions:\n- Pincode\n- Existing Chemist/Lab in Pincode\nActions:\n- Add Chemist/Lab (PASS/FAIL)\nRules:\n1. No existing Chemist/Lab in Pincode -> PASS\n2. Existing Chemist/Lab in Pincode -> FAIL\n\nDecision Table for Requirement U12_3/2: View and Update existing Chemist/Lab details\nConditions:\n- Chemist/Lab ID exists\n- Attempted field to update (Name, Pincode)\nActions:\n- View Details (PASS)\n- Update fields (PASS/FAIL)\nRules:\n1. ID exists, update non-Pincode field -> PASS\n2. ID exists, attempt to update Pincode -> FAIL\n3. ID does not exist -> FAIL\n\nDecision Table for Requirement U12_3/3: Delete Chemist/Lab Details\nConditions:\n- Chemist/Lab ID exists\n- Pending Prescription\nActions:\n- Delete Chemist/Lab (PASS/FAIL)\nRules:\n1. No pending prescription -> PASS\n2. Pending prescription -> FAIL",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a unique Doctor",
+          "req_ids": [
+            "U12_4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Name": "Dr. Smith",
+            "Age": 45,
+            "Sex": "Male",
+            "Qualification": "MBBS",
+            "Experience": 10,
+            "Speciality": "Cardiology"
+          },
+          "steps": [
+            "Submit Doctor details"
+          ],
+          "expected": [
+            "Doctor added successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Attempt to add a duplicate Doctor",
+          "req_ids": [
+            "U12_4/1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Name": "Dr. Smith",
+            "Age": 45,
+            "Sex": "Male",
+            "Qualification": "MBBS",
+            "Experience": 10,
+            "Speciality": "Cardiology"
+          },
+          "steps": [
+            "Submit Doctor details"
+          ],
+          "expected": [
+            "Error: Doctor name already exists"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "View and update non-speciality Doctor fields",
+          "req_ids": [
+            "U12_4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor ID exists"
+          ],
+          "inputs": {
+            "DoctorID": "DOC001",
+            "FieldName": "Age",
+            "NewValue": 46
+          },
+          "steps": [
+            "View Doctor details",
+            "Update Age"
+          ],
+          "expected": [
+            "Doctor Age updated to 46"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Attempt to update Doctor Speciality",
+          "req_ids": [
+            "U12_4/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor ID exists"
+          ],
+          "inputs": {
+            "DoctorID": "DOC001",
+            "FieldName": "Speciality",
+            "NewValue": "Neurology"
+          },
+          "steps": [
+            "Attempt to update Speciality"
+          ],
+          "expected": [
+            "Error: Speciality cannot be updated"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete Doctor with no pending consultation",
+          "req_ids": [
+            "U12_4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor ID exists",
+            "No pending consultation"
+          ],
+          "inputs": {
+            "DoctorID": "DOC001"
+          },
+          "steps": [
+            "Delete Doctor"
+          ],
+          "expected": [
+            "Doctor deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Attempt to delete Doctor with pending consultation",
+          "req_ids": [
+            "U12_4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor ID exists",
+            "Pending consultation"
+          ],
+          "inputs": {
+            "DoctorID": "DOC001"
+          },
+          "steps": [
+            "Attempt to delete Doctor"
+          ],
+          "expected": [
+            "Error: Cannot delete Doctor with pending consultation"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Add a new Chemist in a unique Pincode",
+          "req_ids": [
+            "U12_3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Pincode": "400001",
+            "Name": "Chemist A",
+            "Type": "Chemist"
+          },
+          "steps": [
+            "Submit Chemist details"
+          ],
+          "expected": [
+            "Chemist added successfully"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Attempt to add a Chemist in an existing Pincode",
+          "req_ids": [
+            "U12_3/1"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "Pincode": "400001",
+            "Name": "Chemist B",
+            "Type": "Chemist"
+          },
+          "steps": [
+            "Submit Chemist details"
+          ],
+          "expected": [
+            "Error: Pincode already has a Chemist"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "View and update non-Pincode Chemist fields",
+          "req_ids": [
+            "U12_3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist ID exists"
+          ],
+          "inputs": {
+            "ChemistID": "CHEM001",
+            "FieldName": "Name",
+            "NewValue": "Updated Chemist A"
+          },
+          "steps": [
+            "View Chemist details",
+            "Update Name"
+          ],
+          "expected": [
+            "Chemist Name updated to Updated Chemist A"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Attempt to update Chemist Pincode",
+          "req_ids": [
+            "U12_3/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist ID exists"
+          ],
+          "inputs": {
+            "ChemistID": "CHEM001",
+            "FieldName": "Pincode",
+            "NewValue": "400002"
+          },
+          "steps": [
+            "Attempt to update Pincode"
+          ],
+          "expected": [
+            "Error: Pincode cannot be updated"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U12_4/1']",
+          "test case #2 (TC-002): traces to unknown requirement ids ['U12_4/1']",
+          "test case #3 (TC-003): traces to unknown requirement ids ['U12_4/2']",
+          "test case #4 (TC-004): traces to unknown requirement ids ['U12_4/2']",
+          "test case #5 (TC-005): traces to unknown requirement ids ['U12_4/3']",
+          "test case #6 (TC-006): traces to unknown requirement ids ['U12_4/3']",
+          "test case #7 (TC-007): traces to unknown requirement ids ['U12_3/1']",
+          "test case #8 (TC-008): traces to unknown requirement ids ['U12_3/1']",
+          "test case #9 (TC-009): traces to unknown requirement ids ['U12_3/2']",
+          "test case #10 (TC-010): traces to unknown requirement ids ['U12_3/2']",
+          "No table structure detected."
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): traces to unknown requirement ids ['U12_4/1']\n- test case #2 (TC-002): traces to unknown requirement ids ['U12_4/1']\n- test case #3 (TC-003): traces to unknown requirement ids ['U12_4/2']\n- test case #4 (TC-004): traces to unknown requirement ids ['U12_4/2']\n- test case #5 (TC-005): traces to unknown requirement ids ['U12_4/3']\n- test case #6 (TC-006): traces to unknown requirement ids ['U12_4/3']\n- test case #7 (TC-007): traces to unknown requirement ids ['U12_3/1']\n- test case #8 (TC-008): traces to unknown requirement ids ['U12_3/1']\n- test case #9 (TC-009): traces to unknown requirement ids ['U12_3/2']\n- test case #10 (TC-010): traces to unknown requirement ids ['U12_3/2']\n- No table structure detected.",
+      "artifact": "Decision Table for Requirement U12_4/1: Add a new (unique) Doctor\nConditions:\n- Doctor Name (unique)\n- Age\n- Sex\n- Qualification\n- Experience\n- Speciality\nActions:\n- Add Doctor (PASS/FAIL)\nRules:\n1. Name unique, all other fields valid -> PASS\n2. Name duplicate -> FAIL\n3. Any field invalid (e.g., negative age) -> FAIL\n\nDecision Table for Requirement U12_4/2: View and Update existing Doctor details\nConditions:\n- Doctor ID (exists)\n- Attempted field to update (Name, Age, Sex, Qualification, Experience, Speciality)\nActions:\n- View Doctor Details (PASS)\n- Update Doctor (PASS/FAIL)\nRules:\n1. View any field -> PASS\n2. Attempt to update Speciality -> FAIL\n3. Attempt to update any other field with valid data -> PASS\n4. Attempt to update with invalid data -> FAIL\n\nDecision Table for Requirement U12_4/3: Delete Doctor Details\nConditions:\n- Doctor ID (exists)\n- Pending Patient Consultation Request (Yes/No)\nActions:\n- Delete Doctor (PASS/FAIL)\nRules:\n1. No pending request -> PASS\n2. Pending request -> FAIL\n\nDecision Table for Requirement U12_3/1: Add a new Chemist or Lab\nConditions:\n- Pincode\n- Existing Chemist/Lab in Pincode (Yes/No)\nActions:\n- Add Chemist/Lab (PASS/FAIL)\nRules:\n1. No existing Chemist/Lab in Pincode -> PASS\n2. Existing Chemist/Lab in Pincode -> FAIL\n\nDecision Table for Requirement U12_3/2: View and Update existing Chemist/Lab details\nConditions:\n- Chemist/Lab ID (exists)\n- Attempted field to update (Name, Pincode, ...)\nActions:\n- View Details (PASS)\n- Update Details (PASS/FAIL)\nRules:\n1. View any field -> PASS\n2. Attempt to update Pincode -> FAIL\n3. Attempt to update any other field with valid data -> PASS\n4. Attempt to update with invalid data -> FAIL\n\nDecision Table for Requirement U12_3/3: Delete Chemist/Lab Details\nConditions:\n- Chemist/Lab ID (exists)\n- Pending Prescription (Yes/No)\nActions:\n- Delete Chemist/Lab (PASS/FAIL)\nRules:\n1. No pending prescription -> PASS\n2. Pending prescription -> FAIL",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a unique Doctor",
+          "req_ids": [
+            "U12_4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Name": "Dr. Smith",
+            "Age": 45,
+            "Sex": "Male",
+            "Qualification": "MBBS",
+            "Experience": 10,
+            "Speciality": "Cardiology"
+          },
+          "steps": [
+            "Call AddDoctor API with inputs",
+            "Verify response status is SUCCESS"
+          ],
+          "expected": [
+            "Doctor added successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Attempt to add a Doctor with duplicate Name",
+          "req_ids": [
+            "U12_4/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor with Name 'Dr. Smith' already exists"
+          ],
+          "inputs": {
+            "Name": "Dr. Smith",
+            "Age": 45,
+            "Sex": "Male",
+            "Qualification": "MBBS",
+            "Experience": 10,
+            "Speciality": "Cardiology"
+          },
+          "steps": [
+            "Call AddDoctor API with inputs",
+            "Verify response status is FAILURE"
+          ],
+          "expected": [
+            "Duplicate name error"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "View existing Doctor details",
+          "req_ids": [
+            "U12_4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor with ID 1 exists"
+          ],
+          "inputs": {
+            "DoctorID": 1
+          },
+          "steps": [
+            "Call ViewDoctor API with DoctorID",
+            "Verify response contains correct Doctor details"
+          ],
+          "expected": [
+            "Doctor details returned correctly"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Attempt to update Doctor's Speciality",
+          "req_ids": [
+            "U12_4/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor with ID 1 exists"
+          ],
+          "inputs": {
+            "DoctorID": 1,
+            "Speciality": "Neurology"
+          },
+          "steps": [
+            "Call UpdateDoctor API with inputs",
+            "Verify response status is FAILURE"
+          ],
+          "expected": [
+            "Speciality update denied"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete a Doctor with no pending Patient Consultation Request",
+          "req_ids": [
+            "U12_4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor with ID 1 exists and no pending requests"
+          ],
+          "inputs": {
+            "DoctorID": 1
+          },
+          "steps": [
+            "Call DeleteDoctor API with DoctorID",
+            "Verify response status is SUCCESS"
+          ],
+          "expected": [
+            "Doctor deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Attempt to delete a Doctor with pending Patient Consultation Request",
+          "req_ids": [
+            "U12_4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor with ID 1 exists and has a pending request"
+          ],
+          "inputs": {
+            "DoctorID": 1
+          },
+          "steps": [
+            "Call DeleteDoctor API with DoctorID",
+            "Verify response status is FAILURE"
+          ],
+          "expected": [
+            "Deletion denied due to pending request"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Add a new Chemist or Lab with unique Pincode",
+          "req_ids": [
+            "U12_3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Pincode": "400001",
+            "Type": "Chemist",
+            "Name": "HealthMart"
+          },
+          "steps": [
+            "Call AddChemistLab API with inputs",
+            "Verify response status is SUCCESS"
+          ],
+          "expected": [
+            "Chemist added successfully"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Attempt to add a Chemist or Lab with existing Pincode",
+          "req_ids": [
+            "U12_3/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist with Pincode 400001 already exists"
+          ],
+          "inputs": {
+            "Pincode": "400001",
+            "Type": "Lab",
+            "Name": "BioTest"
+          },
+          "steps": [
+            "Call AddChemistLab API with inputs",
+            "Verify response status is FAILURE"
+          ],
+          "expected": [
+            "Pincode already in use error"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "View and Update existing Chemist/Lab details (non-Pincode fields)",
+          "req_ids": [
+            "U12_3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist with ID 10 exists"
+          ],
+          "inputs": {
+            "ChemistID": 10,
+            "Name": "HealthMart Updated"
+          },
+          "steps": [
+            "Call ViewChemistLab API with ChemistID",
+            "Verify response contains correct Chemist details",
+            "Call UpdateChemistLab API with inputs",
+            "Verify response status is SUCCESS"
+          ],
+          "expected": [
+            "Chemist details viewed and updated correctly"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Attempt to update Chemist/Lab Pincode",
+          "req_ids": [
+            "U12_3/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist with ID 10 exists"
+          ],
+          "inputs": {
+            "ChemistID": 10,
+            "Pincode": "500002"
+          },
+          "steps": [
+            "Call UpdateChemistLab API with inputs",
+            "Verify response status is FAILURE"
+          ],
+          "expected": [
+            "Pincode update denied"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U12_4/1']",
+          "test case #2 (TC-002): traces to unknown requirement ids ['U12_4/1']",
+          "test case #3 (TC-003): traces to unknown requirement ids ['U12_4/2']",
+          "test case #4 (TC-004): traces to unknown requirement ids ['U12_4/2']",
+          "test case #5 (TC-005): traces to unknown requirement ids ['U12_4/3']",
+          "test case #6 (TC-006): traces to unknown requirement ids ['U12_4/3']",
+          "test case #7 (TC-007): traces to unknown requirement ids ['U12_3/1']",
+          "test case #8 (TC-008): traces to unknown requirement ids ['U12_3/1']",
+          "test case #9 (TC-009): traces to unknown requirement ids ['U12_3/2']",
+          "test case #10 (TC-010): traces to unknown requirement ids ['U12_3/2']",
+          "No table structure detected."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.00). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): traces to unknown requirement ids ['U12_4/1']\n- test case #2 (TC-002): traces to unknown requirement ids ['U12_4/1']\n- test case #3 (TC-003): traces to unknown requirement ids ['U12_4/2']\n- test case #4 (TC-004): traces to unknown requirement ids ['U12_4/2']\n- test case #5 (TC-005): traces to unknown requirement ids ['U12_4/3']\n- test case #6 (TC-006): traces to unknown requirement ids ['U12_4/3']\n- test case #7 (TC-007): traces to unknown requirement ids ['U12_3/1']\n- test case #8 (TC-008): traces to unknown requirement ids ['U12_3/1']\n- test case #9 (TC-009): traces to unknown requirement ids ['U12_3/2']\n- test case #10 (TC-010): traces to unknown requirement ids ['U12_3/2']\n- No table structure detected.",
+      "artifact": "Decision Table for Requirement U12_4/1: Add a new (unique) Doctor\nConditions:\n- Doctor Name (unique)\n- Age\n- Sex\n- Qualification\n- Experience\n- Speciality\nActions:\n- Add Doctor (PASS/FAIL)\nRules:\n1. Name unique, all other fields valid -> PASS\n2. Name duplicate -> FAIL\n3. Any field invalid (e.g., negative age) -> FAIL\n\nDecision Table for Requirement U12_4/2: View and Update existing Doctor details\nConditions:\n- Doctor ID (exists)\n- Attempted field to update (Name, Age, Sex, Qualification, Experience, Speciality)\nActions:\n- View Doctor Details (PASS)\n- Update Doctor (PASS/FAIL)\nRules:\n1. View any field -> PASS\n2. Attempt to update Speciality -> FAIL\n3. Attempt to update any other field with valid data -> PASS\n4. Attempt to update with invalid data -> FAIL\n\nDecision Table for Requirement U12_4/3: Delete Doctor Details\nConditions:\n- Doctor ID (exists)\n- Pending Patient Consultation Request (Yes/No)\nActions:\n- Delete Doctor (PASS/FAIL)\nRules:\n1. No pending request -> PASS\n2. Pending request -> FAIL\n\nDecision Table for Requirement U12_3/1: Add a new Chemist or Lab\nConditions:\n- Pincode\n- Existing Chemist/Lab in Pincode (Yes/No)\nActions:\n- Add Chemist/Lab (PASS/FAIL)\nRules:\n1. No existing Chemist/Lab in Pincode -> PASS\n2. Existing Chemist/Lab in Pincode -> FAIL\n\nDecision Table for Requirement U12_3/2: View and Update existing Chemist/Lab details\nConditions:\n- Chemist/Lab ID (exists)\n- Attempted field to update (Name, Pincode, ...)\nActions:\n- View Details (PASS)\n- Update Details (PASS/FAIL)\nRules:\n1. View any field -> PASS\n2. Attempt to update Pincode -> FAIL\n3. Attempt to update any other field with valid data -> PASS\n4. Attempt to update with invalid data -> FAIL\n\nDecision Table for Requirement U12_3/3: Delete Chemist/Lab Details\nConditions:\n- Chemist/Lab ID (exists)\n- Pending Prescription (Yes/No)\nActions:\n- Delete Chemist/Lab (PASS/FAIL)\nRules:\n1. No pending prescription -> PASS\n2. Pending prescription -> FAIL",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Add a unique Doctor",
+          "req_ids": [
+            "U12_4/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Name": "Dr. Smith",
+            "Age": 45,
+            "Sex": "Male",
+            "Qualification": "MBBS",
+            "Experience": 10,
+            "Speciality": "Cardiology"
+          },
+          "steps": [
+            "Call AddDoctor API with inputs",
+            "Verify response status is SUCCESS"
+          ],
+          "expected": [
+            "Doctor added successfully"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Attempt to add a Doctor with duplicate Name",
+          "req_ids": [
+            "U12_4/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor with Name 'Dr. Smith' already exists"
+          ],
+          "inputs": {
+            "Name": "Dr. Smith",
+            "Age": 45,
+            "Sex": "Male",
+            "Qualification": "MBBS",
+            "Experience": 10,
+            "Speciality": "Cardiology"
+          },
+          "steps": [
+            "Call AddDoctor API with inputs",
+            "Verify response status is FAILURE"
+          ],
+          "expected": [
+            "Duplicate name error"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "View existing Doctor details",
+          "req_ids": [
+            "U12_4/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor with ID 1 exists"
+          ],
+          "inputs": {
+            "DoctorID": 1
+          },
+          "steps": [
+            "Call ViewDoctor API with DoctorID",
+            "Verify response contains correct Doctor details"
+          ],
+          "expected": [
+            "Doctor details returned correctly"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Attempt to update Doctor's Speciality",
+          "req_ids": [
+            "U12_4/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor with ID 1 exists"
+          ],
+          "inputs": {
+            "DoctorID": 1,
+            "Speciality": "Neurology"
+          },
+          "steps": [
+            "Call UpdateDoctor API with inputs",
+            "Verify response status is FAILURE"
+          ],
+          "expected": [
+            "Speciality update denied"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Delete a Doctor with no pending Patient Consultation Request",
+          "req_ids": [
+            "U12_4/3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Doctor with ID 1 exists and no pending requests"
+          ],
+          "inputs": {
+            "DoctorID": 1
+          },
+          "steps": [
+            "Call DeleteDoctor API with DoctorID",
+            "Verify response status is SUCCESS"
+          ],
+          "expected": [
+            "Doctor deleted successfully"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Attempt to delete a Doctor with pending Patient Consultation Request",
+          "req_ids": [
+            "U12_4/3"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Doctor with ID 1 exists and has a pending request"
+          ],
+          "inputs": {
+            "DoctorID": 1
+          },
+          "steps": [
+            "Call DeleteDoctor API with DoctorID",
+            "Verify response status is FAILURE"
+          ],
+          "expected": [
+            "Deletion denied due to pending request"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Add a new Chemist or Lab with unique Pincode",
+          "req_ids": [
+            "U12_3/1"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "Pincode": "400001",
+            "Type": "Chemist",
+            "Name": "HealthMart"
+          },
+          "steps": [
+            "Call AddChemistLab API with inputs",
+            "Verify response status is SUCCESS"
+          ],
+          "expected": [
+            "Chemist added successfully"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Attempt to add a Chemist or Lab with existing Pincode",
+          "req_ids": [
+            "U12_3/1"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist with Pincode 400001 already exists"
+          ],
+          "inputs": {
+            "Pincode": "400001",
+            "Type": "Lab",
+            "Name": "BioTest"
+          },
+          "steps": [
+            "Call AddChemistLab API with inputs",
+            "Verify response status is FAILURE"
+          ],
+          "expected": [
+            "Pincode already in use error"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "View and Update existing Chemist/Lab details (non-Pincode fields)",
+          "req_ids": [
+            "U12_3/2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist with ID 10 exists"
+          ],
+          "inputs": {
+            "ChemistID": 10,
+            "Name": "HealthMart Updated"
+          },
+          "steps": [
+            "Call ViewChemistLab API with ChemistID",
+            "Verify response contains correct Chemist details",
+            "Call UpdateChemistLab API with inputs",
+            "Verify response status is SUCCESS"
+          ],
+          "expected": [
+            "Chemist details viewed and updated correctly"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Attempt to update Chemist/Lab Pincode",
+          "req_ids": [
+            "U12_3/2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Chemist with ID 10 exists"
+          ],
+          "inputs": {
+            "ChemistID": 10,
+            "Pincode": "500002"
+          },
+          "steps": [
+            "Call UpdateChemistLab API with inputs",
+            "Verify response status is FAILURE"
+          ],
+          "expected": [
+            "Pincode update denied"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 0.0,
+        "representation_score": 0.0,
+        "sfv_score": 0.0,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U12_4/1']",
+          "test case #2 (TC-002): traces to unknown requirement ids ['U12_4/1']",
+          "test case #3 (TC-003): traces to unknown requirement ids ['U12_4/2']",
+          "test case #4 (TC-004): traces to unknown requirement ids ['U12_4/2']",
+          "test case #5 (TC-005): traces to unknown requirement ids ['U12_4/3']",
+          "test case #6 (TC-006): traces to unknown requirement ids ['U12_4/3']",
+          "test case #7 (TC-007): traces to unknown requirement ids ['U12_3/1']",
+          "test case #8 (TC-008): traces to unknown requirement ids ['U12_3/1']",
+          "test case #9 (TC-009): traces to unknown requirement ids ['U12_3/2']",
+          "test case #10 (TC-010): traces to unknown requirement ids ['U12_3/2']",
+          "No table structure detected."
+        ]
+      }
+    }
+  ]
+}

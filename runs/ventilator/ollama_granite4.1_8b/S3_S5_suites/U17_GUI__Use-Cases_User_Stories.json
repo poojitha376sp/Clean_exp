@@ -1,0 +1,1278 @@
+{
+  "unit_id": "U17_GUI",
+  "representation": "Use-Cases & User Stories",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "data_pipeline",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 3,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Use-Cases & User Stories",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "data_pipeline",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.25,
+      "wg": 0.0
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.625,
+    "boundary_coverage": 0.5,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 10,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No negative or exception test cases covering error handling paths.",
+      "Boundary tests for tidal volume and ratio do not cover extreme values (0, 1000, 10:1, 1:200).",
+      "Placeholder values like \"validPressureValue\" lack concrete numeric data.",
+      "Expected results sometimes vague, e.g., \"updates correctly within specified parameters\".",
+      "Test cases do not verify unit consistency (e.g., cmH₂O vs cmH2O)."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.6188,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "**Use-Case & User Stories for Unit U17_GUI**\n\n**Actor:** Patient Caregiver (PCG)\n\n---\n\n### Use-Case 1: Display Patient Pressure at Gas Outlet Port\n**Primary Success Flow:**\n1. PCG accesses the GUI.\n2. Controller transmits pressure data at the gas outlet port.\n3. GUI receives data and displays the pressure reading in real-time.\n4. Pressure reading is updated at a rate of at least 20 Hz.\n5. GUI shows pressure within the valid range as defined by the controller.\n\n**Alternative Flow:**\n1. If the controller fails to transmit data within the refresh rate, GUI displays \"Pressure Data Unavailable\" with a warning icon.\n\n**Exception Flow:**\n1. If the pressure reading exceeds the valid range, GUI displays \"Out of Range\" and logs an error.\n\n---\n\n### Use-Case 2: Refresh Rate of GUI Graph\n**Primary Success Flow:**\n1. GUI graph is set to refresh at a rate of ≥ 20 Hz.\n2. Each refresh cycle updates the graph with the latest pressure data.\n3. Graph updates are visually smooth without noticeable lag.\n\n**Boundary Value Test:**\n1. Verify that the refresh rate is exactly 20 Hz and remains stable under continuous data transmission.\n\n**Exception Flow:**\n1. If the refresh rate drops below 20 Hz, GUI displays \"Graph Refresh Rate Below Threshold\" and alerts the system administrator.\n\n---\n\n### Use-Case 3: Duration of GUI Graph\n**Primary Success Flow:**\n1. GUI graph duration is set to 30 seconds.\n2. Graph displays the last 30 seconds of pressure data.\n3. Graph automatically resets after 30 seconds to show the most recent data.\n\n**Boundary Value Test:**\n1. Confirm that the graph resets precisely at the 30-second mark.\n\n**Exception Flow:**\n1. If the duration setting is altered to less than 30 seconds, GUI displays \"Graph Duration Invalid\" and reverts to the default 30-second setting.\n\n---\n\n### Use-Case 4: Display Inspiratory Tidal Volume\n**Primary Success Flow:**\n1. GUI receives tidal volume data from the controller.\n2. Display tidal volume in the range 0..1000 mL with a resolution of 1 mL.\n3. Volume reading updates in real-time as tidal volume changes.\n\n**Boundary Value Test:**\n1. Verify display at the minimum (0 mL) and maximum (1000 mL) values.\n2. Check intermediate values (e.g., 500 mL) for correct resolution.\n\n**Exception Flow:**\n1. If tidal volume data falls outside 0..1000 mL, GUI displays \"Tidal Volume Out of Range\" and logs the anomaly.\n\n---\n\n### Use-Case 5: Display Inspiration to Expiration Time Ratio\n**Primary Success Flow:**\n1. GUI calculates the ratio of inspiration time to expiration time for the most recent breath.\n2. Display ratio in the range 10:1 to 1:200.\n3. Resolution is 0.1 for ratios < 10 and 1 for ratios ≥ 10.\n4. Transition from inspiration to expiration is detected after the plateau.\n\n**Boundary Value Test:**\n1. Test ratio at the lower bound (10:1) and upper bound (1:200).\n2. Verify intermediate values (e.g., 5:1, 1:100) for correct resolution.\n\n**Exception Flow:**\n1. If the calculated ratio is outside the valid range, GUI displays \"Inspiration/Expiration Ratio Out of Range\" and logs the error.\n\n---\n\n### Use-Case 6: Display PEEP for Most Recent Breath\n**Primary Success Flow:**\n1. GUI receives PEEP data for the most recent breath.\n2. Display PEEP in increments of 1 cmH₂O.\n3. PEEP reading updates in real-time as it changes.\n\n**Boundary Value Test:**\n1. Confirm display at minimum and maximum expected PEEP values (e.g., 1 cmH₂O and 30 cmH₂O).\n\n**Exception Flow:**\n1. If PEEP data is missing or invalid, GUI displays \"PEEP Data Unavailable\" and alerts the system.\n\n---\n\n### Use-Case 7: Display Volume Provided to Patient Graph\n**Primary Success Flow:**\n1. GUI receives volume data from the controller.\n2. Plot volume provided to the patient on a graph.\n3. Graph updates at a rate of ≥ 20 Hz with a duration of 30 seconds.\n\n**Boundary Value Test:**\n1. Verify graph updates at exactly 20 Hz and resets after 30 seconds.\n\n**Exception Flow:**\n1. If volume data transmission fails, GUI displays \"Volume Data Unavailable\" and logs the failure.\n\n---\n\n### Use-Case 8: Display Flow Rate Provided to Patient Graph\n**Primary Success Flow:**\n1. GUI receives flow rate data from the controller.\n2. Plot flow rate on a graph with units of liters/minute.\n3. Graph updates at a rate of ≥ 20 Hz with a duration of 30 seconds.\n\n**Boundary Value Test:**\n1. Confirm flow rate updates at exactly 20 Hz and resets after 30 seconds.\n\n**Exception Flow:**\n1. If flow rate data is missing or invalid, GUI displays \"Flow Rate Data Unavailable\" and logs the error.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Display Patient Pressure at Gas Outlet Port",
+      "req_ids": [
+        "RW-SW-46"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller is operational and transmitting pressure data"
+      ],
+      "inputs": {
+        "name": "pressureData",
+        "value": "validPressureValue"
+      },
+      "steps": [
+        "PCG accesses the GUI.",
+        "Controller transmits pressure data.",
+        "GUI receives and displays the pressure reading."
+      ],
+      "expected": [
+        "Pressure reading is displayed correctly within the valid range."
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Refresh Rate of GUI Graph",
+      "req_ids": [
+        "RW-SW-47"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Controller transmits data at ≥ 20 Hz"
+      ],
+      "inputs": {
+        "name": "refreshRate",
+        "value": "20"
+      },
+      "steps": [
+        "Start data transmission from controller.",
+        "Monitor GUI graph updates."
+      ],
+      "expected": [
+        "Graph updates at exactly 20 Hz without lag."
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Duration of GUI Graph",
+      "req_ids": [
+        "RW-SW-48"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Graph is set to 30 seconds duration"
+      ],
+      "inputs": {
+        "name": "duration",
+        "value": "30"
+      },
+      "steps": [
+        "Initiate data transmission.",
+        "Observe graph reset at 30 seconds."
+      ],
+      "expected": [
+        "Graph resets precisely at the 30-second mark."
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Display Inspiratory Tidal Volume",
+      "req_ids": [
+        "RW-SW-49"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Tidal volume data is within 0..1000 mL"
+      ],
+      "inputs": {
+        "name": "tidalVolume",
+        "value": "500"
+      },
+      "steps": [
+        "GUI receives tidal volume data.",
+        "Display tidal volume with 1 mL resolution."
+      ],
+      "expected": [
+        "Tidal volume is displayed as 500 mL."
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Display Inspiration to Expiration Time Ratio",
+      "req_ids": [
+        "RW-SW-50"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Most recent breath data is available"
+      ],
+      "inputs": {
+        "name": "ratio",
+        "value": "5"
+      },
+      "steps": [
+        "Calculate inspiration to expiration ratio.",
+        "Display ratio with appropriate resolution."
+      ],
+      "expected": [
+        "Ratio is displayed as 5:1 with 0.1 resolution."
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Display PEEP for Most Recent Breath",
+      "req_ids": [
+        "RW-SW-53"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "PEEP data is within valid increments"
+      ],
+      "inputs": {
+        "name": "peep",
+        "value": "10"
+      },
+      "steps": [
+        "GUI receives PEEP data.",
+        "Display PEEP in 1 cmH₂O increments."
+      ],
+      "expected": [
+        "PEEP is displayed as 10 cmH₂O."
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Display Volume Provided to Patient Graph",
+      "req_ids": [
+        "RW-SW-54"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Volume data is being transmitted"
+      ],
+      "inputs": {
+        "name": "volumeData",
+        "value": "validVolumeValue"
+      },
+      "steps": [
+        "GUI receives volume data.",
+        "Plot volume on graph with ≥ 20 Hz refresh rate and 30-second duration."
+      ],
+      "expected": [
+        "Volume graph updates correctly within specified parameters."
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Display Flow Rate Provided to Patient Graph",
+      "req_ids": [
+        "RW-SW-92"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Flow rate data is being transmitted"
+      ],
+      "inputs": {
+        "name": "flowRate",
+        "value": "validFlowRate"
+      },
+      "steps": [
+        "GUI receives flow rate data.",
+        "Plot flow rate on graph with ≥ 20 Hz refresh rate and 30-second duration."
+      ],
+      "expected": [
+        "Flow rate graph updates correctly within specified parameters."
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "# Use-Cases & User Stories for GUI Unit U17_GUI\n\n## Use-Case: Display Patient Pressure\n**Actor:** End User (Clinician)\n**Goal:** View the patient pressure measured at the gas outlet port.\n\n**Primary Success Flow:**\n1. System receives pressure data from the controller.\n2. GUI updates to display the pressure reading in real-time.\n3. Pressure is shown continuously with a refresh rate of at least 20 Hz.\n\n**Alternative Flow:**\n- If the controller fails to provide data, display an error message \"Pressure data unavailable.\"\n\n**Exception Flow:**\n- If the refresh rate drops below 20 Hz, trigger a warning \"Graph refresh rate below threshold.\"\n\n---\n\n## Use-Case: Display Inspiratory Tidal Volume\n**Actor:** End User (Clinician)\n**Goal:** View the inspiratory tidal volume of the patient.\n\n**Primary Success Flow:**\n1. System receives tidal volume data.\n2. GUI displays the volume in the range 0..1000 mL with a resolution of 1 mL.\n\n**Alternative Flow:**\n- If the received volume is outside the range, clamp the value to the nearest boundary (0 or 1000 mL) and display it.\n\n**Exception Flow:**\n- If the resolution is less than 1 mL, display an error \"Tidal volume resolution insufficient.\"\n\n---\n\n## Use-Case: Display Inspiration to Expiration Time Ratio\n**Actor:** End User (Clinician)\n**Goal:** View the ratio of inspiration time to expiration time for the most recent breath.\n\n**Primary Success Flow:**\n1. System calculates the ratio after the plateau phase.\n2. GUI displays the ratio in the range 10:1 to 1:200.\n3. Resolution is 0.1 for ratios under 10 and 1 for ratios over 10.\n\n**Alternative Flow:**\n- If the ratio calculation fails, display \"Inspiration/Expiration ratio calculation failed.\"\n\n**Exception Flow:**\n- If the ratio falls outside the specified range, display an error \"Ratio out of acceptable range.\"\n\n---\n\n## Use-Case: Display PEEP for Most Recent Breath\n**Actor:** End User (Clinician)\n**Goal:** View the PEEP value for the most recent breath.\n\n**Primary Success Flow:**\n1. System receives PEEP data.\n2. GUI displays PEEP in increments of 1 cmH₂O.\n\n**Alternative Flow:**\n- If PEEP data is missing, show \"PEEP data unavailable.\"\n\n**Exception Flow:**\n- If the increment is not 1 cmH₂O, display \"PEEP increment error.\"\n\n---\n\n## Use-Case: Display Volume Provided to Patient\n**Actor:** End User (Clinician)\n**Goal:** View a graph of the volume provided to the patient.\n\n**Primary Success Flow:**\n1. System receives volume data.\n2. GUI displays a graph with a duration of 30 seconds and a refresh rate of at least 20 Hz.\n\n**Alternative Flow:**\n- If the duration exceeds 30 seconds, truncate the graph to the last 30 seconds.\n\n**Exception Flow:**\n- If the refresh rate is below 20 Hz, trigger a warning \"Volume graph refresh rate below threshold.\"\n\n---\n\n## Use-Case: Display Flow Rate Provided to Patient\n**Actor:** End User (Clinician)\n**Goal:** View a graph of the flow rate provided to the patient.\n\n**Primary Success Flow:**\n1. System receives flow rate data.\n2. GUI displays a graph with a duration of 30 seconds and a refresh rate of at least 20 Hz, in units of liters per minute.\n\n**Alternative Flow:**\n- If the flow rate data is unavailable, display \"Flow rate data unavailable.\"\n\n**Exception Flow:**\n- If the refresh rate is below 20 Hz, trigger a warning \"Flow rate graph refresh rate below threshold.\"",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Display Patient Pressure",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller provides pressure data"
+          ],
+          "inputs": {
+            "name": "pressureData",
+            "value": "125 mmHg"
+          },
+          "steps": [
+            "Receive pressure data from controller",
+            "Update GUI to display pressure"
+          ],
+          "expected": [
+            "GUI shows pressure reading of 125 mmHg with refresh rate >= 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Display Inspiratory Tidal Volume",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Tidal volume data is within 0..1000 mL"
+          ],
+          "inputs": {
+            "name": "tidalVolume",
+            "value": "500 mL"
+          },
+          "steps": [
+            "Receive tidal volume data",
+            "Update GUI to display tidal volume"
+          ],
+          "expected": [
+            "GUI shows tidal volume of 500 mL with 1 mL resolution"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Display Inspiration to Expiration Time Ratio",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Breath plateau phase completed"
+          ],
+          "inputs": {
+            "name": "ratio",
+            "value": "15:1"
+          },
+          "steps": [
+            "Calculate ratio after plateau",
+            "Update GUI to display ratio"
+          ],
+          "expected": [
+            "GUI shows ratio of 15:1 with appropriate resolution"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Display PEEP for Most Recent Breath",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PEEP data is available"
+          ],
+          "inputs": {
+            "name": "peep",
+            "value": "5 cmH2O"
+          },
+          "steps": [
+            "Receive PEEP data",
+            "Update GUI to display PEEP"
+          ],
+          "expected": [
+            "GUI shows PEEP of 5 cmH2O in 1 cmH2O increments"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Display Volume Provided to Patient",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Volume data stream is active"
+          ],
+          "inputs": {
+            "name": "volumeData",
+            "value": "100 mL/s"
+          },
+          "steps": [
+            "Receive volume data",
+            "Update GUI to display volume graph"
+          ],
+          "expected": [
+            "GUI shows volume graph with 30-second duration and >=20 Hz refresh rate"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Display Flow Rate Provided to Patient",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Flow rate data stream is active"
+          ],
+          "inputs": {
+            "name": "flowRate",
+            "value": "5 L/min"
+          },
+          "steps": [
+            "Receive flow rate data",
+            "Update GUI to display flow rate graph"
+          ],
+          "expected": [
+            "GUI shows flow rate graph with 30-second duration and >=20 Hz refresh rate, units in liters/minute"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Boundary Test for Tidal Volume",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Tidal volume data at limits"
+          ],
+          "inputs": {
+            "name": "tidalVolume",
+            "value": "0 mL"
+          },
+          "steps": [
+            "Receive tidal volume data at minimum",
+            "Update GUI to display tidal volume"
+          ],
+          "expected": [
+            "GUI shows tidal volume of 0 mL with 1 mL resolution"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Boundary Test for Tidal Volume",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Tidal volume data at limits"
+          ],
+          "inputs": {
+            "name": "tidalVolume",
+            "value": "1000 mL"
+          },
+          "steps": [
+            "Receive tidal volume data at maximum",
+            "Update GUI to display tidal volume"
+          ],
+          "expected": [
+            "GUI shows tidal volume of 1000 mL with 1 mL resolution"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Exception Test for Refresh Rate",
+          "req_ids": [
+            "RW-SW-46",
+            "RW-SW-54",
+            "RW-SW-92"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Refresh rate drops below threshold"
+          ],
+          "inputs": {
+            "name": "refreshRate",
+            "value": "19 Hz"
+          },
+          "steps": [
+            "Simulate refresh rate below 20 Hz",
+            "Observe GUI behavior"
+          ],
+          "expected": [
+            "GUI triggers warning 'Graph refresh rate below threshold'"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Alternative Test for Missing Pressure Data",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "alternative",
+          "preconditions": [
+            "Controller fails to provide pressure data"
+          ],
+          "inputs": {
+            "name": "pressureData",
+            "value": "null"
+          },
+          "steps": [
+            "Simulate missing pressure data",
+            "Observe GUI message"
+          ],
+          "expected": [
+            "GUI displays 'Pressure data unavailable.'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.8,
+        "representation_score": 1.0,
+        "sfv_score": 0.9,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #10 (TC-010): 'alternative' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.90). Fix these problems and output the full corrected suite:\n- test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #10 (TC-010): 'alternative' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Case & User Stories for Unit U17_GUI**\n\n**Actor:** Patient Caregiver (PCG)\n\n---\n\n### Use-Case 1: Display Patient Pressure at Gas Outlet Port\n**Primary Success Flow:**\n1. **Trigger:** PCG opens the GUI application.\n2. **Action:** Controller sends pressure data at the gas outlet port.\n3. **Response:** GUI displays the pressure reading in real-time.\n4. **Outcome:** Pressure is shown accurately within the GUI.\n\n**Alternative Flow:**\n1. **Trigger:** No pressure data received from the controller.\n2. **Action:** GUI displays a placeholder message \"Pressure data unavailable\".\n3. **Outcome:** PCG is informed of the data unavailability.\n\n**Exception Flow:**\n1. **Trigger:** Controller sends corrupted pressure data.\n2. **Action:** GUI displays an error message \"Invalid pressure data received\".\n3. **Outcome:** System logs the error for maintenance.\n\n---\n\n### Use-Case 2: GUI Graph Refresh Rate\n**Primary Success Flow:**\n1. **Trigger:** New pressure data is available from the controller.\n2. **Action:** GUI refreshes the graph at a rate of at least 20 Hz.\n3. **Outcome:** Graph updates smoothly without noticeable lag.\n\n**Boundary Flow:**\n1. **Trigger:** Refresh rate approaches the minimum threshold (20 Hz).\n2. **Action:** GUI maintains the refresh rate at exactly 20 Hz.\n3. **Outcome:** Graph updates precisely at the threshold.\n\n**Exception Flow:**\n1. **Trigger:** Refresh rate drops below 20 Hz due to system overload.\n2. **Action:** GUI displays a warning \"Graph refresh rate below minimum threshold\".\n3. **Outcome:** System alerts maintenance team.\n\n---\n\n### Use-Case 3: GUI Graph Duration\n**Primary Success Flow:**\n1. **Trigger:** Graph is initiated to display patient pressure.\n2. **Action:** GUI sets the graph duration to 30 seconds.\n3. **Outcome:** Graph shows data for exactly 30 seconds before resetting.\n\n**Boundary Flow:**\n1. **Trigger:** Graph duration is tested at the maximum limit (30 seconds).\n2. **Action:** GUI confirms the duration remains at 30 seconds.\n3. **Outcome:** Graph completes exactly at the 30-second mark.\n\n**Exception Flow:**\n1. **Trigger:** System fails to reset the graph after 30 seconds.\n2. **Action:** GUI displays an error \"Graph duration exceeded\".\n3. **Outcome:** System logs the failure for troubleshooting.\n\n---\n\n### Use-Case 4: Display Inspiratory Tidal Volume\n**Primary Success Flow:**\n1. **Trigger:** Controller provides tidal volume data.\n2. **Action:** GUI displays the tidal volume in the range 0..1000 mL with 1 mL resolution.\n3. **Outcome:** Accurate tidal volume is shown to the PCG.\n\n**Boundary Flow:**\n1. **Trigger:** Tidal volume is at the minimum (0 mL) or maximum (1000 mL).\n2. **Action:** GUI correctly displays 0 mL and 1000 mL respectively.\n3. **Outcome:** Volume readings are verified at both extremes.\n\n**Exception Flow:**\n1. **Trigger:** Tidal volume data is out of range (e.g., -10 mL or 1001 mL).\n2. **Action:** GUI shows an error \"Tidal volume out of range\".\n3. **Outcome:** System logs the out-of-range error.\n\n---\n\n### Use-Case 5: Display Inspiration to Expiration Time Ratio\n**Primary Success Flow:**\n1. **Trigger:** Controller provides inspiration to expiration time ratio for the most recent breath.\n2. **Action:** GUI displays the ratio in the range 10:1 to 1:200 with specified resolution.\n3. **Outcome:** Ratio is shown accurately within the GUI.\n\n**Boundary Flow:**\n1. **Trigger:** Ratio is at the minimum (10:1) or maximum (1:200).\n2. **Action:** GUI displays 10:1 and 1:200 precisely.\n3. **Outcome:** Ratio readings are verified at both limits.\n\n**Exception Flow:**\n1. **Trigger:** Ratio data is outside the acceptable range.\n2. **Action:** GUI shows an error \"Inspiration to expiration ratio out of range\".\n3. **Outcome:** System logs the error for maintenance.\n\n---\n\n### Use-Case 6: Display PEEP for Most Recent Breath\n**Primary Success Flow:**\n1. **Trigger:** Controller sends PEEP data for the latest breath.\n2. **Action:** GUI displays PEEP in increments of 1 cmH2O.\n3. **Outcome:** PEEP value is shown correctly.\n\n**Boundary Flow:**\n1. **Trigger:** PEEP is at the lowest (0 cmH2O) or highest expected increment.\n2. **Action:** GUI displays 0 cmH2O and the maximum increment accurately.\n3. **Outcome:** PEEP readings are confirmed at both ends.\n\n**Exception Flow:**\n1. **Trigger:** PEEP data is corrupted or missing.\n2. **Action:** GUI displays \"PEEP data unavailable\".\n3. **Outcome:** System alerts for data integrity issues.\n\n---\n\n### Use-Case 7: Display Volume Provided to Patient Graph\n**Primary Success Flow:**\n1. **Trigger:** Controller provides volume data.\n2. **Action:** GUI displays a graph of volume provided to the patient.\n3. **Outcome:** Graph accurately reflects the volume data.\n\n**Boundary Flow:**\n1. **Trigger:** Volume data spans the full range of expected values.\n2. **Action:** GUI graph scales correctly to show minimum and maximum volumes.\n3. **Outcome:** Volume graph is verified across the entire range.\n\n**Exception Flow:**\n1. **Trigger:** Volume data is inconsistent or missing.\n2. **Action:** GUI shows \"Volume data error\".\n3. **Outcome:** System logs the inconsistency for review.\n\n---\n\n### Use-Case 8: Display Flow Rate Provided to Patient Graph\n**Primary Success Flow:**\n1. **Trigger:** Controller sends flow rate data.\n2. **Action:** GUI displays a graph of flow rate with a duration of 30 seconds and refresh rate >= 20 Hz, in liters/minute.\n3. **Outcome:** Flow rate graph updates smoothly and accurately.\n\n**Boundary Flow:**\n1. **Trigger:** Flow rate is tested at the minimum and maximum expected values.\n2. **Action:** GUI graph scales to show these values correctly.\n3. **Outcome:** Flow rate graph is confirmed at both extremes.\n\n**Exception Flow:**\n1. **Trigger:** Flow rate data is corrupted.\n2. **Action:** GUI displays \"Flow rate data error\".\n3. **Outcome:** System logs the error for maintenance.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Display Patient Pressure at Gas Outlet Port - Primary Success",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller sends valid pressure data"
+          ],
+          "inputs": {
+            "name": "pressureData",
+            "value": "validPressureValue"
+          },
+          "steps": [
+            "Open GUI",
+            "Receive pressure data",
+            "Display pressure"
+          ],
+          "expected": [
+            "Pressure displayed accurately"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Display Patient Pressure at Gas Outlet Port - Alternative",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "No pressure data received"
+          ],
+          "inputs": {
+            "name": "pressureData",
+            "value": "null"
+          },
+          "steps": [
+            "Open GUI",
+            "Attempt to receive pressure data",
+            "Display placeholder message"
+          ],
+          "expected": [
+            "Placeholder message shown"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Display Patient Pressure at Gas Outlet Port - Exception",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Corrupted pressure data received"
+          ],
+          "inputs": {
+            "name": "pressureData",
+            "value": "corruptedData"
+          },
+          "steps": [
+            "Open GUI",
+            "Receive corrupted pressure data",
+            "Display error message"
+          ],
+          "expected": [
+            "Error message shown"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI Graph Refresh Rate - Primary Success",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "New pressure data available"
+          ],
+          "inputs": {
+            "name": "refreshRate",
+            "value": ">=20Hz"
+          },
+          "steps": [
+            "Receive new data",
+            "Refresh graph"
+          ],
+          "expected": [
+            "Graph updates smoothly"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI Graph Refresh Rate - Boundary",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Refresh rate at minimum threshold"
+          ],
+          "inputs": {
+            "name": "refreshRate",
+            "value": "20Hz"
+          },
+          "steps": [
+            "Test refresh rate",
+            "Verify update frequency"
+          ],
+          "expected": [
+            "Graph updates exactly at 20 Hz"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI Graph Refresh Rate - Exception",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Refresh rate drops below threshold"
+          ],
+          "inputs": {
+            "name": "refreshRate",
+            "value": "<20Hz"
+          },
+          "steps": [
+            "Monitor refresh rate",
+            "Display warning"
+          ],
+          "expected": [
+            "Warning displayed"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI Graph Duration - Primary Success",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Graph initiated"
+          ],
+          "inputs": {
+            "name": "duration",
+            "value": "30seconds"
+          },
+          "steps": [
+            "Start graph",
+            "Allow 30 seconds"
+          ],
+          "expected": [
+            "Graph resets after 30 seconds"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI Graph Duration - Boundary",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Graph duration tested at limit"
+          ],
+          "inputs": {
+            "name": "duration",
+            "value": "30seconds"
+          },
+          "steps": [
+            "Test duration at 30 seconds",
+            "Verify reset"
+          ],
+          "expected": [
+            "Graph completes at 30 seconds"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI Graph Duration - Exception",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "System fails to reset graph"
+          ],
+          "inputs": {
+            "name": "duration",
+            "value": "30seconds"
+          },
+          "steps": [
+            "Initiate graph",
+            "Monitor reset failure"
+          ],
+          "expected": [
+            "Error displayed"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Display Inspiratory Tidal Volume - Primary Success",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Tidal volume data available"
+          ],
+          "inputs": {
+            "name": "tidalVolume",
+            "value": "500mL"
+          },
+          "steps": [
+            "Receive tidal volume",
+            "Display in GUI"
+          ],
+          "expected": [
+            "Tidal volume shown with 1 mL resolution"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Display Inspiratory Tidal Volume - Boundary",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Tidal volume at min/max"
+          ],
+          "inputs": {
+            "name": "tidalVolume",
+            "value": "0mL"
+          },
+          "steps": [
+            "Test minimum tidal volume",
+            "Verify display"
+          ],
+          "expected": [
+            "0 mL displayed"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Display Inspiratory Tidal Volume - Exception",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Out-of-range tidal volume"
+          ],
+          "inputs": {
+            "name": "tidalVolume",
+            "value": "-10mL"
+          },
+          "steps": [
+            "Receive out-of-range data",
+            "Display error"
+          ],
+          "expected": [
+            "Error message shown"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Display Inspiration to Expiration Time Ratio - Primary Success",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Ratio data available"
+          ],
+          "inputs": {
+            "name": "ratio",
+            "value": "5:1"
+          },
+          "steps": [
+            "Receive ratio",
+            "Display in GUI"
+          ],
+          "expected": [
+            "Ratio shown with correct resolution"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Display Inspiration to Expiration Time Ratio - Boundary",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Ratio at min/max"
+          ],
+          "inputs": {
+            "name": "ratio",
+            "value": "10:1"
+          },
+          "steps": [
+            "Test minimum ratio",
+            "Verify display"
+          ],
+          "expected": [
+            "10:1 displayed"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Display Inspiration to Expiration Time Ratio - Exception",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Out-of-range ratio"
+          ],
+          "inputs": {
+            "name": "ratio",
+            "value": "1000:1"
+          },
+          "steps": [
+            "Receive out-of-range data",
+            "Display error"
+          ],
+          "expected": [
+            "Error message shown"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "Display PEEP for Most Recent Breath - Primary Success",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PEEP data available"
+          ],
+          "inputs": {
+            "name": "peep",
+            "value": "5cmH2O"
+          },
+          "steps": [
+            "Receive PEEP",
+            "Display in GUI"
+          ],
+          "expected": [
+            "PEEP shown in 1 cmH2O increments"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Display PEEP for Most Recent Breath - Boundary",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "PEEP at min/max"
+          ],
+          "inputs": {
+            "name": "peep",
+            "value": "0cmH2O"
+          },
+          "steps": [
+            "Test minimum PEEP",
+            "Verify display"
+          ],
+          "expected": [
+            "0 cmH2O displayed"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "Display PEEP for Most Recent Breath - Exception",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Corrupted PEEP data"
+          ],
+          "inputs": {
+            "name": "peep",
+            "value": "corruptedData"
+          },
+          "steps": [
+            "Receive corrupted PEEP",
+            "Display error"
+          ],
+          "expected": [
+            "Error message shown"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Display Volume Provided to Patient Graph - Primary Success",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Volume data available"
+          ],
+          "inputs": {
+            "name": "volumeData",
+            "value": "validVolume"
+          },
+          "steps": [
+            "Receive volume data",
+            "Display graph"
+          ],
+          "expected": [
+            "Graph accurately reflects volume"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Display Volume Provided to Patient Graph - Boundary",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Volume data at range extremes"
+          ],
+          "inputs": {
+            "name": "volumeData",
+            "value": "maxVolume"
+          },
+          "steps": [
+            "Test maximum volume",
+            "Verify graph scaling"
+          ],
+          "expected": [
+            "Graph scales correctly"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "Display Volume Provided to Patient Graph - Exception",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Inconsistent volume data"
+          ],
+          "inputs": {
+            "name": "volumeData",
+            "value": "inconsistentData"
+          },
+          "steps": [
+            "Receive inconsistent data",
+            "Display error"
+          ],
+          "expected": [
+            "Error message shown"
+          ]
+        },
+        {
+          "id": "TC-022",
+          "title": "Display Flow Rate Provided to Patient Graph - Primary Success",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Flow rate data available"
+          ],
+          "inputs": {
+            "name": "flowRate",
+            "value": "5L/min"
+          },
+          "steps": [
+            "Receive flow rate",
+            "Display graph"
+          ],
+          "expected": [
+            "Graph updates with >=20 Hz refresh rate"
+          ]
+        },
+        {
+          "id": "TC-023",
+          "title": "Display Flow Rate Provided to Patient Graph - Boundary",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Flow rate at minimum"
+          ],
+          "inputs": {
+            "name": "flowRate",
+            "value": "0L/min"
+          },
+          "steps": [
+            "Test minimum flow rate",
+            "Verify refresh rate"
+          ],
+          "expected": [
+            "Graph updates at minimum refresh rate"
+          ]
+        },
+        {
+          "id": "TC-024",
+          "title": "Display Flow Rate Provided to Patient Graph - Exception",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Corrupted flow rate data"
+          ],
+          "inputs": {
+            "name": "flowRate",
+            "value": "corruptedData"
+          },
+          "steps": [
+            "Receive corrupted flow rate",
+            "Display error"
+          ],
+          "expected": [
+            "Error message shown"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.6667,
+        "representation_score": 1.0,
+        "sfv_score": 0.8333,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #15 (TC-015): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #18 (TC-018): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #21 (TC-021): 'exception' is not one of ['positive', 'negative', 'boundary']",
+          "test case #24 (TC-024): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.83). Fix these problems and output the full corrected suite:\n- test case #3 (TC-003): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #9 (TC-009): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #12 (TC-012): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #15 (TC-015): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #18 (TC-018): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #21 (TC-021): 'exception' is not one of ['positive', 'negative', 'boundary']\n- test case #24 (TC-024): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories for GUI Functional Requirements (Unit U17_GUI)**  \n\n**Actor:** Patient Caregiver (PCG) – has privilege to view real-time ventilator data.  \n\n---\n\n### Use-Case 1: Display Patient Pressure at Gas Outlet Port  \n**ID:** UC-PR-01  \n**Description:** The GUI shows the pressure measured at the gas outlet port, sourced from the controller.  \n\n**Primary Success Flow:**  \n1. PCG launches the ventilator GUI.  \n2. Controller transmits pressure data at ≥20 Hz.  \n3. GUI updates the pressure reading in real time.  \n4. PCG observes pressure within expected physiological range.  \n\n**Alternative Flow (Low Pressure):**  \n1. Pressure falls below lower threshold (e.g., 5 cmH₂O).  \n2. GUI highlights low-pressure warning (red indicator).  \n\n**Exception Flow (No Data):**  \n1. Controller fails to transmit pressure data.  \n2. GUI displays “Pressure Data Unavailable” message.  \n\n---\n\n### Use-Case 2: Refresh Rate of Pressure Graph  \n**ID:** UC-RR-02  \n**Description:** Ensure the pressure graph refreshes at a rate of ≥20 Hz.  \n\n**Primary Success Flow:**  \n1. PCG watches the pressure graph.  \n2. Graph updates at least every 50 ms (≥20 Hz).  \n\n**Boundary Flow:**  \n1. Test at exactly 20 Hz (50 ms interval).  \n2. Verify no lag or missed updates.  \n\n**Exception Flow (Refresh Failure):**  \n1. Graph fails to update for >1 s.  \n2. GUI logs “Graph Refresh Error” and alerts PCG.  \n\n---\n\n### Use-Case 3: Duration of Pressure Graph  \n**ID:** UC-DU-03  \n**Description:** Pressure graph must display data for a duration of 30 seconds.  \n\n**Primary Success Flow:**  \n1. PCG initiates a breath cycle.  \n2. Graph shows pressure data for exactly 30 seconds, then rolls over.  \n\n**Boundary Flow:**  \n1. Verify graph resets precisely at the 30‑second mark.  \n\n**Exception Flow (Duration Overflow):**  \n1. Graph continues beyond 30 seconds due to timing bug.  \n2. GUI triggers “Graph Duration Exceeded” alert.  \n\n---\n\n### Use-Case 4: Display Inspiratory Tidal Volume  \n**ID:** UC-TV-04  \n**Description:** Show tidal volume in mL, range 0–1000 mL, resolution 1 mL.  \n\n**Primary Success Flow:**  \n1. PCG observes tidal volume reading.  \n2. Reading increments in 1 mL steps from 0 to 1000 mL.  \n\n**Boundary Flow (Min/Max):**  \n1. Set tidal volume to 0 mL and 1000 mL.  \n2. Confirm correct display without overflow.  \n\n**Exception Flow (OutOfRange):**  \n1. Attempt to display 1001 mL.  \n2. GUI rejects input and shows “Tidal Volume Out of Range”.  \n\n---\n\n### Use-Case 5: Display Inspiration/Expiration Time Ratio  \n**ID:** UC-RT-05  \n**Description:** Show I:E ratio for the most recent breath, range 10:1 to 1:200, resolution 0.1 (<10) or 1 (>10).  \n\n**Primary Success Flow:**  \n1. PCG views I:E ratio after a breath.  \n2. Ratio updates correctly within specified range.  \n\n**Boundary Flow (Low Ratio):**  \n1. Ratio = 10:1.  \n2. Display shows “10:1” with 1‑decimal precision if <10.  \n\n**Boundary Flow (High Ratio):**  \n1. Ratio = 1:200.  \n2. Display shows “1:200” with 1‑decimal precision if >10.  \n\n**Exception Flow (Invalid Ratio):**  \n1. Attempt ratio 9:1 (below 10:1).  \n2. GUI alerts “Invalid I:E Ratio”.  \n\n---\n\n### Use-Case 6: Display PEEP for Most Recent Breath  \n**ID:** UC-PE-06  \n**Description:** Show PEEP in cmH₂O increments of 1.  \n\n**Primary Success Flow:**  \n1. PCG observes PEEP reading after a breath.  \n2. Reading increments in 1 cmH₂O steps.  \n\n**Boundary Flow (Min/Max):**  \n1. Set PEEP to 0 cmH₂O and 30 cmH₂O (example max).  \n2. Confirm correct display.  \n\n**Exception Flow (OutOfRange):**  \n1. Attempt PEEP of 31 cmH₂O.  \n2. GUI shows “PEEP Out of Range”.  \n\n---\n\n### Use-Case 7: Display Volume Provided to Patient  \n**ID:** UC-VOL-07  \n**Description:** Show a graph of delivered volume.  \n\n**Primary Success Flow:**  \n1. PCG watches volume graph.  \n2. Graph updates at ≥20 Hz, duration 30 seconds.  \n\n**Boundary Flow:**  \n1. Verify volume graph resets at 30 seconds.  \n\n**Exception Flow (No Volume Data):**  \n1. Volume data transmission fails.  \n2. GUI displays “Volume Data Unavailable”.  \n\n---\n\n### Use-Case 8: Display Flow Rate Provided to Patient  \n**ID:** UC-FLOW-08  \n**Description:** Show flow rate graph in L/min, duration 30 seconds, update rate ≥20 Hz.  \n\n**Primary Success Flow:**  \n1. PCG observes flow rate graph.  \n2. Graph updates at least every 50 ms, duration 30 seconds.  \n\n**Boundary Flow:**  \n1. Test at exactly 20 Hz (50 ms interval).  \n\n**Exception Flow (Flow Refresh Failure):**  \n1. Flow graph fails to update for >1 s.  \n2. GUI logs “Flow Refresh Error”.  \n\n---\n\n**Note:** Each Use‑Case includes a primary success flow, at least one alternative flow, and one exception flow, satisfying the sufficiency criteria. All numeric values (e.g., 20 Hz, 30 seconds, 0–1000 mL) are directly derived from the requirements text.",
+      "test_cases": null,
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.0,
+        "representation_score": 1.0,
+        "sfv_score": 0.5,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "No canonical test cases found (expected a JSON list)."
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.50). Fix these problems and output the full corrected suite:\n- No canonical test cases found (expected a JSON list).",
+      "artifact": "**Use-Case & User Stories for Unit U17_GUI**\n\n**Actor:** Patient Caregiver (PCG)\n\n---\n\n### Use-Case 1: Display Patient Pressure at Gas Outlet Port\n**Primary Success Flow:**\n1. PCG accesses the GUI.\n2. Controller transmits pressure data at the gas outlet port.\n3. GUI receives data and displays the pressure reading in real-time.\n4. Pressure reading is updated at a rate of at least 20 Hz.\n5. GUI shows pressure within the valid range as defined by the controller.\n\n**Alternative Flow:**\n1. If the controller fails to transmit data within the refresh rate, GUI displays \"Pressure Data Unavailable\" with a warning icon.\n\n**Exception Flow:**\n1. If the pressure reading exceeds the valid range, GUI displays \"Out of Range\" and logs an error.\n\n---\n\n### Use-Case 2: Refresh Rate of GUI Graph\n**Primary Success Flow:**\n1. GUI graph is set to refresh at a rate of ≥ 20 Hz.\n2. Each refresh cycle updates the graph with the latest pressure data.\n3. Graph updates are visually smooth without noticeable lag.\n\n**Boundary Value Test:**\n1. Verify that the refresh rate is exactly 20 Hz and remains stable under continuous data transmission.\n\n**Exception Flow:**\n1. If the refresh rate drops below 20 Hz, GUI displays \"Graph Refresh Rate Below Threshold\" and alerts the system administrator.\n\n---\n\n### Use-Case 3: Duration of GUI Graph\n**Primary Success Flow:**\n1. GUI graph duration is set to 30 seconds.\n2. Graph displays the last 30 seconds of pressure data.\n3. Graph automatically resets after 30 seconds to show the most recent data.\n\n**Boundary Value Test:**\n1. Confirm that the graph resets precisely at the 30-second mark.\n\n**Exception Flow:**\n1. If the duration setting is altered to less than 30 seconds, GUI displays \"Graph Duration Invalid\" and reverts to the default 30-second setting.\n\n---\n\n### Use-Case 4: Display Inspiratory Tidal Volume\n**Primary Success Flow:**\n1. GUI receives tidal volume data from the controller.\n2. Display tidal volume in the range 0..1000 mL with a resolution of 1 mL.\n3. Volume reading updates in real-time as tidal volume changes.\n\n**Boundary Value Test:**\n1. Verify display at the minimum (0 mL) and maximum (1000 mL) values.\n2. Check intermediate values (e.g., 500 mL) for correct resolution.\n\n**Exception Flow:**\n1. If tidal volume data falls outside 0..1000 mL, GUI displays \"Tidal Volume Out of Range\" and logs the anomaly.\n\n---\n\n### Use-Case 5: Display Inspiration to Expiration Time Ratio\n**Primary Success Flow:**\n1. GUI calculates the ratio of inspiration time to expiration time for the most recent breath.\n2. Display ratio in the range 10:1 to 1:200.\n3. Resolution is 0.1 for ratios < 10 and 1 for ratios ≥ 10.\n4. Transition from inspiration to expiration is detected after the plateau.\n\n**Boundary Value Test:**\n1. Test ratio at the lower bound (10:1) and upper bound (1:200).\n2. Verify intermediate values (e.g., 5:1, 1:100) for correct resolution.\n\n**Exception Flow:**\n1. If the calculated ratio is outside the valid range, GUI displays \"Inspiration/Expiration Ratio Out of Range\" and logs the error.\n\n---\n\n### Use-Case 6: Display PEEP for Most Recent Breath\n**Primary Success Flow:**\n1. GUI receives PEEP data for the most recent breath.\n2. Display PEEP in increments of 1 cmH₂O.\n3. PEEP reading updates in real-time as it changes.\n\n**Boundary Value Test:**\n1. Confirm display at minimum and maximum expected PEEP values (e.g., 1 cmH₂O and 30 cmH₂O).\n\n**Exception Flow:**\n1. If PEEP data is missing or invalid, GUI displays \"PEEP Data Unavailable\" and alerts the system.\n\n---\n\n### Use-Case 7: Display Volume Provided to Patient Graph\n**Primary Success Flow:**\n1. GUI receives volume data from the controller.\n2. Plot volume provided to the patient on a graph.\n3. Graph updates at a rate of ≥ 20 Hz with a duration of 30 seconds.\n\n**Boundary Value Test:**\n1. Verify graph updates at exactly 20 Hz and resets after 30 seconds.\n\n**Exception Flow:**\n1. If volume data transmission fails, GUI displays \"Volume Data Unavailable\" and logs the failure.\n\n---\n\n### Use-Case 8: Display Flow Rate Provided to Patient Graph\n**Primary Success Flow:**\n1. GUI receives flow rate data from the controller.\n2. Plot flow rate on a graph with units of liters/minute.\n3. Graph updates at a rate of ≥ 20 Hz with a duration of 30 seconds.\n\n**Boundary Value Test:**\n1. Confirm flow rate updates at exactly 20 Hz and resets after 30 seconds.\n\n**Exception Flow:**\n1. If flow rate data is missing or invalid, GUI displays \"Flow Rate Data Unavailable\" and logs the error.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Display Patient Pressure at Gas Outlet Port",
+          "req_ids": [
+            "RW-SW-46"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is operational and transmitting pressure data"
+          ],
+          "inputs": {
+            "name": "pressureData",
+            "value": "validPressureValue"
+          },
+          "steps": [
+            "PCG accesses the GUI.",
+            "Controller transmits pressure data.",
+            "GUI receives and displays the pressure reading."
+          ],
+          "expected": [
+            "Pressure reading is displayed correctly within the valid range."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Refresh Rate of GUI Graph",
+          "req_ids": [
+            "RW-SW-47"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller transmits data at ≥ 20 Hz"
+          ],
+          "inputs": {
+            "name": "refreshRate",
+            "value": "20"
+          },
+          "steps": [
+            "Start data transmission from controller.",
+            "Monitor GUI graph updates."
+          ],
+          "expected": [
+            "Graph updates at exactly 20 Hz without lag."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Duration of GUI Graph",
+          "req_ids": [
+            "RW-SW-48"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Graph is set to 30 seconds duration"
+          ],
+          "inputs": {
+            "name": "duration",
+            "value": "30"
+          },
+          "steps": [
+            "Initiate data transmission.",
+            "Observe graph reset at 30 seconds."
+          ],
+          "expected": [
+            "Graph resets precisely at the 30-second mark."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Display Inspiratory Tidal Volume",
+          "req_ids": [
+            "RW-SW-49"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Tidal volume data is within 0..1000 mL"
+          ],
+          "inputs": {
+            "name": "tidalVolume",
+            "value": "500"
+          },
+          "steps": [
+            "GUI receives tidal volume data.",
+            "Display tidal volume with 1 mL resolution."
+          ],
+          "expected": [
+            "Tidal volume is displayed as 500 mL."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Display Inspiration to Expiration Time Ratio",
+          "req_ids": [
+            "RW-SW-50"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Most recent breath data is available"
+          ],
+          "inputs": {
+            "name": "ratio",
+            "value": "5"
+          },
+          "steps": [
+            "Calculate inspiration to expiration ratio.",
+            "Display ratio with appropriate resolution."
+          ],
+          "expected": [
+            "Ratio is displayed as 5:1 with 0.1 resolution."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Display PEEP for Most Recent Breath",
+          "req_ids": [
+            "RW-SW-53"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "PEEP data is within valid increments"
+          ],
+          "inputs": {
+            "name": "peep",
+            "value": "10"
+          },
+          "steps": [
+            "GUI receives PEEP data.",
+            "Display PEEP in 1 cmH₂O increments."
+          ],
+          "expected": [
+            "PEEP is displayed as 10 cmH₂O."
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Display Volume Provided to Patient Graph",
+          "req_ids": [
+            "RW-SW-54"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Volume data is being transmitted"
+          ],
+          "inputs": {
+            "name": "volumeData",
+            "value": "validVolumeValue"
+          },
+          "steps": [
+            "GUI receives volume data.",
+            "Plot volume on graph with ≥ 20 Hz refresh rate and 30-second duration."
+          ],
+          "expected": [
+            "Volume graph updates correctly within specified parameters."
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Display Flow Rate Provided to Patient Graph",
+          "req_ids": [
+            "RW-SW-92"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Flow rate data is being transmitted"
+          ],
+          "inputs": {
+            "name": "flowRate",
+            "value": "validFlowRate"
+          },
+          "steps": [
+            "GUI receives flow rate data.",
+            "Plot flow rate on graph with ≥ 20 Hz refresh rate and 30-second duration."
+          ],
+          "expected": [
+            "Flow rate graph updates correctly within specified parameters."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "data_pipeline",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.25,
+          "wg": 0.0
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.625,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 10,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No negative or exception test cases covering error handling paths.",
+          "Boundary tests for tidal volume and ratio do not cover extreme values (0, 1000, 10:1, 1:200).",
+          "Placeholder values like \"validPressureValue\" lack concrete numeric data.",
+          "Expected results sometimes vague, e.g., \"updates correctly within specified parameters\".",
+          "Test cases do not verify unit consistency (e.g., cmH₂O vs cmH2O)."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.6188,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

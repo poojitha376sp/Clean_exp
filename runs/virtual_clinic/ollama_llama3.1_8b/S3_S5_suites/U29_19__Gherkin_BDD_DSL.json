@@ -1,0 +1,817 @@
+{
+  "unit_id": "U29_19",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:llama3.1:8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 1.0,
+    "hallucinated": [],
+    "n_concrete_elements": 30,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Assertions are vague; add explicit checks for field values and counts",
+      "No verification of medicine and lab test counts; add assertions for exact numbers",
+      "No check that appointment date is exactly next day; add date validation",
+      "No validation of pin-code zone boundaries; add tests for boundary pin-codes",
+      "No error messages or status codes checked; add assertions for error responses"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.88,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Patient Appointment Management\n\n  Scenario: Query Patient Details by Patient Id\n    Given a patient with id \"PAT-001\" exists\n    When I query patient details by patient id \"PAT-001\"\n    Then patient details are displayed\n    And patient pin-code is displayed\n    And patient pin-code cannot be modified to be outside the Zone\n\n  Scenario: Create Patient Appointment\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    When I query patient details by patient id \"PAT-001\"\n    And I enter details like Speciality \"Cardiology\" and Symptoms \"Chest Pain\"\n    And I request for consultation\n    Then appointment is created for next day\n    And appointment date is displayed\n\n  Scenario: Doctor Provides Consultation\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    And a consultation request for patient \"PAT-001\" exists\n    When doctor selects consultation request\n    Then consultation is provided\n    And diagnosis is entered\n    And medicines are prescribed (max 8)\n    And lab tests are requested (max 5)\n\n  Scenario: Chemist Dispenses Medicines\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    And a consultation request for patient \"PAT-001\" exists\n    And a prescription for patient \"PAT-001\" exists\n    When chemist selects consultation request\n    Then medicines are dispensed\n    And flag is marked in prescription\n\n  Scenario: Lab Notes Lab Tests\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    And a consultation request for patient \"PAT-001\" exists\n    And a prescription for patient \"PAT-001\" exists\n    When lab selects consultation request\n    Then lab tests are noted\n    And patient details are displayed\n    And flag is marked in prescription\n    And report is added\n\n  Scenario Outline: Patient Appointment Management with Different Pin-Codes\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    When I query patient details by patient id \"PAT-001\"\n    And I enter pin-code \"<pin-code>\"\n    Then pin-code is validated\n    Examples:\n      | pin-code |\n      | 1234     |\n      | 5678     |\n      | 9012     |\n      | 1111     |  # invalid pin-code (outside Zone)\n\n  Scenario Outline: Patient Appointment Management with Different Medicine Counts\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    When I query patient details by patient id \"PAT-001\"\n    And I prescribe medicines \"<medicine-count>\"\n    Then medicine count is validated\n    Examples:\n      | medicine-count |\n      | 0              |\n      | 1              |\n      | 8              |\n      | 9              |  # invalid medicine count (exceeds limit)\n\n  Scenario Outline: Patient Appointment Management with Different Lab Test Counts\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    When I query patient details by patient id \"PAT-001\"\n    And I request lab tests \"<lab-test-count>\"\n    Then lab test count is validated\n    Examples:\n      | lab-test-count |\n      | 0              |\n      | 1              |\n      | 5              |\n      | 6              |  # invalid lab test count (exceeds limit)",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Query Patient Details by Patient Id",
+      "req_ids": [
+        "VCDPA03"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "patient exists"
+      ],
+      "inputs": {
+        "patient_id": "PAT-001"
+      },
+      "steps": [
+        "query patient details",
+        "verify patient details displayed"
+      ],
+      "expected": [
+        "patient details displayed"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Create Patient Appointment",
+      "req_ids": [
+        "VCDPA04"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "patient and doctor exist"
+      ],
+      "inputs": {
+        "patient_id": "PAT-001",
+        "doctor_id": "DOC-001"
+      },
+      "steps": [
+        "query patient details",
+        "enter details",
+        "request consultation",
+        "verify appointment created"
+      ],
+      "expected": [
+        "appointment created"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Doctor Provides Consultation",
+      "req_ids": [
+        "VCDDR01",
+        "VCDDR02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "patient, doctor, and consultation request exist"
+      ],
+      "inputs": {
+        "patient_id": "PAT-001",
+        "doctor_id": "DOC-001"
+      },
+      "steps": [
+        "doctor selects consultation request",
+        "provide consultation",
+        "enter diagnosis",
+        "prescribe medicines",
+        "request lab tests"
+      ],
+      "expected": [
+        "consultation provided",
+        "diagnosis entered",
+        "medicines prescribed",
+        "lab tests requested"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Chemist Dispenses Medicines",
+      "req_ids": [
+        "VCDCM01",
+        "VCDCM02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "patient, doctor, consultation request, and prescription exist"
+      ],
+      "inputs": {
+        "patient_id": "PAT-001",
+        "doctor_id": "DOC-001"
+      },
+      "steps": [
+        "chemist selects consultation request",
+        "dispense medicines",
+        "mark flag in prescription"
+      ],
+      "expected": [
+        "medicines dispensed",
+        "flag marked in prescription"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Lab Notes Lab Tests",
+      "req_ids": [
+        "VCDLB01",
+        "VCDLB02"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "patient, doctor, consultation request, and prescription exist"
+      ],
+      "inputs": {
+        "patient_id": "PAT-001",
+        "doctor_id": "DOC-001"
+      },
+      "steps": [
+        "lab selects consultation request",
+        "note lab tests",
+        "display patient details",
+        "mark flag in prescription",
+        "add report"
+      ],
+      "expected": [
+        "lab tests noted",
+        "patient details displayed",
+        "flag marked in prescription",
+        "report added"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Patient Appointment Management with Different Pin-Codes",
+      "req_ids": [
+        "VCDPA03"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "patient and doctor exist"
+      ],
+      "inputs": {
+        "patient_id": "PAT-001",
+        "doctor_id": "DOC-001",
+        "pin-code": "1234"
+      },
+      "steps": [
+        "query patient details",
+        "enter pin-code",
+        "verify pin-code validated"
+      ],
+      "expected": [
+        "pin-code validated"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Patient Appointment Management with Different Medicine Counts",
+      "req_ids": [
+        "VCDDR02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "patient and doctor exist"
+      ],
+      "inputs": {
+        "patient_id": "PAT-001",
+        "doctor_id": "DOC-001",
+        "medicine-count": "9"
+      },
+      "steps": [
+        "query patient details",
+        "prescribe medicines",
+        "verify medicine count validated"
+      ],
+      "expected": [
+        "medicine count validated"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Patient Appointment Management with Different Lab Test Counts",
+      "req_ids": [
+        "VCDDR02"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "patient and doctor exist"
+      ],
+      "inputs": {
+        "patient_id": "PAT-001",
+        "doctor_id": "DOC-001",
+        "lab-test-count": "6"
+      },
+      "steps": [
+        "query patient details",
+        "request lab tests",
+        "verify lab test count validated"
+      ],
+      "expected": [
+        "lab test count validated"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Patient Appointment Management\n\n  Scenario: Query on Patient Id, Patient details are displayed and can be modified\n    Given a patient with id \"PAT-001\" and pin-code \"1234\"\n    When the user queries the patient by id \"PAT-001\"\n    Then the patient details are displayed with pin-code \"1234\"\n    And the pin-code cannot be modified to be outside the Zone\n\n  Scenario: Query on Patient Id, to display Patient details and then enter details\n    Given a patient with id \"PAT-001\" and pin-code \"1234\"\n    When the user queries the patient by id \"PAT-001\"\n    Then the patient details are displayed\n    When the user enters speciality \"Cardiology\" and symptoms \"Chest Pain\"\n    Then the patient appointment is created with speciality \"Cardiology\" and symptoms \"Chest Pain\"\n    When the user requests an appointment for next day\n    Then the patient appointment is created with appointment date for next day\n\n  Scenario: Doctor sees all the workflow consultation requests and selects them one by one\n    Given a doctor with id \"DOC-001\" and a patient with id \"PAT-001\"\n    When the doctor queries the patient by id \"PAT-001\"\n    Then the patient consultation requests are displayed\n    When the doctor selects a consultation request\n    Then the consultation request is displayed with patient details and doctor's notes\n\n  Scenario: Doctor sees the Patient Consultation Requests and enters Diagnosis, Prescribes medicines and requests for lab tests\n    Given a doctor with id \"DOC-001\" and a patient with id \"PAT-001\"\n    When the doctor queries the patient by id \"PAT-001\"\n    Then the patient consultation requests are displayed\n    When the doctor enters diagnosis \"Heart Attack\"\n    Then the diagnosis is recorded\n    When the doctor prescribes medicines \"Aspirin\" and \"Ibuprofen\"\n    Then the medicines are recorded with maximum 8 medicines\n    When the doctor requests lab tests \"Blood Test\" and \"ECG\"\n    Then the lab tests are recorded with maximum 5 lab tests\n\n  Scenario: Chemist sees all the workflow consultation requests and selects them one by one\n    Given a chemist with id \"CHE-001\" and a patient with id \"PAT-001\"\n    When the chemist queries the patient by id \"PAT-001\"\n    Then the patient consultation requests are displayed\n    When the chemist selects a consultation request\n    Then the consultation request is displayed with patient details and chemist's notes\n\n  Scenario: Chemist sees the Prescription, dispenses medicines and marks the flag in Prescription\n    Given a chemist with id \"CHE-001\" and a patient with id \"PAT-001\"\n    When the chemist queries the patient by id \"PAT-001\"\n    Then the patient consultation requests are displayed\n    When the chemist views the prescription\n    Then the prescription is displayed with patient details and doctor's notes\n    When the chemist dispenses medicines \"Aspirin\" and \"Ibuprofen\"\n    Then the medicines are dispensed and the flag is marked in the prescription\n\n  Scenario: Lab sees all the workflow consultation requests and selects them one by one\n    Given a lab with id \"LAB-001\" and a patient with id \"PAT-001\"\n    When the lab queries the patient by id \"PAT-001\"\n    Then the patient consultation requests are displayed\n    When the lab selects a consultation request\n    Then the consultation request is displayed with patient details and lab's notes\n\n  Scenario: Lab sees the Prescription, notes the lab tests to be done and the Patient details and marks the flag in prescription\n    Given a lab with id \"LAB-001\" and a patient with id \"PAT-001\"\n    When the lab queries the patient by id \"PAT-001\"\n    Then the patient consultation requests are displayed\n    When the lab views the prescription\n    Then the prescription is displayed with patient details and doctor's notes\n    When the lab notes the lab tests to be done \"Blood Test\" and \"ECG\"\n    Then the lab tests are recorded with patient details and the flag is marked in the prescription\n    When the lab adds the report\n    Then the report is added with patient details and lab's notes",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Query on Patient Id, Patient details are displayed and can be modified",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient exists"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001",
+            "pin_code": "1234"
+          },
+          "steps": [
+            "query patient by id",
+            "display patient details",
+            "modify pin-code"
+          ],
+          "expected": [
+            "patient details displayed",
+            "pin-code modified"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Query on Patient Id, to display Patient details and then enter details",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient exists"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001",
+            "pin_code": "1234"
+          },
+          "steps": [
+            "query patient by id",
+            "display patient details",
+            "enter speciality and symptoms",
+            "create patient appointment"
+          ],
+          "expected": [
+            "patient appointment created"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor sees all the workflow consultation requests and selects them one by one",
+          "req_ids": [
+            "VCDDR01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor exists",
+            "patient exists"
+          ],
+          "inputs": {
+            "doctor_id": "DOC-001",
+            "patient_id": "PAT-001"
+          },
+          "steps": [
+            "query patient by id",
+            "display patient consultation requests",
+            "select consultation request"
+          ],
+          "expected": [
+            "consultation request displayed"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Doctor sees the Patient Consultation Requests and enters Diagnosis, Prescribes medicines and requests for lab tests",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "doctor exists",
+            "patient exists"
+          ],
+          "inputs": {
+            "doctor_id": "DOC-001",
+            "patient_id": "PAT-001"
+          },
+          "steps": [
+            "query patient by id",
+            "display patient consultation requests",
+            "enter diagnosis",
+            "prescribe medicines",
+            "request lab tests"
+          ],
+          "expected": [
+            "diagnosis recorded",
+            "medicines recorded",
+            "lab tests recorded"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Chemist sees all the workflow consultation requests and selects them one by one",
+          "req_ids": [
+            "VCDCM01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "chemist exists",
+            "patient exists"
+          ],
+          "inputs": {
+            "chemist_id": "CHE-001",
+            "patient_id": "PAT-001"
+          },
+          "steps": [
+            "query patient by id",
+            "display patient consultation requests",
+            "select consultation request"
+          ],
+          "expected": [
+            "consultation request displayed"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Chemist sees the Prescription, dispenses medicines and marks the flag in Prescription",
+          "req_ids": [
+            "VCDCM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "chemist exists",
+            "patient exists"
+          ],
+          "inputs": {
+            "chemist_id": "CHE-001",
+            "patient_id": "PAT-001"
+          },
+          "steps": [
+            "query patient by id",
+            "display patient consultation requests",
+            "view prescription",
+            "dispense medicines",
+            "mark flag in prescription"
+          ],
+          "expected": [
+            "medicines dispensed",
+            "flag marked in prescription"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Lab sees all the workflow consultation requests and selects them one by one",
+          "req_ids": [
+            "VCDLB01"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "lab exists",
+            "patient exists"
+          ],
+          "inputs": {
+            "lab_id": "LAB-001",
+            "patient_id": "PAT-001"
+          },
+          "steps": [
+            "query patient by id",
+            "display patient consultation requests",
+            "select consultation request"
+          ],
+          "expected": [
+            "consultation request displayed"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Lab sees the Prescription, notes the lab tests to be done and the Patient details and marks the flag in prescription",
+          "req_ids": [
+            "VCDLB02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "lab exists",
+            "patient exists"
+          ],
+          "inputs": {
+            "lab_id": "LAB-001",
+            "patient_id": "PAT-001"
+          },
+          "steps": [
+            "query patient by id",
+            "display patient consultation requests",
+            "view prescription",
+            "note lab tests",
+            "mark flag in prescription",
+            "add report"
+          ],
+          "expected": [
+            "lab tests recorded",
+            "flag marked in prescription",
+            "report added"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.0,
+        "hallucinated": [
+          {
+            "value": "PAT-001",
+            "context": "patient id",
+            "grounded": false
+          },
+          {
+            "value": "1234",
+            "context": "pin-code",
+            "grounded": false
+          },
+          {
+            "value": "Cardiology",
+            "context": "speciality",
+            "grounded": false
+          },
+          {
+            "value": "Chest Pain",
+            "context": "symptoms",
+            "grounded": false
+          },
+          {
+            "value": "next day",
+            "context": "appointment date",
+            "grounded": false
+          },
+          {
+            "value": "DOC-001",
+            "context": "doctor id",
+            "grounded": false
+          },
+          {
+            "value": "CHE-001",
+            "context": "chemist id",
+            "grounded": false
+          },
+          {
+            "value": "LAB-001",
+            "context": "lab id",
+            "grounded": false
+          },
+          {
+            "value": "Aspirin",
+            "context": "medicine",
+            "grounded": false
+          },
+          {
+            "value": "Ibuprofen",
+            "context": "medicine",
+            "grounded": false
+          },
+          {
+            "value": "Blood Test",
+            "context": "lab test",
+            "grounded": false
+          },
+          {
+            "value": "ECG",
+            "context": "lab test",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 12,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test cases for pin-code zone violations",
+          "Test boundary conditions for medicine count (8) and lab test count (5)",
+          "Use Scenario Outline with Examples to cover normal, edge, and invalid values",
+          "Replace vague assertions with concrete state checks (e.g., verify pin-code value, appointment date)",
+          "Include assertions for system messages or status codes"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.43,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.43; sub-scores {'clause_coverage': 1.0, 'negative_coverage': 0.0, 'oracle_assertiveness': 0.2, 'boundary_coverage': 0.0, 'groundedness_mg': 0.0}). Output the full improved suite addressing:\n- ungrounded value 'PAT-001' (patient id): remove or use the SRS value\n- ungrounded value '1234' (pin-code): remove or use the SRS value\n- ungrounded value 'Cardiology' (speciality): remove or use the SRS value\n- ungrounded value 'Chest Pain' (symptoms): remove or use the SRS value\n- ungrounded value 'next day' (appointment date): remove or use the SRS value\n- ungrounded value 'DOC-001' (doctor id): remove or use the SRS value\n- Add negative test cases for pin-code zone violations\n- Test boundary conditions for medicine count (8) and lab test count (5)\n- Use Scenario Outline with Examples to cover normal, edge, and invalid values\n- Replace vague assertions with concrete state checks (e.g., verify pin-code value, appointment date)\n- Include assertions for system messages or status codes",
+      "artifact": "Feature: Patient Appointment Management\n\n  Scenario: Query Patient Details by Patient Id\n    Given a patient with id \"PAT-001\" exists\n    When I query patient details by patient id \"PAT-001\"\n    Then patient details are displayed\n    And patient pin-code is displayed\n    And patient pin-code cannot be modified to be outside the Zone\n\n  Scenario: Create Patient Appointment\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    When I query patient details by patient id \"PAT-001\"\n    And I enter details like Speciality \"Cardiology\" and Symptoms \"Chest Pain\"\n    And I request for consultation\n    Then appointment is created for next day\n    And appointment date is displayed\n\n  Scenario: Doctor Provides Consultation\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    And a consultation request for patient \"PAT-001\" exists\n    When doctor selects consultation request\n    Then consultation is provided\n    And diagnosis is entered\n    And medicines are prescribed (max 8)\n    And lab tests are requested (max 5)\n\n  Scenario: Chemist Dispenses Medicines\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    And a consultation request for patient \"PAT-001\" exists\n    And a prescription for patient \"PAT-001\" exists\n    When chemist selects consultation request\n    Then medicines are dispensed\n    And flag is marked in prescription\n\n  Scenario: Lab Notes Lab Tests\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    And a consultation request for patient \"PAT-001\" exists\n    And a prescription for patient \"PAT-001\" exists\n    When lab selects consultation request\n    Then lab tests are noted\n    And patient details are displayed\n    And flag is marked in prescription\n    And report is added\n\n  Scenario Outline: Patient Appointment Management with Different Pin-Codes\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    When I query patient details by patient id \"PAT-001\"\n    And I enter pin-code \"<pin-code>\"\n    Then pin-code is validated\n    Examples:\n      | pin-code |\n      | 1234     |\n      | 5678     |\n      | 9012     |\n      | 1111     |  # invalid pin-code (outside Zone)\n\n  Scenario Outline: Patient Appointment Management with Different Medicine Counts\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    When I query patient details by patient id \"PAT-001\"\n    And I prescribe medicines \"<medicine-count>\"\n    Then medicine count is validated\n    Examples:\n      | medicine-count |\n      | 0              |\n      | 1              |\n      | 8              |\n      | 9              |  # invalid medicine count (exceeds limit)\n\n  Scenario Outline: Patient Appointment Management with Different Lab Test Counts\n    Given a patient with id \"PAT-001\" exists\n    And a doctor with id \"DOC-001\" exists\n    When I query patient details by patient id \"PAT-001\"\n    And I request lab tests \"<lab-test-count>\"\n    Then lab test count is validated\n    Examples:\n      | lab-test-count |\n      | 0              |\n      | 1              |\n      | 5              |\n      | 6              |  # invalid lab test count (exceeds limit)",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Query Patient Details by Patient Id",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient exists"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001"
+          },
+          "steps": [
+            "query patient details",
+            "verify patient details displayed"
+          ],
+          "expected": [
+            "patient details displayed"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Create Patient Appointment",
+          "req_ids": [
+            "VCDPA04"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient and doctor exist"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001",
+            "doctor_id": "DOC-001"
+          },
+          "steps": [
+            "query patient details",
+            "enter details",
+            "request consultation",
+            "verify appointment created"
+          ],
+          "expected": [
+            "appointment created"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Doctor Provides Consultation",
+          "req_ids": [
+            "VCDDR01",
+            "VCDDR02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient, doctor, and consultation request exist"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001",
+            "doctor_id": "DOC-001"
+          },
+          "steps": [
+            "doctor selects consultation request",
+            "provide consultation",
+            "enter diagnosis",
+            "prescribe medicines",
+            "request lab tests"
+          ],
+          "expected": [
+            "consultation provided",
+            "diagnosis entered",
+            "medicines prescribed",
+            "lab tests requested"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Chemist Dispenses Medicines",
+          "req_ids": [
+            "VCDCM01",
+            "VCDCM02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient, doctor, consultation request, and prescription exist"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001",
+            "doctor_id": "DOC-001"
+          },
+          "steps": [
+            "chemist selects consultation request",
+            "dispense medicines",
+            "mark flag in prescription"
+          ],
+          "expected": [
+            "medicines dispensed",
+            "flag marked in prescription"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Lab Notes Lab Tests",
+          "req_ids": [
+            "VCDLB01",
+            "VCDLB02"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "patient, doctor, consultation request, and prescription exist"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001",
+            "doctor_id": "DOC-001"
+          },
+          "steps": [
+            "lab selects consultation request",
+            "note lab tests",
+            "display patient details",
+            "mark flag in prescription",
+            "add report"
+          ],
+          "expected": [
+            "lab tests noted",
+            "patient details displayed",
+            "flag marked in prescription",
+            "report added"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Patient Appointment Management with Different Pin-Codes",
+          "req_ids": [
+            "VCDPA03"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "patient and doctor exist"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001",
+            "doctor_id": "DOC-001",
+            "pin-code": "1234"
+          },
+          "steps": [
+            "query patient details",
+            "enter pin-code",
+            "verify pin-code validated"
+          ],
+          "expected": [
+            "pin-code validated"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Patient Appointment Management with Different Medicine Counts",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "patient and doctor exist"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001",
+            "doctor_id": "DOC-001",
+            "medicine-count": "9"
+          },
+          "steps": [
+            "query patient details",
+            "prescribe medicines",
+            "verify medicine count validated"
+          ],
+          "expected": [
+            "medicine count validated"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient Appointment Management with Different Lab Test Counts",
+          "req_ids": [
+            "VCDDR02"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "patient and doctor exist"
+          ],
+          "inputs": {
+            "patient_id": "PAT-001",
+            "doctor_id": "DOC-001",
+            "lab-test-count": "6"
+          },
+          "steps": [
+            "query patient details",
+            "request lab tests",
+            "verify lab test count validated"
+          ],
+          "expected": [
+            "lab test count validated"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 1.0,
+        "hallucinated": [],
+        "n_concrete_elements": 30,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Assertions are vague; add explicit checks for field values and counts",
+          "No verification of medicine and lab test counts; add assertions for exact numbers",
+          "No check that appointment date is exactly next day; add date validation",
+          "No validation of pin-code zone boundaries; add tests for boundary pin-codes",
+          "No error messages or status codes checked; add assertions for error responses"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.88,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

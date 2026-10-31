@@ -1,0 +1,1974 @@
+{
+  "unit_id": "U02_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:qwen2.5-coder:7b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 0.875,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.1667,
+    "hallucinated": [
+      {
+        "value": "Input air line blocked",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Input O2 line blocked",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Inspiratory pressure too low",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Input O2 line pressure too high",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "GUI unresponsive",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Controller unresponsive",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "Overpressure detected",
+        "context": "alarm message",
+        "grounded": false
+      },
+      {
+        "value": "HIGH",
+        "context": "alarm severity",
+        "grounded": false
+      },
+      {
+        "value": 0.1,
+        "context": "pressure value",
+        "grounded": false
+      },
+      {
+        "value": 0.05,
+        "context": "pressure value",
+        "grounded": false
+      },
+      {
+        "value": -4.01,
+        "context": "pressure value",
+        "grounded": false
+      },
+      {
+        "value": -3.99,
+        "context": "pressure value",
+        "grounded": false
+      },
+      {
+        "value": 60.01,
+        "context": "pressure value",
+        "grounded": false
+      },
+      {
+        "value": 59.99,
+        "context": "pressure value",
+        "grounded": false
+      },
+      {
+        "value": 0.25,
+        "context": "apnea time fraction",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 18,
+    "uncovered_clauses": [
+      "RW-SW-5"
+    ],
+    "weaknesses": [
+      "Missing test for GUI overpressure alarm (RW-SW-5).",
+      "Test steps are vague; need explicit triggers for low/high pressure conditions.",
+      "Alarm severity values are not verified against specification; need confirmation of severity levels.",
+      "Edge values for thresholds are not exactly at the boundary (e.g., -4.01 instead of -4.00).",
+      "The test suite does not verify that alarms are cleared when conditions return to normal."
+    ],
+    "traceability": 0.875,
+    "untraced_reqs": [
+      "RW-SW-5"
+    ],
+    "fsa_score": 0.81,
+    "fsa_threshold": 0.5,
+    "fsa_pass": false
+  },
+  "artifact": "Feature: Alarms in the GUI and Controller\n\n  Scenario: Input air line blocked\n    Given the input air line is blocked\n    When the system detects low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input air line blocked\"\n\n  Scenario: Input O2 line blocked\n    Given the input O2 line is blocked\n    When the system detects low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line blocked\"\n\n  Scenario: Inspiratory pressure drops below -4cm H2O\n    Given the inspiratory pressure is below -4cm H2O\n    When the system detects the pressure drop\n    Then the device and GUI must display an alarm\n    And the alarm message must be \"Inspiratory pressure too low\"\n\n  Scenario: Input O2 line pressure too high\n    Given the input O2 line pressure is too high\n    When the system detects the high pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line pressure too high\"\n\n  Scenario: GUI unresponsive for 1/2 of the apnea time\n    Given the GUI is unresponsive\n    When the apnea time is reached\n    Then the controller must trigger an alarm\n    And the alarm message must be \"GUI unresponsive\"\n\n  Scenario: Controller unresponsive for 1/2 of the apnea time\n    Given the controller is unresponsive\n    When the apnea time is reached\n    Then the GUI must trigger an alarm\n    And the alarm message must be \"Controller unresponsive\"\n\n  Scenario: Overpressure alarm firing above 60 cmH2O\n    Given the pressure is above 60 cmH2O\n    When the system detects the overpressure\n    Then the controller must trigger an alarm\n    And the alarm message must be \"Overpressure detected\"\n\n  Scenario Outline: Normal values for alarms\n    Given the system is in normal operation\n    When the <alarm condition> is met\n    Then the <alarm type> alarm must be triggered\n    And the alarm message must be \"<expected message>\"\n\n    Examples:\n      | alarm condition                | alarm type | expected message                |\n      | input air line blocked         | GUI        | Input air line blocked          |\n      | input O2 line blocked          | GUI        | Input O2 line blocked           |\n      | inspiratory pressure too low   | Device/GUI | Inspiratory pressure too low    |\n      | input O2 line pressure too high  | GUI        | Input O2 line pressure too high |\n      | GUI unresponsive               | Controller | GUI unresponsive                |\n      | controller unresponsive        | GUI        | Controller unresponsive         |\n      | pressure above 60 cmH2O        | Controller | Overpressure detected           |\n\n  Scenario Outline: Edge values for alarms\n    Given the system is in normal operation\n    When the <alarm condition> is met\n    Then the <alarm type> alarm must be triggered\n    And the alarm message must be \"<expected message>\"\n\n    Examples:\n      | alarm condition                | alarm type | expected message                |\n      | input air line pressure at 0.1   | GUI        | Input air line blocked          |\n      | input O2 line pressure at 0.1    | GUI        | Input O2 line blocked           |\n      | inspiratory pressure at -4.01    | Device/GUI | Inspiratory pressure too low    |\n      | input O2 line pressure at 60.01  | GUI        | Input O2 line pressure too high |\n      | GUI unresponsive for 0.5 apnea | Controller | GUI unresponsive                |\n      | controller unresponsive for 0.5 apnea | GUI | Controller unresponsive         |\n      | pressure at 60.01 cmH2O        | Controller | Overpressure detected           |\n\n  Scenario Outline: Invalid values for alarms\n    Given the system is in normal operation\n    When the <alarm condition> is met\n    Then the <alarm type> alarm must not be triggered\n    And the alarm message must be \"<expected message>\"\n\n    Examples:\n      | alarm condition                | alarm type | expected message                |\n      | input air line pressure at 0.05  | GUI        | Input air line blocked          |\n      | input O2 line pressure at 0.05   | GUI        | Input O2 line blocked           |\n      | inspiratory pressure at -3.99    | Device/GUI | Inspiratory pressure too low    |\n      | input O2 line pressure at 59.99  | GUI        | Input O2 line pressure too high |\n      | GUI unresponsive for 0.25 apnea | Controller | GUI unresponsive                |\n      | controller unresponsive for 0.25 apnea | GUI | Controller unresponsive         |\n      | pressure at 59.99 cmH2O        | Controller | Overpressure detected           |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Input air line blocked",
+      "req_ids": [
+        "RW-SW-45"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "input air line is blocked"
+      ],
+      "inputs": {},
+      "steps": [
+        "system detects low pressure"
+      ],
+      "expected": [
+        "GUI displays an alarm with severity HIGH",
+        "alarm message is 'Input air line blocked'"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Input O2 line blocked",
+      "req_ids": [
+        "RW-SW-58"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "input O2 line is blocked"
+      ],
+      "inputs": {},
+      "steps": [
+        "system detects low pressure"
+      ],
+      "expected": [
+        "GUI displays an alarm with severity HIGH",
+        "alarm message is 'Input O2 line blocked'"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Inspiratory pressure drops below -4cm H2O",
+      "req_ids": [
+        "RW-SW-60"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "inspiratory pressure is below -4cm H2O"
+      ],
+      "inputs": {},
+      "steps": [
+        "system detects the pressure drop"
+      ],
+      "expected": [
+        "device and GUI display an alarm",
+        "alarm message is 'Inspiratory pressure too low'"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Input O2 line pressure too high",
+      "req_ids": [
+        "RW-SW-21"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "input O2 line pressure is too high"
+      ],
+      "inputs": {},
+      "steps": [
+        "system detects the high pressure"
+      ],
+      "expected": [
+        "GUI displays an alarm with severity HIGH",
+        "alarm message is 'Input O2 line pressure too high'"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "GUI unresponsive for 1/2 of the apnea time",
+      "req_ids": [
+        "RW-SW-61"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "GUI is unresponsive"
+      ],
+      "inputs": {},
+      "steps": [
+        "apnea time is reached"
+      ],
+      "expected": [
+        "controller triggers an alarm",
+        "alarm message is 'GUI unresponsive'"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Controller unresponsive for 1/2 of the apnea time",
+      "req_ids": [
+        "RW-SW-36"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "controller is unresponsive"
+      ],
+      "inputs": {},
+      "steps": [
+        "apnea time is reached"
+      ],
+      "expected": [
+        "GUI triggers an alarm",
+        "alarm message is 'Controller unresponsive'"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Overpressure alarm firing above 60 cmH2O",
+      "req_ids": [
+        "RW-SW-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "pressure is above 60 cmH2O"
+      ],
+      "inputs": {},
+      "steps": [
+        "system detects the overpressure"
+      ],
+      "expected": [
+        "controller triggers an alarm",
+        "alarm message is 'Overpressure detected'"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Normal values for alarms",
+      "req_ids": [
+        "RW-SW-45",
+        "RW-SW-58",
+        "RW-SW-60",
+        "RW-SW-21",
+        "RW-SW-61",
+        "RW-SW-36",
+        "RW-SW-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system is in normal operation"
+      ],
+      "inputs": {},
+      "steps": [
+        "<alarm condition> is met"
+      ],
+      "expected": [
+        "<alarm type> alarm is triggered",
+        "alarm message is '<expected message>'"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Edge values for alarms",
+      "req_ids": [
+        "RW-SW-45",
+        "RW-SW-58",
+        "RW-SW-60",
+        "RW-SW-21",
+        "RW-SW-61",
+        "RW-SW-36",
+        "RW-SW-6"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "system is in normal operation"
+      ],
+      "inputs": {},
+      "steps": [
+        "<alarm condition> is met"
+      ],
+      "expected": [
+        "<alarm type> alarm is triggered",
+        "alarm message is '<expected message>'"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Invalid values for alarms",
+      "req_ids": [
+        "RW-SW-45",
+        "RW-SW-58",
+        "RW-SW-60",
+        "RW-SW-21",
+        "RW-SW-61",
+        "RW-SW-36",
+        "RW-SW-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "system is in normal operation"
+      ],
+      "inputs": {},
+      "steps": [
+        "<alarm condition> is met"
+      ],
+      "expected": [
+        "<alarm type> alarm is not triggered",
+        "alarm message is '<expected message>'"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarms in the GUI and Controller\n\n  Scenario: Input air line blocked\n    Given the input air line is blocked\n    When the system detects low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input air line blocked\"\n\n  Scenario: Input O2 line blocked\n    Given the input O2 line is blocked\n    When the system detects low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line blocked\"\n\n  Scenario: Inspiratory pressure drops below -4cm H2O\n    Given the inspiratory pressure is below -4cm H2O\n    When the system detects the pressure drop\n    Then the device and GUI must display an alarm\n    And the alarm message must be \"Inspiratory pressure too low\"\n\n  Scenario: Input O2 line pressure too high\n    Given the input O2 line pressure is too high\n    When the system detects the high pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line pressure too high\"\n\n  Scenario: GUI unresponsive for 1/2 of the apnea time\n    Given the GUI is unresponsive\n    When the apnea time is reached\n    Then the controller must trigger an alarm\n    And the alarm message must be \"GUI unresponsive\"\n\n  Scenario: Controller unresponsive for 1/2 of the apnea time\n    Given the controller is unresponsive\n    When the apnea time is reached\n    Then the GUI must trigger an alarm\n    And the alarm message must be \"Controller unresponsive\"\n\n  Scenario: Overpressure alarm firing above 60 cmH2O\n    Given the pressure is above 60 cmH2O\n    When the system detects the overpressure\n    Then the controller must trigger an alarm\n    And the alarm message must be \"Overpressure detected\"\n\n  Scenario Outline: Normal values for alarms\n    Given the system is in normal operation\n    When the <alarm condition> is met\n    Then the <alarm type> alarm must be triggered\n    And the alarm message must be \"<expected message>\"\n\n    Examples:\n      | alarm condition                | alarm type | expected message                |\n      | input air line blocked         | GUI        | Input air line blocked          |\n      | input O2 line blocked          | GUI        | Input O2 line blocked           |\n      | inspiratory pressure too low   | Device/GUI | Inspiratory pressure too low    |\n      | input O2 line pressure too high  | GUI        | Input O2 line pressure too high |\n      | GUI unresponsive               | Controller | GUI unresponsive                |\n      | controller unresponsive        | GUI        | Controller unresponsive         |\n      | pressure above 60 cmH2O        | Controller | Overpressure detected           |\n\n  Scenario Outline: Edge values for alarms\n    Given the system is in normal operation\n    When the <alarm condition> is met\n    Then the <alarm type> alarm must be triggered\n    And the alarm message must be \"<expected message>\"\n\n    Examples:\n      | alarm condition                | alarm type | expected message                |\n      | input air line pressure at 0.1   | GUI        | Input air line blocked          |\n      | input O2 line pressure at 0.1    | GUI        | Input O2 line blocked           |\n      | inspiratory pressure at -4.01    | Device/GUI | Inspiratory pressure too low    |\n      | input O2 line pressure at 60.01  | GUI        | Input O2 line pressure too high |\n      | GUI unresponsive for 0.5 apnea | Controller | GUI unresponsive                |\n      | controller unresponsive for 0.5 apnea | GUI | Controller unresponsive         |\n      | pressure at 60.01 cmH2O        | Controller | Overpressure detected           |\n\n  Scenario Outline: Invalid values for alarms\n    Given the system is in normal operation\n    When the <alarm condition> is met\n    Then the <alarm type> alarm must not be triggered\n    And the alarm message must be \"<expected message>\"\n\n    Examples:\n      | alarm condition                | alarm type | expected message                |\n      | input air line pressure at 0.05  | GUI        | Input air line blocked          |\n      | input O2 line pressure at 0.05   | GUI        | Input O2 line blocked           |\n      | inspiratory pressure at -3.99    | Device/GUI | Inspiratory pressure too low    |\n      | input O2 line pressure at 59.99  | GUI        | Input O2 line pressure too high |\n      | GUI unresponsive for 0.25 apnea | Controller | GUI unresponsive                |\n      | controller unresponsive for 0.25 apnea | GUI | Controller unresponsive         |\n      | pressure at 59.99 cmH2O        | Controller | Overpressure detected           |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Input air line blocked",
+          "req_ids": [
+            "RW-SW-45"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input air line is blocked"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects low pressure"
+          ],
+          "expected": [
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input air line blocked'"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Input O2 line blocked",
+          "req_ids": [
+            "RW-SW-58"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input O2 line is blocked"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects low pressure"
+          ],
+          "expected": [
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input O2 line blocked'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Inspiratory pressure drops below -4cm H2O",
+          "req_ids": [
+            "RW-SW-60"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "inspiratory pressure is below -4cm H2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the pressure drop"
+          ],
+          "expected": [
+            "device and GUI display an alarm",
+            "alarm message is 'Inspiratory pressure too low'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Input O2 line pressure too high",
+          "req_ids": [
+            "RW-SW-21"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input O2 line pressure is too high"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the high pressure"
+          ],
+          "expected": [
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input O2 line pressure too high'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI unresponsive for 1/2 of the apnea time",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive"
+          ],
+          "inputs": {},
+          "steps": [
+            "apnea time is reached"
+          ],
+          "expected": [
+            "controller triggers an alarm",
+            "alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller unresponsive for 1/2 of the apnea time",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is unresponsive"
+          ],
+          "inputs": {},
+          "steps": [
+            "apnea time is reached"
+          ],
+          "expected": [
+            "GUI triggers an alarm",
+            "alarm message is 'Controller unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Overpressure alarm firing above 60 cmH2O",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "pressure is above 60 cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the overpressure"
+          ],
+          "expected": [
+            "controller triggers an alarm",
+            "alarm message is 'Overpressure detected'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Normal values for alarms",
+          "req_ids": [
+            "RW-SW-45",
+            "RW-SW-58",
+            "RW-SW-60",
+            "RW-SW-21",
+            "RW-SW-61",
+            "RW-SW-36",
+            "RW-SW-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is in normal operation"
+          ],
+          "inputs": {},
+          "steps": [
+            "<alarm condition> is met"
+          ],
+          "expected": [
+            "<alarm type> alarm is triggered",
+            "alarm message is '<expected message>'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Edge values for alarms",
+          "req_ids": [
+            "RW-SW-45",
+            "RW-SW-58",
+            "RW-SW-60",
+            "RW-SW-21",
+            "RW-SW-61",
+            "RW-SW-36",
+            "RW-SW-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "system is in normal operation"
+          ],
+          "inputs": {},
+          "steps": [
+            "<alarm condition> is met"
+          ],
+          "expected": [
+            "<alarm type> alarm is triggered",
+            "alarm message is '<expected message>'"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Invalid values for alarms",
+          "req_ids": [
+            "RW-SW-45",
+            "RW-SW-58",
+            "RW-SW-60",
+            "RW-SW-21",
+            "RW-SW-61",
+            "RW-SW-36",
+            "RW-SW-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "system is in normal operation"
+          ],
+          "inputs": {},
+          "steps": [
+            "<alarm condition> is met"
+          ],
+          "expected": [
+            "<alarm type> alarm is not triggered",
+            "alarm message is '<expected message>'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.1667,
+        "hallucinated": [
+          {
+            "value": "Input air line blocked",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 line blocked",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Inspiratory pressure too low",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 line pressure too high",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "GUI unresponsive",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Controller unresponsive",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Overpressure detected",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "HIGH",
+            "context": "alarm severity",
+            "grounded": false
+          },
+          {
+            "value": 0.1,
+            "context": "pressure value",
+            "grounded": false
+          },
+          {
+            "value": 0.05,
+            "context": "pressure value",
+            "grounded": false
+          },
+          {
+            "value": -4.01,
+            "context": "pressure value",
+            "grounded": false
+          },
+          {
+            "value": -3.99,
+            "context": "pressure value",
+            "grounded": false
+          },
+          {
+            "value": 60.01,
+            "context": "pressure value",
+            "grounded": false
+          },
+          {
+            "value": 59.99,
+            "context": "pressure value",
+            "grounded": false
+          },
+          {
+            "value": 0.25,
+            "context": "apnea time fraction",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 18,
+        "uncovered_clauses": [
+          "RW-SW-5"
+        ],
+        "weaknesses": [
+          "Missing test for GUI overpressure alarm (RW-SW-5).",
+          "Test steps are vague; need explicit triggers for low/high pressure conditions.",
+          "Alarm severity values are not verified against specification; need confirmation of severity levels.",
+          "Edge values for thresholds are not exactly at the boundary (e.g., -4.01 instead of -4.00).",
+          "The test suite does not verify that alarms are cleared when conditions return to normal."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-5"
+        ],
+        "fsa_score": 0.81,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.81; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.9, 'boundary_coverage': 1.0, 'groundedness_mg': 0.1667}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-5'] (add at least one each)\n- uncovered clause: RW-SW-5\n- ungrounded value 'Input air line blocked' (alarm message): remove or use the SRS value\n- ungrounded value 'Input O2 line blocked' (alarm message): remove or use the SRS value\n- ungrounded value 'Inspiratory pressure too low' (alarm message): remove or use the SRS value\n- ungrounded value 'Input O2 line pressure too high' (alarm message): remove or use the SRS value\n- ungrounded value 'GUI unresponsive' (alarm message): remove or use the SRS value\n- ungrounded value 'Controller unresponsive' (alarm message): remove or use the SRS value\n- Missing test for GUI overpressure alarm (RW-SW-5).\n- Test steps are vague; need explicit triggers for low/high pressure conditions.\n- Alarm severity values are not verified against specification; need confirmation of severity levels.\n- Edge values for thresholds are not exactly at the boundary (e.g., -4.01 instead of -4.00).\n- The test suite does not verify that alarms are cleared when conditions return to normal.",
+      "artifact": "Feature: Alarms in the GUI and Controller\n\n  Scenario: GUI alarm for blocked input air line\n    Given the input air line is blocked\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input air line blocked\"\n\n  Scenario: GUI alarm for blocked input O2 line\n    Given the input O2 line is blocked\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line blocked\"\n\n  Scenario: GUI alarm for inspiratory pressure too low\n    Given the inspiratory pressure drops below -4cm H2O\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Inspiratory pressure too low\"\n\n  Scenario: GUI alarm for high input O2 line pressure\n    Given the input O2 line pressure is too high\n    When the system detects the high pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line pressure too high\"\n\n  Scenario: GUI alarm for GUI unresponsiveness\n    Given the GUI is unresponsive for 1/2 of the apnea time\n    When the system detects the unresponsiveness\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"GUI unresponsive\"\n\n  Scenario: GUI alarm for controller unresponsiveness\n    Given the controller is unresponsive for 1/2 of the apnea time\n    When the system detects the unresponsiveness\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Controller unresponsive\"\n\n  Scenario: Controller alarm for overpressure\n    Given the pressure exceeds 60 cmH2O\n    When the system detects the overpressure\n    Then the controller must trigger an alarm\n    And the alarm message must be \"Overpressure\"\n\n  Scenario Outline: GUI alarm for normal conditions\n    Given the system is in normal conditions\n    When the system detects normal conditions\n    Then the GUI must not display any alarms\n    Examples:\n      | Input air line | Input O2 line | Inspiratory pressure | Input O2 line pressure | GUI responsiveness | Controller responsiveness |\n      |----------------|---------------|----------------------|------------------------|--------------------|-------------------------|\n      | Normal         | Normal        | Normal               | Normal                 | Responsive         | Responsive              |\n      | Normal         | Normal        | Normal               | Normal                 | Responsive         | Unresponsive            |\n      | Normal         | Normal        | Normal               | Normal                 | Unresponsive         | Responsive              |\n      | Normal         | Normal        | Normal               | Normal                 | Unresponsive         | Unresponsive            |\n\n  Scenario Outline: GUI alarm for edge conditions\n    Given the system is in edge conditions\n    When the system detects edge conditions\n    Then the GUI must display an alarm with severity HIGH\n    Examples:\n      | Input air line | Input O2 line | Inspiratory pressure | Input O2 line pressure | GUI responsiveness | Controller responsiveness |\n      |----------------|---------------|----------------------|------------------------|--------------------|-------------------------|\n      | Blocked        | Normal        | -4.00                | Normal                 | Responsive         | Responsive              |\n      | Normal         | Blocked       | Normal               | Normal                 | Responsive         | Responsive              |\n      | Normal         | Normal        | -4.01                | Normal                 | Responsive         | Responsive              |\n      | Normal         | Normal        | Normal               | 60.00                  | Responsive         | Responsive              |\n      | Normal         | Normal        | Normal               | 60.01                  | Responsive         | Responsive              |\n      | Normal         | Normal        | Normal               | Normal                 | Unresponsive         | Responsive              |\n      | Normal         | Normal        | Normal               | Normal                 | Responsive         | Unresponsive            |\n      | Normal         | Normal        | Normal               | Normal                 | Unresponsive         | Unresponsive            |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI alarm for blocked input air line",
+          "req_ids": [
+            "RW-SW-45"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Input air line is blocked"
+          ],
+          "inputs": {},
+          "steps": [
+            "System detects the low pressure"
+          ],
+          "expected": [
+            "GUI displays an alarm with severity HIGH",
+            "Alarm message is 'Input air line blocked'"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI alarm for blocked input O2 line",
+          "req_ids": [
+            "RW-SW-58"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Input O2 line is blocked"
+          ],
+          "inputs": {},
+          "steps": [
+            "System detects the low pressure"
+          ],
+          "expected": [
+            "GUI displays an alarm with severity HIGH",
+            "Alarm message is 'Input O2 line blocked'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI alarm for inspiratory pressure too low",
+          "req_ids": [
+            "RW-SW-60"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Inspiratory pressure drops below -4cm H2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "System detects the low pressure"
+          ],
+          "expected": [
+            "GUI displays an alarm with severity HIGH",
+            "Alarm message is 'Inspiratory pressure too low'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI alarm for high input O2 line pressure",
+          "req_ids": [
+            "RW-SW-21"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Input O2 line pressure is too high"
+          ],
+          "inputs": {},
+          "steps": [
+            "System detects the high pressure"
+          ],
+          "expected": [
+            "GUI displays an alarm with severity HIGH",
+            "Alarm message is 'Input O2 line pressure too high'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI alarm for GUI unresponsiveness",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive for 1/2 of the apnea time"
+          ],
+          "inputs": {},
+          "steps": [
+            "System detects the unresponsiveness"
+          ],
+          "expected": [
+            "GUI displays an alarm with severity HIGH",
+            "Alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI alarm for controller unresponsiveness",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is unresponsive for 1/2 of the apnea time"
+          ],
+          "inputs": {},
+          "steps": [
+            "System detects the unresponsiveness"
+          ],
+          "expected": [
+            "GUI displays an alarm with severity HIGH",
+            "Alarm message is 'Controller unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller alarm for overpressure",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Pressure exceeds 60 cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "System detects the overpressure"
+          ],
+          "expected": [
+            "Controller triggers an alarm",
+            "Alarm message is 'Overpressure'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI alarm for normal conditions",
+          "req_ids": [
+            "RW-SW-45",
+            "RW-SW-58",
+            "RW-SW-60",
+            "RW-SW-21",
+            "RW-SW-61",
+            "RW-SW-36"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System is in normal conditions"
+          ],
+          "inputs": {},
+          "steps": [
+            "System detects normal conditions"
+          ],
+          "expected": [
+            "GUI does not display any alarms"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI alarm for edge conditions",
+          "req_ids": [
+            "RW-SW-45",
+            "RW-SW-58",
+            "RW-SW-60",
+            "RW-SW-21",
+            "RW-SW-61",
+            "RW-SW-36"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is in edge conditions"
+          ],
+          "inputs": {},
+          "steps": [
+            "System detects edge conditions"
+          ],
+          "expected": [
+            "GUI displays an alarm with severity HIGH"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 0.9,
+        "groundedness_mg": 0.3636,
+        "hallucinated": [
+          {
+            "value": "Input air line blocked",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 line blocked",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Inspiratory pressure too low",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 line pressure too high",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "GUI unresponsive",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Controller unresponsive",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Overpressure",
+            "context": "alarm message",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 11,
+        "uncovered_clauses": [
+          "RW-SW-5"
+        ],
+        "weaknesses": [
+          "Missing test for GUI overpressure alarm (RW-SW-5).",
+          "Alarm messages are not grounded in the SRS; consider using standardized messages or referencing spec.",
+          "Scenario outlines use generic assertions; add specific alarm identifiers to improve oracle assertiveness.",
+          "Boundary tests for 1/2 apnea time are not numeric; add explicit timing values.",
+          "No tests for invalid or out-of-range values beyond thresholds; consider adding negative pressure or extremely high values."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-5"
+        ],
+        "fsa_score": 0.8095,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.8095; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 1.0, 'oracle_assertiveness': 0.8, 'boundary_coverage': 0.9, 'groundedness_mg': 0.3636}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-5'] (add at least one each)\n- uncovered clause: RW-SW-5\n- ungrounded value 'Input air line blocked' (alarm message): remove or use the SRS value\n- ungrounded value 'Input O2 line blocked' (alarm message): remove or use the SRS value\n- ungrounded value 'Inspiratory pressure too low' (alarm message): remove or use the SRS value\n- ungrounded value 'Input O2 line pressure too high' (alarm message): remove or use the SRS value\n- ungrounded value 'GUI unresponsive' (alarm message): remove or use the SRS value\n- ungrounded value 'Controller unresponsive' (alarm message): remove or use the SRS value\n- Missing test for GUI overpressure alarm (RW-SW-5).\n- Alarm messages are not grounded in the SRS; consider using standardized messages or referencing spec.\n- Scenario outlines use generic assertions; add specific alarm identifiers to improve oracle assertiveness.\n- Boundary tests for 1/2 apnea time are not numeric; add explicit timing values.\n- No tests for invalid or out-of-range values beyond thresholds; consider adding negative pressure or extremely high values.",
+      "artifact": "Feature: Alarms in the GUI and Controller\n\n  Scenario: GUI alarm for blocked input air line\n    Given the input air line is blocked\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input air line blocked\"\n\n  Scenario: GUI alarm for blocked input O2 line\n    Given the input O2 line is blocked\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line blocked\"\n\n  Scenario: GUI alarm for inspiratory pressure too low\n    Given the inspiratory pressure drops below -4cm H2O\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Inspiratory pressure too low\"\n\n  Scenario: GUI alarm for input O2 line pressure too high\n    Given the input O2 line pressure is too high\n    When the system detects the high pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line pressure too high\"\n\n  Scenario: GUI alarm for GUI unresponsive\n    Given the GUI is unresponsive for 1/2 of the apnea time\n    When the system detects the unresponsiveness\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"GUI unresponsive\"\n\n  Scenario: Controller alarm for GUI unresponsive\n    Given the GUI is unresponsive for 1/2 of the apnea time\n    When the system detects the unresponsiveness\n    Then the controller must trigger an alarm\n    And the alarm message must be \"GUI unresponsive\"\n\n  Scenario: GUI alarm for controller unresponsive\n    Given the controller is unresponsive for 1/2 of the apnea time\n    When the system detects the unresponsiveness\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Controller unresponsive\"\n\n  Scenario: Controller alarm for controller unresponsive\n    Given the controller is unresponsive for 1/2 of the apnea time\n    When the system detects the unresponsiveness\n    Then the controller must trigger an alarm\n    And the alarm message must be \"Controller unresponsive\"\n\n  Scenario: GUI overpressure alarm\n    Given the pressure exceeds 60 cmH2O\n    When the system detects the overpressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Overpressure\"\n\n  Scenario Outline: GUI alarm for apnea time unresponsiveness\n    Given the GUI is unresponsive for <apnea_time> seconds\n    When the system detects the unresponsiveness\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"GUI unresponsive\"\n\n    Examples:\n      | apnea_time |\n      | 30         |\n      | 60         |\n      | 90         |\n\n  Scenario Outline: Controller alarm for apnea time unresponsiveness\n    Given the controller is unresponsive for <apnea_time> seconds\n    When the system detects the unresponsiveness\n    Then the controller must trigger an alarm\n    And the alarm message must be \"Controller unresponsive\"\n\n    Examples:\n      | apnea_time |\n      | 30         |\n      | 60         |\n      | 90         |\n\n  Scenario Outline: GUI alarm for negative pressure\n    Given the pressure is <pressure> cmH2O\n    When the system detects the negative pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Negative pressure\"\n\n    Examples:\n      | pressure |\n      | -5       |\n      | -10      |\n      | -15      |\n\n  Scenario Outline: Controller alarm for negative pressure\n    Given the pressure is <pressure> cmH2O\n    When the system detects the negative pressure\n    Then the controller must trigger an alarm\n    And the alarm message must be \"Negative pressure\"\n\n    Examples:\n      | pressure |\n      | -5       |\n      | -10      |\n      | -15      |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI alarm for blocked input air line",
+          "req_ids": [
+            "RW-SW-45"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input air line is blocked"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the low pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input air line blocked'"
+          ],
+          "expected": [
+            "alarm displayed",
+            "alarm severity is HIGH",
+            "alarm message is 'Input air line blocked'"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI alarm for blocked input O2 line",
+          "req_ids": [
+            "RW-SW-58"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input O2 line is blocked"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the low pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input O2 line blocked'"
+          ],
+          "expected": [
+            "alarm displayed",
+            "alarm severity is HIGH",
+            "alarm message is 'Input O2 line blocked'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI alarm for inspiratory pressure too low",
+          "req_ids": [
+            "RW-SW-60"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "inspiratory pressure drops below -4cm H2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the low pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Inspiratory pressure too low'"
+          ],
+          "expected": [
+            "alarm displayed",
+            "alarm severity is HIGH",
+            "alarm message is 'Inspiratory pressure too low'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI alarm for input O2 line pressure too high",
+          "req_ids": [
+            "RW-SW-21"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input O2 line pressure is too high"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the high pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input O2 line pressure too high'"
+          ],
+          "expected": [
+            "alarm displayed",
+            "alarm severity is HIGH",
+            "alarm message is 'Input O2 line pressure too high'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI alarm for GUI unresponsive",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive for 1/2 of the apnea time"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'GUI unresponsive'"
+          ],
+          "expected": [
+            "alarm displayed",
+            "alarm severity is HIGH",
+            "alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller alarm for GUI unresponsive",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive for 1/2 of the apnea time"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "controller triggers an alarm",
+            "alarm message is 'GUI unresponsive'"
+          ],
+          "expected": [
+            "alarm triggered",
+            "alarm severity is HIGH",
+            "alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI alarm for controller unresponsive",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is unresponsive for 1/2 of the apnea time"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Controller unresponsive'"
+          ],
+          "expected": [
+            "alarm displayed",
+            "alarm severity is HIGH",
+            "alarm message is 'Controller unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Controller alarm for controller unresponsive",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is unresponsive for 1/2 of the apnea time"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "controller triggers an alarm",
+            "alarm message is 'Controller unresponsive'"
+          ],
+          "expected": [
+            "alarm triggered",
+            "alarm severity is HIGH",
+            "alarm message is 'Controller unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI overpressure alarm",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "pressure exceeds 60 cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the overpressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Overpressure'"
+          ],
+          "expected": [
+            "alarm displayed",
+            "alarm severity is HIGH",
+            "alarm message is 'Overpressure'"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI alarm for apnea time unresponsiveness",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive for 30 seconds"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'GUI unresponsive'"
+          ],
+          "expected": [
+            "alarm displayed",
+            "alarm severity is HIGH",
+            "alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Controller alarm for apnea time unresponsiveness",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive for 60 seconds"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "controller triggers an alarm",
+            "alarm message is 'GUI unresponsive'"
+          ],
+          "expected": [
+            "alarm triggered",
+            "alarm severity is HIGH",
+            "alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "GUI alarm for apnea time unresponsiveness",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive for 90 seconds"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'GUI unresponsive'"
+          ],
+          "expected": [
+            "alarm displayed",
+            "alarm severity is HIGH",
+            "alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Controller alarm for apnea time unresponsiveness",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive for 30 seconds"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "controller triggers an alarm",
+            "alarm message is 'GUI unresponsive'"
+          ],
+          "expected": [
+            "alarm triggered",
+            "alarm severity is HIGH",
+            "alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Controller alarm for apnea time unresponsiveness",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive for 60 seconds"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "controller triggers an alarm",
+            "alarm message is 'GUI unresponsive'"
+          ],
+          "expected": [
+            "alarm triggered",
+            "alarm severity is HIGH",
+            "alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-015",
+          "title": "Controller alarm for apnea time unresponsiveness",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive for 90 seconds"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "controller triggers an alarm",
+            "alarm message is 'GUI unresponsive'"
+          ],
+          "expected": [
+            "alarm triggered",
+            "alarm severity is HIGH",
+            "alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-016",
+          "title": "GUI alarm for negative pressure",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "pressure is -5 cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the negative pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Negative pressure'"
+          ],
+          "expected": [
+            "alarm displayed",
+            "alarm severity is HIGH",
+            "alarm message is 'Negative pressure'"
+          ]
+        },
+        {
+          "id": "TC-017",
+          "title": "Controller alarm for negative pressure",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "pressure is -10 cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the negative pressure",
+            "controller triggers an alarm",
+            "alarm message is 'Negative pressure'"
+          ],
+          "expected": [
+            "alarm triggered",
+            "alarm severity is HIGH",
+            "alarm message is 'Negative pressure'"
+          ]
+        },
+        {
+          "id": "TC-018",
+          "title": "GUI alarm for negative pressure",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "pressure is -15 cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the negative pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Negative pressure'"
+          ],
+          "expected": [
+            "alarm displayed",
+            "alarm severity is HIGH",
+            "alarm message is 'Negative pressure'"
+          ]
+        },
+        {
+          "id": "TC-019",
+          "title": "Controller alarm for negative pressure",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "pressure is -5 cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the negative pressure",
+            "controller triggers an alarm",
+            "alarm message is 'Negative pressure'"
+          ],
+          "expected": [
+            "alarm triggered",
+            "alarm severity is HIGH",
+            "alarm message is 'Negative pressure'"
+          ]
+        },
+        {
+          "id": "TC-020",
+          "title": "Controller alarm for negative pressure",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "pressure is -10 cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the negative pressure",
+            "controller triggers an alarm",
+            "alarm message is 'Negative pressure'"
+          ],
+          "expected": [
+            "alarm triggered",
+            "alarm severity is HIGH",
+            "alarm message is 'Negative pressure'"
+          ]
+        },
+        {
+          "id": "TC-021",
+          "title": "Controller alarm for negative pressure",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "pressure is -15 cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the negative pressure",
+            "controller triggers an alarm",
+            "alarm message is 'Negative pressure'"
+          ],
+          "expected": [
+            "alarm triggered",
+            "alarm severity is HIGH",
+            "alarm message is 'Negative pressure'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.875,
+        "negative_coverage": 0.875,
+        "oracle_assertiveness": 1.0,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.3125,
+        "hallucinated": [
+          {
+            "value": "Input air line blocked",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 line blocked",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Inspiratory pressure too low",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 line pressure too high",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "GUI unresponsive",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Controller unresponsive",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Overpressure",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Negative pressure",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "30 seconds",
+            "context": "apnea time",
+            "grounded": false
+          },
+          {
+            "value": "60 seconds",
+            "context": "apnea time",
+            "grounded": false
+          },
+          {
+            "value": "90 seconds",
+            "context": "apnea time",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 16,
+        "uncovered_clauses": [
+          "RW-SW-6"
+        ],
+        "weaknesses": [
+          "Missing scenario outlines for each requirement; tests use simple scenarios instead of outlines with normal, edge, and invalid values.",
+          "No tests for controller overpressure alarm (RW-SW-6).",
+          "No boundary tests at thresholds (e.g., exactly -4 cm H2O, exactly 60 cm H2O, half apnea time).",
+          "Alarm messages are not specified in the SRS; tests use arbitrary messages, reducing traceability.",
+          "No negative tests for invalid inputs or error handling beyond alarm conditions."
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-5"
+        ],
+        "fsa_score": 0.6781,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE ADEQUACY GATE (FSA 0.6781; sub-scores {'clause_coverage': 0.875, 'negative_coverage': 0.875, 'oracle_assertiveness': 1.0, 'boundary_coverage': 0.0, 'groundedness_mg': 0.3125}). Output the full improved suite addressing:\n- requirements with NO test case: ['RW-SW-5'] (add at least one each)\n- uncovered clause: RW-SW-6\n- ungrounded value 'Input air line blocked' (alarm message): remove or use the SRS value\n- ungrounded value 'Input O2 line blocked' (alarm message): remove or use the SRS value\n- ungrounded value 'Inspiratory pressure too low' (alarm message): remove or use the SRS value\n- ungrounded value 'Input O2 line pressure too high' (alarm message): remove or use the SRS value\n- ungrounded value 'GUI unresponsive' (alarm message): remove or use the SRS value\n- ungrounded value 'Controller unresponsive' (alarm message): remove or use the SRS value\n- Missing scenario outlines for each requirement; tests use simple scenarios instead of outlines with normal, edge, and invalid values.\n- No tests for controller overpressure alarm (RW-SW-6).\n- No boundary tests at thresholds (e.g., exactly -4 cm H2O, exactly 60 cm H2O, half apnea time).\n- Alarm messages are not specified in the SRS; tests use arbitrary messages, reducing traceability.\n- No negative tests for invalid inputs or error handling beyond alarm conditions.",
+      "artifact": "Feature: Alarms in the GUI and Controller\n\n  Scenario: GUI alarm for blocked input air line\n    Given the input air line is blocked\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input air line blocked\"\n\n  Scenario: GUI alarm for blocked input O2 line\n    Given the input O2 line is blocked\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line blocked\"\n\n  Scenario: GUI alarm for inspiratory pressure too low\n    Given the inspiratory pressure is below -4 cm H2O\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Inspiratory pressure too low\"\n\n  Scenario: GUI alarm for high O2 line pressure\n    Given the input O2 line pressure is too high\n    When the system detects the high pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line pressure too high\"\n\n  Scenario: Controller alarm for GUI unresponsiveness\n    Given the GUI is unresponsive for 1/2 of the apnea time\n    When the system detects the unresponsiveness\n    Then the controller must trigger an alarm\n    And the alarm message must be \"GUI unresponsive\"\n\n  Scenario: Controller alarm for controller unresponsiveness\n    Given the controller is unresponsive for 1/2 of the apnea time\n    When the system detects the unresponsiveness\n    Then the controller must trigger an alarm\n    And the alarm message must be \"Controller unresponsive\"\n\n  Scenario: Controller overpressure alarm\n    Given the pressure is above 60 cmH2O\n    When the system detects the overpressure\n    Then the controller must trigger an alarm\n    And the alarm message must be \"Overpressure detected\"\n\n  Scenario Outline: GUI alarm for blocked input air line with different scenarios\n    Given the input air line is <scenario>\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input air line blocked\"\n\n    Examples:\n      | scenario |\n      | blocked  |\n      | partially blocked |\n      | disconnected |\n\n  Scenario Outline: GUI alarm for blocked input O2 line with different scenarios\n    Given the input O2 line is <scenario>\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line blocked\"\n\n    Examples:\n      | scenario |\n      | blocked  |\n      | partially blocked |\n      | disconnected |\n\n  Scenario Outline: GUI alarm for inspiratory pressure too low with different scenarios\n    Given the inspiratory pressure is <pressure> cm H2O\n    When the system detects the low pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Inspiratory pressure too low\"\n\n    Examples:\n      | pressure |\n      | -5       |\n      | -3       |\n      | -2       |\n\n  Scenario Outline: GUI alarm for high O2 line pressure with different scenarios\n    Given the input O2 line pressure is <pressure> cm H2O\n    When the system detects the high pressure\n    Then the GUI must display an alarm with severity HIGH\n    And the alarm message must be \"Input O2 line pressure too high\"\n\n    Examples:\n      | pressure |\n      | 65       |\n      | 70       |\n      | 75       |\n\n  Scenario Outline: Controller alarm for GUI unresponsiveness with different scenarios\n    Given the GUI is unresponsive for <time> seconds\n    When the system detects the unresponsiveness\n    Then the controller must trigger an alarm\n    And the alarm message must be \"GUI unresponsive\"\n\n    Examples:\n      | time |\n      | 30   |\n      | 45   |\n      | 60   |\n\n  Scenario Outline: Controller alarm for controller unresponsiveness with different scenarios\n    Given the controller is unresponsive for <time> seconds\n    When the system detects the unresponsiveness\n    Then the controller must trigger an alarm\n    And the alarm message must be \"Controller unresponsive\"\n\n    Examples:\n      | time |\n      | 30   |\n      | 45   |\n      | 60   |\n\n  Scenario Outline: Controller overpressure alarm with different scenarios\n    Given the pressure is <pressure> cmH2O\n    When the system detects the overpressure\n    Then the controller must trigger an alarm\n    And the alarm message must be \"Overpressure detected\"\n\n    Examples:\n      | pressure |\n      | 61       |\n      | 62       |\n      | 63       |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "GUI alarm for blocked input air line",
+          "req_ids": [
+            "RW-SW-45"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input air line is blocked"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the low pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input air line blocked'"
+          ],
+          "expected": [
+            "alarm displayed with severity HIGH",
+            "alarm message is 'Input air line blocked'"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "GUI alarm for blocked input O2 line",
+          "req_ids": [
+            "RW-SW-58"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input O2 line is blocked"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the low pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input O2 line blocked'"
+          ],
+          "expected": [
+            "alarm displayed with severity HIGH",
+            "alarm message is 'Input O2 line blocked'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI alarm for inspiratory pressure too low",
+          "req_ids": [
+            "RW-SW-60"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "inspiratory pressure is below -4 cm H2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the low pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Inspiratory pressure too low'"
+          ],
+          "expected": [
+            "alarm displayed with severity HIGH",
+            "alarm message is 'Inspiratory pressure too low'"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI alarm for high O2 line pressure",
+          "req_ids": [
+            "RW-SW-21"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input O2 line pressure is too high"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the high pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input O2 line pressure too high'"
+          ],
+          "expected": [
+            "alarm displayed with severity HIGH",
+            "alarm message is 'Input O2 line pressure too high'"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller alarm for GUI unresponsiveness",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive for 1/2 of the apnea time"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "controller triggers an alarm",
+            "alarm message is 'GUI unresponsive'"
+          ],
+          "expected": [
+            "alarm triggered by controller",
+            "alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Controller alarm for controller unresponsiveness",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is unresponsive for 1/2 of the apnea time"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "controller triggers an alarm",
+            "alarm message is 'Controller unresponsive'"
+          ],
+          "expected": [
+            "alarm triggered by controller",
+            "alarm message is 'Controller unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller overpressure alarm",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "pressure is above 60 cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the overpressure",
+            "controller triggers an alarm",
+            "alarm message is 'Overpressure detected'"
+          ],
+          "expected": [
+            "alarm triggered by controller",
+            "alarm message is 'Overpressure detected'"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "GUI alarm for blocked input air line with different scenarios",
+          "req_ids": [
+            "RW-SW-45"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input air line is <scenario>"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the low pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input air line blocked'"
+          ],
+          "expected": [
+            "alarm displayed with severity HIGH",
+            "alarm message is 'Input air line blocked'"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "GUI alarm for blocked input O2 line with different scenarios",
+          "req_ids": [
+            "RW-SW-58"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input O2 line is <scenario>"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the low pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input O2 line blocked'"
+          ],
+          "expected": [
+            "alarm displayed with severity HIGH",
+            "alarm message is 'Input O2 line blocked'"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "GUI alarm for inspiratory pressure too low with different scenarios",
+          "req_ids": [
+            "RW-SW-60"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "inspiratory pressure is <pressure> cm H2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the low pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Inspiratory pressure too low'"
+          ],
+          "expected": [
+            "alarm displayed with severity HIGH",
+            "alarm message is 'Inspiratory pressure too low'"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "GUI alarm for high O2 line pressure with different scenarios",
+          "req_ids": [
+            "RW-SW-21"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "input O2 line pressure is <pressure> cm H2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the high pressure",
+            "GUI displays an alarm with severity HIGH",
+            "alarm message is 'Input O2 line pressure too high'"
+          ],
+          "expected": [
+            "alarm displayed with severity HIGH",
+            "alarm message is 'Input O2 line pressure too high'"
+          ]
+        },
+        {
+          "id": "TC-012",
+          "title": "Controller alarm for GUI unresponsiveness with different scenarios",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "GUI is unresponsive for <time> seconds"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "controller triggers an alarm",
+            "alarm message is 'GUI unresponsive'"
+          ],
+          "expected": [
+            "alarm triggered by controller",
+            "alarm message is 'GUI unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-013",
+          "title": "Controller alarm for controller unresponsiveness with different scenarios",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "controller is unresponsive for <time> seconds"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the unresponsiveness",
+            "controller triggers an alarm",
+            "alarm message is 'Controller unresponsive'"
+          ],
+          "expected": [
+            "alarm triggered by controller",
+            "alarm message is 'Controller unresponsive'"
+          ]
+        },
+        {
+          "id": "TC-014",
+          "title": "Controller overpressure alarm with different scenarios",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "pressure is <pressure> cmH2O"
+          ],
+          "inputs": {},
+          "steps": [
+            "system detects the overpressure",
+            "controller triggers an alarm",
+            "alarm message is 'Overpressure detected'"
+          ],
+          "expected": [
+            "alarm triggered by controller",
+            "alarm message is 'Overpressure detected'"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 0.857,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.8,
+        "boundary_coverage": 0.5,
+        "groundedness_mg": 0.3333,
+        "hallucinated": [
+          {
+            "value": "Input air line blocked",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 line blocked",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Inspiratory pressure too low",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Input O2 line pressure too high",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "GUI unresponsive",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Controller unresponsive",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "Overpressure detected",
+            "context": "alarm message",
+            "grounded": false
+          },
+          {
+            "value": "-5 cm H2O",
+            "context": "pressure test value",
+            "grounded": false
+          },
+          {
+            "value": "-3 cm H2O",
+            "context": "pressure test value",
+            "grounded": false
+          },
+          {
+            "value": "-2 cm H2O",
+            "context": "pressure test value",
+            "grounded": false
+          },
+          {
+            "value": "65 cm H2O",
+            "context": "pressure test value",
+            "grounded": false
+          },
+          {
+            "value": "70 cm H2O",
+            "context": "pressure test value",
+            "grounded": false
+          },
+          {
+            "value": "75 cm H2O",
+            "context": "pressure test value",
+            "grounded": false
+          },
+          {
+            "value": "61 cmH2O",
+            "context": "pressure test value",
+            "grounded": false
+          },
+          {
+            "value": "62 cmH2O",
+            "context": "pressure test value",
+            "grounded": false
+          },
+          {
+            "value": "63 cmH2O",
+            "context": "pressure test value",
+            "grounded": false
+          },
+          {
+            "value": "30 seconds",
+            "context": "time test value",
+            "grounded": false
+          },
+          {
+            "value": "45 seconds",
+            "context": "time test value",
+            "grounded": false
+          },
+          {
+            "value": "60 seconds",
+            "context": "time test value",
+            "grounded": false
+          },
+          {
+            "value": "blocked",
+            "context": "scenario value",
+            "grounded": false
+          },
+          {
+            "value": "partially blocked",
+            "context": "scenario value",
+            "grounded": false
+          },
+          {
+            "value": "disconnected",
+            "context": "scenario value",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 33,
+        "uncovered_clauses": [
+          "RW-SW-5"
+        ],
+        "weaknesses": [
+          "No negative test cases to verify no alarm when conditions are normal",
+          "Missing coverage for RW-SW-5 (GUI overpressure alarm)",
+          "Tests use placeholder values not grounded; lack of concrete boundary values for unresponsive time relative to apnea time",
+          "No tests assert that the alarm is cleared when conditions normalize",
+          "Scenario outlines use generic messages; no verification of severity codes or numeric alarm IDs"
+        ],
+        "traceability": 0.875,
+        "untraced_reqs": [
+          "RW-SW-5"
+        ],
+        "fsa_score": 0.5878,
+        "fsa_threshold": 0.5,
+        "fsa_pass": false
+      }
+    }
+  ]
+}

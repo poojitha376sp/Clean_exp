@@ -1,0 +1,625 @@
+{
+  "unit_id": "U24_3",
+  "representation": "Use-Cases & User Stories",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "data_pipeline",
+  "n_attempts": 2,
+  "repairs_used": 1,
+  "final_attempt": 1,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Use-Cases & User Stories",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "data_pipeline",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.25,
+      "wg": 0.0
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.25,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.3333,
+    "hallucinated": [
+      {
+        "value": "patient@example.com",
+        "grounded": false
+      },
+      {
+        "value": "invalid_email@domain",
+        "grounded": false
+      },
+      {
+        "value": "chemist_user",
+        "grounded": false
+      },
+      {
+        "value": "securePass123",
+        "grounded": false
+      },
+      {
+        "value": "abc123xyz",
+        "grounded": false
+      },
+      {
+        "value": "https://gateway.example.com/pay",
+        "grounded": false
+      },
+      {
+        "value": "4111111111111111",
+        "grounded": false
+      },
+      {
+        "value": "12/25",
+        "grounded": false
+      },
+      {
+        "value": "123",
+        "grounded": false
+      },
+      {
+        "value": "Paid",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 15,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add alternative and exception flows to test cases to satisfy representation-specific sufficiency criteria.",
+      "Include negative tests for login failure and account lock to cover VIRTUA-3.3-1 negative paths.",
+      "Include negative test for payment failure due to network to cover VIRTUA-3.3-4.",
+      "Make expected results more assertive by specifying exact email subject, status codes, or database state.",
+      "Remove invented concrete values not supported by SRS or provide justification."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.73,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "**Use-Cases & User Stories**\n\n*Actor: Patient*\n\n**UC-001: Receive Prescription and Invoice via Email**\n- **Goal:** Ensure patients receive their full prescription and invoice electronically.\n- **Preconditions:** Patient has been registered in the system and a prescription has been generated.\n- **Primary Flow:**\n  1. System generates a prescription and invoice for the patient.\n  2. System sends an email to the patient's registered email address containing the full prescription and invoice.\n- **Alternative Flow:**\n  1. If the patient's email address is invalid, the system logs an error and notifies the administrator.\n- **Exception Flow:**\n  1. If the email service fails to send the email, the system retries up to three times; if still unsuccessful, it notifies the patient via an in-app message and logs the failure.\n\n*Actor: Chemist / Lab Technician*\n\n**UC-002: Access Prescriptions**\n- **Goal:** Allow chemists and lab technicians to log into the system and view prescriptions.\n- **Preconditions:** Chemist/Lab Technician has a valid account with appropriate permissions.\n- **Primary Flow:**\n  1. Chemist/Lab Technician logs into the system using their credentials.\n  2. System authenticates the credentials.\n  3. System displays the list of prescriptions available for the chemist/lab technician to access.\n- **Alternative Flow:**\n  1. If the login credentials are incorrect, the system prompts the user to re-enter credentials after a delay.\n- **Exception Flow:**\n  1. If the account is locked due to multiple failed login attempts, the system notifies the administrator and denies further attempts for a specified period.\n\n*Actor: Administrator*\n\n**UC-003: Configure Payment Gateway Interface**\n- **Goal:** Enable the system to integrate with the current standard payment gateway available with the hospital.\n- **Preconditions:** Administrator has access to system configuration settings.\n- **Primary Flow:**\n  1. Administrator navigates to the payment gateway configuration section.\n  2. Administrator enters the required API keys and endpoint URLs provided by the payment gateway.\n  3. System validates the configuration and enables the payment gateway interface.\n- **Alternative Flow:**\n  1. If the API keys are invalid, the system prompts the administrator to re-enter the keys.\n- **Exception Flow:**\n  1. If the configuration fails validation after three attempts, the system logs the error and requires manual intervention by the support team.\n\n*Actor: Patient (Payment)*\n\n**UC-004: Make Payment Securely**\n- **Goal:** Allow patients to securely accept payments using debit/credit cards and net banking.\n- **Preconditions:** Patient has logged into the system and selected a prescription to pay for.\n- **Primary Flow:**\n  1. Patient selects the \"Pay Now\" button on the prescription page.\n  2. System redirects the patient to the integrated payment gateway interface.\n  3. Patient enters payment details and confirms the transaction.\n  4. System receives payment confirmation and updates the prescription status to \"Paid.\"\n- **Alternative Flow:**\n  1. If the payment gateway redirects back with an error code, the system displays an error message to the patient and logs the incident.\n- **Exception Flow:**\n  1. If the payment fails due to a network issue, the system retries the payment process automatically up to two times before notifying the patient.\n\n*Actor: System Administrator (Technical)*\n\n**UC-005: Ensure System Isolation and Compliance**\n- **Goal:** Verify that the system is self-contained and no data is shared with third parties, adhering to the specified technology stack.\n- **Preconditions:** System is deployed and operational.\n- **Primary Flow:**\n  1. Administrator runs a diagnostic to confirm the system is using Django 2.0 and MySQL as the database.\n  2. Administrator verifies that the system supports the specified browsers (Google Chrome, Mozilla Firefox, Safari) and operating systems.\n- **Alternative Flow:**\n  1. If any component deviates from the specified stack, the system logs a warning and prompts for immediate corrective action.\n- **Exception Flow:**\n  1. If the system fails to meet any of the specified constraints (e.g., unsupported browser), the system logs a critical error and alerts the technical team for immediate resolution.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Receive Prescription and Invoice via Email",
+      "req_ids": [
+        "VIRTUA-3.3-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient has been registered in the system and a prescription has been generated."
+      ],
+      "inputs": {
+        "patient_email": "patient@example.com"
+      },
+      "steps": [
+        "System generates a prescription and invoice for the patient.",
+        "System sends an email to the patient's registered email address containing the full prescription and invoice."
+      ],
+      "expected": [
+        "Email is received by the patient at patient@example.com with the prescription and invoice."
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Access Prescriptions",
+      "req_ids": [
+        "VIRTUA-3.3-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Chemist/Lab Technician has a valid account with appropriate permissions."
+      ],
+      "inputs": {
+        "username": "chemist_user",
+        "password": "securePass123"
+      },
+      "steps": [
+        "Chemist/Lab Technician logs into the system using their credentials.",
+        "System authenticates the credentials.",
+        "System displays the list of prescriptions available for the chemist/lab technician to access."
+      ],
+      "expected": [
+        "Chemist/Lab Technician sees the list of prescriptions."
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Configure Payment Gateway Interface",
+      "req_ids": [
+        "VIRTUA-3.3-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Administrator has access to system configuration settings."
+      ],
+      "inputs": {
+        "api_key": "abc123xyz",
+        "endpoint_url": "https://gateway.example.com/pay"
+      },
+      "steps": [
+        "Administrator navigates to the payment gateway configuration section.",
+        "Administrator enters the required API keys and endpoint URLs provided by the payment gateway.",
+        "System validates the configuration and enables the payment gateway interface."
+      ],
+      "expected": [
+        "Payment gateway interface is enabled and validated."
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Make Payment Securely",
+      "req_ids": [
+        "VIRTUA-3.3-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient has logged into the system and selected a prescription to pay for."
+      ],
+      "inputs": {
+        "card_number": "4111111111111111",
+        "expiry_date": "12/25",
+        "cvv": "123"
+      },
+      "steps": [
+        "Patient selects the 'Pay Now' button on the prescription page.",
+        "System redirects the patient to the integrated payment gateway interface.",
+        "Patient enters payment details and confirms the transaction.",
+        "System receives payment confirmation and updates the prescription status to 'Paid'."
+      ],
+      "expected": [
+        "Prescription status is updated to 'Paid' and patient receives a confirmation message."
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Ensure System Isolation and Compliance",
+      "req_ids": [
+        "VIRTUA-3.3-1",
+        "VIRTUA-3.3-1#2",
+        "VIRTUA-3.3-2#2",
+        "VIRTUA-3.3-3#2",
+        "VIRTUA-3.3-4#2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is deployed and operational."
+      ],
+      "inputs": {},
+      "steps": [
+        "Administrator runs a diagnostic to confirm the system is using Django 2.0 and MySQL as the database.",
+        "Administrator verifies that the system supports the specified browsers (Google Chrome, Mozilla Firefox, Safari) and operating systems."
+      ],
+      "expected": [
+        "Diagnostic confirms Django 2.0 and MySQL usage; browser and OS support are verified."
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Email Delivery Failure",
+      "req_ids": [
+        "VIRTUA-3.3-2"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient has been registered in the system and a prescription has been generated."
+      ],
+      "inputs": {
+        "patient_email": "invalid_email@domain"
+      },
+      "steps": [
+        "System generates a prescription and invoice for the patient.",
+        "System attempts to send an email to the invalid email address."
+      ],
+      "expected": [
+        "System logs an error and notifies the administrator; no email is sent."
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "**Use-Cases & User Stories for Virtual Pharmacy System (Unit U24_3)**\n\n---\n\n### Use-Case: Patient Receives Prescription and Invoice\n\n**Primary Actor:** Patient  \n**Goal:** To receive a prescription and invoice via email after a consultation.\n\n**Preconditions:**  \n- Patient has logged into the system.  \n- A prescription has been generated by a chemist or lab.  \n\n**Main Success Scenario (Primary Flow):**  \n1. System generates a prescription and invoice after a consultation.  \n2. System sends an email to the patient containing the full prescription and invoice.  \n3. Patient receives the email and can view/download the documents.  \n\n**Alternative Flows:**  \n- **A1:** If the email service fails, the system logs an error and retries sending the email up to three times.  \n- **A2:** If the patient's email address is invalid, the system notifies the administrator and does not send the email.  \n\n**Exception Flows:**  \n- **E1:** If the prescription data is incomplete, the system prevents email dispatch and prompts the chemist to complete the prescription.  \n- **E2:** If the system encounters a permanent email delivery failure after retries, it flags the patient's record for manual follow-up.  \n\n---\n\n### Use-Case: Payment Processing\n\n**Primary Actor:** Patient / Chemist / Lab  \n\n**Goal:** To securely accept payments using Debit/Credit Cards and Net banking through the integrated payment gateway.\n\n**Preconditions:**  \n- User is logged into the system.  \n- Prescription and invoice have been emailed to the patient.  \n\n**Main Success Scenario (Primary Flow):**  \n1. User clicks the “Pay Now” button on the invoice page.  \n2. System redirects to the integrated payment gateway.  \n3. User enters payment details (card or net banking).  \n4. Payment is processed securely.  \n5. System confirms payment success and updates the invoice status.  \n\n**Alternative Flows:**  \n- **A1:** If the payment gateway is temporarily unavailable, the system displays a retry message and allows the user to attempt payment again after a delay.  \n- **A2:** If the user cancels the payment midway, the system returns to the invoice page without processing.  \n\n**Exception Flows:**  \n- **E1:** If the payment fails due to invalid card details, the system displays an error message and prompts the user to retry.  \n- **E2:** If the payment gateway returns a permanent error (e.g., network failure), the system logs the incident and notifies the administrator.  \n\n---\n\n### Use-Case: System Integration with Hospital Payment Gateway\n\n**Primary Actor:** System Administrator  \n\n**Goal:** To ensure seamless integration with the hospital's standard payment gateway.\n\n**Preconditions:**  \n- Hospital payment gateway API credentials are configured.  \n- System is running Django 2.0 on MySQL.  \n\n**Main Success Scenario (Primary Flow):**  \n1. Administrator configures the payment gateway API endpoint in the system settings.  \n2. System performs a test transaction to verify connectivity.  \n3. Test transaction succeeds, confirming integration.  \n\n**Alternative Flows:**  \n- **A1:** If the test transaction fails due to incorrect API keys, the system prompts the administrator to re-enter the credentials.  \n- **A2:** If the gateway responds with a temporary rate limit error, the system waits and retries the test transaction.  \n\n**Exception Flows:**  \n- **E1:** If the API endpoint is unreachable, the system logs a critical error and blocks further transactions until resolved.  \n- **E2:** If the gateway returns an unexpected response format, the system raises a compatibility alert for development.  \n\n---\n\n### Use-Case: Browser and OS Support Verification\n\n**Primary Actor:** End User  \n\n**Goal:** To ensure the system functions correctly across supported browsers and operating systems.\n\n**Preconditions:**  \n- System is deployed on a server accessible via supported browsers.  \n\n**Main Success Scenario (Primary Flow):**  \n1. User accesses the system using Google Chrome, Mozilla Firefox, or Safari on a supported OS (Windows, macOS, Linux).  \n2. System loads all pages and features without errors.  \n3. User performs typical actions (login, view prescriptions, make payments).  \n\n**Alternative Flows:**  \n- **A1:** If a supported browser version is outdated, the system displays a compatibility notice and suggests updating.  \n- **A2:** If the user's OS is not listed but supports the browsers, the system still functions as expected.  \n\n**Exception Flows:**  \n- **E1:** If a critical feature fails on a supported browser, the system logs the issue and disables the feature temporarily.  \n- **E2:** If the system crashes on an unsupported OS, it logs the event and prevents further access until compatibility is confirmed.  \n\n---\n\n**Note:** All test cases must trace back to the above use-cases and ensure coverage of the constraints (Django 2.0, MySQL, supported browsers/OS) and functional requirements (email dispatch, payment processing, integration).",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Patient receives prescription and invoice via email",
+          "req_ids": [
+            "VIRTUA-3.3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has logged into the system",
+            "Prescription generated"
+          ],
+          "inputs": {
+            "email": "patient@example.com"
+          },
+          "steps": [
+            "System generates prescription and invoice",
+            "System sends email to patient",
+            "Patient checks inbox"
+          ],
+          "expected": [
+            "Email received with prescription and invoice"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Payment processing via Debit/Credit Card and Net banking",
+          "req_ids": [
+            "VIRTUA-3.3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "User logged in",
+            "Invoice emailed"
+          ],
+          "inputs": {
+            "card_number": "4111111111111111",
+            "expiry": "12/25",
+            "cvv": "123"
+          },
+          "steps": [
+            "User clicks 'Pay Now'",
+            "Redirect to payment gateway",
+            "Enter payment details",
+            "Payment processed",
+            "System confirms payment"
+          ],
+          "expected": [
+            "Payment status updated to 'Paid'"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Integration test with hospital payment gateway",
+          "req_ids": [
+            "VIRTUA-3.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "API credentials configured"
+          ],
+          "inputs": {
+            "api_endpoint": "https://gateway.hospital.com/pay",
+            "api_key": "test_key"
+          },
+          "steps": [
+            "Administrator configures API endpoint",
+            "System performs test transaction",
+            "Verify successful response"
+          ],
+          "expected": [
+            "Test transaction succeeds"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Browser and OS support verification (Chrome on Windows)",
+          "req_ids": [
+            "VIRTUA-3.3-3#2",
+            "VIRTUA-3.3-4#2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System deployed",
+            "Chrome 90+ installed"
+          ],
+          "inputs": {
+            "browser": "Chrome",
+            "os": "Windows 10"
+          },
+          "steps": [
+            "User accesses system",
+            "Navigate to prescription page",
+            "Make a payment",
+            "Verify all features function"
+          ],
+          "expected": [
+            "All pages load without errors",
+            "Payment processed successfully"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Negative path: Email dispatch failure",
+          "req_ids": [
+            "VIRTUA-3.3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Invalid email address"
+          ],
+          "inputs": {
+            "email": "invalid_email@"
+          },
+          "steps": [
+            "System attempts to send email",
+            "Email service returns failure"
+          ],
+          "expected": [
+            "System logs error",
+            "Administrator notified"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Exception path: Payment failure due to invalid card",
+          "req_ids": [
+            "VIRTUA-3.3-4"
+          ],
+          "kind": "exception",
+          "preconditions": [
+            "Invalid card details provided"
+          ],
+          "inputs": {
+            "card_number": "0000000000000000",
+            "expiry": "12/24",
+            "cvv": "000"
+          },
+          "steps": [
+            "User initiates payment",
+            "Enter invalid card details",
+            "Payment gateway returns error"
+          ],
+          "expected": [
+            "Error message displayed",
+            "Payment not processed"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 0.8333,
+        "representation_score": 1.0,
+        "sfv_score": 0.9167,
+        "threshold": 0.6,
+        "sfv_pass": false,
+        "issues": [
+          "test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.92). Fix these problems and output the full corrected suite:\n- test case #6 (TC-006): 'exception' is not one of ['positive', 'negative', 'boundary']",
+      "artifact": "**Use-Cases & User Stories**\n\n*Actor: Patient*\n\n**UC-001: Receive Prescription and Invoice via Email**\n- **Goal:** Ensure patients receive their full prescription and invoice electronically.\n- **Preconditions:** Patient has been registered in the system and a prescription has been generated.\n- **Primary Flow:**\n  1. System generates a prescription and invoice for the patient.\n  2. System sends an email to the patient's registered email address containing the full prescription and invoice.\n- **Alternative Flow:**\n  1. If the patient's email address is invalid, the system logs an error and notifies the administrator.\n- **Exception Flow:**\n  1. If the email service fails to send the email, the system retries up to three times; if still unsuccessful, it notifies the patient via an in-app message and logs the failure.\n\n*Actor: Chemist / Lab Technician*\n\n**UC-002: Access Prescriptions**\n- **Goal:** Allow chemists and lab technicians to log into the system and view prescriptions.\n- **Preconditions:** Chemist/Lab Technician has a valid account with appropriate permissions.\n- **Primary Flow:**\n  1. Chemist/Lab Technician logs into the system using their credentials.\n  2. System authenticates the credentials.\n  3. System displays the list of prescriptions available for the chemist/lab technician to access.\n- **Alternative Flow:**\n  1. If the login credentials are incorrect, the system prompts the user to re-enter credentials after a delay.\n- **Exception Flow:**\n  1. If the account is locked due to multiple failed login attempts, the system notifies the administrator and denies further attempts for a specified period.\n\n*Actor: Administrator*\n\n**UC-003: Configure Payment Gateway Interface**\n- **Goal:** Enable the system to integrate with the current standard payment gateway available with the hospital.\n- **Preconditions:** Administrator has access to system configuration settings.\n- **Primary Flow:**\n  1. Administrator navigates to the payment gateway configuration section.\n  2. Administrator enters the required API keys and endpoint URLs provided by the payment gateway.\n  3. System validates the configuration and enables the payment gateway interface.\n- **Alternative Flow:**\n  1. If the API keys are invalid, the system prompts the administrator to re-enter the keys.\n- **Exception Flow:**\n  1. If the configuration fails validation after three attempts, the system logs the error and requires manual intervention by the support team.\n\n*Actor: Patient (Payment)*\n\n**UC-004: Make Payment Securely**\n- **Goal:** Allow patients to securely accept payments using debit/credit cards and net banking.\n- **Preconditions:** Patient has logged into the system and selected a prescription to pay for.\n- **Primary Flow:**\n  1. Patient selects the \"Pay Now\" button on the prescription page.\n  2. System redirects the patient to the integrated payment gateway interface.\n  3. Patient enters payment details and confirms the transaction.\n  4. System receives payment confirmation and updates the prescription status to \"Paid.\"\n- **Alternative Flow:**\n  1. If the payment gateway redirects back with an error code, the system displays an error message to the patient and logs the incident.\n- **Exception Flow:**\n  1. If the payment fails due to a network issue, the system retries the payment process automatically up to two times before notifying the patient.\n\n*Actor: System Administrator (Technical)*\n\n**UC-005: Ensure System Isolation and Compliance**\n- **Goal:** Verify that the system is self-contained and no data is shared with third parties, adhering to the specified technology stack.\n- **Preconditions:** System is deployed and operational.\n- **Primary Flow:**\n  1. Administrator runs a diagnostic to confirm the system is using Django 2.0 and MySQL as the database.\n  2. Administrator verifies that the system supports the specified browsers (Google Chrome, Mozilla Firefox, Safari) and operating systems.\n- **Alternative Flow:**\n  1. If any component deviates from the specified stack, the system logs a warning and prompts for immediate corrective action.\n- **Exception Flow:**\n  1. If the system fails to meet any of the specified constraints (e.g., unsupported browser), the system logs a critical error and alerts the technical team for immediate resolution.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Receive Prescription and Invoice via Email",
+          "req_ids": [
+            "VIRTUA-3.3-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has been registered in the system and a prescription has been generated."
+          ],
+          "inputs": {
+            "patient_email": "patient@example.com"
+          },
+          "steps": [
+            "System generates a prescription and invoice for the patient.",
+            "System sends an email to the patient's registered email address containing the full prescription and invoice."
+          ],
+          "expected": [
+            "Email is received by the patient at patient@example.com with the prescription and invoice."
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Access Prescriptions",
+          "req_ids": [
+            "VIRTUA-3.3-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Chemist/Lab Technician has a valid account with appropriate permissions."
+          ],
+          "inputs": {
+            "username": "chemist_user",
+            "password": "securePass123"
+          },
+          "steps": [
+            "Chemist/Lab Technician logs into the system using their credentials.",
+            "System authenticates the credentials.",
+            "System displays the list of prescriptions available for the chemist/lab technician to access."
+          ],
+          "expected": [
+            "Chemist/Lab Technician sees the list of prescriptions."
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Configure Payment Gateway Interface",
+          "req_ids": [
+            "VIRTUA-3.3-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Administrator has access to system configuration settings."
+          ],
+          "inputs": {
+            "api_key": "abc123xyz",
+            "endpoint_url": "https://gateway.example.com/pay"
+          },
+          "steps": [
+            "Administrator navigates to the payment gateway configuration section.",
+            "Administrator enters the required API keys and endpoint URLs provided by the payment gateway.",
+            "System validates the configuration and enables the payment gateway interface."
+          ],
+          "expected": [
+            "Payment gateway interface is enabled and validated."
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Make Payment Securely",
+          "req_ids": [
+            "VIRTUA-3.3-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient has logged into the system and selected a prescription to pay for."
+          ],
+          "inputs": {
+            "card_number": "4111111111111111",
+            "expiry_date": "12/25",
+            "cvv": "123"
+          },
+          "steps": [
+            "Patient selects the 'Pay Now' button on the prescription page.",
+            "System redirects the patient to the integrated payment gateway interface.",
+            "Patient enters payment details and confirms the transaction.",
+            "System receives payment confirmation and updates the prescription status to 'Paid'."
+          ],
+          "expected": [
+            "Prescription status is updated to 'Paid' and patient receives a confirmation message."
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Ensure System Isolation and Compliance",
+          "req_ids": [
+            "VIRTUA-3.3-1",
+            "VIRTUA-3.3-1#2",
+            "VIRTUA-3.3-2#2",
+            "VIRTUA-3.3-3#2",
+            "VIRTUA-3.3-4#2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is deployed and operational."
+          ],
+          "inputs": {},
+          "steps": [
+            "Administrator runs a diagnostic to confirm the system is using Django 2.0 and MySQL as the database.",
+            "Administrator verifies that the system supports the specified browsers (Google Chrome, Mozilla Firefox, Safari) and operating systems."
+          ],
+          "expected": [
+            "Diagnostic confirms Django 2.0 and MySQL usage; browser and OS support are verified."
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Email Delivery Failure",
+          "req_ids": [
+            "VIRTUA-3.3-2"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient has been registered in the system and a prescription has been generated."
+          ],
+          "inputs": {
+            "patient_email": "invalid_email@domain"
+          },
+          "steps": [
+            "System generates a prescription and invoice for the patient.",
+            "System attempts to send an email to the invalid email address."
+          ],
+          "expected": [
+            "System logs an error and notifies the administrator; no email is sent."
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Use-Cases & User Stories",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "data_pipeline",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.25,
+          "wg": 0.0
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.25,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.3333,
+        "hallucinated": [
+          {
+            "value": "patient@example.com",
+            "grounded": false
+          },
+          {
+            "value": "invalid_email@domain",
+            "grounded": false
+          },
+          {
+            "value": "chemist_user",
+            "grounded": false
+          },
+          {
+            "value": "securePass123",
+            "grounded": false
+          },
+          {
+            "value": "abc123xyz",
+            "grounded": false
+          },
+          {
+            "value": "https://gateway.example.com/pay",
+            "grounded": false
+          },
+          {
+            "value": "4111111111111111",
+            "grounded": false
+          },
+          {
+            "value": "12/25",
+            "grounded": false
+          },
+          {
+            "value": "123",
+            "grounded": false
+          },
+          {
+            "value": "Paid",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 15,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add alternative and exception flows to test cases to satisfy representation-specific sufficiency criteria.",
+          "Include negative tests for login failure and account lock to cover VIRTUA-3.3-1 negative paths.",
+          "Include negative test for payment failure due to network to cover VIRTUA-3.3-4.",
+          "Make expected results more assertive by specifying exact email subject, status codes, or database state.",
+          "Remove invented concrete values not supported by SRS or provide justification."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.73,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,566 @@
+{
+  "unit_id": "U01_General",
+  "representation": "Temporal Logic (LTL)",
+  "generator": "ollama:gemma3:27b",
+  "system_type": "standard",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Temporal Logic (LTL)",
+    "group": 3,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.8,
+    "oracle_assertiveness": 0.2,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.5,
+    "hallucinated": [
+      {
+        "value": "algorithm_stability",
+        "context": "boolean signal used in LTL formula G (algorithm_stability)",
+        "grounded": false
+      },
+      {
+        "value": "inspiration_detected",
+        "context": "boolean signal used in LTL formula G (inspiration_detected -> patient_inspired)",
+        "grounded": false
+      },
+      {
+        "value": "patient_inspired",
+        "context": "boolean signal used in LTL formula G (inspiration_detected -> patient_inspired)",
+        "grounded": false
+      },
+      {
+        "value": "clock_range",
+        "context": "variable used in LTL formula G (clock_range > 2 * 7 * 24 * 60 * 60)",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 8,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No negative test for algorithm stability (divergence/NaN)",
+      "Expected results are vague, lacking concrete assertions",
+      "Test suite uses invented signals (algorithm_stability, inspiration_detected, patient_inspired, clock_range) not defined in SRS",
+      "No formal verification of safety/liveness properties, only informal LTL formulas",
+      "Battery life tests do not cover varying loads or environmental conditions"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.765,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "G (clock_range > 2 * 7 * 24 * 60 * 60)  // [RW-SW-8] - Clock range is sufficient for 2 weeks (in seconds)\nG (algorithm_stability) // [RW-SW-9] - Algorithm stability maintained over 2 weeks.  'algorithm_stability' is a boolean signal.\nG (execution_time < real_time) // [RW-SW-10] - Algorithm execution faster than real time.\nG (battery_life >= 1 * 60 * 60) // [RW-SW-41] - Battery life is at least 1 hour (in seconds)\nG (inspiration_detected -> patient_inspired) // [RW-SW-154] - If inspiration is detected, patient is registered as inspired. 'patient_inspired' is a boolean signal.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Clock Range Sufficient for 2 Weeks",
+      "req_ids": [
+        "RW-SW-8"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System clocks initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "Run system for 2 * 7 * 24 * 60 * 60 seconds"
+      ],
+      "expected": [
+        "Clock values remain within valid range; no overflow detected"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Clock Range Boundary - 2 Weeks",
+      "req_ids": [
+        "RW-SW-8"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System clocks initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "Run system for exactly 2 * 7 * 24 * 60 * 60 seconds"
+      ],
+      "expected": [
+        "Clock values are valid and have not overflowed"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Clock Range Boundary - 2 Weeks + 1 Second",
+      "req_ids": [
+        "RW-SW-8"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System clocks initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "Run system for 2 * 7 * 24 * 60 * 60 + 1 seconds"
+      ],
+      "expected": [
+        "Clock values have overflowed, triggering an error condition"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Algorithm Stability - 2 Weeks",
+      "req_ids": [
+        "RW-SW-9"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Algorithms initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "Run algorithms continuously for 2 * 7 * 24 * 60 * 60 seconds with typical input data"
+      ],
+      "expected": [
+        "Algorithm outputs remain stable and within expected bounds; no divergence or NaN values"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Algorithm Stability - Boundary - 2 Weeks",
+      "req_ids": [
+        "RW-SW-9"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Algorithms initialized"
+      ],
+      "inputs": {},
+      "steps": [
+        "Run algorithms continuously for exactly 2 * 7 * 24 * 60 * 60 seconds with typical input data"
+      ],
+      "expected": [
+        "Algorithm outputs remain stable and within expected bounds"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Algorithm Execution Time - Faster than Real Time",
+      "req_ids": [
+        "RW-SW-10"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Algorithms initialized"
+      ],
+      "inputs": {
+        "input_data": "as specified"
+      },
+      "steps": [
+        "Measure execution time of algorithms for a given input"
+      ],
+      "expected": [
+        "Execution time is consistently less than the real time taken to process the same input"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Battery Life - 1 Hour",
+      "req_ids": [
+        "RW-SW-41"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Device fully charged"
+      ],
+      "inputs": {
+        "operational_mode": "typical"
+      },
+      "steps": [
+        "Run device on battery power for 1 * 60 * 60 seconds in typical operational mode"
+      ],
+      "expected": [
+        "Device continues to operate without power failure for at least 1 hour"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Battery Life - Boundary - 1 Hour",
+      "req_ids": [
+        "RW-SW-41"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Device fully charged"
+      ],
+      "inputs": {
+        "operational_mode": "typical"
+      },
+      "steps": [
+        "Run device on battery power for exactly 1 * 60 * 60 seconds in typical operational mode"
+      ],
+      "expected": [
+        "Device continues to operate without power failure for the full hour"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Battery Life - Boundary - 1 Hour + 1 Second",
+      "req_ids": [
+        "RW-SW-41"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Device fully charged"
+      ],
+      "inputs": {
+        "operational_mode": "typical"
+      },
+      "steps": [
+        "Run device on battery power for 1 * 60 * 60 + 1 seconds in typical operational mode"
+      ],
+      "expected": [
+        "Device shuts down due to battery depletion"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Inspiration Detection - Positive",
+      "req_ids": [
+        "RW-SW-154"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Patient connected, inspiration signal present"
+      ],
+      "inputs": {
+        "inspiration_signal": "present"
+      },
+      "steps": [
+        "Simulate patient inspiration"
+      ],
+      "expected": [
+        "Controller registers patient as inspired"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Inspiration Detection - Negative",
+      "req_ids": [
+        "RW-SW-154"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Patient connected, no inspiration signal"
+      ],
+      "inputs": {
+        "inspiration_signal": "absent"
+      },
+      "steps": [
+        "Verify no inspiration signal is present"
+      ],
+      "expected": [
+        "Controller does not register patient as inspired"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "G (clock_range > 2 * 7 * 24 * 60 * 60)  // [RW-SW-8] - Clock range is sufficient for 2 weeks (in seconds)\nG (algorithm_stability) // [RW-SW-9] - Algorithm stability maintained over 2 weeks.  'algorithm_stability' is a boolean signal.\nG (execution_time < real_time) // [RW-SW-10] - Algorithm execution faster than real time.\nG (battery_life >= 1 * 60 * 60) // [RW-SW-41] - Battery life is at least 1 hour (in seconds)\nG (inspiration_detected -> patient_inspired) // [RW-SW-154] - If inspiration is detected, patient is registered as inspired. 'patient_inspired' is a boolean signal.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Clock Range Sufficient for 2 Weeks",
+          "req_ids": [
+            "RW-SW-8"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System clocks initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "Run system for 2 * 7 * 24 * 60 * 60 seconds"
+          ],
+          "expected": [
+            "Clock values remain within valid range; no overflow detected"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Clock Range Boundary - 2 Weeks",
+          "req_ids": [
+            "RW-SW-8"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System clocks initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "Run system for exactly 2 * 7 * 24 * 60 * 60 seconds"
+          ],
+          "expected": [
+            "Clock values are valid and have not overflowed"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Clock Range Boundary - 2 Weeks + 1 Second",
+          "req_ids": [
+            "RW-SW-8"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System clocks initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "Run system for 2 * 7 * 24 * 60 * 60 + 1 seconds"
+          ],
+          "expected": [
+            "Clock values have overflowed, triggering an error condition"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Algorithm Stability - 2 Weeks",
+          "req_ids": [
+            "RW-SW-9"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Algorithms initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "Run algorithms continuously for 2 * 7 * 24 * 60 * 60 seconds with typical input data"
+          ],
+          "expected": [
+            "Algorithm outputs remain stable and within expected bounds; no divergence or NaN values"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Algorithm Stability - Boundary - 2 Weeks",
+          "req_ids": [
+            "RW-SW-9"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Algorithms initialized"
+          ],
+          "inputs": {},
+          "steps": [
+            "Run algorithms continuously for exactly 2 * 7 * 24 * 60 * 60 seconds with typical input data"
+          ],
+          "expected": [
+            "Algorithm outputs remain stable and within expected bounds"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Algorithm Execution Time - Faster than Real Time",
+          "req_ids": [
+            "RW-SW-10"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Algorithms initialized"
+          ],
+          "inputs": {
+            "input_data": "as specified"
+          },
+          "steps": [
+            "Measure execution time of algorithms for a given input"
+          ],
+          "expected": [
+            "Execution time is consistently less than the real time taken to process the same input"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Battery Life - 1 Hour",
+          "req_ids": [
+            "RW-SW-41"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Device fully charged"
+          ],
+          "inputs": {
+            "operational_mode": "typical"
+          },
+          "steps": [
+            "Run device on battery power for 1 * 60 * 60 seconds in typical operational mode"
+          ],
+          "expected": [
+            "Device continues to operate without power failure for at least 1 hour"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Battery Life - Boundary - 1 Hour",
+          "req_ids": [
+            "RW-SW-41"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Device fully charged"
+          ],
+          "inputs": {
+            "operational_mode": "typical"
+          },
+          "steps": [
+            "Run device on battery power for exactly 1 * 60 * 60 seconds in typical operational mode"
+          ],
+          "expected": [
+            "Device continues to operate without power failure for the full hour"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Battery Life - Boundary - 1 Hour + 1 Second",
+          "req_ids": [
+            "RW-SW-41"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Device fully charged"
+          ],
+          "inputs": {
+            "operational_mode": "typical"
+          },
+          "steps": [
+            "Run device on battery power for 1 * 60 * 60 + 1 seconds in typical operational mode"
+          ],
+          "expected": [
+            "Device shuts down due to battery depletion"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Inspiration Detection - Positive",
+          "req_ids": [
+            "RW-SW-154"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Patient connected, inspiration signal present"
+          ],
+          "inputs": {
+            "inspiration_signal": "present"
+          },
+          "steps": [
+            "Simulate patient inspiration"
+          ],
+          "expected": [
+            "Controller registers patient as inspired"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Inspiration Detection - Negative",
+          "req_ids": [
+            "RW-SW-154"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Patient connected, no inspiration signal"
+          ],
+          "inputs": {
+            "inspiration_signal": "absent"
+          },
+          "steps": [
+            "Verify no inspiration signal is present"
+          ],
+          "expected": [
+            "Controller does not register patient as inspired"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Temporal Logic (LTL)",
+        "group": 3,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.8,
+        "oracle_assertiveness": 0.2,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.5,
+        "hallucinated": [
+          {
+            "value": "algorithm_stability",
+            "context": "boolean signal used in LTL formula G (algorithm_stability)",
+            "grounded": false
+          },
+          {
+            "value": "inspiration_detected",
+            "context": "boolean signal used in LTL formula G (inspiration_detected -> patient_inspired)",
+            "grounded": false
+          },
+          {
+            "value": "patient_inspired",
+            "context": "boolean signal used in LTL formula G (inspiration_detected -> patient_inspired)",
+            "grounded": false
+          },
+          {
+            "value": "clock_range",
+            "context": "variable used in LTL formula G (clock_range > 2 * 7 * 24 * 60 * 60)",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 8,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No negative test for algorithm stability (divergence/NaN)",
+          "Expected results are vague, lacking concrete assertions",
+          "Test suite uses invented signals (algorithm_stability, inspiration_detected, patient_inspired, clock_range) not defined in SRS",
+          "No formal verification of safety/liveness properties, only informal LTL formulas",
+          "Battery life tests do not cover varying loads or environmental conditions"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.765,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

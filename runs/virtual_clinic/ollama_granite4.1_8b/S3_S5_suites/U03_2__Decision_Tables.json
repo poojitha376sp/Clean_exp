@@ -1,0 +1,594 @@
+{
+  "unit_id": "U03_2",
+  "representation": "Decision Tables",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "safety_critical",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Decision Tables",
+    "group": 4,
+    "schema_score": 1.0,
+    "representation_score": 0.6667,
+    "sfv_score": 0.8333,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": [
+      "Table syntax is inconsistent."
+    ]
+  },
+  "fsa": {
+    "system_type": "safety_critical",
+    "weights": {
+      "wc": 0.25,
+      "wn": 0.25,
+      "wo": 0.2,
+      "wb": 0.2,
+      "wg": 0.1
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.3,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.6875,
+    "hallucinated": [
+      {
+        "value": "No",
+        "context": "Prescription Received by",
+        "grounded": false
+      },
+      {
+        "value": "No",
+        "context": "Nearest Local Chemist",
+        "grounded": false
+      },
+      {
+        "value": "No",
+        "context": "Nearest Local Lab",
+        "grounded": false
+      },
+      {
+        "value": "No",
+        "context": "Prescription Valid",
+        "grounded": false
+      },
+      {
+        "value": "No",
+        "context": "Chemist Availability",
+        "grounded": false
+      },
+      {
+        "value": "No",
+        "context": "Offline Delivery Capability",
+        "grounded": false
+      },
+      {
+        "value": "No",
+        "context": "Lab Availability",
+        "grounded": false
+      },
+      {
+        "value": "No",
+        "context": "Specimen Collection Capability",
+        "grounded": false
+      },
+      {
+        "value": "No",
+        "context": "Delivery of Lab Reports",
+        "grounded": false
+      },
+      {
+        "value": "No",
+        "context": "System Update",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 32,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "No negative test cases in the canonical suite; decision tables only",
+      "Oracle assertions are vague; need concrete expected values",
+      "No boundary or threshold tests; could add for completeness",
+      "Decision tables include 'No' values not grounded; need clarification",
+      "Missing tests for confidentiality constraint enforcement (only positive scenario)"
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.8287,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Decision Table for Requirement VIRTUA-2.1-1:\n| Condition | Prescription Received by | Nearest Local Chemist | Nearest Local Lab | Action |\n|-----------|--------------------------|----------------------|-------------------|--------|\n| True      | Patient                  | Yes                  | Yes               | Prescription delivered |\n| False     | Patient                  | No                   | No                | No action |\n\nDecision Table for Requirement VIRTUA-2.1-2:\n| Condition | Prescription Valid | Chemist Availability | Offline Delivery Capability | Action |\n|-----------|--------------------|----------------------|----------------------------|--------|\n| True      | Yes                | Yes                  | Yes                        | Medicines provided |\n| False     | No                 | Yes                  | Yes                        | No medicines provided |\n| True      | Yes                | No                   | Yes                        | No medicines provided |\n| False     | No                 | No                   | Yes                        | No medicines provided |\n\nDecision Table for Requirement VIRTUA-2.1-3:\n| Condition | Prescription Valid | Lab Availability | Specimen Collection Capability | Delivery of Lab Reports | System Update | Action |\n|-----------|--------------------|------------------|-------------------------------|--------------------------|---------------|--------|\n| True      | Yes                | Yes              | Yes                           | Yes                      | Yes           | Reports delivered and system updated |\n| False     | No                 | Yes              | Yes                           | No                       | No            | No delivery, no update |\n| True      | Yes                | No               | Yes                           | No                       | No            | No delivery, no update |\n| False     | No                 | No               | Yes                           | No                       | No            | No delivery, no update |\n\nDecision Table for Requirement VIRTUA-2.1-4:\n| Condition | Information Displayed to Chemist | Information Displayed to Lab | Patient Confidentiality | Action |\n|-----------|----------------------------------|------------------------------|------------------------|--------|\n| True      | Only necessary prescription info | Only necessary prescription info | Protected             | Information displayed as per constraint |\n| False     | Full prescription details       | Full prescription details   | Not protected         | Violation of confidentiality |\n\nDecision Table for Requirement VIRTUA-2.2-1:\n| Condition | Specialty Database Populated | Valid Specialties | Action |\n|-----------|-----------------------------|-------------------|--------|\n| True      | Yes                         | Yes               | Database populated |\n| False     | No                          | No                | No database populated |\n\nDecision Table for Requirement VIRTUA-2.2-2:\n| Condition | Doctor Linked to Specialty | Valid Doctor | Action |\n|-----------|---------------------------|---------------|--------|\n| True      | Yes                       | Yes           | Doctors linked |\n| False     | No                        | Yes           | No linking |\n| True      | Yes                       | No            | No linking |\n| False     | No                        | No            | No linking |\n\nDecision Table for Requirement VIRTUA-2.2-3:\n| Condition | Lab Information Available | Chemist Information Available | Database Population | Action |\n|-----------|---------------------------|------------------------------|--------------------|--------|\n| True      | Yes                       | Yes                         | Yes                | Databases populated |\n| False     | No                        | Yes                         | No                 | Only chemist database partially populated |\n| True      | Yes                       | No                         | No                 | Only lab database partially populated |\n| False     | No                        | No                         | No                 | No databases populated |\n\nDecision Table for Requirement VIRTUA-2.2-4:\n| Condition | Patient Registration Form | Valid Details | Registration Success | Action |\n|-----------|---------------------------|---------------|----------------------|--------|\n| True      | Yes                       | Yes           | Yes                  | Patient registered |\n| False     | No                        | Yes           | No                   | Registration failed |\n| True      | Yes                       | No            | No                   | Registration failed |\n| False     | No                        | No            | No                   | Registration failed |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Prescription delivery to patient, chemist, and lab",
+      "req_ids": [
+        "VIRTUA-2.1-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Prescription is valid"
+      ],
+      "inputs": {
+        "Prescription Received by": "Patient",
+        "Nearest Local Chemist": "Yes",
+        "Nearest Local Lab": "Yes"
+      },
+      "steps": [
+        "Verify prescription validity",
+        "Notify patient, chemist, and lab"
+      ],
+      "expected": [
+        "Prescription delivered to patient, chemist, and lab"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Medicines provision by chemist via offline delivery",
+      "req_ids": [
+        "VIRTUA-2.1-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Prescription is valid",
+        "Chemist is available",
+        "Offline delivery is possible"
+      ],
+      "inputs": {
+        "Prescription Valid": "Yes",
+        "Chemist Availability": "Yes",
+        "Offline Delivery Capability": "Yes"
+      },
+      "steps": [
+        "Check prescription validity",
+        "Confirm chemist availability",
+        "Initiate offline delivery"
+      ],
+      "expected": [
+        "Medicines provided to patient"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Specimen collection and lab report delivery",
+      "req_ids": [
+        "VIRTUA-2.1-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Prescription is valid",
+        "Lab is available",
+        "Specimen collection is possible",
+        "Delivery of lab reports is possible",
+        "System update is possible"
+      ],
+      "inputs": {
+        "Prescription Valid": "Yes",
+        "Lab Availability": "Yes",
+        "Specimen Collection Capability": "Yes",
+        "Delivery of Lab Reports": "Yes",
+        "System Update": "Yes"
+      },
+      "steps": [
+        "Verify prescription validity",
+        "Collect specimen",
+        "Deliver lab reports",
+        "Update system"
+      ],
+      "expected": [
+        "Specimen collected, lab reports delivered, system updated"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Protection of patient confidentiality for chemist and lab",
+      "req_ids": [
+        "VIRTUA-2.1-4"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Prescription is valid"
+      ],
+      "inputs": {
+        "Information Displayed to Chemist": "Only necessary prescription info",
+        "Information Displayed to Lab": "Only necessary prescription info",
+        "Patient Confidentiality": "Protected"
+      },
+      "steps": [
+        "Display information to chemist and lab",
+        "Attempt to access full prescription details"
+      ],
+      "expected": [
+        "Full prescription details not displayed, confidentiality maintained"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Populating specialty database by admin",
+      "req_ids": [
+        "VIRTUA-2.2-1"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin access",
+        "Valid specialties present"
+      ],
+      "inputs": {
+        "Specialty Database Populated": "Yes",
+        "Valid Specialties": "Yes"
+      },
+      "steps": [
+        "Admin populates specialty database"
+      ],
+      "expected": [
+        "Specialty database populated with valid specialties"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Linking specialties to doctors by admin",
+      "req_ids": [
+        "VIRTUA-2.2-2"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Admin access",
+        "Valid doctor"
+      ],
+      "inputs": {
+        "Doctor Linked to Specialty": "Yes",
+        "Valid Doctor": "Yes"
+      },
+      "steps": [
+        "Admin links specialty to doctor"
+      ],
+      "expected": [
+        "Doctors linked to respective specialties"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Populating chemist and lab databases with information",
+      "req_ids": [
+        "VIRTUA-2.2-3"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Valid lab information",
+        "Valid chemist information"
+      ],
+      "inputs": {
+        "Lab Information Available": "Yes",
+        "Chemist Information Available": "Yes",
+        "Database Population": "Yes"
+      },
+      "steps": [
+        "Admin populates databases with lab and chemist information"
+      ],
+      "expected": [
+        "Databases populated with relevant information"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Patient registration into the system",
+      "req_ids": [
+        "VIRTUA-2.2-4"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Valid patient registration form"
+      ],
+      "inputs": {
+        "Patient Registration Form": "Yes",
+        "Valid Details": "Yes"
+      },
+      "steps": [
+        "Patient fills registration form",
+        "System processes registration"
+      ],
+      "expected": [
+        "Patient registered successfully"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Decision Table for Requirement VIRTUA-2.1-1:\n| Condition | Prescription Received by | Nearest Local Chemist | Nearest Local Lab | Action |\n|-----------|--------------------------|----------------------|-------------------|--------|\n| True      | Patient                  | Yes                  | Yes               | Prescription delivered |\n| False     | Patient                  | No                   | No                | No action |\n\nDecision Table for Requirement VIRTUA-2.1-2:\n| Condition | Prescription Valid | Chemist Availability | Offline Delivery Capability | Action |\n|-----------|--------------------|----------------------|----------------------------|--------|\n| True      | Yes                | Yes                  | Yes                        | Medicines provided |\n| False     | No                 | Yes                  | Yes                        | No medicines provided |\n| True      | Yes                | No                   | Yes                        | No medicines provided |\n| False     | No                 | No                   | Yes                        | No medicines provided |\n\nDecision Table for Requirement VIRTUA-2.1-3:\n| Condition | Prescription Valid | Lab Availability | Specimen Collection Capability | Delivery of Lab Reports | System Update | Action |\n|-----------|--------------------|------------------|-------------------------------|--------------------------|---------------|--------|\n| True      | Yes                | Yes              | Yes                           | Yes                      | Yes           | Reports delivered and system updated |\n| False     | No                 | Yes              | Yes                           | No                       | No            | No delivery, no update |\n| True      | Yes                | No               | Yes                           | No                       | No            | No delivery, no update |\n| False     | No                 | No               | Yes                           | No                       | No            | No delivery, no update |\n\nDecision Table for Requirement VIRTUA-2.1-4:\n| Condition | Information Displayed to Chemist | Information Displayed to Lab | Patient Confidentiality | Action |\n|-----------|----------------------------------|------------------------------|------------------------|--------|\n| True      | Only necessary prescription info | Only necessary prescription info | Protected             | Information displayed as per constraint |\n| False     | Full prescription details       | Full prescription details   | Not protected         | Violation of confidentiality |\n\nDecision Table for Requirement VIRTUA-2.2-1:\n| Condition | Specialty Database Populated | Valid Specialties | Action |\n|-----------|-----------------------------|-------------------|--------|\n| True      | Yes                         | Yes               | Database populated |\n| False     | No                          | No                | No database populated |\n\nDecision Table for Requirement VIRTUA-2.2-2:\n| Condition | Doctor Linked to Specialty | Valid Doctor | Action |\n|-----------|---------------------------|---------------|--------|\n| True      | Yes                       | Yes           | Doctors linked |\n| False     | No                        | Yes           | No linking |\n| True      | Yes                       | No            | No linking |\n| False     | No                        | No            | No linking |\n\nDecision Table for Requirement VIRTUA-2.2-3:\n| Condition | Lab Information Available | Chemist Information Available | Database Population | Action |\n|-----------|---------------------------|------------------------------|--------------------|--------|\n| True      | Yes                       | Yes                         | Yes                | Databases populated |\n| False     | No                        | Yes                         | No                 | Only chemist database partially populated |\n| True      | Yes                       | No                         | No                 | Only lab database partially populated |\n| False     | No                        | No                         | No                 | No databases populated |\n\nDecision Table for Requirement VIRTUA-2.2-4:\n| Condition | Patient Registration Form | Valid Details | Registration Success | Action |\n|-----------|---------------------------|---------------|----------------------|--------|\n| True      | Yes                       | Yes           | Yes                  | Patient registered |\n| False     | No                        | Yes           | No                   | Registration failed |\n| True      | Yes                       | No            | No                   | Registration failed |\n| False     | No                        | No            | No                   | Registration failed |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Prescription delivery to patient, chemist, and lab",
+          "req_ids": [
+            "VIRTUA-2.1-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription is valid"
+          ],
+          "inputs": {
+            "Prescription Received by": "Patient",
+            "Nearest Local Chemist": "Yes",
+            "Nearest Local Lab": "Yes"
+          },
+          "steps": [
+            "Verify prescription validity",
+            "Notify patient, chemist, and lab"
+          ],
+          "expected": [
+            "Prescription delivered to patient, chemist, and lab"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Medicines provision by chemist via offline delivery",
+          "req_ids": [
+            "VIRTUA-2.1-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription is valid",
+            "Chemist is available",
+            "Offline delivery is possible"
+          ],
+          "inputs": {
+            "Prescription Valid": "Yes",
+            "Chemist Availability": "Yes",
+            "Offline Delivery Capability": "Yes"
+          },
+          "steps": [
+            "Check prescription validity",
+            "Confirm chemist availability",
+            "Initiate offline delivery"
+          ],
+          "expected": [
+            "Medicines provided to patient"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Specimen collection and lab report delivery",
+          "req_ids": [
+            "VIRTUA-2.1-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Prescription is valid",
+            "Lab is available",
+            "Specimen collection is possible",
+            "Delivery of lab reports is possible",
+            "System update is possible"
+          ],
+          "inputs": {
+            "Prescription Valid": "Yes",
+            "Lab Availability": "Yes",
+            "Specimen Collection Capability": "Yes",
+            "Delivery of Lab Reports": "Yes",
+            "System Update": "Yes"
+          },
+          "steps": [
+            "Verify prescription validity",
+            "Collect specimen",
+            "Deliver lab reports",
+            "Update system"
+          ],
+          "expected": [
+            "Specimen collected, lab reports delivered, system updated"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Protection of patient confidentiality for chemist and lab",
+          "req_ids": [
+            "VIRTUA-2.1-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Prescription is valid"
+          ],
+          "inputs": {
+            "Information Displayed to Chemist": "Only necessary prescription info",
+            "Information Displayed to Lab": "Only necessary prescription info",
+            "Patient Confidentiality": "Protected"
+          },
+          "steps": [
+            "Display information to chemist and lab",
+            "Attempt to access full prescription details"
+          ],
+          "expected": [
+            "Full prescription details not displayed, confidentiality maintained"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Populating specialty database by admin",
+          "req_ids": [
+            "VIRTUA-2.2-1"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin access",
+            "Valid specialties present"
+          ],
+          "inputs": {
+            "Specialty Database Populated": "Yes",
+            "Valid Specialties": "Yes"
+          },
+          "steps": [
+            "Admin populates specialty database"
+          ],
+          "expected": [
+            "Specialty database populated with valid specialties"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Linking specialties to doctors by admin",
+          "req_ids": [
+            "VIRTUA-2.2-2"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Admin access",
+            "Valid doctor"
+          ],
+          "inputs": {
+            "Doctor Linked to Specialty": "Yes",
+            "Valid Doctor": "Yes"
+          },
+          "steps": [
+            "Admin links specialty to doctor"
+          ],
+          "expected": [
+            "Doctors linked to respective specialties"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Populating chemist and lab databases with information",
+          "req_ids": [
+            "VIRTUA-2.2-3"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Valid lab information",
+            "Valid chemist information"
+          ],
+          "inputs": {
+            "Lab Information Available": "Yes",
+            "Chemist Information Available": "Yes",
+            "Database Population": "Yes"
+          },
+          "steps": [
+            "Admin populates databases with lab and chemist information"
+          ],
+          "expected": [
+            "Databases populated with relevant information"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Patient registration into the system",
+          "req_ids": [
+            "VIRTUA-2.2-4"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Valid patient registration form"
+          ],
+          "inputs": {
+            "Patient Registration Form": "Yes",
+            "Valid Details": "Yes"
+          },
+          "steps": [
+            "Patient fills registration form",
+            "System processes registration"
+          ],
+          "expected": [
+            "Patient registered successfully"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Decision Tables",
+        "group": 4,
+        "schema_score": 1.0,
+        "representation_score": 0.6667,
+        "sfv_score": 0.8333,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": [
+          "Table syntax is inconsistent."
+        ]
+      },
+      "fsa": {
+        "system_type": "safety_critical",
+        "weights": {
+          "wc": 0.25,
+          "wn": 0.25,
+          "wo": 0.2,
+          "wb": 0.2,
+          "wg": 0.1
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.3,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.6875,
+        "hallucinated": [
+          {
+            "value": "No",
+            "context": "Prescription Received by",
+            "grounded": false
+          },
+          {
+            "value": "No",
+            "context": "Nearest Local Chemist",
+            "grounded": false
+          },
+          {
+            "value": "No",
+            "context": "Nearest Local Lab",
+            "grounded": false
+          },
+          {
+            "value": "No",
+            "context": "Prescription Valid",
+            "grounded": false
+          },
+          {
+            "value": "No",
+            "context": "Chemist Availability",
+            "grounded": false
+          },
+          {
+            "value": "No",
+            "context": "Offline Delivery Capability",
+            "grounded": false
+          },
+          {
+            "value": "No",
+            "context": "Lab Availability",
+            "grounded": false
+          },
+          {
+            "value": "No",
+            "context": "Specimen Collection Capability",
+            "grounded": false
+          },
+          {
+            "value": "No",
+            "context": "Delivery of Lab Reports",
+            "grounded": false
+          },
+          {
+            "value": "No",
+            "context": "System Update",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 32,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "No negative test cases in the canonical suite; decision tables only",
+          "Oracle assertions are vague; need concrete expected values",
+          "No boundary or threshold tests; could add for completeness",
+          "Decision tables include 'No' values not grounded; need clarification",
+          "Missing tests for confidentiality constraint enforcement (only positive scenario)"
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.8287,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

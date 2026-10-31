@@ -1,0 +1,1397 @@
+{
+  "unit_id": "U02_Alarms",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:phi3.5:3.8b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 4,
+  "repairs_used": 3,
+  "final_attempt": 0,
+  "gate2_pass": false,
+  "gate3_pass": false,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 0.9444,
+    "representation_score": 1.0,
+    "sfv_score": 0.9722,
+    "threshold": 0.7,
+    "sfv_pass": false,
+    "issues": [
+      "test case #14 (TC-104): 'req_ids' is a required property"
+    ]
+  },
+  "fsa": null,
+  "artifact": "<Finite State Machines / Statecharts Representation>\n\n// Statechart definition (simplified representation for illustrative purposes)\n\nStates:\n- Idle\n- CheckingInput\n- AlarmTriggered\n- Responding\n- Unresponsive\n\nTransitions:\n  - Idle -> CheckingInput on \"start alarm check\"\n  - CheckingInput (input air line blocked) -> AlarmTriggered on \"low pressure detected\"\n  - CheckingInput (input O2 line blocked) -> AlarmTriggered on \"low pressure detected\"\n  - CheckingInput (input O2 line pressure too high) -> AlarmTriggered on \"high pressure detected\"\n  - AlarmTriggered -> Responding\n  - Responding -> Unresponsive on \"alarm unresponsive for 0.5 apnea time\"\n  - Responding -> Idle on \"alarm responsive\"\n  - Unresponsive (controller) -> Idle on \"controller responsive for 0.5 apnea time\"\n  - Unresponsive (controller) -> Idle on \"controller unresponsive for 0.5 apnea time\"\n  - Idle -> AlarmTriggered on \"start alarm check\"\n  - AlarmTriggered (low pressure) -> Responding\n  - AlarmTriggered (high pressure) -> Responding\n  - Responding (pressure below -4cm H2O) -> Unresponsive\n  - Responding (pressure above 60 cmH2O) -> Responding\n\n// Note: The above transitions are a high-level representation and would need to be fleshed out with proper states and guards in a real Statechart implementation.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Alarm for blocked air line",
+      "req_ids": [
+        "RW-SW-45"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "air line blocked": true
+      },
+      "steps": [
+        "Start alarm check",
+        "Detect low pressure",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Alarm for blocked O2 line",
+      "req_ids": [
+        "RW-SW-58"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "O2 line blocked": true
+      },
+      "steps": [
+        "Start alarm check",
+        "Detect low pressure",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Alarm for low inspiratory pressure",
+      "req_ids": [
+        "RW-SW-60"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "pressure below -4cm H2O": true
+      },
+      "steps": [
+        "Start alarm check",
+        "Detect low pressure",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Alarm for high input O2 line pressure",
+      "req_ids": [
+        "RW-SW-21"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "O2 line pressure too high": true
+      },
+      "steps": [
+        "Start alarm check",
+        "Detect high pressure",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Controller unresponsiveness during apnea",
+      "req_ids": [
+        "RW-SW-61"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "controller unresponsive for 0.5 apnea time": true
+      },
+      "steps": [
+        "Start alarm check",
+        "Detect controller unresponsiveness",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Alarm for overpressure",
+      "req_ids": [
+        "RW-SW-5"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "overpressure": true
+      },
+      "steps": [
+        "Start alarm check",
+        "Detect overpressure",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Controller unresponsiveness during apnea",
+      "req_ids": [
+        "RW-SW-36"
+      ],
+      "kind": "positive",
+      "preconditions": [],
+      "inputs": {
+        "controller unresponsive for 0.5 apnea time": true
+      },
+      "steps": [
+        "Start alarm check",
+        "Detect controller unresponsiveness",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Reset after alarm",
+      "req_ids": [
+        "RW-SW-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Alarm triggered"
+      ],
+      "inputs": {
+        "reset alarm": true
+      },
+      "steps": [
+        "Reset alarm",
+        "Return to Idle"
+      ],
+      "expected": [
+        "Returned to Idle state"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "Reset after false alarm",
+      "req_ids": [
+        "RW-SW-6"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Alarm triggered"
+      ],
+      "inputs": {
+        "reset alarm": false
+      },
+      "steps": [
+        "Attempt to reset alarm",
+        "No change in state"
+      ],
+      "expected": [
+        "Still in Alarm state"
+      ]
+    },
+    {
+      "id": "TC-100",
+      "title": "Boundary value for overpressure",
+      "req_ids": [
+        "RW-SW-6"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "overpressure": 60
+      },
+      "steps": [
+        "Start alarm check",
+        "Detect overpressure",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-101",
+      "title": "Boundary value for overpressure",
+      "req_ids": [
+        "RW-SW-6"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "overpressure": 61
+      },
+      "steps": [
+        "Start alarm check",
+        "Detect overpressure",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-102",
+      "title": "Boundary value for controller unresponsiveness",
+      "req_ids": [
+        "RW-SW-36"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "controller unresponsive for 0.5 apnea time": false
+      },
+      "steps": [
+        "Start alarm check",
+        "Controller responsive",
+        "Return to Idle"
+      ],
+      "expected": [
+        "Returned to Idle state"
+      ]
+    },
+    {
+      "id": "TC-103",
+      "title": "Boundary value for controller unresponsiveness",
+      "req_ids": [
+        "RW-SW-36"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "controller unresponsive for 1 apnea time": true
+      },
+      "steps": [
+        "Start alarm check",
+        "Controller unresponsive",
+        "Return to Idle"
+      ],
+      "expected": [
+        "Controller unresponsive for 1 apnea time",
+        "Returned to Idle state"
+      ]
+    },
+    {
+      "id": "TC-104",
+      "title": "Boundary value for controller unresponsiveness",
+      "reqs": [
+        "RW-SW-61"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "controller unresponsive for 1.5 apnea time": true
+      },
+      "steps": [
+        "Start alarm check",
+        "Controller unresponsive",
+        "Return to Idle"
+      ],
+      "expected": [
+        "Controller unresponsive for 1.5 apnea time",
+        "Returned to Idle state"
+      ]
+    },
+    {
+      "id": "TC-105",
+      "title": "Boundary value for low pressure",
+      "req_ids": [
+        "RW-SW-45"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "low pressure": true
+      },
+      "steps": [
+        "Start alarm check",
+        "Detect low pressure",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-106",
+      "title": "Boundary value for low pressure",
+      "req_ids": [
+        "RW-SW-45"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "low pressure": false
+      },
+      "steps": [
+        "Start alarm check",
+        "No low pressure detected",
+        "Still in Idle state"
+      ],
+      "expected": [
+        "Still in Idle state"
+      ]
+    },
+    {
+      "id": "TC-107",
+      "title": "Boundary value for high pressure",
+      "req_ids": [
+        "RW-SW-21"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "high pressure": true
+      },
+      "steps": [
+        "Start alarm check",
+        "Detect high pressure",
+        "Alarm triggered"
+      ],
+      "expected": [
+        "Alarm triggered"
+      ]
+    },
+    {
+      "id": "TC-108",
+      "title": "Boundary value for high pressure",
+      "req_ids": [
+        "RW-SW-21"
+      ],
+      "kind": "boundary",
+      "preconditions": [],
+      "inputs": {
+        "high pressure": false
+      },
+      "steps": [
+        "Start alarm check",
+        "No high pressure detected",
+        "Still in Idle state"
+      ],
+      "expected": [
+        "Still in Idle state"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "<Finite State Machines / Statecharts Representation>\n\n// Statechart definition (simplified representation for illustrative purposes)\n\nStates:\n- Idle\n- CheckingInput\n- AlarmTriggered\n- Responding\n- Unresponsive\n\nTransitions:\n  - Idle -> CheckingInput on \"start alarm check\"\n  - CheckingInput (input air line blocked) -> AlarmTriggered on \"low pressure detected\"\n  - CheckingInput (input O2 line blocked) -> AlarmTriggered on \"low pressure detected\"\n  - CheckingInput (input O2 line pressure too high) -> AlarmTriggered on \"high pressure detected\"\n  - AlarmTriggered -> Responding\n  - Responding -> Unresponsive on \"alarm unresponsive for 0.5 apnea time\"\n  - Responding -> Idle on \"alarm responsive\"\n  - Unresponsive (controller) -> Idle on \"controller responsive for 0.5 apnea time\"\n  - Unresponsive (controller) -> Idle on \"controller unresponsive for 0.5 apnea time\"\n  - Idle -> AlarmTriggered on \"start alarm check\"\n  - AlarmTriggered (low pressure) -> Responding\n  - AlarmTriggered (high pressure) -> Responding\n  - Responding (pressure below -4cm H2O) -> Unresponsive\n  - Responding (pressure above 60 cmH2O) -> Responding\n\n// Note: The above transitions are a high-level representation and would need to be fleshed out with proper states and guards in a real Statechart implementation.",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Alarm for blocked air line",
+          "req_ids": [
+            "RW-SW-45"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "air line blocked": true
+          },
+          "steps": [
+            "Start alarm check",
+            "Detect low pressure",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Alarm for blocked O2 line",
+          "req_ids": [
+            "RW-SW-58"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "O2 line blocked": true
+          },
+          "steps": [
+            "Start alarm check",
+            "Detect low pressure",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Alarm for low inspiratory pressure",
+          "req_ids": [
+            "RW-SW-60"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pressure below -4cm H2O": true
+          },
+          "steps": [
+            "Start alarm check",
+            "Detect low pressure",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Alarm for high input O2 line pressure",
+          "req_ids": [
+            "RW-SW-21"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "O2 line pressure too high": true
+          },
+          "steps": [
+            "Start alarm check",
+            "Detect high pressure",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Controller unresponsiveness during apnea",
+          "req_ids": [
+            "RW-SW-61"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "controller unresponsive for 0.5 apnea time": true
+          },
+          "steps": [
+            "Start alarm check",
+            "Detect controller unresponsiveness",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Alarm for overpressure",
+          "req_ids": [
+            "RW-SW-5"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "overpressure": true
+          },
+          "steps": [
+            "Start alarm check",
+            "Detect overpressure",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller unresponsiveness during apnea",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "controller unresponsive for 0.5 apnea time": true
+          },
+          "steps": [
+            "Start alarm check",
+            "Detect controller unresponsiveness",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Reset after alarm",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Alarm triggered"
+          ],
+          "inputs": {
+            "reset alarm": true
+          },
+          "steps": [
+            "Reset alarm",
+            "Return to Idle"
+          ],
+          "expected": [
+            "Returned to Idle state"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Reset after false alarm",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Alarm triggered"
+          ],
+          "inputs": {
+            "reset alarm": false
+          },
+          "steps": [
+            "Attempt to reset alarm",
+            "No change in state"
+          ],
+          "expected": [
+            "Still in Alarm state"
+          ]
+        },
+        {
+          "id": "TC-100",
+          "title": "Boundary value for overpressure",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "overpressure": 60
+          },
+          "steps": [
+            "Start alarm check",
+            "Detect overpressure",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-101",
+          "title": "Boundary value for overpressure",
+          "req_ids": [
+            "RW-SW-6"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "overpressure": 61
+          },
+          "steps": [
+            "Start alarm check",
+            "Detect overpressure",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-102",
+          "title": "Boundary value for controller unresponsiveness",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "controller unresponsive for 0.5 apnea time": false
+          },
+          "steps": [
+            "Start alarm check",
+            "Controller responsive",
+            "Return to Idle"
+          ],
+          "expected": [
+            "Returned to Idle state"
+          ]
+        },
+        {
+          "id": "TC-103",
+          "title": "Boundary value for controller unresponsiveness",
+          "req_ids": [
+            "RW-SW-36"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "controller unresponsive for 1 apnea time": true
+          },
+          "steps": [
+            "Start alarm check",
+            "Controller unresponsive",
+            "Return to Idle"
+          ],
+          "expected": [
+            "Controller unresponsive for 1 apnea time",
+            "Returned to Idle state"
+          ]
+        },
+        {
+          "id": "TC-104",
+          "title": "Boundary value for controller unresponsiveness",
+          "reqs": [
+            "RW-SW-61"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "controller unresponsive for 1.5 apnea time": true
+          },
+          "steps": [
+            "Start alarm check",
+            "Controller unresponsive",
+            "Return to Idle"
+          ],
+          "expected": [
+            "Controller unresponsive for 1.5 apnea time",
+            "Returned to Idle state"
+          ]
+        },
+        {
+          "id": "TC-105",
+          "title": "Boundary value for low pressure",
+          "req_ids": [
+            "RW-SW-45"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "low pressure": true
+          },
+          "steps": [
+            "Start alarm check",
+            "Detect low pressure",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-106",
+          "title": "Boundary value for low pressure",
+          "req_ids": [
+            "RW-SW-45"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "low pressure": false
+          },
+          "steps": [
+            "Start alarm check",
+            "No low pressure detected",
+            "Still in Idle state"
+          ],
+          "expected": [
+            "Still in Idle state"
+          ]
+        },
+        {
+          "id": "TC-107",
+          "title": "Boundary value for high pressure",
+          "req_ids": [
+            "RW-SW-21"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "high pressure": true
+          },
+          "steps": [
+            "Start alarm check",
+            "Detect high pressure",
+            "Alarm triggered"
+          ],
+          "expected": [
+            "Alarm triggered"
+          ]
+        },
+        {
+          "id": "TC-108",
+          "title": "Boundary value for high pressure",
+          "req_ids": [
+            "RW-SW-21"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {
+            "high pressure": false
+          },
+          "steps": [
+            "Start alarm check",
+            "No high pressure detected",
+            "Still in Idle state"
+          ],
+          "expected": [
+            "Still in Idle state"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.9444,
+        "representation_score": 1.0,
+        "sfv_score": 0.9722,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #14 (TC-104): 'req_ids' is a required property"
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.97). Fix these problems and output the full corrected suite:\n- test case #14 (TC-104): 'req_ids' is a required property",
+      "artifact": "<Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Alarm for blocked air line (Low Pressure)",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "air line blocked": true
+          },
+          "steps": [
+            "Simulate air line being blocked",
+            "Check if alarm triggers with severity HIGH"
+          ],
+          "expected": [
+            "Alarm with severity HIGH should trigger"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Alarm for blocked O2 line (Low Pressure)",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "O2 line blocked": true
+          },
+          "steps": [
+            "Simulate O2 line being blocked",
+            "Check if alarm triggers with severity HIGH"
+          ],
+          "expected": [
+            "Alarm with severity HIGH should trigger"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Alarm for inspiratory pressure below -4cm H2O",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "inspiratory pressure": -4
+          },
+          "steps": [
+            "Set inspiratory pressure to -4cm H2O",
+            "Check if alarm triggers with severity HIGH"
+          ],
+          "expected": [
+            "Alarm with severity HIGH should trigger"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Alarm for blocked air line (Low Pressure) - Negative Path",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "air line blocked": false
+          },
+          "steps": [
+            "Simulate air line not being blocked",
+            "Check if alarm does not trigger"
+          ],
+          "expected": [
+            "No alarm should trigger"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Alarm for blocked O2 line (Low Pressure) - Negative Path",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "O2 line blocked": false
+          },
+          "steps": [
+            "Simulate O2 line not being blocked",
+            "Check if alarm does not trigger"
+          ],
+          "expected": [
+            "No alarm should trigger"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Alarm for high O2 line pressure",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "O2 line pressure": "too high"
+          },
+          "steps": [
+            "Set O2 line pressure to too high",
+            "Check if alarm triggers with severity HIGH"
+          ],
+          "expected": [
+            "Alarm with severity HIGH should trigger"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Controller unresponsive for 1/2 apnea time",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller is responsive initially"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate controller becoming unresponsive for 1/2 apnea time",
+            "Check if alarm triggers in GUI and Controller"
+          ],
+          "expected": [
+            "Alarm should trigger in both GUI and Controller after 1/2 apnea time"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Controller unresponsive for 1/2 apnea time - Negative Path",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Controller is responsive initially"
+          ],
+          "inputs": {},
+          "steps": [
+            "Ensure controller remains responsive",
+            "Check if no alarm triggers"
+          ],
+          "expected": [
+            "No alarm should trigger"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "Overpressure alarm above 60 cmH2O",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [],
+          "inputs": {
+            "pressure": 60.1
+          },
+          "steps": [
+            "Set pressure to 60.1 cmH2O",
+            "Check if overpressure alarm triggers"
+          ],
+          "expected": [
+            "Overpressure alarm should trigger"
+          ]
+        },
+        {
+          "id": "TC-100",
+          "title": "Overpressure alarm - Negative Path",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "negative",
+          "preconditions": [],
+          "inputs": {
+            "pressure": "<= 60 cmH2O"
+          },
+          "steps": [],
+          "expected": [
+            "No alarm should trigger"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.1,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #2 (TC-002): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #3 (TC-003): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #4 (TC-004): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #5 (TC-005): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #6 (TC-006): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #7 (TC-007): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #8 (TC-008): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #9 (TC-009): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #10 (TC-100): [] should be non-empty; traces to unknown requirement ids ['U02_Alarms']",
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.10). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): traces to unknown requirement ids ['U02_Alarms']\n- test case #2 (TC-002): traces to unknown requirement ids ['U02_Alarms']\n- test case #3 (TC-003): traces to unknown requirement ids ['U02_Alarms']\n- test case #4 (TC-004): traces to unknown requirement ids ['U02_Alarms']\n- test case #5 (TC-005): traces to unknown requirement ids ['U02_Alarms']\n- test case #6 (TC-006): traces to unknown requirement ids ['U02_Alarms']\n- test case #7 (TC-007): traces to unknown requirement ids ['U02_Alarms']\n- test case #8 (TC-008): traces to unknown requirement ids ['U02_Alarms']\n- test case #9 (TC-009): traces to unknown requirement ids ['U02_Alarms']\n- test case #10 (TC-100): [] should be non-empty; traces to unknown requirement ids ['U02_Alarms']\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<the test suite written in Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Alarm for Low Pressure in Air Line",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, GUI and Controller ready"
+          ],
+          "inputs": {
+            "air_line_blocked": true
+          },
+          "steps": [
+            "Simulate air line blockage",
+            "Check if alarm triggers with severity HIGH"
+          ],
+          "expected": [
+            "Alarm triggers with severity HIGH"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Alarm for Low Pressure in O2 Line",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, GUI and Controller ready"
+          ],
+          "inputs": {
+            "O2_line_blocked": true
+          },
+          "steps": [
+            "Simulate O2 line blockage",
+            "Check if alarm triggers with severity HIGH"
+          ],
+          "expected": [
+            "Alarm triggers with severity HIGH"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Alarm for Low Inspiratory Pressure",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialized, GUI and Controller ready"
+          ],
+          "inputs": {
+            "inspiratory_pressure": -4
+          },
+          "steps": [
+            "Set inspiratory pressure to -4cm H2O",
+            "Check if alarm triggers"
+          ],
+          "expected": [
+            "Alarm triggers"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test High Pressure Alarm",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System initialized, GUI and Controller ready"
+          ],
+          "inputs": {
+            "pressure": "above 60 cmH2O"
+          },
+          "steps": [
+            "Set pressure above 60 cmH2O",
+            "Check if alarm triggers"
+          ],
+          "expected": [
+            "Alarm should not trigger"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Controller Unresponsiveness during Apnea",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System initialized, GUI and Controller ready, apnea time started"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate Controller unresponsiveness for half of apnea time",
+            "Check if alarm triggers in GUI and Controller"
+          ],
+          "expected": [
+            "Alarm should trigger in both GUI and Controller after 1/2 apnea time"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Controller Unresponsiveness for High O2 Line Pressure",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System initialized, GUI and Controller ready, high O2 line pressure"
+          ],
+          "inputs": {},
+          "steps": [
+            "Simulate Controller unresponsiveness",
+            "Check if alarm triggers in GUI and Controller"
+          ],
+          "expected": [
+            "Alarm should not trigger"
+          ]
+        },
+        {
+          "id": "TC-100",
+          "title": "Initial State Verification",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System initialization"
+          ],
+          "inputs": {},
+          "steps": [
+            "Check initial state of the system",
+            "Verify all required states and events are declared",
+            "Check initial state of the Controller and GUI"
+          ],
+          "expected": [
+            "All initial states and events are declared correctly"
+          ]
+        },
+        {
+          "id": "TC-101",
+          "title": "Missing Transitions Test",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "System initialized, GUI and Controller ready"
+          ],
+          "inputs": {},
+          "steps": [
+            "Check for at least two transitions in the system",
+            "Check for transitions between relevant states"
+          ],
+          "expected": [
+            "At least two transitions should be present and correctly defined"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.1,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #2 (TC-002): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #3 (TC-003): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #4 (TC-004): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #5 (TC-005): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #6 (TC-006): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #7 (TC-100): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #8 (TC-101): traces to unknown requirement ids ['U02_Alarms']",
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    },
+    {
+      "attempt": 3,
+      "feedback_given": "YOUR PREVIOUS ATTEMPT FAILED THE SYNTAX GATE (SFV 0.10). Fix these problems and output the full corrected suite:\n- test case #1 (TC-001): traces to unknown requirement ids ['U02_Alarms']\n- test case #2 (TC-002): traces to unknown requirement ids ['U02_Alarms']\n- test case #3 (TC-003): traces to unknown requirement ids ['U02_Alarms']\n- test case #4 (TC-004): traces to unknown requirement ids ['U02_Alarms']\n- test case #5 (TC-005): traces to unknown requirement ids ['U02_Alarms']\n- test case #6 (TC-006): traces to unknown requirement ids ['U02_Alarms']\n- test case #7 (TC-100): traces to unknown requirement ids ['U02_Alarms']\n- test case #8 (TC-101): traces to unknown requirement ids ['U02_Alarms']\n- missing: transitions (>=2)\n- missing: states declared\n- missing: initial state\n- missing: events/guards",
+      "artifact": "<the test suite written in Finite State Machines / Statecharts notation>",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test Alarm for Low Pressure in Air Line",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Input air line pressure is below normal threshold"
+          ],
+          "inputs": {
+            "air_line_pressure": "low"
+          },
+          "steps": [
+            "Simulate low air line pressure",
+            "Activate alarm in GUI"
+          ],
+          "expected": [
+            "Alarm for low air line pressure should trigger with HIGH severity"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test Alarm for Low Pressure in O2 Line",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Input O2 line pressure is below normal threshold"
+          ],
+          "inputs": {
+            "O2_line_pressure": "low"
+          },
+          "steps": [
+            "Simulate low O2 line pressure",
+            "Activate alarm in GUI"
+          ],
+          "expected": [
+            "Alarm for low O2 line pressure should trigger with HIGH severity"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test Alarm for High Input O2 Line Pressure",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Input O2 line pressure is above normal threshold"
+          ],
+          "inputs": {
+            "O2_line_pressure": "high"
+          },
+          "steps": [
+            "Simulate high O2 line pressure",
+            "Activate alarm in GUI"
+          ],
+          "expected": [
+            "Alarm for high O2 line pressure should not trigger with HIGH severity"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test Alarm for Controller Unresponsiveness During Apnea",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller is responsive at the start of apnea"
+          ],
+          "inputs": {
+            "controller_unresponsive_duration": "0.5 apnea time"
+          },
+          "steps": [
+            "Simulate controller unresponsiveness for half apnea time",
+            "Activate alarm in GUI"
+          ],
+          "expected": [
+            "Alarm should trigger when controller is unresponsive for half apnea time with HIGH severity"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test Overpressure Alarm in Controller",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller pressure is above 60 cmH2O"
+          ],
+          "inputs": {
+            "controller_pressure": "above_60_cmH2O"
+          },
+          "steps": [
+            "Simulate controller pressure above 60 cmH2O",
+            "Activate alarm in GUI"
+          ],
+          "expected": [
+            "Overpressure alarm should trigger in controller with HIGH severity"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test Overpressure Alarm in Controller Unresponsiveness",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Controller is responsive at the start of apnea"
+          ],
+          "inputs": {
+            "controller_unresponsive_duration": "0.5 apnea time"
+          },
+          "steps": [
+            "Simulate controller unresponsiveness for half apnea time with overpressure",
+            "Activate alarm in GUI"
+          ],
+          "expected": [
+            "Overpressure alarm should not trigger when controller is unresponsive for half apnea time"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test Initial State of System",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "initial",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [],
+          "expected": [
+            "System should be in initial state with no alarms active"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test Mode Switching Behavior",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "boundary",
+          "preconditions": [],
+          "inputs": {},
+          "steps": [
+            "Switch modes",
+            "Verify system transitions to correct state without false alarms"
+          ],
+          "expected": [
+            "System should transition to correct state without false alarms"
+          ]
+        },
+        {
+          "id": "TC-100",
+          "title": "Test Missing Transitions",
+          "req_ids": [
+            "U02_Alarms"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "All transitions are present"
+          ],
+          "inputs": {},
+          "steps": [
+            "Attempt to trigger transition not present in the system",
+            "Verify no alarm or unexpected behavior occurs"
+          ],
+          "expected": [
+            "No alarm or unexpected behavior should occur for missing transitions"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 0.0,
+        "representation_score": 0.2,
+        "sfv_score": 0.1,
+        "threshold": 0.7,
+        "sfv_pass": false,
+        "issues": [
+          "test case #1 (TC-001): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #2 (TC-002): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #3 (TC-003): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #4 (TC-004): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #5 (TC-005): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #6 (TC-006): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #7 (TC-007): 'initial' is not one of ['positive', 'negative', 'boundary']; [] should be non-empty; traces to unknown requirement ids ['U02_Alarms']",
+          "test case #8 (TC-008): traces to unknown requirement ids ['U02_Alarms']",
+          "test case #9 (TC-100): traces to unknown requirement ids ['U02_Alarms']",
+          "missing: transitions (>=2)",
+          "missing: states declared",
+          "missing: initial state",
+          "missing: events/guards"
+        ]
+      }
+    }
+  ]
+}

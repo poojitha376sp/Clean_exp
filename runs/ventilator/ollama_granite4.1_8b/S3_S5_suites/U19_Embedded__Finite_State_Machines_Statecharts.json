@@ -1,0 +1,620 @@
+{
+  "unit_id": "U19_Embedded",
+  "representation": "Finite State Machines / Statecharts",
+  "generator": "ollama:granite4.1:8b",
+  "system_type": "standard",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Finite State Machines / Statecharts",
+    "group": 2,
+    "schema_score": 1.0,
+    "representation_score": 0.8,
+    "sfv_score": 0.9,
+    "threshold": 0.7,
+    "sfv_pass": true,
+    "issues": [
+      "missing: initial state"
+    ]
+  },
+  "fsa": {
+    "system_type": "standard",
+    "weights": {
+      "wc": 0.3,
+      "wn": 0.2,
+      "wo": 0.15,
+      "wb": 0.2,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 1.0,
+    "oracle_assertiveness": 0.9,
+    "boundary_coverage": 0.0,
+    "groundedness_mg": 0.1765,
+    "hallucinated": [
+      {
+        "value": "MeasurePEEPRequested",
+        "context": "event to trigger PEEP measurement",
+        "grounded": false
+      },
+      {
+        "value": "30",
+        "context": "commanded pressure value",
+        "grounded": false
+      },
+      {
+        "value": "30",
+        "context": "commanded PIP value",
+        "grounded": false
+      },
+      {
+        "value": "12",
+        "context": "commanded breath rate value",
+        "grounded": false
+      },
+      {
+        "value": "Idle",
+        "context": "controller state",
+        "grounded": false
+      },
+      {
+        "value": "Inspiration",
+        "context": "controller state",
+        "grounded": false
+      },
+      {
+        "value": "Expiration",
+        "context": "controller state",
+        "grounded": false
+      },
+      {
+        "value": "Measurement",
+        "context": "controller state",
+        "grounded": false
+      },
+      {
+        "value": "PressureBelowThresholdGuard",
+        "context": "guard name",
+        "grounded": false
+      },
+      {
+        "value": "PressureAboveThresholdGuard",
+        "context": "guard name",
+        "grounded": false
+      },
+      {
+        "value": "PEEPMeasured",
+        "context": "measurement flag",
+        "grounded": false
+      },
+      {
+        "value": "27-33cm",
+        "context": "pressure tolerance range",
+        "grounded": false
+      },
+      {
+        "value": "25-35cmH2O",
+        "context": "PIP tolerance range",
+        "grounded": false
+      },
+      {
+        "value": "11-13 breaths/min",
+        "context": "breath rate tolerance range",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 17,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add boundary tests at exact threshold values (-4cm, 60cm, 10% limits, PIP +/-5, breath rate +-1).",
+      "Include tests for guard conditions false (e.g., pressure > -4cm, <60cm).",
+      "Add timing tests to verify controller response speed for RW-SW-4.",
+      "Test error handling when pressure >60 is commanded, not just guard evaluation.",
+      "Verify state transitions for expiration cycle completion guard and ensure proper sequencing."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.6615,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "/* Finite State Machine (FSM) representation for the embedded controller requirements */\n\n/* States */\nState Idle;\nState Inspiration;\nState Expiration;\nState Measurement;\n\n/* Events */\nEvent TriggerInspiration;\nEvent TriggerExpiration;\nEvent MeasurePEEP;\nEvent PressureBelowThreshold;\nEvent PressureAboveThreshold;\nEvent BreathRateExceeded;\n\n/* Transitions with guards */\nTransition Idle --> Inspiration\n    Guard: TriggerInspiration\n    Action: InitiateInspirationCycle;\n\nTransition Inspiration --> Expiration\n    Guard: InspirationCycleComplete\n    Action: EndInspirationCycle;\n\nTransition Expiration --> Idle\n    Guard: ExpirationCycleComplete\n    Action: PrepareNextCycle;\n\nTransition Idle --> Measurement\n    Guard: MeasurePEEPRequested\n    Action: StartPEEPMeasurement;\n\nTransition Measurement --> Idle\n    Guard: PEEPMeasured\n    Action: RecordPEEPValue;\n\n/* Additional guards for pressure limits */\nGuard PressureBelowThresholdGuard\n    Condition: MeasuredPressure < -4cm;\nGuard PressureAboveThresholdGuard\n    Condition: MeasuredPressure > 60cm;\n\n/* Lifecycle */\nInitialState: Idle;\n\n/* Requirements mapping */\n[RW-SW-4] => PressureBelowThresholdGuard;\n[RW-SW-7] => PressureAboveThresholdGuard;\n[RW-SW-52] => MeasurePEEP;\n[RW-SW-55] => Within10PercentTargetGuard;\n[RW-SW-56] => TriggerInspiration;\n[RW-SW-57] => TriggerExpiration;\n[RW-SW-59] => PIPTargetGuard;\n[RW-SW-62] => BreathRateTargetGuard;",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Test TriggerInspiration when pressure below -4cm",
+      "req_ids": [
+        "RW-SW-4"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Controller in Idle state",
+        "MeasuredPressure < -4cm"
+      ],
+      "inputs": {
+        "name": "TriggerInspiration",
+        "value": true
+      },
+      "steps": [
+        "Send TriggerInspiration event",
+        "Check state transition to Inspiration"
+      ],
+      "expected": [
+        "State changes to Inspiration",
+        "PressureBelowThresholdGuard evaluates to True"
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Test PressureAboveThresholdGuard when pressure > 60cm",
+      "req_ids": [
+        "RW-SW-7"
+      ],
+      "kind": "negative",
+      "preconditions": [
+        "Controller in any state",
+        "MeasuredPressure > 60cm"
+      ],
+      "inputs": {
+        "name": "MeasuredPressure",
+        "value": 61
+      },
+      "steps": [
+        "Update MeasuredPressure to 61cm",
+        "Evaluate PressureAboveThresholdGuard"
+      ],
+      "expected": [
+        "PressureAboveThresholdGuard evaluates to True",
+        "Trigger error handling"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "Test PEEP measurement over each breath",
+      "req_ids": [
+        "RW-SW-52"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in Idle state",
+        "End of breath detected"
+      ],
+      "inputs": {
+        "name": "MeasurePEEPRequested",
+        "value": true
+      },
+      "steps": [
+        "Send MeasurePEEP event",
+        "Transition to Measurement state",
+        "Record PEEP value"
+      ],
+      "expected": [
+        "State changes to Measurement",
+        "PEEPMeasured evaluates to True"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Test within 10% target for unspecified parameters",
+      "req_ids": [
+        "RW-SW-55"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller commanded to set pressure"
+      ],
+      "inputs": {
+        "name": "CommandedPressure",
+        "value": 30
+      },
+      "steps": [
+        "Set commanded pressure to 30cm",
+        "Measure actual pressure",
+        "Calculate deviation"
+      ],
+      "expected": [
+        "Actual pressure within 10% of 30cm (27-33cm)"
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "Test TriggerInspiration cycle initiation",
+      "req_ids": [
+        "RW-SW-56"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in Idle state"
+      ],
+      "inputs": {
+        "name": "TriggerInspiration",
+        "value": true
+      },
+      "steps": [
+        "Send TriggerInspiration event",
+        "Verify transition to Inspiration"
+      ],
+      "expected": [
+        "State changes to Inspiration"
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "Test TriggerExpiration cycle initiation",
+      "req_ids": [
+        "RW-SW-57"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "Controller in Inspiration state"
+      ],
+      "inputs": {
+        "name": "InspirationCycleComplete",
+        "value": true
+      },
+      "steps": [
+        "Indicate InspirationCycleComplete",
+        "Verify transition to Expiration"
+      ],
+      "expected": [
+        "State changes to Expiration"
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Test PIP target within +/- 5cm of 5-55cmH2O range",
+      "req_ids": [
+        "RW-SW-59"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Controller commanded to set PIP"
+      ],
+      "inputs": {
+        "name": "CommandedPIP",
+        "value": 30
+      },
+      "steps": [
+        "Set commanded PIP to 30cmH2O",
+        "Measure actual PIP",
+        "Calculate deviation"
+      ],
+      "expected": [
+        "Actual PIP within 25-35cmH2O (±5cm)"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "Test commanded breath rate within ±1 breath",
+      "req_ids": [
+        "RW-SW-62"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "Controller set to specific breath rate"
+      ],
+      "inputs": {
+        "name": "CommandedBreathRate",
+        "value": 12
+      },
+      "steps": [
+        "Set commanded breath rate to 12 breaths/min",
+        "Measure actual breath rate"
+      ],
+      "expected": [
+        "Actual breath rate between 11 and 13 breaths/min"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "/* Finite State Machine (FSM) representation for the embedded controller requirements */\n\n/* States */\nState Idle;\nState Inspiration;\nState Expiration;\nState Measurement;\n\n/* Events */\nEvent TriggerInspiration;\nEvent TriggerExpiration;\nEvent MeasurePEEP;\nEvent PressureBelowThreshold;\nEvent PressureAboveThreshold;\nEvent BreathRateExceeded;\n\n/* Transitions with guards */\nTransition Idle --> Inspiration\n    Guard: TriggerInspiration\n    Action: InitiateInspirationCycle;\n\nTransition Inspiration --> Expiration\n    Guard: InspirationCycleComplete\n    Action: EndInspirationCycle;\n\nTransition Expiration --> Idle\n    Guard: ExpirationCycleComplete\n    Action: PrepareNextCycle;\n\nTransition Idle --> Measurement\n    Guard: MeasurePEEPRequested\n    Action: StartPEEPMeasurement;\n\nTransition Measurement --> Idle\n    Guard: PEEPMeasured\n    Action: RecordPEEPValue;\n\n/* Additional guards for pressure limits */\nGuard PressureBelowThresholdGuard\n    Condition: MeasuredPressure < -4cm;\nGuard PressureAboveThresholdGuard\n    Condition: MeasuredPressure > 60cm;\n\n/* Lifecycle */\nInitialState: Idle;\n\n/* Requirements mapping */\n[RW-SW-4] => PressureBelowThresholdGuard;\n[RW-SW-7] => PressureAboveThresholdGuard;\n[RW-SW-52] => MeasurePEEP;\n[RW-SW-55] => Within10PercentTargetGuard;\n[RW-SW-56] => TriggerInspiration;\n[RW-SW-57] => TriggerExpiration;\n[RW-SW-59] => PIPTargetGuard;\n[RW-SW-62] => BreathRateTargetGuard;",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Test TriggerInspiration when pressure below -4cm",
+          "req_ids": [
+            "RW-SW-4"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Controller in Idle state",
+            "MeasuredPressure < -4cm"
+          ],
+          "inputs": {
+            "name": "TriggerInspiration",
+            "value": true
+          },
+          "steps": [
+            "Send TriggerInspiration event",
+            "Check state transition to Inspiration"
+          ],
+          "expected": [
+            "State changes to Inspiration",
+            "PressureBelowThresholdGuard evaluates to True"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Test PressureAboveThresholdGuard when pressure > 60cm",
+          "req_ids": [
+            "RW-SW-7"
+          ],
+          "kind": "negative",
+          "preconditions": [
+            "Controller in any state",
+            "MeasuredPressure > 60cm"
+          ],
+          "inputs": {
+            "name": "MeasuredPressure",
+            "value": 61
+          },
+          "steps": [
+            "Update MeasuredPressure to 61cm",
+            "Evaluate PressureAboveThresholdGuard"
+          ],
+          "expected": [
+            "PressureAboveThresholdGuard evaluates to True",
+            "Trigger error handling"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "Test PEEP measurement over each breath",
+          "req_ids": [
+            "RW-SW-52"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in Idle state",
+            "End of breath detected"
+          ],
+          "inputs": {
+            "name": "MeasurePEEPRequested",
+            "value": true
+          },
+          "steps": [
+            "Send MeasurePEEP event",
+            "Transition to Measurement state",
+            "Record PEEP value"
+          ],
+          "expected": [
+            "State changes to Measurement",
+            "PEEPMeasured evaluates to True"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "Test within 10% target for unspecified parameters",
+          "req_ids": [
+            "RW-SW-55"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller commanded to set pressure"
+          ],
+          "inputs": {
+            "name": "CommandedPressure",
+            "value": 30
+          },
+          "steps": [
+            "Set commanded pressure to 30cm",
+            "Measure actual pressure",
+            "Calculate deviation"
+          ],
+          "expected": [
+            "Actual pressure within 10% of 30cm (27-33cm)"
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "Test TriggerInspiration cycle initiation",
+          "req_ids": [
+            "RW-SW-56"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in Idle state"
+          ],
+          "inputs": {
+            "name": "TriggerInspiration",
+            "value": true
+          },
+          "steps": [
+            "Send TriggerInspiration event",
+            "Verify transition to Inspiration"
+          ],
+          "expected": [
+            "State changes to Inspiration"
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "Test TriggerExpiration cycle initiation",
+          "req_ids": [
+            "RW-SW-57"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "Controller in Inspiration state"
+          ],
+          "inputs": {
+            "name": "InspirationCycleComplete",
+            "value": true
+          },
+          "steps": [
+            "Indicate InspirationCycleComplete",
+            "Verify transition to Expiration"
+          ],
+          "expected": [
+            "State changes to Expiration"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "Test PIP target within +/- 5cm of 5-55cmH2O range",
+          "req_ids": [
+            "RW-SW-59"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller commanded to set PIP"
+          ],
+          "inputs": {
+            "name": "CommandedPIP",
+            "value": 30
+          },
+          "steps": [
+            "Set commanded PIP to 30cmH2O",
+            "Measure actual PIP",
+            "Calculate deviation"
+          ],
+          "expected": [
+            "Actual PIP within 25-35cmH2O (±5cm)"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "Test commanded breath rate within ±1 breath",
+          "req_ids": [
+            "RW-SW-62"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "Controller set to specific breath rate"
+          ],
+          "inputs": {
+            "name": "CommandedBreathRate",
+            "value": 12
+          },
+          "steps": [
+            "Set commanded breath rate to 12 breaths/min",
+            "Measure actual breath rate"
+          ],
+          "expected": [
+            "Actual breath rate between 11 and 13 breaths/min"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Finite State Machines / Statecharts",
+        "group": 2,
+        "schema_score": 1.0,
+        "representation_score": 0.8,
+        "sfv_score": 0.9,
+        "threshold": 0.7,
+        "sfv_pass": true,
+        "issues": [
+          "missing: initial state"
+        ]
+      },
+      "fsa": {
+        "system_type": "standard",
+        "weights": {
+          "wc": 0.3,
+          "wn": 0.2,
+          "wo": 0.15,
+          "wb": 0.2,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 1.0,
+        "oracle_assertiveness": 0.9,
+        "boundary_coverage": 0.0,
+        "groundedness_mg": 0.1765,
+        "hallucinated": [
+          {
+            "value": "MeasurePEEPRequested",
+            "context": "event to trigger PEEP measurement",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "commanded pressure value",
+            "grounded": false
+          },
+          {
+            "value": "30",
+            "context": "commanded PIP value",
+            "grounded": false
+          },
+          {
+            "value": "12",
+            "context": "commanded breath rate value",
+            "grounded": false
+          },
+          {
+            "value": "Idle",
+            "context": "controller state",
+            "grounded": false
+          },
+          {
+            "value": "Inspiration",
+            "context": "controller state",
+            "grounded": false
+          },
+          {
+            "value": "Expiration",
+            "context": "controller state",
+            "grounded": false
+          },
+          {
+            "value": "Measurement",
+            "context": "controller state",
+            "grounded": false
+          },
+          {
+            "value": "PressureBelowThresholdGuard",
+            "context": "guard name",
+            "grounded": false
+          },
+          {
+            "value": "PressureAboveThresholdGuard",
+            "context": "guard name",
+            "grounded": false
+          },
+          {
+            "value": "PEEPMeasured",
+            "context": "measurement flag",
+            "grounded": false
+          },
+          {
+            "value": "27-33cm",
+            "context": "pressure tolerance range",
+            "grounded": false
+          },
+          {
+            "value": "25-35cmH2O",
+            "context": "PIP tolerance range",
+            "grounded": false
+          },
+          {
+            "value": "11-13 breaths/min",
+            "context": "breath rate tolerance range",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 17,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add boundary tests at exact threshold values (-4cm, 60cm, 10% limits, PIP +/-5, breath rate +-1).",
+          "Include tests for guard conditions false (e.g., pressure > -4cm, <60cm).",
+          "Add timing tests to verify controller response speed for RW-SW-4.",
+          "Test error handling when pressure >60 is commanded, not just guard evaluation.",
+          "Verify state transitions for expiration cycle completion guard and ensure proper sequencing."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.6615,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}

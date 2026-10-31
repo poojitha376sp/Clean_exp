@@ -1,0 +1,614 @@
+{
+  "unit_id": "U06_Alarms",
+  "representation": "Gherkin (BDD DSL)",
+  "generator": "ollama:gemma3:27b",
+  "system_type": "interaction_heavy",
+  "n_attempts": 1,
+  "repairs_used": 0,
+  "final_attempt": 0,
+  "gate2_pass": true,
+  "gate3_pass": true,
+  "sfv": {
+    "representation": "Gherkin (BDD DSL)",
+    "group": 1,
+    "schema_score": 1.0,
+    "representation_score": 1.0,
+    "sfv_score": 1.0,
+    "threshold": 0.6,
+    "sfv_pass": true,
+    "issues": []
+  },
+  "fsa": {
+    "system_type": "interaction_heavy",
+    "weights": {
+      "wc": 0.4,
+      "wn": 0.15,
+      "wo": 0.15,
+      "wb": 0.15,
+      "wg": 0.15
+    },
+    "clause_coverage": 1.0,
+    "negative_coverage": 0.0,
+    "oracle_assertiveness": 0.875,
+    "boundary_coverage": 1.0,
+    "groundedness_mg": 0.4,
+    "hallucinated": [
+      {
+        "value": "ALM-001",
+        "context": "alarm code",
+        "grounded": false
+      },
+      {
+        "value": "ALM-002",
+        "context": "alarm code",
+        "grounded": false
+      },
+      {
+        "value": "ALM-003",
+        "context": "alarm code",
+        "grounded": false
+      },
+      {
+        "value": "ALM-999",
+        "context": "alarm code",
+        "grounded": false
+      },
+      {
+        "value": "ALM-123",
+        "context": "alarm code",
+        "grounded": false
+      },
+      {
+        "value": "High",
+        "context": "priority",
+        "grounded": false
+      },
+      {
+        "value": "Medium",
+        "context": "priority",
+        "grounded": false
+      },
+      {
+        "value": "Low",
+        "context": "priority",
+        "grounded": false
+      },
+      {
+        "value": "system is running",
+        "context": "system state",
+        "grounded": false
+      }
+    ],
+    "n_concrete_elements": 15,
+    "uncovered_clauses": [],
+    "weaknesses": [
+      "Add negative test cases for invalid alarm codes and priorities.",
+      "Include tests for boundary values of flashing frequency and duty cycle.",
+      "Ground alarm codes and priorities in the SRS or use defined values.",
+      "Specify concrete font size or measurement for legibility test.",
+      "Test error handling for buzzer activation failures."
+    ],
+    "traceability": 1.0,
+    "untraced_reqs": [],
+    "fsa_score": 0.7412,
+    "fsa_threshold": 0.5,
+    "fsa_pass": true
+  },
+  "artifact": "Feature: Alarm System Testing\n\n  Scenario: Detect and receive alarms from GUI [RW-SW-66]\n    Given the system is running\n    When an alarm is triggered from the GUI with code \"ALM-001\" and priority \"High\"\n    Then the controller receives the alarm with code \"ALM-001\" and priority \"High\"\n\n  Scenario: Command the hardware PCB buzzer [RW-SW-67]\n    Given the system is running\n    When the controller receives a command to activate the buzzer\n    Then the PCB buzzer is activated\n\n  Scenario Outline: GUI enumerates alarm codes and assigns priorities [RW-SW-68]\n    Given the system is running\n    When the GUI requests the alarm list\n    Then the GUI displays the alarm code \"<alarm_code>\" with priority \"<priority>\"\n    Examples:\n      | alarm_code | priority |\n      | ALM-001    | High     |\n      | ALM-002    | Medium   |\n      | ALM-003    | Low      |\n      | ALM-999    | High     |\n\n  Scenario: GUI displays highest priority alarm on main screen [RW-SW-69]\n    Given the system is running\n    And alarms \"ALM-001\" (High), \"ALM-002\" (Medium), and \"ALM-003\" (Low) are active\n    When the main screen is displayed\n    Then the main screen displays alarm \"ALM-001\" with priority \"High\"\n\n  Scenario: GUI displays list of active alarms on button press [RW-SW-70]\n    Given the system is running\n    And alarms \"ALM-001\" (High), \"ALM-002\" (Medium), and \"ALM-003\" (Low) are active\n    When the \"Show Alarms\" button is pressed\n    Then the GUI displays a list containing alarms \"ALM-001\", \"ALM-002\", and \"ALM-003\"\n\n  Scenario: GUI displays alarm on main screen legible at distance of 1 meter [RW-SW-71]\n    Given the system is running\n    And an alarm \"ALM-001\" (High) is active\n    When the main screen is displayed\n    Then the alarm \"ALM-001\" is displayed with a font size that is legible at a distance of 1 meter as specified\n\n  Scenario Outline: High severity alarms indicated with red color and 2Hz flashing [RW-SW-73]\n    Given the system is running\n    And an alarm \"<alarm_code>\" with severity \"High\" is active\n    When the main screen is displayed\n    Then the alarm \"<alarm_code>\" is displayed in red color\n    And the alarm \"<alarm_code>\" flashes at a frequency of 2Hz with a 50% duty cycle\n    Examples:\n      | alarm_code |\n      | ALM-001    |\n      | ALM-999    |\n\n  Scenario Outline: Low severity alarms indicated with yellow color and constantly on [RW-SW-74]\n    Given the system is running\n    And an alarm \"<alarm_code>\" with severity \"Low\" is active\n    When the main screen is displayed\n    Then the alarm \"<alarm_code>\" is displayed in yellow color\n    And the alarm \"<alarm_code>\" is constantly on\n    Examples:\n      | alarm_code |\n      | ALM-003    |\n      | ALM-123    |",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Detect Alarm from GUI",
+      "req_ids": [
+        "RW-SW-66"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {},
+      "steps": [
+        "An alarm is triggered from the GUI with code \"ALM-001\" and priority \"High\""
+      ],
+      "expected": [
+        "Controller receives alarm with code \"ALM-001\" and priority \"High\""
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "Command Buzzer",
+      "req_ids": [
+        "RW-SW-67"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {},
+      "steps": [
+        "Controller receives a command to activate the buzzer"
+      ],
+      "expected": [
+        "PCB buzzer is activated"
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "GUI Enumerates Alarm Codes - Normal",
+      "req_ids": [
+        "RW-SW-68"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {},
+      "steps": [
+        "GUI requests the alarm list"
+      ],
+      "expected": [
+        "GUI displays alarm code \"ALM-001\" with priority \"High\""
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "GUI Enumerates Alarm Codes - Edge",
+      "req_ids": [
+        "RW-SW-68"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is running"
+      ],
+      "inputs": {},
+      "steps": [
+        "GUI requests the alarm list"
+      ],
+      "expected": [
+        "GUI displays alarm code \"ALM-999\" with priority \"High\""
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "GUI Displays Highest Priority Alarm",
+      "req_ids": [
+        "RW-SW-69"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running",
+        "alarms \"ALM-001\" (High), \"ALM-002\" (Medium), and \"ALM-003\" (Low) are active"
+      ],
+      "inputs": {},
+      "steps": [
+        "Main screen is displayed"
+      ],
+      "expected": [
+        "Main screen displays alarm \"ALM-001\" with priority \"High\""
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "GUI Displays Active Alarms",
+      "req_ids": [
+        "RW-SW-70"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running",
+        "alarms \"ALM-001\" (High), \"ALM-002\" (Medium), and \"ALM-003\" (Low) are active"
+      ],
+      "inputs": {},
+      "steps": [
+        "\"Show Alarms\" button is pressed"
+      ],
+      "expected": [
+        "GUI displays a list containing alarms \"ALM-001\", \"ALM-002\", and \"ALM-003\""
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "GUI Alarm Legibility",
+      "req_ids": [
+        "RW-SW-71"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running",
+        "alarm \"ALM-001\" (High) is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "Main screen is displayed"
+      ],
+      "expected": [
+        "Alarm \"ALM-001\" is displayed with a font size that is legible at a distance of 1 meter as specified"
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "High Severity Alarm - Red and Flashing - Normal",
+      "req_ids": [
+        "RW-SW-73"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running",
+        "alarm \"ALM-001\" with severity \"High\" is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "Main screen is displayed"
+      ],
+      "expected": [
+        "Alarm \"ALM-001\" is displayed in red color",
+        "Alarm \"ALM-001\" flashes at a frequency of 2Hz with a 50% duty cycle"
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "High Severity Alarm - Red and Flashing - Edge",
+      "req_ids": [
+        "RW-SW-73"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is running",
+        "alarm \"ALM-999\" with severity \"High\" is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "Main screen is displayed"
+      ],
+      "expected": [
+        "Alarm \"ALM-999\" is displayed in red color",
+        "Alarm \"ALM-999\" flashes at a frequency of 2Hz with a 50% duty cycle"
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "Low Severity Alarm - Yellow and Constant - Normal",
+      "req_ids": [
+        "RW-SW-74"
+      ],
+      "kind": "positive",
+      "preconditions": [
+        "System is running",
+        "alarm \"ALM-003\" with severity \"Low\" is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "Main screen is displayed"
+      ],
+      "expected": [
+        "Alarm \"ALM-003\" is displayed in yellow color",
+        "Alarm \"ALM-003\" is constantly on"
+      ]
+    },
+    {
+      "id": "TC-011",
+      "title": "Low Severity Alarm - Yellow and Constant - Edge",
+      "req_ids": [
+        "RW-SW-74"
+      ],
+      "kind": "boundary",
+      "preconditions": [
+        "System is running",
+        "alarm \"ALM-123\" with severity \"Low\" is active"
+      ],
+      "inputs": {},
+      "steps": [
+        "Main screen is displayed"
+      ],
+      "expected": [
+        "Alarm \"ALM-123\" is displayed in yellow color",
+        "Alarm \"ALM-123\" is constantly on"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 0,
+      "feedback_given": null,
+      "artifact": "Feature: Alarm System Testing\n\n  Scenario: Detect and receive alarms from GUI [RW-SW-66]\n    Given the system is running\n    When an alarm is triggered from the GUI with code \"ALM-001\" and priority \"High\"\n    Then the controller receives the alarm with code \"ALM-001\" and priority \"High\"\n\n  Scenario: Command the hardware PCB buzzer [RW-SW-67]\n    Given the system is running\n    When the controller receives a command to activate the buzzer\n    Then the PCB buzzer is activated\n\n  Scenario Outline: GUI enumerates alarm codes and assigns priorities [RW-SW-68]\n    Given the system is running\n    When the GUI requests the alarm list\n    Then the GUI displays the alarm code \"<alarm_code>\" with priority \"<priority>\"\n    Examples:\n      | alarm_code | priority |\n      | ALM-001    | High     |\n      | ALM-002    | Medium   |\n      | ALM-003    | Low      |\n      | ALM-999    | High     |\n\n  Scenario: GUI displays highest priority alarm on main screen [RW-SW-69]\n    Given the system is running\n    And alarms \"ALM-001\" (High), \"ALM-002\" (Medium), and \"ALM-003\" (Low) are active\n    When the main screen is displayed\n    Then the main screen displays alarm \"ALM-001\" with priority \"High\"\n\n  Scenario: GUI displays list of active alarms on button press [RW-SW-70]\n    Given the system is running\n    And alarms \"ALM-001\" (High), \"ALM-002\" (Medium), and \"ALM-003\" (Low) are active\n    When the \"Show Alarms\" button is pressed\n    Then the GUI displays a list containing alarms \"ALM-001\", \"ALM-002\", and \"ALM-003\"\n\n  Scenario: GUI displays alarm on main screen legible at distance of 1 meter [RW-SW-71]\n    Given the system is running\n    And an alarm \"ALM-001\" (High) is active\n    When the main screen is displayed\n    Then the alarm \"ALM-001\" is displayed with a font size that is legible at a distance of 1 meter as specified\n\n  Scenario Outline: High severity alarms indicated with red color and 2Hz flashing [RW-SW-73]\n    Given the system is running\n    And an alarm \"<alarm_code>\" with severity \"High\" is active\n    When the main screen is displayed\n    Then the alarm \"<alarm_code>\" is displayed in red color\n    And the alarm \"<alarm_code>\" flashes at a frequency of 2Hz with a 50% duty cycle\n    Examples:\n      | alarm_code |\n      | ALM-001    |\n      | ALM-999    |\n\n  Scenario Outline: Low severity alarms indicated with yellow color and constantly on [RW-SW-74]\n    Given the system is running\n    And an alarm \"<alarm_code>\" with severity \"Low\" is active\n    When the main screen is displayed\n    Then the alarm \"<alarm_code>\" is displayed in yellow color\n    And the alarm \"<alarm_code>\" is constantly on\n    Examples:\n      | alarm_code |\n      | ALM-003    |\n      | ALM-123    |",
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "title": "Detect Alarm from GUI",
+          "req_ids": [
+            "RW-SW-66"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {},
+          "steps": [
+            "An alarm is triggered from the GUI with code \"ALM-001\" and priority \"High\""
+          ],
+          "expected": [
+            "Controller receives alarm with code \"ALM-001\" and priority \"High\""
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "Command Buzzer",
+          "req_ids": [
+            "RW-SW-67"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {},
+          "steps": [
+            "Controller receives a command to activate the buzzer"
+          ],
+          "expected": [
+            "PCB buzzer is activated"
+          ]
+        },
+        {
+          "id": "TC-003",
+          "title": "GUI Enumerates Alarm Codes - Normal",
+          "req_ids": [
+            "RW-SW-68"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI requests the alarm list"
+          ],
+          "expected": [
+            "GUI displays alarm code \"ALM-001\" with priority \"High\""
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "GUI Enumerates Alarm Codes - Edge",
+          "req_ids": [
+            "RW-SW-68"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is running"
+          ],
+          "inputs": {},
+          "steps": [
+            "GUI requests the alarm list"
+          ],
+          "expected": [
+            "GUI displays alarm code \"ALM-999\" with priority \"High\""
+          ]
+        },
+        {
+          "id": "TC-005",
+          "title": "GUI Displays Highest Priority Alarm",
+          "req_ids": [
+            "RW-SW-69"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running",
+            "alarms \"ALM-001\" (High), \"ALM-002\" (Medium), and \"ALM-003\" (Low) are active"
+          ],
+          "inputs": {},
+          "steps": [
+            "Main screen is displayed"
+          ],
+          "expected": [
+            "Main screen displays alarm \"ALM-001\" with priority \"High\""
+          ]
+        },
+        {
+          "id": "TC-006",
+          "title": "GUI Displays Active Alarms",
+          "req_ids": [
+            "RW-SW-70"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running",
+            "alarms \"ALM-001\" (High), \"ALM-002\" (Medium), and \"ALM-003\" (Low) are active"
+          ],
+          "inputs": {},
+          "steps": [
+            "\"Show Alarms\" button is pressed"
+          ],
+          "expected": [
+            "GUI displays a list containing alarms \"ALM-001\", \"ALM-002\", and \"ALM-003\""
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "GUI Alarm Legibility",
+          "req_ids": [
+            "RW-SW-71"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running",
+            "alarm \"ALM-001\" (High) is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "Main screen is displayed"
+          ],
+          "expected": [
+            "Alarm \"ALM-001\" is displayed with a font size that is legible at a distance of 1 meter as specified"
+          ]
+        },
+        {
+          "id": "TC-008",
+          "title": "High Severity Alarm - Red and Flashing - Normal",
+          "req_ids": [
+            "RW-SW-73"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running",
+            "alarm \"ALM-001\" with severity \"High\" is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "Main screen is displayed"
+          ],
+          "expected": [
+            "Alarm \"ALM-001\" is displayed in red color",
+            "Alarm \"ALM-001\" flashes at a frequency of 2Hz with a 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-009",
+          "title": "High Severity Alarm - Red and Flashing - Edge",
+          "req_ids": [
+            "RW-SW-73"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is running",
+            "alarm \"ALM-999\" with severity \"High\" is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "Main screen is displayed"
+          ],
+          "expected": [
+            "Alarm \"ALM-999\" is displayed in red color",
+            "Alarm \"ALM-999\" flashes at a frequency of 2Hz with a 50% duty cycle"
+          ]
+        },
+        {
+          "id": "TC-010",
+          "title": "Low Severity Alarm - Yellow and Constant - Normal",
+          "req_ids": [
+            "RW-SW-74"
+          ],
+          "kind": "positive",
+          "preconditions": [
+            "System is running",
+            "alarm \"ALM-003\" with severity \"Low\" is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "Main screen is displayed"
+          ],
+          "expected": [
+            "Alarm \"ALM-003\" is displayed in yellow color",
+            "Alarm \"ALM-003\" is constantly on"
+          ]
+        },
+        {
+          "id": "TC-011",
+          "title": "Low Severity Alarm - Yellow and Constant - Edge",
+          "req_ids": [
+            "RW-SW-74"
+          ],
+          "kind": "boundary",
+          "preconditions": [
+            "System is running",
+            "alarm \"ALM-123\" with severity \"Low\" is active"
+          ],
+          "inputs": {},
+          "steps": [
+            "Main screen is displayed"
+          ],
+          "expected": [
+            "Alarm \"ALM-123\" is displayed in yellow color",
+            "Alarm \"ALM-123\" is constantly on"
+          ]
+        }
+      ],
+      "raw_if_unparsed": null,
+      "sfv": {
+        "representation": "Gherkin (BDD DSL)",
+        "group": 1,
+        "schema_score": 1.0,
+        "representation_score": 1.0,
+        "sfv_score": 1.0,
+        "threshold": 0.6,
+        "sfv_pass": true,
+        "issues": []
+      },
+      "fsa": {
+        "system_type": "interaction_heavy",
+        "weights": {
+          "wc": 0.4,
+          "wn": 0.15,
+          "wo": 0.15,
+          "wb": 0.15,
+          "wg": 0.15
+        },
+        "clause_coverage": 1.0,
+        "negative_coverage": 0.0,
+        "oracle_assertiveness": 0.875,
+        "boundary_coverage": 1.0,
+        "groundedness_mg": 0.4,
+        "hallucinated": [
+          {
+            "value": "ALM-001",
+            "context": "alarm code",
+            "grounded": false
+          },
+          {
+            "value": "ALM-002",
+            "context": "alarm code",
+            "grounded": false
+          },
+          {
+            "value": "ALM-003",
+            "context": "alarm code",
+            "grounded": false
+          },
+          {
+            "value": "ALM-999",
+            "context": "alarm code",
+            "grounded": false
+          },
+          {
+            "value": "ALM-123",
+            "context": "alarm code",
+            "grounded": false
+          },
+          {
+            "value": "High",
+            "context": "priority",
+            "grounded": false
+          },
+          {
+            "value": "Medium",
+            "context": "priority",
+            "grounded": false
+          },
+          {
+            "value": "Low",
+            "context": "priority",
+            "grounded": false
+          },
+          {
+            "value": "system is running",
+            "context": "system state",
+            "grounded": false
+          }
+        ],
+        "n_concrete_elements": 15,
+        "uncovered_clauses": [],
+        "weaknesses": [
+          "Add negative test cases for invalid alarm codes and priorities.",
+          "Include tests for boundary values of flashing frequency and duty cycle.",
+          "Ground alarm codes and priorities in the SRS or use defined values.",
+          "Specify concrete font size or measurement for legibility test.",
+          "Test error handling for buzzer activation failures."
+        ],
+        "traceability": 1.0,
+        "untraced_reqs": [],
+        "fsa_score": 0.7412,
+        "fsa_threshold": 0.5,
+        "fsa_pass": true
+      }
+    }
+  ]
+}
