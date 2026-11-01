@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+# ARCHIVED (kept for provenance, superseded by tools/run_experiment.sh; see tools/README.md).
 # Starts only when every doorstop generator has all its suites (test generation finished),
 # then brings in the code, runs the generated tests (S6) and the code audit (S6A).
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 GENS="qwen2.5-coder_7b llama3.1_8b deepseek-coder-v2_16b gemma3_27b"
 ready() { for g in $GENS; do [ "$(ls runs/doorstop/ollama_$g/S3_S5_suites 2>/dev/null | wc -l)" -ge 4 ] || return 1; done; }
 until ready; do sleep 20; done

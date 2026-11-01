@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# ARCHIVED (kept for provenance, superseded by tools/run_experiment.sh; see tools/README.md).
 # 2026-09-27: run the pending (model, projects) pairs, one model at a time.
 # After each model's generation, its code comparison runs in the background
 # (executor = gpt-oss only) while the next model generates.
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 L=runs/run_all.log
 code_phase() {  # code_phase <model> <projects...>
   local g=$1; shift

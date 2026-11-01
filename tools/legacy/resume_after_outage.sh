@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# ARCHIVED (kept for provenance, superseded by tools/run_experiment.sh; see tools/README.md).
 # Resume after the 2026-09-27 ~20:00 network outage (server unreachable). Waits until the
 # GPU server answers, then: redo broken/missing suites, re-audit partly failed audits,
 # then the models still to run. Finished suites and cached calls are reused.
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 L=runs/run_all.log
 until curl -s -m 5 localhost:11435/api/version > /dev/null; do sleep 30; done
 echo "$(date +%T) SERVER BACK -> resume" >> $L

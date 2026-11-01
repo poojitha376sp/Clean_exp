@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# ARCHIVED (kept for provenance, superseded by tools/run_experiment.sh; see tools/README.md).
 # Model-major driver: for each generator, run all given projects IN PARALLEL for that
 # one model, then move on. Only (generator + judge) sit in GPU memory -> no swapping.
 #   tools/run_by_model.sh doorstop ventilator        (resumable: finished suites are skipped)
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 GENS=$(.venv/bin/python -c "from tcgen.util import CFG; print(' '.join(CFG['models']['generators']))")
 for g in $GENS; do
   echo "$(date +%T) MODEL $g : $*" >> runs/run_all.log

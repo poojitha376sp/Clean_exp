@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+# ARCHIVED (kept for provenance, superseded by tools/run_experiment.sh; see tools/README.md).
 # virtual_clinic in the background, after doorstop + ventilator code work is finished.
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 until grep -q "VENTILATOR S6A audit done" runs/run_all.log && grep -q "DOORSTOP S6A audit done" runs/run_all.log; do sleep 30; done
 for g in ollama:qwen2.5-coder:7b ollama:llama3.1:8b; do
   echo "$(date +%T) MODEL $g : virtual_clinic" >> runs/run_all.log

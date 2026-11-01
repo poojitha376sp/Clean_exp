@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+# ARCHIVED (kept for provenance, superseded by tools/run_experiment.sh; see tools/README.md).
 # Ventilator: code audit (C++ firmware can't be executed here). Starts only after all
 # ventilator generation is done (tests frozen before the code is moved in).
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 until grep -q "ALL-DONE doorstop(4) ventilator(2)" runs/run_all.log; do sleep 20; done
 echo "$(date +%T) VENTILATOR generation complete -> code audit" >> runs/run_all.log
 [ -d ../inputs/ventilator/code ] || mv ../.code_staging/ventilator ../inputs/ventilator/code

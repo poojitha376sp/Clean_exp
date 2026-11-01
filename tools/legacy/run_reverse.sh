@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+# ARCHIVED (kept for provenance, superseded by tools/run_experiment.sh; see tools/README.md).
 # Second worker: same generation, models in reverse order, so it meets run_all.sh in the middle.
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 GENS=$(.venv/bin/python -c "from tcgen.util import CFG; print(' '.join('--gen ' + g for g in reversed(CFG['models']['generators'])))")
 for p in ventilator virtual_clinic; do
   echo "$(date +%T) START-REV $p" >> runs/run_all.log
