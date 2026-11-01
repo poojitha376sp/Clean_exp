@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # One command for the whole experiment: every generator in config.yaml x every project.
 #
-#   tools/run_experiment.sh                          # phases gen then code, all models, all projects
+#   tools/run_experiment.sh                          # generation (S2,S3) then code stage (S6/S6A), all models, all projects
 #   tools/run_experiment.sh --phase gen              # generation only (S2,S3)
-#   tools/run_experiment.sh --phase code             # stage the code, then S6/S6A only
+#   tools/run_experiment.sh --phase code             # S6/S6A only
 #   tools/run_experiment.sh --projects "doorstop ventilator" --models "qwen2.5-coder:7b llama3.1:8b"
 #
 # Needs the tunnel (tools/server/tunnel_keepalive.sh) and the models pulled
@@ -21,8 +21,8 @@ while [ $# -gt 0 ]; do
   esac
 done
 [ -n "$MODELS" ] || MODELS=$(config_generators)
-projects=""; for p in $PROJECTS; do has_project "$p" && projects="$projects $p" || echo "skip $p: ../inputs/$p/srs missing" >&2; done
-[ -n "$projects" ] || { echo "no project inputs found under ../inputs" >&2; exit 1; }
+projects=""; for p in $PROJECTS; do has_project "$p" && projects="$projects $p" || echo "skip $p: inputs/$p/srs missing" >&2; done
+[ -n "$projects" ] || { echo "no project inputs found under inputs/" >&2; exit 1; }
 
 wait_for_server
 log "START phase=$PHASE projects=$projects"
@@ -33,7 +33,6 @@ if [ "$PHASE" = all ] || [ "$PHASE" = gen ]; then
 fi
 
 if [ "$PHASE" = all ] || [ "$PHASE" = code ]; then
-  stage_code $projects
   for tag in $MODELS; do code_phase "$tag" $projects; done
 fi
 log "ALL-DONE"

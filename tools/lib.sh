@@ -30,7 +30,7 @@ wait_for_model() {           # wait_for_model <ollama tag>: block until the tag 
   done
 }
 
-has_project() { [ -d "../inputs/$1/srs" ]; }
+has_project() { [ -d "inputs/$1/srs" ]; }
 
 # Stages S2,S3 (representation choice + generate/validate/judge loop) for one model on several
 # projects. Projects run in parallel; only generator + judge are in GPU memory, so no swapping.
@@ -43,15 +43,6 @@ generate() {                 # generate <ollama tag> <project...>
   done
   wait
   log "GENERATE-DONE ollama:$tag"
-}
-
-# The code is kept out of ../inputs/<p>/code until every suite exists, so tests are frozen
-# before the code is ever visible. Moves it in from ../.code_staging/<p>.
-stage_code() {               # stage_code <project...>
-  local p
-  for p in "$@"; do
-    [ -d "../inputs/$p/code" ] || { [ -d "../.code_staging/$p" ] && mv "../.code_staging/$p" "../inputs/$p/code"; }
-  done
 }
 
 # S6 (run generated tests; executable projects only) and S6A (code audit) for one model.

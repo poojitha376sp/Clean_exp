@@ -18,7 +18,7 @@ API keys go in `../.env` (never in code). Providers and models: `config.yaml`.
 
 ## Inputs
 ```
-../inputs/<project>/
+inputs/<project>/
     srs/            the SRS (PDF / DOCX / MD / TXT; several files are fine)
     code/           the implementation
     project.yaml    optional: language, framework, setup, test_cmd (see tcgen/execute.py)
@@ -69,6 +69,46 @@ The specific weights, in all profiles, are our design choices. A low groundednes
 *Sensitivity:* each FSA weight was varied by +/-0.05 (others rescaled proportionally). Suite-level pass/fail at FSA >= 0.50 changed in 3.6% of decisions (111 of 3,110). Rankings were not fully stable: the paradigm ordering changed in 6 of 10 perturbations, but only through swaps of adjacent paradigms (tau >= 0.867); the best and worst paradigms were never displaced by more than one rank.
 
 Note: the perturbations are applied to each unit's or suite's own inferred system profile (weights that are 0 are skipped), not only to the standard profile.
+
+## Reproducing the paper's numbers
+
+**Without a GPU (minutes).** All results are committed under `runs/`; every aggregate is recomputed from them:
+```bash
+python -m tcgen.analyze                  # runs/<project>/** -> runs/ANALYSIS/*.csv, analysis.json (verified: identical to the committed files)
+python tools/sensitivity.py              # -> runs/ANALYSIS/sensitivity.json (verified: identical)
+python tools/verify_threshold_claim.py   # design-doc vs implemented thresholds
+python paper/fig/build_figures.py        # -> paper/fig/*.pdf
+```
+
+**With the GPU server (days).** Re-generate everything: `tools/run_experiment.sh` (see [tools/README.md](tools/README.md)). Needs the SSH tunnel, the models pulled, and `../.env`.
+
+Where each paper result comes from:
+
+| paper | source file |
+|---|---|
+| Table `tab:doorstop` (gate outcomes by model, doorstop) | `runs/ANALYSIS/by_model_project.csv` (rows with `project = doorstop`) |
+| Figure `fig:fsa-model` (mean FSA per model) | `runs/ANALYSIS/suites.csv` via `paper/fig/build_figures.py` (aggregate: `by_model.csv`) |
+| Table `tab:byrepr` (gate outcomes by representation) | `runs/ANALYSIS/by_representation.csv` |
+| Figure `fig:fsa-repr` (FSA by paradigm) | `runs/ANALYSIS/suites.csv` via `paper/fig/build_figures.py` (aggregate: `by_rep_group.csv`) |
+| Gate 1 statistics, RSS choice vs LLM choice | `gate1_units.csv`, `gate1_by_model.csv`, `gate1_by_project.csv`, `rep_choice_by_project.csv` |
+| Closed-loop repair, hallucinated values, execution agreement, correlations | `runs/ANALYSIS/analysis.json`, summarised in `runs/ANALYSIS/REPORT.md` |
+| Weight sensitivity (Gates 1 and 3) | `runs/ANALYSIS/sensitivity.json` |
+| Execution and audit against the real code | `runs/<project>/<model>/S6_*.json`, `runs/<project>/S7_report.md` |
+| Per-suite raw data | `runs/ANALYSIS/suites.csv` (one row per project x model x unit; 496 suites, 311 judged) |
+
+## Known deviations from the planned experiment
+
+Read these before comparing a re-run with the paper.
+
+- **12 open-weight generators were planned; 10 completed.** Phi-4-14B failed Gate 1 on every attempted unit (server errors mid-generation; `runs/*/ollama_hf.co_bartowski_phi-4-GGUF_Q4_K_M/` and `ollama_phi4_14b/` hold no suites). Llama-3.3-70B was never executed (no `runs/` directory). Both are still listed in `config.yaml` so a full re-run will attempt them. Phi-4 uses bartowski's GGUF because Ollama's own `phi4:14b` crashes on this llama.cpp build.
+- **Gemma-3-27B and DeepSeek-Coder-V2-Lite are partial** (7 and 6 suites against 58 to 61 for the other eight), because they were too slow. Their aggregates are low-confidence.
+- **The two closed-source controls (GPT-4o, Claude 3.5 Sonnet) were not run** (no paid API access); the paper's 14-model funnel ends in 12 open-weight models plus these two.
+- **Model comparisons use doorstop only** (every model saw the same 4 units there, n = 4 suites per model: descriptive, not a ranking).
+- **Runs were resumed after interruptions** (a network outage on 2026-09-27, and earlier crashes); finished suites and cached LLM calls were reused. The scripts that did this are archived in `tools/legacy/`; `tools/run_experiment.sh` is the cleaned-up equivalent and has not been used for the reported results.
+- **Qwen3-30B-A3B runs with `think: false`**: with thinking on, hidden reasoning used the whole output budget and produced 54 empty answers.
+- **Executor reasoning is set to `low`** (judge unchanged) because long reasoning filled the context and returned empty answers.
+- **Thresholds are the implemented ones** (RSS 0.60, SFV by paradigm 0.60 to 1.00, FSA 0.50), looser than the design document (SFV 0.80, FSA 0.75); absolute pass rates would drop under the stricter values.
+- **Exact byte-for-byte regeneration is not guaranteed** on other hardware: temperature is 0 and the seed is 42, but GPU and Ollama builds can still change outputs. Cached LLM calls (`.cache/llm`, git-ignored) make a re-run identical.
 
 ## Layout
 | path | role |
