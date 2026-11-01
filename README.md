@@ -48,6 +48,10 @@ each benchmark run actually used, so results can be independently re-verified
 ```
 Everything lands in `runs/<project>/` (results are committed; only the S6 scratch workspaces are git-excluded). The final table is `runs/<project>/S7_report.md`.
 LLM calls are cached by prompt hash in `.cache/llm`, so re-runs are free and identical.
+This cache (3,570 raw `{prompt spec, response text}` pairs) is committed, so a rerun
+replays the exact responses actually returned during the benchmark without calling
+any model — the one part of the pipeline that is genuinely bit-for-bit reproducible,
+independent of model/runtime drift (see Threats to Validity for what still isn't).
 
 To run the whole experiment (all models x all projects) on the GPU server, see **[tools/README.md](tools/README.md)** (`tools/run_experiment.sh`). Gate weights, thresholds and their sensitivity analysis: [docs/PIPELINE.md](docs/PIPELINE.md#gate-weights-thresholds-and-sensitivity).
 
