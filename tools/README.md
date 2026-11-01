@@ -1,13 +1,13 @@
 # tools/ — running and analysing the experiment
 
-All commands are run from the repo root. Paths like `../inputs` and `../.env` are relative to it.
+All commands are run from the repo root. The project inputs are in `inputs/`; API keys and GPU credentials come from `../.env` (one level above the repo).
 
 ## Layout
 
 | path | what it is |
 |---|---|
 | `run_experiment.sh` | **The driver.** Every generator in `config.yaml` x every project: generation (S2,S3), then code stage (S6/S6A). |
-| `lib.sh` | Helpers sourced by the driver (`log`, `generate`, `code_phase`, `stage_code`, waiting for server/model). |
+| `lib.sh` | Helpers sourced by the driver (`log`, `generate`, `code_phase`, waiting for server/model). |
 | `server/` | Everything for the GPU server (rubyserc): tunnel, SSH helper, Ollama install, model pulls. |
 | `sensitivity.py` | Weight-sensitivity check of Gate 1 (RSS) and Gate 3 (FSA). Cited in the paper. |
 | `verify_threshold_claim.py` | Checks the paper's claim that design-document thresholds fail >70% of suites at Gate 2. |
@@ -19,13 +19,13 @@ All commands are run from the repo root. Paths like `../inputs` and `../.env` ar
 tools/server/tunnel_keepalive.sh &          # localhost:11435 -> server Ollama; reconnects on drops
 tools/run_experiment.sh                     # everything; resumable
 tools/run_experiment.sh --phase gen         # generation only
-tools/run_experiment.sh --phase code        # stage code, then S6/S6A only
+tools/run_experiment.sh --phase code        # S6/S6A only
 tools/run_experiment.sh --projects "doorstop" --models "qwen2.5-coder:7b llama3.1:8b"
 ```
 
 - **Resumable.** Finished suites are skipped and LLM calls come from `.cache/llm`. After an outage, just run it again; it waits for the server and for each model to be pulled.
 - **Model-major order.** One model at a time, its projects in parallel, so only generator + judge sit in GPU memory (no swapping). The model list and order come from `models.generators` in `config.yaml`.
-- **Tests are frozen before the code is visible.** The code is kept in `../.code_staging/<project>` and moved to `../inputs/<project>/code` only after *all* generation is done (`stage_code`). Only `doorstop` runs generated tests (S6); ventilator (C++ firmware) and virtual_clinic get the code audit (S6A) only.
+- **Tests are generated without seeing the code.** Stages S2-S3 read only the SRS; the code in `inputs/<project>/code/` is read only by S6 (execution) and S6A (audit). Only `doorstop` runs generated tests (S6); ventilator (C++ firmware) and virtual_clinic get the code audit (S6A) only.
 - Logs: `runs/run_all.log` (one line per step), `runs/<project>.run.log` and `runs/<project>.S6.log` (full output).
 
 ## server/
@@ -63,4 +63,4 @@ The experiment was driven by hand-written scripts that grew as the plan changed.
 | `run_pending.sh`, `run_all_pairs.sh` | 2026-09-27: "all 12 models x all projects", with the code phase in the background. |
 | `resume_after_outage.sh` | Same as `run_all_pairs.sh` after the 2026-09-27 network outage, plus re-audits of failed batches. |
 
-They `cd` to the repo root via `../..`, so they still run from `tools/legacy/`.
+They `cd` to the repo root via `../..`, so they still run from `tools/legacy/`. They predate the move of the inputs into the repo and still refer to `../inputs` and `../.code_staging`; use `run_experiment.sh` instead.
