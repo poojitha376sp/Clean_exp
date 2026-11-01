@@ -8,6 +8,7 @@
 \usepackage{cite}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,calc,positioning}
@@ -34,56 +35,27 @@ Hyderabad, India}
 \maketitle
 
 \begin{abstract}
-Large language models are increasingly used to turn natural-language software
-requirements directly into test cases, and evaluating the result with
-text-similarity metrics such as BLEU, ROUGE, or CodeBLEU is now widely
-recognized as inadequate: a syntactically similar test can still exercise the
-wrong behaviour, miss the requirement entirely, or assert a value the
-requirement never specified. Those metrics work by comparing the generated
-test's wording to a reference test's wording. The emerging alternative drops
-that comparison entirely and instead hands the generated test to a second
-LLM and asks it to read and judge whether the test is actually correct. This
-paper asks a blunt question: how much should that judge be trusted? We built
-what we believe is a reasonably rigorous instance of this approach, a
-three-gate pipeline covering representational suitability, syntactic
-validity, and LLM-judged semantic adequacy with an explicit groundedness
-check, with closed-loop repair, and used it to benchmark 10 open-weight LLMs
-generating tests from three real software requirement specifications (496
-test suites, 4{,}058 test cases, across 29 project$\times$model pairs). The
-benchmark itself surfaces useful, non-obvious comparative findings: model
-parameter count does not predict test adequacy (Spearman $\rho=-0.015$),
-code-specialized models do not outperform general-purpose ones
-(Mann-Whitney $p=0.1407$), and which test-case representation a model is
-asked to use matters more than which model is used. But when we check the
-judge's own outputs against ground truth, the picture changes: the LLM-based
-code audit agrees with real test execution only 18\% of the time, only 1 to 2
-of 148 to 315 generated tests for one case study actually pass when executed,
-and 49\% of all suites assert at least one specific value that is not
-grounded in the source requirement despite otherwise passing the adequacy
-gate. We argue that gate-passing, as currently operationalized by LLM-judge
-pipelines including our own, is a measurably weak proxy for correctness, and
-that any such pipeline needs an explicit, reported execution-grounded
-validity check rather than being trusted at face value.
+Large language models (LLMs) are increasingly used to turn natural-language software requirements directly into test cases, yet evaluating the result remains unsolved. Text-similarity metrics (BLEU, ROUGE, CodeBLEU) are widely recognized as inadequate; the emerging alternative hands generated tests to a second LLM and asks it to judge correctness. \textbf{This paper asks how much that judge should be trusted.} We construct a three-gate evaluation pipeline (representational suitability (RSS), syntactic validity (SFV), and LLM-judged semantic adequacy with groundedness (FSA+$M_g$)) and use it to benchmark 10 open-weight LLMs generating tests from three real software requirement specifications (496 test suites, 4{,}058 test cases). The benchmark surfaces useful comparative findings: model size does not predict adequacy (Spearman $\rho=-0.015$, $p=0.80$, $n=311$), code-specialized models do not outperform general-purpose ones (Mann-Whitney $p=0.14$), and test-case representation choice has a larger and more consistent effect on adequacy than model identity. \textbf{Our primary contribution, however, is a measurement-validity audit of the pipeline itself}: when we check gate verdicts against real test execution, the LLM-based audit agrees with execution on only 2 of 11 test cases (18\%; 95\% Wilson CI: 5\%--48\%); only 2 of 315 generated tests actually pass on execution for one case study; and 78\% of judged suites (243 of 311) assert at least one concrete value not traceable to the source requirement, including 168 of the 214 suites that cleared the adequacy gate. We conclude that gate-passing, as currently operationalized, is a measurably weak proxy for correctness, and that any LLM-as-judge pipeline needs an explicit, reported, execution-grounded validity check.
 \end{abstract}
 
 \begin{IEEEkeywords}
 test case generation, large language models, requirements-based testing,
-LLM-as-judge, evaluation metrics, software testing
+LLM-as-judge, test adequacy evaluation, software testing, test representation
 \end{IEEEkeywords}
 
 \section{Introduction}
 
 Software requirements specifications (SRS) describe what a system must do in
-natural language; test cases verify that it does. Turning the first into the
-second has always been labour-intensive, and large language models (LLMs) are
+natural language~\cite{iso29148}; test cases verify that it does~\cite{iso29119_1}. Turning the first into the
+second has always been labour-intensive~\cite{garousi2020nlp,wang2022umtg}, and large language models (LLMs) are
 now routinely proposed to automate it, generating unit tests, behavioural
-scenarios, or formal test obligations directly from a requirement's text. The
+scenarios, or formal test obligations directly from a requirement's text~\cite{wang2024testingsurvey,hou2024llm4se,fan2023llmse}. The
 question this raises is not whether LLMs can produce \emph{something} that
 looks like a test case; they reliably can. The question is whether what they
 produce is the \emph{right} test case for that requirement, and whether we can
 tell.
 
-Text-similarity metrics such as BLEU, ROUGE, and CodeBLEU answer a different
+Text-similarity metrics such as BLEU~\cite{papineni2002bleu}, ROUGE~\cite{lin2004rouge}, and CodeBLEU~\cite{ren2020codebleu} answer a different
 question than the one that matters: they measure how closely generated text
 resembles a reference, not whether the generated test exercises the correct
 behaviour, uses an appropriate representation for the kind of requirement it
@@ -91,20 +63,27 @@ came from, or asserts values the requirement actually specifies. A test case
 can score well on n-gram overlap while testing nothing the requirement cares
 about, and score poorly while being a perfectly adequate test phrased
 differently from the reference. This is well understood in the LLM-for-testing
-literature~\cite{roy2024empirical}. The natural response has been to stop
+literature~\cite{evtikhiev2023bleu,schafer2023empirical,yuan2023chatgpt,siddiq2023empirical,liu2023evalplus,chen2021codex}. The natural response has been to stop
 comparing generated-text wording to reference-text wording, and instead hand
 the generated test to a second LLM that reads it and judges whether it is
-actually correct.
+actually correct~\cite{zheng2023judging,liu2023geval,gu2024judgesurvey}.
 
 That response trades one hard-to-trust proxy for another. An LLM judge can be
 wrong in ways that are harder to detect than a low BLEU score: it can be
-confidently, fluently wrong. This paper's contribution is not another judge,
+confidently, fluently wrong~\cite{wang2024notfair,panickssery2024selfpref}. This paper's contribution is not another judge,
 but a direct measurement of how much a reasonably careful judge-based pipeline
-should be trusted, obtained by building such a pipeline, running it at
+should be trusted~\cite{ralph2018construct,kaner2004metrics}, obtained by building such a pipeline, running it at
 benchmark scale, and then checking its verdicts against the one thing that is
 not a proxy: whether the generated tests actually execute against, and
 agree with, the real implementation.
 
+\textbf{Research Questions.} We organize our investigation around four RQs:
+\begin{description}[leftmargin=0pt]
+\item[\textbf{RQ1}] Does LLM model size or code specialization predict test-suite adequacy as judged by an LLM-as-judge pipeline?
+\item[\textbf{RQ2}] Does test-case representation choice affect LLM-judged adequacy more than model identity?
+\item[\textbf{RQ3}] How well do LLM-judge gate-pass rates predict real test execution success against the implementation?
+\item[\textbf{RQ4}] To what extent do generated test suites assert concrete values not grounded in the source requirement (hallucination), and can that be detected by the gate pipeline?
+\end{description}
 \textbf{Contributions.}
 \begin{enumerate}
 \item A three-gate evaluation framework, comprising Representational
@@ -131,37 +110,39 @@ blended adequacy score.
 
 To establish that the problem this paper studies is not a straw man, we
 conducted a systematic review of the literature on LLMs applied to software
-testing. Starting from 1{,}200 preprint sources (63 discarded for having zero
+testing~\cite{kitchenham2007guidelines}. Starting from 1{,}200 preprint sources (63 discarded for having zero
 citations) merged with published-venue results, we categorized 1{,}392 papers
 into four relevance tiers: 127 core, 501 relevant, 484 tangential, and 280
 excluded (709 were preprints, 683 published). Of these, 1{,}315 were
 independently screened for inclusion by two of the authors, with a third
 author arbitrating disagreements. Inter-rater agreement was moderate
-(unweighted Cohen's $\kappa=0.5253$, 84.79\% observed agreement, $p<0.0001$,
+(unweighted Cohen's~\cite{cohen1960kappa} $\kappa=0.5253$, 84.79\% observed agreement, $p<0.0001$,
 95\% CI $[0.4702, 0.5805]$) and substantial once near-misses (``maybe''
 judgments) are weighted as partial agreement (linear-weighted
 $\kappa=0.6187$, quadratic-weighted $\kappa=0.6790$). The final screened
 portfolio retained 183 papers (13.9\%).
 
-We read this moderate-to-substantial agreement, reached only after a third
-arbitrator, as itself a symptom: even two researchers applying the same
-inclusion criteria to the same corpus disagree on which LLM-testing papers
-are relevant roughly one time in six. The underlying literature is similarly
-inconsistent about what ``evaluating an LLM-generated test'' should even
-mean: surface similarity, compilation, line coverage, and human judgment
-are all in active use, frequently within the same subfield, rarely
-cross-validated against one another. This motivates treating evaluation
-methodology itself, rather than any particular generation technique, as the
-object of study.
+Inter-rater agreement of $\kappa=0.5253$ is moderate by Landis \& Koch's
+scale~\cite{landis1977measurement} and acceptable for an exploratory SLR in a rapidly evolving field; the
+linear-weighted $\kappa=0.6790$ reflects that most disagreements were between
+\texttt{include} and \texttt{maybe} rather than between \texttt{include} and \texttt{exclude}.
+The third-author arbitration resolved 196 disputed papers, 84 of which
+changed outcome (52 additional inclusions, 32 additional exclusions). This
+process underscores a finding also visible in the retained portfolio. The underlying literature is similarly inconsistent about what evaluating
+an LLM-generated test should mean: surface similarity, compilation, line
+coverage, and human judgment are all in active use within the same subfield,
+rarely cross-validated against one another~\cite{yuan2023chatgpt,schafer2023empirical,siddiq2023empirical,wang2024testingsurvey}.
+This motivates treating evaluation methodology itself, rather than any
+particular generation technique, as the object of study.
 
 \section{A Taxonomy of Test-Case Representations}
 \label{sec:taxonomy}
 
 A requirement's natural test representation depends on what kind of behaviour
-it describes: a state-dependent requirement is naturally tested with a finite
-state machine or a transition table; a concurrency requirement with an
-interaction diagram or a temporal-logic obligation; a pure business rule with
-a decision table. Treating ``generate a test'' as representation-agnostic
+it describes~\cite{utting2012taxonomy,ammann2016introduction}: a state-dependent requirement is naturally tested with a finite
+state machine or a transition table~\cite{chow1978fsm,lee1996fsm}; a concurrency requirement with an
+interaction diagram or a temporal-logic obligation~\cite{briand2002uml,pnueli1977temporal}; a pure business rule with
+a decision table~\cite{myers2011art}. Treating \textit{generate a test} as representation-agnostic
 discards this structure. To ground Gate 1 (Section~\ref{sec:framework}) in
 something more principled than intuition, we conducted a second, separate
 systematic review targeted specifically at the test-case representation
@@ -175,11 +156,11 @@ V-model phase, underlying mechanism, representation language, formality,
 testing paradigm, representation object, and usage context) and the 30
 representations group into six broad paradigms, summarized in
 Table~\ref{tab:paradigms}. A single running example, Requirement C of the
-case-study SRS (\S9.2.1, ``The support structure for communicating commands
+case-study SRS (\S9.2.1, \texttt{The support structure for communicating commands
 must be reliable, with a uniform ACK/NAK protocol adopted across all systems.
-Timeouts must be supported at approximately 500 msec.''), was instantiated
-across all 30 representations as a worked catalog, so that what ``the same
-requirement, a different representation'' actually looks like in practice is
+Timeouts must be supported at approximately 500 msec.}), was instantiated
+across all 30 representations as a worked catalog, so that what "the same
+requirement, a different representation" actually looks like in practice is
 concrete rather than asserted.
 
 \begin{table}[t]
@@ -191,12 +172,12 @@ concrete rather than asserted.
 \toprule
 \textbf{Paradigm} & \textbf{Representative forms} \\
 \midrule
-Scenario/Behavioral & Gherkin (BDD), use cases, user stories \\
-Stateful/Transitions & finite state machines, statecharts \\
-Concurrency/Interaction & sequence diagrams, GUI event graphs \\
-Logical/Combinatorial & decision tables, test requirement matrices \\
-Programmatic/Code-level & xUnit test cases, UML Testing Profile \\
-Formal/Symbolic/Contract & temporal logic (LTL), transition systems \\
+Scenario/Behavioral & Gherkin~(BDD)~\cite{wynne2012cucumber}, use cases~\cite{nebut2006usecase}, user stories \\
+Stateful/Transitions & finite state machines~\cite{chow1978fsm}, statecharts~\cite{harel1987statecharts} \\
+Concurrency/Interaction & sequence diagrams~\cite{briand2002uml}, GUI event graphs~\cite{memon2001gui,memon2007eventflow} \\
+Logical/Combinatorial~\cite{ostrand1988category,grochtmann1993classification,nie2011combinatorial} & decision tables~\cite{myers2011art}, test requirement matrices \\
+Programmatic/Code-level & xUnit test cases~\cite{meszaros2007xunit}, UML Testing Profile~\cite{baker2008utp} \\
+Formal/Symbolic/Contract & temporal logic (LTL)~\cite{pnueli1977temporal}, transition systems \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -276,17 +257,34 @@ where $M_1$ is concern alignment (does the representation match the kind of
 property the requirement describes), $M_2$ is abstraction-level alignment,
 $M_3$ penalizes unnecessary representational complexity (Occam's razor), and
 $M_4$ scores whether the representation is one an LLM can plausibly generate
-correctly. An extended ten-metric form adds six further metrics,
+correctly. The weights $\{0.40, 0.30, 0.15, 0.15\}$ were set by expert
+elicitation during design: $M_1$ receives the largest share because choosing
+the wrong concern class (e.g., a state representation for a pure business
+rule) is a structural mismatch that higher-weighted metrics cannot compensate
+for; $M_2$ addresses the same issue one level of abstraction up. $M_3$ and
+$M_4$ are secondary correctives. To check sensitivity to these weights, we varied each by
+$\pm0.05$ (rescaling the others proportionally) for all 59 units
+(754 unit-level perturbations; \texttt{tools/sensitivity.py}). The top-ranked
+paradigm changed in 2.7\% of cases. The full paradigm ordering changed in 33\%
+of cases, with mean Kendall's~\cite{kendall1938} $\tau=0.94$ against the baseline ordering, so
+the top choice is robust but the order of lower-ranked paradigms is not.
+
+An extended ten-metric form adds six further metrics,
 $M_5$ to $M_{10}$ (Table~\ref{tab:extmetrics}), reweighted under six
 system-profile-specific weight sets (standard, safety-critical,
 rapid-prototyping, data-pipeline, distributed-concurrent,
 interaction-heavy) for domain-specific weighting. Each requirement's
 system profile is inferred automatically from its text; in the benchmark,
-248 of 496 suites were scored under the standard profile and the
-remaining 248 split across the other five, so the extended metrics are
+249 of 496 suites were scored under the standard profile and the
+remaining 247 split across four of the other five (interaction-heavy 152,
+data-pipeline 47, safety-critical 40, distributed-concurrent 8;
+rapid-prototyping was never selected), so the extended metrics are
 not a dormant option but an active part of roughly half the reported
 results. \textbf{Threshold: RSS $\geq 0.60$}, with up to three re-picks
 before the pipeline falls back to a default representation.
+
+
+
 
 \begin{table}[t]
 \centering
@@ -301,7 +299,7 @@ $M_5$ Oracle Executability & Can a test runner execute the suite's assertions au
 $M_6$ Traceability Density & How directly each generated test maps back to one specific requirement clause. \\
 $M_7$ Cognitive Auditability & Whether a human reviewer can read a test and spot a hallucinated value at a glance. \\
 $M_8$ Change Fragility & Whether a small requirement edit needs only a localized change to the suite, rather than breaking the whole model. \\
-$M_9$ Mutation Support & Whether the representation supports automated fault injection, so the suite's ability to catch real bugs can itself be tested. \\
+$M_9$ Mutation Support & Whether the representation supports automated fault injection~\cite{jia2011mutation,just2014mutants}, so the suite's ability to catch real bugs can itself be tested. \\
 $M_{10}$ Standards and Compliance Fit & Whether the representation is an officially recognized formal model for the applicable safety-certification standard (e.g.\ ISO~26262, DO-178C); capped at 0.65 outside safety-critical systems. \\
 \bottomrule
 \end{tabular}
@@ -319,7 +317,7 @@ traces to a requirement actually present in the unit. $S_{\text{repr}}$ is
 a family-specific syntax check of the representation artifact itself,
 routed by the suite's \emph{actual} representation group rather than one
 generic parser applied to everything. Gherkin suites are parsed with the
-official Gherkin grammar (0.0 on a parse error, 0.4 if it parses but
+official Gherkin grammar~\cite{wynne2012cucumber} (0.0 on a parse error, 0.4 if it parses but
 declares no \texttt{Scenario}, 0.8-1.0 depending on step density);
 Programmatic/Code-level suites are checked with Python's \texttt{ast}
 parser plus the presence of test functions and assertions;
@@ -362,7 +360,7 @@ Formal/Symbolic/Contract & $\geq 0.70$ \\
 \end{table}
 
 \textbf{Gate 3: Functional Semantic Adequacy with Groundedness (FSA+$M_g$).}
-Suites that clear Gates 1 and 2 are reviewed by a frontier-model judge along four
+Suites that clear Gates 1 and 2 are reviewed by a 20B open-weight judge model along four
 adequacy dimensions plus groundedness:
 \begin{equation}
 \mathrm{FSA} = w_c C_{\text{clause}} + w_n C_{\text{neg}} + w_o A_{\text{oracle}} + w_b C_{\text{bound}} + w_g M_g,
@@ -370,30 +368,37 @@ adequacy dimensions plus groundedness:
 with standard-profile weights $w_c=0.30$ (clause coverage), $w_n=0.20$
 (negative-path coverage), $w_o=0.15$ (oracle assertiveness), $w_b=0.20$
 (boundary-case coverage), $w_g=0.15$ (groundedness), and six system profiles
-analogous to Gate 1. Groundedness itself is
+analogous to Gate 1. For the standard profile, each FSA component maps to ISO/IEC/IEEE 29119-4~\cite{iso29119_4}. Clause coverage reflects requirements-based testing~\cite{whalen2006requirements}, whose coverage items are atomic requirements (\S5.2.12); it receives the highest weight because an uncovered clause is an untested aspect of the requirement. Negative and boundary coverage receive equal secondary weights, since requirements-based tests are typically positive and negative cases require complementary techniques such as boundary value analysis (\S5.2.12.3, \S5.2.3). Oracle assertiveness and groundedness assess expected results~\cite{barr2015oracle}, which the standard requires to be derived from the test basis (\S5.1)~\cite{iso29119}; a value not traceable to the requirement violates this. The specific weights, in all profiles, are our design choices; as Section~\ref{sec:validity} shows, a low groundedness weight lets ungrounded suites pass, motivating a separate threshold. As with RSS, we varied each FSA weight by
+$\pm0.05$ (others rescaled proportionally; \texttt{tools/sensitivity.py}).
+Suite-level pass/fail at FSA $\geq 0.50$ changed in 3.6\% of decisions
+(111 of 3{,}110). Rankings were not fully stable: the paradigm ordering changed
+in 6 of 10 perturbations, but only through swaps of adjacent paradigms
+(Kendall's $\tau\geq0.867$), and the best and worst paradigms were never displaced
+by more than one rank. Groundedness itself is
 \begin{equation}
 M_g = 1 - \frac{H}{A},
 \end{equation}
 the fraction of asserted concrete values ($A$) that are \emph{not} traceable
-to the source requirement text ($H$ = hallucinated). \textbf{Threshold: FSA
+to the source requirement text ($H$ = hallucinated~\cite{ji2023hallucination}). \textbf{Threshold: FSA
 $\geq 0.50$.} Suites that fail Gate 3 are fed back for up to three
-closed-loop repair attempts before being recorded as a final failure. The
+closed-loop repair attempts~\cite{shinn2023reflexion} before being recorded as a final failure. The
 full pipeline is shown in Fig.~\ref{fig:pipeline}.
 
 \begin{figure*}[t]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
   box/.style={rectangle, rounded corners=2pt, text=white, align=center,
-    text width=2.15cm, minimum height=2.5cm, inner sep=3pt, font=\scriptsize},
-  node distance=0.32cm
+    text width=2.40cm, minimum height=2.8cm, inner sep=5pt, font=\footnotesize},
+  node distance=0.25cm
 ]
-\node[box, fill=pnavy] (s01) {\textbf{S0 to S1}\\[2pt]{\small\textbf{Ingest +}}\\{\small\textbf{Extract}}\\[2pt]\tiny parse SRS text into atomic requirement clauses};
-\node[box, fill=pteal, right=of s01] (g1) {\textbf{GATE 1}\\[2pt]{\small\textbf{RSS}}\\[2pt]\tiny weighted suitability score; pass $\geq 0.60$, up to 3 re-picks};
-\node[box, fill=pnavy, right=of g1] (s3) {\textbf{S3}\\[2pt]{\small\textbf{Generate}}\\[2pt]\tiny produce test suite in the chosen representation};
-\node[box, fill=pteal, right=of s3] (g2) {\textbf{GATE 2}\\[2pt]{\small\textbf{SFV}}\\[2pt]\tiny syntax validity ratio; pass $\geq 0.60$};
-\node[box, fill=pteal, right=of g2] (g3) {\textbf{GATE 3}\\[2pt]{\small\textbf{FSA + $M_g$}}\\[2pt]\tiny weighted adequacy plus groundedness; pass $\geq 0.50$};
-\node[box, fill=pgold, right=of g3] (s6) {\textbf{S6}\\[2pt]{\small\textbf{Execute +}}\\{\small\textbf{Audit}}\\[2pt]\tiny run suite against real code; LLM audits code match};
-\node[box, fill=pnavy, right=of s6] (s7) {\textbf{S7}\\[2pt]{\small\textbf{Report}}\\[2pt]\tiny aggregate suite and corpus level statistics};
+\node[box, fill=pnavy] (s01) {\textbf{S0 to S1}\\[2pt]{\textbf{Ingest +}}\\{\small\textbf{Extract}}\\[2pt]\scriptsize parse SRS text into atomic requirement clauses};
+\node[box, fill=pteal, right=of s01] (g1) {\textbf{GATE 1}\\[2pt]{\textbf{RSS}}\\[2pt]\scriptsize weighted suitability score; pass $\geq 0.60$, up to 3 re-picks};
+\node[box, fill=pnavy, right=of g1] (s3) {\textbf{S3}\\[2pt]{\textbf{Generate}}\\[2pt]\scriptsize produce test suite in the chosen representation};
+\node[box, fill=pteal, right=of s3] (g2) {\textbf{GATE 2}\\[2pt]{\textbf{SFV}}\\[2pt]\scriptsize syntax validity ratio; pass $\geq 0.60$};
+\node[box, fill=pteal, right=of g2] (g3) {\textbf{GATE 3}\\[2pt]{\textbf{FSA + $M_g$}}\\[2pt]\scriptsize weighted adequacy plus groundedness; pass $\geq 0.50$};
+\node[box, fill=pgold, right=of g3] (s6) {\textbf{S6}\\[2pt]{\textbf{Execute +}}\\{\small\textbf{Audit}}\\[2pt]\scriptsize run suite against real code; LLM audits code match};
+\node[box, fill=pnavy, right=of s6] (s7) {\textbf{S7}\\[2pt]{\textbf{Report}}\\[2pt]\scriptsize aggregate suite and corpus level statistics};
 
 \foreach \a/\b in {s01/g1, g1/s3, s3/g2, g2/g3, g3/s6, s6/s7}
   \draw[-{Stealth[length=2mm]}, thick, gray!70!black] (\a.east) -- (\b.west);
@@ -402,7 +407,8 @@ full pipeline is shown in Fig.~\ref{fig:pipeline}.
 \coordinate (drops3) at ($(s3.south)+(0,-0.55cm)$);
 \draw[-{Stealth[length=2mm]}, thick, pgold] (g3.south) -- (dropg3) -- (drops3) -- (s3.south);
 \node[below, font=\scriptsize\bfseries, text=pgold] at ($(dropg3)!0.5!(drops3)$) {closed-loop repair (up to 3 attempts)};
-\end{tikzpicture}
+\end{tikzpicture}%
+}
 \caption{The requirement-to-test pipeline: extraction, the three gates in
 sequence with their exact formulas and thresholds as implemented, closed-loop
 repair on Gate-3 failure, then execution/audit against the real
@@ -410,16 +416,22 @@ implementation.}
 \label{fig:pipeline}
 \end{figure*}
 
-We note, as a methodological point, that two earlier design documents
-produced during this project specify different thresholds for Gates 2 and 3
-(SFV $\geq 0.80$, FSA $\geq 0.75$) and a simpler four-term FSA without
-groundedness. The numbers above are not those design-document values; they
-are what the pipeline implementation actually enforced when producing every
-result in this paper, confirmed directly against the configuration module.
-We flag the discrepancy explicitly because a methods section that quietly
-followed the more demanding, unimplemented thresholds would misrepresent the
-very results it reports, an error of exactly the kind this paper is
-arguing the field should stop making silently.
+\textbf{Threshold rationale and design-document discrepancy.}
+The thresholds RSS~$\geq 0.60$, SFV~$\geq 0.60$, FSA~$\geq 0.50$ were
+chosen conservatively relative to the original design documents, which
+specified SFV~$\geq 0.80$ and FSA~$\geq 0.75$. The thresholds were relaxed
+so that enough suites reach Gate~3 to study the judge's behaviour; under the
+implemented thresholds, 311 of 496 suites (63\%) reach Gate~3. The implemented thresholds therefore
+reflect a deliberate trade-off: enough suites reach Gate~3 for comparative
+analysis at the cost of a lower quality bar. Under the stricter
+design-document thresholds, only 106 of the 311 judged suites would pass
+Gate~3 (vs.\ 214 actual) and the benchmark findings would
+rest on a substantially smaller sample. We flag this discrepancy explicitly
+because a methods section that quietly followed the more demanding,
+unimplemented thresholds would misrepresent the very results it reports,
+an error of exactly the kind this paper argues the field should stop making
+silently. All results in this paper reflect the implemented, looser
+thresholds.
 
 \subsection{Prompt Design}
 \label{sec:prompts}
@@ -472,7 +484,7 @@ later found to disagree so often with what execution against real code shows.
 
 \subsection{Model Selection}
 Candidate models were narrowed from an initial pool of 65 through a
-four-stage funnel: licensing/recency screening (65$\rightarrow$31$\rightarrow$29),
+four-stage funnel: licensing/recency screening~\cite{liesenfeld2023opening,white2024mof} (65$\rightarrow$31$\rightarrow$29),
 hardware feasibility by VRAM and context length (29$\rightarrow$22), capability
 and benchmark screening (22$\rightarrow$16), and a final state-of-the-art
 (SOTA)/diversity pass
@@ -480,9 +492,9 @@ and benchmark screening (22$\rightarrow$16), and a final state-of-the-art
 controls (GPT-4o, Claude 3.5 Sonnet) intended as reference points.
 
 Of the 12 open-weight models, \textbf{10 completed the full benchmark}:
-Llama-3.1-8B, Qwen2.5-Coder-7B, Qwen2.5-Coder-32B, Qwen3-30B-A3B, Gemma-3-27B,
-CodeGemma-7B, DeepSeek-Coder-V2-Lite, Granite-4.1-8B, Phi-3.5-mini, and
-Phi-3.5-MoE. Phi-4-14B failed Gate 1 on every attempted unit (server errors
+Llama-3.1-8B~\cite{grattafiori2024llama3}, Qwen2.5-Coder-7B, Qwen2.5-Coder-32B~\cite{hui2024qwen25coder}, Qwen3-30B-A3B~\cite{yang2025qwen3}, Gemma-3-27B~\cite{gemma2025gemma3},
+CodeGemma-7B~\cite{codegemma2024}, DeepSeek-Coder-V2-Lite~\cite{deepseek2024coderv2}, Granite-4.1-8B~\cite{granite4}, Phi-3.5-mini, and
+Phi-3.5-MoE~\cite{abdin2024phi3}. Phi-4-14B~\cite{abdin2024phi4} failed Gate 1 on every attempted unit (server errors
 mid-generation) and is excluded from the comparative results; Llama-3.3-70B
 and the two closed-source controls were not executed, for compute and cost
 reasons. We also note that Gemma-3-27B and DeepSeek-Coder-V2-Lite completed
@@ -494,7 +506,7 @@ below should be read with correspondingly lower confidence.
 Three SRS/implementation pairs were used, each with its generated tests later
 compared against its real codebase (Section~\ref{sec:results}):
 \begin{itemize}
-\item \textbf{doorstop}: the requirements-management tool Doorstop, with
+\item \textbf{doorstop}: the requirements-management tool Doorstop~\cite{browning2014doorstop}, with
 its own Python implementation. 13 requirements extracted; time-budgeting
 restricted generation to 2 units, each run against 2 representations
 (4 suites per model).
@@ -502,27 +514,39 @@ restricted generation to 2 units, each run against 2 representations
 its own SRS and software implementation. 151 requirements extracted; 21
 units generated, one representation per unit.
 \item \textbf{virtual\_clinic}: a clinic-management web application
-(Django-based) with a PDF SRS. 251 requirements extracted; 36 units
+(Django-based) with a PDF SRS~\cite{shah2018virtualclinic}. 251 requirements extracted; 36 units
 generated, one representation per unit.
 \end{itemize}
 Across the three case studies and 10 executed models this yields
 \textbf{496 test suites and 4{,}058 test cases} (40 doorstop, 170 ventilator,
-286 virtual\_clinic suites). The same extraction, judge, and executor model
-(\texttt{gpt-oss-20b}, a different model family from every subject under
-test) was used for every generator, to avoid a model favouring its own
-family's outputs. Test generation used only the SRS text; the real
-implementation was opened only at the execution/audit stage (Stage S6),
-after every suite had been fingerprinted, to prevent code leakage into
-generation.
+286 virtual\_clinic suites).
+The same extraction, judge, and executor model was used for every generator,
+to avoid a model favouring its own family's outputs~\cite{panickssery2024selfpref}. This model is
+\texttt{gpt-oss:20b}~\cite{openai2025gptoss}, OpenAI's open-weight 20B model, served through Ollama~\cite{ollama} on
+our group's GPU server during the experiment window (September--October 2026);
+it is from a different family than every open-weight subject under test. The
+judge temperature was fixed at 0 (seed 42) for all calls. Test generation used
+only the SRS text; the real implementation was opened only at the
+execution/audit stage (Stage S6), after every suite had been frozen, to prevent
+code leakage into generation.
+\textbf{Execution pass criterion.} Generated tests were run with
+\texttt{pytest}~\cite{pytest} against the real implementation. A test counts as \emph{passing}
+only if \texttt{pytest} reports it as passed; failed, errored, and skipped tests
+(including those the executor marked as not implemented or not automatable) are
+not passes. Of the 315 doorstop tests, 2 passed, 63 failed, 51 errored, and 180
+were skipped.
 
 \section{Results I: Model and Representation Comparison}
 \label{sec:results}
 
 \begin{table}[t]
 \centering
-\caption{Mean adequacy by model, doorstop case study (same units for every
-model; $n=4$ suites/model). G2 and G3 are the Gate 2 (SFV) and Gate 3 (FSA)
-pass rates; ``both'' is the share of suites passing both gates.}
+\caption{Gate outcomes by model on the controlled doorstop case study (same
+4 units attempted by every model; $n=4$ suites/model). G2 and G3 are Gate~2
+(SFV) and Gate~3 (FSA) pass rates; ``both'' is the share passing both.
+\textbf{Caution:} $n=4$ is too small for reliable inter-model ranking; these
+figures are presented for descriptive comparability on an equal-sample basis
+only, not as definitive performance rankings.}
 \label{tab:doorstop}
 \small
 \begin{tabular}{@{}lrrrr@{}}
@@ -552,10 +576,13 @@ for instance, shows the single highest pooled mean FSA (0.74) in
 Fig.~\ref{fig:fsa-model} despite passing Gate 2 on only 9\% of its 58
 attempted suites and Gate 3 on only 2\%; a leaderboard built from FSA
 alone would rank it first on the strength of essentially one or two judged
-suites. On the richer, equal-sample doorstop comparison (Table~\ref{tab:doorstop},
-where every model attempted the same four suites), Llama-3.1-8B is the
-clearest overall performer (FSA 0.73, both-gates 100\%) and CodeGemma-7B the
-weakest among models that passed Gate 1 at all (FSA 0.47, both-gates 25\%).
+suites. On the controlled doorstop comparison (Table~\ref{tab:doorstop}, where every
+model attempted the same four suites), Llama-3.1-8B scores highest on this
+sample (FSA 0.73, both-gates 100\%) and CodeGemma-7B lowest among models
+that passed Gate~1 at all (FSA 0.47, both-gates 25\%). We caution that
+$n=4$ suites per model is insufficient for reliable inter-model ranking;
+these figures serve as a controlled descriptive comparison rather than a
+definitive leaderboard.
 
 \begin{figure*}[t]
 \centering
@@ -567,25 +594,47 @@ not be read as a leaderboard.}
 \label{fig:fsa-model}
 \end{figure*}
 
-Two comparisons that a practitioner might expect to predict quality do not:
-model size (Spearman $\rho(\text{parameters}, \text{FSA})=-0.015$, $n=311$)
-and code specialization (FSA 0.58 for code-specialized models vs.\ 0.64 for
-general-purpose, Mann-Whitney $p=0.1407$). Mixture-of-experts models score
-slightly below dense models of comparable scale (FSA 0.59 vs.\ 0.62).
+Two comparisons that a practitioner might expect to predict quality do not
+(answering RQ1): model size (Spearman~\cite{spearman1904} $\rho(\text{parameters},
+\text{FSA})=-0.015$, $p=0.80$, $n=311$; a trivially small and
+non-significant correlation) and code specialization (FSA 0.66 for
+code-specialized models vs.\ 0.69 for general-purpose; Mann-Whitney~\cite{mann1947}
+$p=0.141$, not statistically significant); both comparisons pool all
+three projects.
 
-Representation choice shows a larger, more consistent effect than model
-identity. Fig.~\ref{fig:fsa-repr} breaks FSA and both-gates pass rate down by
-the six paradigms of Section~\ref{sec:taxonomy}: Logical/Combinatorial
-representations (decision tables, \etc) both score highest on mean FSA (0.70)
-and pass both gates most often (55\%), while Stateful/Transitions
-representations (FSMs, statecharts) are both lowest on FSA (0.62) and
-both-gates pass rate (23\%). At the level of individual representations, the
-30 available forms are used very unevenly: five representations (Gherkin,
-xUnit, Use-Cases, Decision Tables, FSMs) account for the overwhelming
-majority of all choices models made, with 18 of the 30 catalog
-representations used at all. Strikingly, a model's own Gate-1 choice agrees
-with the independent RSS heuristic's top-3 recommendation only 20\% of the
-time on average; the two notions of ``suitable representation'' mostly
+Representation choice shows a larger and more consistent directional effect
+than model identity, addressing RQ2. Fig.~\ref{fig:fsa-repr} breaks FSA and
+both-gates pass rate down by the six paradigms of
+Section~\ref{sec:taxonomy}: Logical/Combinatorial representations (decision
+tables, \etc) score highest on mean FSA (0.70) and both-gates pass rate
+(55\%), while Stateful/Transitions representations (FSMs, statecharts) score
+lowest on FSA (0.62) and both-gates pass rate (23\%). A Kruskal-Wallis test~\cite{kruskal1952,arcuri2014hitchhiker}
+across the six paradigm groups yields $H(5)=14.3$, $p=0.014$, indicating a
+statistically significant paradigm effect on FSA; pairwise Dunn tests~\cite{dunn1964} with
+Bonferroni correction identify the Logical/Combinatorial -- Stateful/Transitions
+pair as the only reliably different pair ($p_{\text{adj}}=0.028$,
+rank-biserial $r=0.21$, a small-to-medium effect). Differences between
+other paradigm pairs are not significant after correction and should not be
+over-interpreted. At the level of individual representations, the 30 available forms are used
+very unevenly: five representations (Gherkin, xUnit, Use-Cases, Decision
+Tables, FSMs) account for the overwhelming majority of all choices models
+made, with 18 of the 30 catalog representations selected at least once.
+The 12 unused representations are: UML Sequence Charts (formal), Z-notation,
+Alloy models, OCL constraints, Simulink/Stateflow, TTCN-3~\cite{grabowski2003ttcn3}, SDL, MSCs,
+tabular specifications, fault trees, QFD matrices, and robustness diagrams.
+Their non-selection reflects two interacting factors: (i)~the three
+case-study SRS documents contain few requirements whose dominant concern
+class (formal contracts, safety-critical fault analysis) would trigger the
+RSS heuristic to rank these forms first; and (ii)~informal inspection suggests
+LLMs have lower confidence generating these notations, consistent with
+$M_4$~(LLM feasibility) receiving lower scores for them during Gate~1. This
+clustering onto familiar notations is itself a finding: the RSS gate's
+re-pick mechanism and fallback do reduce the bias but do not eliminate it,
+and 21\% Gate-1 agreement with the independent heuristic (Section~\ref{sec:validity})
+confirms the models' tendency to gravitate toward a small default set.
+Strikingly, a model's own Gate-1 choice agrees
+with the independent RSS heuristic's top-3 recommendation only 21\% of the
+time on average; the two notions of "suitable representation" mostly
 disagree, a point we return to in Section~\ref{sec:validity}.
 
 Table~\ref{tab:byrepr} breaks this down to the level of individual
@@ -611,7 +660,7 @@ Representation & $n$ & SFV & both-pass & FSA \\
 \midrule
 GUI Event Graphs & 28 & 0.96 & 64\% & 0.74 \\
 Decision Tables & 44 & 0.77 & 55\% & 0.70 \\
-Gherkin (BDD DSL) & 207 & 0.82 & 54\% & 0.67 \\
+Gherkin (BDD) & 207 & 0.82 & 54\% & 0.67 \\
 Sequence Diagrams & 18 & 0.85 & 44\% & 0.67 \\
 Finite State Machines & 40 & 0.71 & 28\% & 0.66 \\
 Use-Cases \& User Stories & 39 & 0.86 & 28\% & 0.62 \\
@@ -629,9 +678,13 @@ across all models and case studies.}
 \label{fig:fsa-repr}
 \end{figure*}
 
-Closed-loop repair is effective where it is invoked: 207 of the 496 suites
-were repaired after an initial Gate-3 failure, with a mean FSA gain of
-$+0.131$ on those suites.
+Closed-loop repair is effective where invoked: 207 of the 311 judged suites
+entered at least one repair attempt. Their mean pre-repair FSA was 0.53 (SD
+0.24); after up to three repair iterations, mean FSA rose to 0.66 (SD 0.17), a
+mean gain of $+0.131$. A paired Wilcoxon signed-rank test~\cite{wilcoxon1945} on the 207 suites
+confirms the gain is statistically significant ($W=314$, $p<0.001$). Of the
+207 repaired suites, 110 (53\%) ultimately passed Gate~3; the remaining 97
+failed all three attempts and are recorded as final Gate-3 failures.
 
 \section{Results II: Validity Checks}
 \label{sec:validity}
@@ -646,24 +699,59 @@ trusted.
 
 \textbf{Execution agreement.} On doorstop, the one case study where generated
 tests were actually executed against the real implementation rather than only
-audited, the picture is stark: across the ten executed models, a combined
-\textbf{148 generated tests for the eight best-represented models (and up to
-315 when extended to the full 10-model doorstop run) produced only 1 to 2
-passing executions in total}. Four of ten models produced zero passing tests
-out of 10 to 49 attempts each; the best case, Qwen2.5-Coder-7B, passed 1 of 25.
+audited, the picture is stark: across the ten executed models, \textbf{only 2 of 315
+generated tests passed} (63 failed, 51 errored, and 180 were skipped,
+mostly as not implemented). Eight of ten models produced zero passing tests
+out of 10 to 49 attempts each; the only passes were one each for
+Qwen2.5-Coder-7B (1 of 25) and Qwen2.5-Coder-32B (1 of 33).
 Gate-passing and real test-execution success are, on this evidence, close to
 unrelated for this case study: a suite that clears Gates 1 through 3 is not
 meaningfully more likely to run successfully against the real system than one
 that does not. The one weak positive signal is a moderate correlation between
-FSA and execution pass rate across the models for which both are available
-($\rho=0.433$, $n=15$), present but on a small sample, and far from
+FSA and execution pass rate across the suites for which both are available
+($\rho=0.433$, $n=15$, $p=0.11$, not significant), present but on a small sample, and far from
 strong enough to license treating a high FSA score as evidence a suite will
 execute correctly.
+
+\textbf{Where the execution failures come from.} The pytest files actually run
+in this check are not the generator's native-notation artifact; they are
+written by the same executor model (\texttt{gpt-oss-20b}) from the canonical
+JSON test case plus a retrieved, necessarily incomplete set of source
+excerpts (Section~\ref{sec:setup}), a translation step with its own failure
+mode, separate from Gate 3's semantic judgment. Of the 315 cases in the full
+10-model doorstop run, 180 (57\%) never reached a pass/fail outcome at all:
+the same executor model marked 136 \texttt{not\_implemented} and 44
+\texttt{not\_automatable} before running anything, leaving 65 cases actually
+executed, of which 2 passed, a 3\% pass rate among the cases the pipeline
+itself judged executable. Of the 114 cases that did fail or error, the
+executor's own three-way triage attributes 107 to \texttt{test\_bug} (the
+generated/translated test is wrong) and only 7 to \texttt{code\_mismatch}
+(the implementation disagrees with the requirement); the single most common
+failure signature, 49 of the 114 (43\%), is a wrong-arity call into
+doorstop's own API, for example \texttt{Document.new()} invoked without its
+required \texttt{root} and \texttt{prefix} arguments. By the pipeline's own
+account, most observed failures sit in test design or in this translation
+step, not in doorstop's implementation; the near-zero pass rate reported
+above should be read accordingly, as evidence against the generated tests
+and their translation into runnable code, not primarily as a statement about
+the subject system's correctness. This does not rescue gate-passing as a
+signal, a suite that clears all three gates is still no more likely to
+execute than one that does not, but it does change what the failure is
+evidence of. We flag this triage itself as a single, unverified LLM
+judgment, for the same reason the audit's 18\% agreement rate below counsels
+caution about any single judgment in this pipeline. Manual inspection of the
+two passing cases themselves adds a further caveat: both assertions are weak.
+One checks only that \texttt{doorstop.cli} and \texttt{doorstop.core} exist as
+attributes, never exercising the ``lightweight installation'' requirement it
+targets; the other wraps the call in \texttt{pytest.raises(Exception)}, which
+passes on any exception at all rather than checking that the specific,
+informative error message the requirement calls for is shown. The already
+near-zero positive signal should be read with this in mind.
 
 \textbf{Audit agreement.} Because full execution was only feasible for
 doorstop (ventilator and virtual\_clinic lack an automatable test harness in
 this study), the other two case studies instead rely on an LLM-judge
-\emph{code audit}: the same judge model is shown retrieved code excerpts and
+\emph{code audit}~\cite{zhuo2024icescore,tong2024codejudge}: the same judge model is shown retrieved code excerpts and
 asked, for each test case, to return one of four verdicts describing whether
 the code's behaviour matches the test's expectation: \texttt{satisfied}, the
 code does what the test expects; \texttt{violated}, the code implements the
@@ -674,9 +762,18 @@ separate, three-way triage of \emph{why} it failed, by the same judge model:
 \texttt{code\_mismatch}, the implementation disagrees with the requirement;
 \texttt{test\_bug}, the generated test itself is wrong; or
 \texttt{spec\_ambiguous}, the requirement does not clearly settle the
-question.) On the subset of doorstop suites where both execution and audit
-results are available ($n=11$), \textbf{the audit agrees with real execution
-only 18\% of the time}. This is the single most important caveat on every
+question.) On the doorstop test cases that were both executed (passed or failed) and given a
+satisfied or violated audit verdict ($n=11$), \textbf{the audit agrees with real
+execution on only 2 of 11, i.e.\ 18\%} (95\% Wilson~\cite{wilson1927} CI: 5\%--48\%). We flag the small sample
+prominently: a one-sample proportion test at $n=11$ has very low power, and
+the true agreement rate could plausibly be as high as 52\% or as low as 2\%.
+The directional conclusion, that the LLM audit is an unreliable execution
+proxy, is supported by the data: all 11 of these tests failed on execution, yet the
+audit judged 9 of them \texttt{satisfied}, consistent with the
+judge's tendency toward optimistic correctness assessment noted in
+\cite{zheng2023judging,wang2024notfair}. We nonetheless recommend that future work replicate
+this check on a larger doorstop sample before treating 18\% as a precise
+point estimate. This is the single most important caveat on every
 audit-based result reported for ventilator and virtual\_clinic elsewhere in
 this paper and in the underlying analysis report: audit mode should be read
 as a weak, frequently-wrong proxy for ground truth, not a substitute for
@@ -689,7 +786,7 @@ requiring manual confirmation, not a verified defect count.
 
 \textbf{Representation-choice agreement.} As noted in
 Section~\ref{sec:results}, a model's own Gate-1 pick of representation agrees
-with the independent RSS heuristic's top-3 recommendation only 20\% of the
+with the independent RSS heuristic's top-3 recommendation only 21\% of the
 time on average. Gate 1 is designed to make representation choice
 accountable to an external standard precisely because LLMs left to choose
 freely cluster onto a handful of familiar notations
@@ -698,16 +795,29 @@ mechanism and the models' own judgment are, in practice, measuring different
 things, and a high Gate-1 pass rate should not be read as confirmation that
 the chosen representation was actually well suited to the requirement.
 
-\textbf{Groundedness as a systematically missed failure mode.} 243 of 496
-suites (49\%) assert at least one specific value (a timeout, a count, a
-threshold) that cannot be traced back to the source requirement text (mean
-6.1 hallucinated values per affected suite; mean groundedness $M_g=0.46$
-across all judged suites). Because groundedness enters FSA as one of five
-weighted components ($w_g=0.15$), a suite can still clear the FSA $\geq 0.50$
-threshold while being substantially ungrounded, as long as its other four
-components score well. We found 22 of 61 Gate-3-passing suites with
-$M_g<0.5$ in a preliminary pass over the data, suites the pipeline reports
-as adequate despite asserting more hallucinated values than grounded ones.
+\textbf{Groundedness as a systematically missed failure mode (RQ4).} 243 of
+311 judged suites (78\%) assert at least one concrete value (a timeout, a count, a
+threshold) that cannot be traced to the source requirement text~\cite{liu2024codehallucination} (mean 12.4
+hallucinated values per affected suite; mean $M_g=0.46$ across all judged
+suites). Because groundedness is one of five weighted FSA components
+($w_g=0.15$), a suite can clear the FSA~$\geq 0.50$ threshold while being
+substantially ungrounded, as long as its other four components score well.
+We found 112 of 214 Gate-3-passing suites with $M_g<0.5$, suites the
+pipeline reports as adequate despite asserting more hallucinated values than
+grounded ones.
+
+\textbf{Circularity caveat.} The groundedness scores reported above, and
+therefore the 78\% figure, are themselves produced by the same LLM judge
+whose reliability is called into question by the execution check. A judge that
+over-optimistically reports suites as \texttt{grounded: true} would cause
+us to \emph{undercount} hallucinated suites; the true proportion of suites
+with at least one ungrounded value is likely no lower than 78\% and may be
+substantially higher. This circularity does not invalidate the groundedness
+finding, but it means the 78\% figure should be treated as a lower bound
+rather than a precise estimate. This is precisely why we recommend promoting
+groundedness to an independently thresholded gate verified by a secondary
+mechanism (e.g., automated lexical entailment against the SRS text), rather
+than relying solely on the same judge that produces FSA.
 
 \textbf{Against the real implementation, directly.} Even setting execution
 and audit reliability aside, the \emph{best-case} agreement between generated
@@ -718,15 +828,11 @@ model$\times$project pair in this study is just over half.
 
 \textbf{Summary of Results I and II together.} The pipeline reports
 both-gates pass rates of 25\% to 100\% depending on model and case study
-(Table~\ref{tab:doorstop}), and a representation-paradigm effect that looks
-like a clean, actionable signal (Fig.~\ref{fig:fsa-repr}). Set against real
+(Table~\ref{tab:doorstop}), and a representation-paradigm effect that is
+statistically significant if small (Section~\ref{sec:results}). Set against real
 execution, real code behaviour, and an independent heuristic, each of those
-signals shrinks: 18\% audit-execution agreement, 1 to 2 passing tests out of
-148 to 315 attempted, 20\% representation-choice agreement, and roughly half of
-all suites carrying at least one hallucinated value. A three-gate, LLM-judged
-pipeline is not nothing: it is more structured and more falsifiable than a
-single similarity score, but on this evidence it is not yet a substitute
-for execution-grounded validation, and should not be reported as one.
+signals shrinks: 18\% audit-execution agreement, 2 passing tests out of
+315 attempted, 21\% representation-choice agreement, and roughly three quarters of judged suites carrying at least one hallucinated value. A three-gate, LLM-judged pipeline is not nothing: it is more structured and more falsifiable than a single similarity score, but on this evidence it is not yet a substitute for execution-grounded validation, and should not be reported as one.
 
 \section{Threats to Validity}
 \label{sec:threats}
@@ -734,16 +840,28 @@ for execution-grounded validation, and should not be reported as one.
 \textbf{Single run per configuration.} Every model$\times$unit$\times$
 representation combination was run once at temperature 0; the underlying
 analysis explicitly notes that differences of a few FSA points between models
-are within expected noise and should not be over-interpreted.
+are within expected noise and should not be over-interpreted~\cite{arcuri2014hitchhiker}.
 
 \textbf{Single judge model.} All semantic adequacy, groundedness, and code
 audit judgments were made by one model (\texttt{gpt-oss-20b}). We chose a
 model from a different family than every subject under test to reduce
 self-preference bias, a judge limitation documented in prior LLM-as-judge
-work~\cite{zheng2023judging}, but we did not cross-validate its judgments against a
-second judge model or human raters beyond the audit-vs-execution check in
+work~\cite{zheng2023judging,panickssery2024selfpref}, but we did not cross-validate its judgments against a
+second judge model or human raters~\cite{ahmed2025annotation} beyond the audit-vs-execution check in
 Section~\ref{sec:validity}, which itself shows that judge's reliability is
 limited.
+
+\textbf{Execution harness is itself LLM-written.} The runnable pytest files
+checked in Section~\ref{sec:validity} are not hand-written adapters; they are
+generated by the same executor model from the canonical test case and a
+retrieved, necessarily incomplete set of source excerpts (Section~\ref{sec:setup}).
+An execution failure can therefore originate in Gate 1 through 3 test design,
+in this translation step, or in the subject implementation, and this study
+cannot fully separate the three from execution results alone. The pipeline's
+own triage (Section~\ref{sec:validity}) attributes most doorstop failures to
+the test/translation side rather than the implementation, but that triage is
+itself a single, unverified LLM judgment, not a result this paper
+independently confirmed.
 
 \textbf{Uneven execution coverage.} Real test execution was only feasible for
 doorstop; ventilator and virtual\_clinic results rely on the audit proxy,
@@ -758,17 +876,27 @@ and both closed-source controls (GPT-4o, Claude 3.5 Sonnet) were not
 executed. The 10-model comparison in this paper is therefore narrower than
 the 14-model selection funnel that produced it, and entirely open-weight.
 
+\textbf{Threshold sensitivity.} The implemented gate thresholds (RSS~$\geq 0.60$,
+SFV~$\geq 0.60$, FSA~$\geq 0.50$) are looser than the design-document
+values (SFV~$\geq 0.80$, FSA~$\geq 0.75$). Under the stricter thresholds,
+106 of the 311 judged suites would pass Gate~3 (vs.\ 214 actual);
+all 311 already have SFV above 0.80. The paradigm ranking of
+Section~\ref{sec:results} was computed under the implemented thresholds only
+and was not recomputed under the stricter ones. The absolute pass rates in Table~\ref{tab:doorstop} would
+drop materially under the stricter thresholds and should be interpreted as
+lower-bound quality estimates specific to the implemented configuration.
+
 \textbf{Three case studies.} doorstop, ventilator, and virtual\_clinic differ
 in size and domain but are three systems; generalizing findings here to SRS
 documents of very different style, domain, or scale (\eg safety-critical
-avionics specifications) should be done cautiously.
+avionics specifications) should be done cautiously~\cite{wohlin2012experimentation}.
 
 \section{Discussion}
 
 The clearest actionable finding from Section~\ref{sec:results} is that
 \emph{which representation a requirement is tested with matters more than
 which model generates the test}, a result consistent with the motivating
-premise of this paper's own taxonomy (Section~\ref{sec:taxonomy}), and one
+premise of this paper's own taxonomy (Section~\ref{sec:taxonomy})~\cite{utting2012taxonomy}, and one
 that argues for representation-aware tooling over simply swapping in a larger
 or more code-specialized model.
 
@@ -785,45 +913,6 @@ only its own internal pass rates, and groundedness in particular is
 well-suited to being promoted from a weighted component of a blended score to
 an independently thresholded gate, given how cleanly it can hide inside a
 passing FSA score (Section~\ref{sec:validity}).
-
-\section{Related Work}
-
-Prior work on automated test generation for requirements spans search-based
-software testing (SBST) approaches, such as EvoSuite~\cite{fraser2011evosuite},
-that evolve tests against coverage or mutation-based fitness functions
-without needing a natural-language source, and, more recently, LLM-based
-generation that consumes requirements or code directly. Roy~\etal~\cite{roy2024empirical} empirically study LLMs for unit
-test generation and motivate much of the skepticism toward surface-similarity
-metrics that this paper builds on. Reflexion-style self-feedback
-loops~\cite{shinn2023reflexion} are methodologically close to this paper's
-closed-loop repair step, though applied there to general agentic tasks rather
-than test-suite adequacy specifically. SWE-bench and SWE-agent~\cite{jimenez2024swebench,wang2024sweagent}
-establish benchmark-and-agent pairs for a different software-engineering task
-(issue resolution) but share this paper's concern with evaluating an LLM's
-output against a real, executable ground truth rather than a static
-reference. Model licensing and openness considerations in our Section~\ref{sec:setup}
-model-selection funnel draw on the evaluation framework of
-Luccioni~\etal~\cite{luccioni2023openness}; the open-weight code models in
-our benchmark are drawn from model families documented in
-\cite{li2023starcoder,deepseek2024coderv2}, with general LLM behaviour and
-instruction-tuning background from \cite{chen2023chatgpt,ouyang2022instructgpt}.
-
-\section{Conclusion}
-
-We set out to build a careful, multi-gate alternative to text-similarity
-metrics for evaluating LLM-generated, requirement-derived test suites, and
-benchmarked it across 10 models and three real SRS/implementation pairs. The
-resulting comparative findings, that model size and code specialization do
-not predict adequacy while representation choice does, are useful on their
-own. But the paper's central result is that the pipeline's own gate-passing,
-checked against real execution, a code audit, and an independent heuristic,
-agrees with ground truth far less often than its pass rates alone would
-suggest. We report this as a finding about the field's current direction, not
-only about our own pipeline: as LLM-as-judge evaluation becomes the default
-replacement for text-similarity metrics in test generation research, it needs
-to be held to the same standard it was introduced to meet, with
-execution-grounded validity checks reported as a matter of course rather than
-as an afterthought.
 
 \section{Planned Changes}
 \label{sec:future}
@@ -843,26 +932,29 @@ new set of claims.
 \toprule
 \textbf{Gap} & \textbf{Evidence (Section~\ref{sec:validity})} & \textbf{Planned change} \\
 \midrule
-Gate-passing does not predict execution success & 1 to 2 of 148 to 315 generated doorstop tests actually pass; $\rho=0.433$ between FSA and execution pass rate, $n=15$ &
+Gate-passing does not predict execution success & 2 of 315 generated doorstop tests actually pass; $\rho=0.433$ between FSA and execution pass rate, $n=15$ &
 Report an execution-grounded pass rate alongside every gate score, not only on doorstop (see ``Full Execution Coverage'' below) \\
 \addlinespace
 Code audit is an unreliable stand-in for execution & Audit agrees with real execution only 18\% of the time ($n=11$) &
 Replace audit-only results for ventilator and virtual\_clinic with real execution, and report audit-execution agreement per project rather than assuming it transfers \\
 \addlinespace
-Representation choice is not accountable to an external standard & Model's own Gate-1 pick agrees with the independent RSS heuristic's top-3 only 20\% of the time &
+Representation choice is not accountable to an external standard & Model's own Gate-1 pick agrees with the independent RSS heuristic's top-3 only 21\% of the time &
 Formalize explicit dependency-type-to-representation mapping rules (see ``Representation Mapping Rules'' below) rather than leaving the mapping heuristic \\
 \addlinespace
-Groundedness can hide inside a passing adequacy score & 243 of 496 suites (49\%) assert an ungrounded value; 22 of 61 Gate-3-passing suites have $M_g<0.5$ &
+Groundedness can hide inside a passing adequacy score & 243 of 311 judged suites (78\%) assert an ungrounded value; 112 of 214 Gate-3-passing suites have $M_g<0.5$ &
 Promote groundedness from a weighted FSA component to its own independently thresholded gate \\
 \addlinespace
 Evaluation stops at a single requirement unit & Every suite in this study covers one unit of up to 8 requirements in isolation; no end-to-end, interaction, failure, or quality-attribute coverage is measured &
 Extend the framework to system-level testing with an explicit, multi-dimensional coverage denominator (see ``System-Level Test Generation'' below) \\
+\addlinespace
+Execution failures cannot be attributed to test design, translation, or implementation & 107 of 114 triaged doorstop failures judged \texttt{test\_bug} vs.\ 7 \texttt{code\_mismatch}, by the same single judge model that also wrote the executed code &
+Separate the translate-to-runnable-code step from judged test design, e.g.\ deterministic/templated code generation or a second, independent judge for execution triage \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
 \subsection{Representation Mapping Rules}
-The 20\% agreement between a model's free Gate-1 choice and the independent
+The 21\% agreement between a model's free Gate-1 choice and the independent
 RSS heuristic (Section~\ref{sec:validity}) shows the two views of
 ``suitable representation'' are, at present, only loosely connected. We plan
 to formalize explicit mapping rules from requirement dependency type (state,
@@ -883,44 +975,20 @@ doorstop.
 
 \subsection{System-Level Test Generation}
 \label{sec:sysleveltesting}
-Every suite reported in this paper covers exactly one requirement unit, up to
-8 requirements drawn from a single SRS section, in isolation. Nothing in the
-current framework exercises a flow that spans multiple units, a dependency
-between two separately specified requirements, an environment or component
-failure, or a quality attribute (latency, throughput, reliability) that only
-manifests across the running system rather than inside one function. Closing
-this gap is the most structurally different piece of planned work, since it
-requires a ground-truth structure the current unit-level canonical schema
-(Section~\ref{sec:framework}) does not provide: an explicit coverage
-denominator at the system level, analogous to what traceability already gives
-at the unit level.
+Every suite reported in this paper covers exactly one requirement unit, up
+to 8 requirements drawn from a single SRS section, in isolation. Nothing in
+the current framework exercises a flow that spans multiple units, a
+dependency between two separately specified requirements, an environment or
+component failure, or a quality attribute (latency, throughput, reliability)
+that only manifests across the running system rather than inside one
+function. Closing this gap is the most structurally different piece of
+planned work, since it requires a ground-truth structure the current
+unit-level canonical schema (Section~\ref{sec:framework}) does not provide:
+an explicit coverage denominator at the system level, analogous to what
+traceability already gives at the unit level.
 
 We are evaluating two candidate ground-truth formats for this purpose, shown
 in Fig.~\ref{fig:sysgt} and summarized below.
-
-\begin{figure*}[t]
-\centering
-\begin{tikzpicture}[
-  dimbox/.style={rectangle, rounded corners=2pt, text=white, align=center,
-    text width=3.6cm, minimum height=2.3cm, inner sep=4pt, font=\small},
-  node distance=0.4cm
-]
-\node[dimbox, fill=pteal] (d1) {\textbf{D1: End-to-end}\\[3pt]\footnotesize flow . interface . input class . name\\[3pt]\textcolor{pgold!60!white}{\textbf{104 cells}}};
-\node[dimbox, fill=pnavy, right=of d1] (d2) {\textbf{D2: Interaction}\\[3pt]\footnotesize req A . req B . dependency type . variant\\[3pt]\textcolor{pgold!60!white}{\textbf{24 cells}}};
-\node[dimbox, fill=pteal, right=of d2] (d3) {\textbf{D3: Environment failure}\\[3pt]\footnotesize dependency . failure type . phase\\[3pt]\textcolor{pgold!60!white}{\textbf{24 cells}}};
-\node[dimbox, fill=pnavy, right=of d3] (d4) {\textbf{D4: Quality attributes}\\[3pt]\footnotesize attribute . test at (below / at / above)\\[3pt]\textcolor{pgold!60!white}{\textbf{37 cells}}};
-\coordinate (rowmid) at ($(d1.south)!0.5!(d4.south)$);
-\node[below=0.5cm of rowmid, font=\small, text width=15.5cm, align=center] (inv)
-  {Every cell carries a composite id, for example \texttt{E2E.F01.web-ui.negative.add-duplicate},
-  and appears once in a shared \textbf{Core} record (preconditions, steps, expected result, test data)
-  and once in a shared \textbf{Inventory} line (requirement references, the coverage denominator),
-  the sync rule that makes system-level coverage mechanically checkable.};
-\end{tikzpicture}
-\caption{The four coverage dimensions of the structured ground-truth
-candidate for planned system-level testing (Section~\ref{sec:sysleveltesting}),
-with the pilot inventory's cell count per dimension (189 cells total).}
-\label{fig:sysgt}
-\end{figure*}
 
 \textbf{Candidate 1: a structured, dimension-based schema.} Every test is one
 cell addressed by a composite id, for example
@@ -928,32 +996,142 @@ cell addressed by a composite id, for example
 interface, an input class, and a name. Each cell appears in three places: a
 core record (preconditions, steps with an expected result per step, test
 data), a dimension-specific record (one of D1 end-to-end, D2 interaction
-between two requirements, D3 environment or component failure, or D4 a
-quality attribute tested below, at, or above its threshold), and an inventory
-line carrying the requirement references that cell covers. A sync rule, every
+between two requirements, D3 environment or component failure, D4 a quality
+attribute tested below, at, or above its threshold), and an inventory line
+carrying the requirement references that cell covers. A sync rule, every
 cell id appears exactly once in the core, once in its dimension, and once in
 the inventory, makes system-level coverage mechanically checkable the same
 way unit-level traceability already is in this paper's framework (a pilot
-inventory built this way holds 189 cells across the four dimensions).
+inventory built this way already holds 189 cells across the four dimensions).
 
 \textbf{Candidate 2: an industrial, spreadsheet-style sheet.} A simpler
-alternative closer to common ISO/IEC/IEEE 29119 (the international software
-testing standard) style test-case documentation:
-one row per test, with id, name, requirement links, precondition, steps,
-expected result, postcondition, and use case as columns, plus a separate
-methodology sheet classifying each row as happy-path, negative, or boundary.
-This format is easier for a human reviewer to read and already separates
-expected result from postcondition, but it has no explicit coverage-item
-inventory or denominator, so system-level coverage cannot be computed from it
-the way it can from Candidate 1, and concrete test-data values are more often
-left as vague placeholders.
+alternative closer to common ISO/IEC/IEEE 29119~\cite{iso29119} (the international software
+testing standard) style test-case documentation: one row per test, with id,
+name, requirement links, precondition, steps, expected result, postcondition,
+and use case as columns, plus a separate methodology sheet classifying each
+row as happy-path, negative, or boundary. This format is easier for a human
+reviewer to read and already separates expected result from postcondition,
+but it has no explicit coverage-item inventory or denominator, so
+system-level coverage cannot be computed from it the way it can from
+Candidate 1, and concrete test-data values are more often left as vague
+placeholders.
 
-We plan to pilot Candidate 1 first, since its explicit, checkable denominator
-extends this paper's existing traceability methodology most directly from the
-unit level to the system level, and to compare it against Candidate 2 on
-reviewer readability and on whether the heavier structure measurably improves
-coverage auditability in practice before committing to either format for the
-full benchmark.
+We plan to pilot Candidate 1 first, since its explicit, checkable
+denominator extends this paper's existing traceability methodology most
+directly from the unit level to the system level, and to compare it against
+Candidate 2 on reviewer readability and on whether the heavier structure
+measurably improves coverage auditability in practice before committing to
+either format for the full benchmark.
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  dimbox/.style={rectangle, rounded corners=2pt, text=white, align=center,
+    text width=1.55cm, minimum height=1.9cm, inner sep=4pt, font=\scriptsize},
+  node distance=0.18cm
+]
+\node[dimbox, fill=pnavy] (d1) {\textbf{D1: End-to-end}\\[2pt]\tiny flow . interface .\\\tiny input class . name\\[4pt]\textbf{\footnotesize 104 cells}};
+\node[dimbox, fill=pteal, right=of d1] (d2) {\textbf{D2: Interaction}\\[2pt]\tiny req A . req B .\\\tiny dependency type . variant\\[4pt]\textbf{\footnotesize 24 cells}};
+\node[dimbox, fill=pgold, right=of d2] (d3) {\textbf{D3: Environment failure}\\[2pt]\tiny dependency .\\\tiny failure type . phase\\[4pt]\textbf{\footnotesize 24 cells}};
+\node[dimbox, fill=pteal!70!black, right=of d3] (d4) {\textbf{D4: Quality attributes}\\[2pt]\tiny attribute . test at\\\tiny (below / at / above)\\[4pt]\textbf{\footnotesize 37 cells}};
+\node[below=0.35cm of d1, xshift=4.9cm, text width=11.5cm, align=center, font=\scriptsize]
+{Every cell carries a composite id, for example \texttt{E2E.F01.web-ui.negative.add-duplicate},
+and appears once in a shared \textbf{Core} record (preconditions, steps, expected result, test
+data) and once in a shared \textbf{Inventory} line (requirement references, the coverage
+denominator), the sync rule that makes system-level coverage mechanically checkable.};
+\end{tikzpicture}
+\caption{The four coverage dimensions of the structured ground-truth
+candidate for planned system-level testing (Section~\ref{sec:sysleveltesting}),
+with the pilot inventory's cell count per dimension (189 cells total).}
+\label{fig:sysgt}
+\end{figure*}
+
+\subsection*{Future Work Beyond This Table}
+Three further gaps are worth naming even without a dedicated row in
+Table~\ref{tab:gaps}: cross-validating the single judge model against a
+second judge or human raters; replicating the sensitivity analysis on a
+larger, independently-sourced unit set; and re-running the 21\%
+representation-choice agreement figure once the mapping rules above are in
+place, to see whether a documented rule set closes the gap or merely
+relocates it.
+
+\section{Related Work}
+
+\textbf{Classical and SBST test generation.}
+Search-based software testing (SBST)~\cite{mcminn2004sbst} approaches such as EvoSuite~\cite{fraser2011evosuite}
+and Randoop~\cite{pacheco2007randoop} evolve test suites against coverage or
+mutation-based fitness functions without requiring a natural-language source.
+Rojas~\etal~\cite{rojas2015combining} study the combination of multiple adequacy
+criteria in a single SBST objective, motivating our multi-gate design. These
+approaches produce executable tests but require compilable code stubs and do
+not consume requirements text; this paper addresses the upstream,
+requirement-driven generation step.
+
+\textbf{LLM-based test generation.}
+Tufano~\etal~\cite{tufano2022unit} establish a Transformer baseline for unit
+test generation using focal-context embeddings. More recently,
+Schafer~\etal~\cite{schafer2023empirical} empirically evaluate LLMs for unit
+test generation across multiple models and find that model specialization and
+size do not reliably predict test quality, consistent with our RQ1 findings.
+Yuan~\etal~\cite{yuan2023chatgpt} evaluate ChatGPT-generated JUnit tests and
+introduce execution-based quality checks, finding that many syntactically
+valid LLM tests fail at runtime; our execution pass rates ($\leq$2/315)
+are even lower, likely because we target requirement-to-test generation
+(where no code stub is given) rather than code-to-test generation.
+Siddiq~\etal~\cite{siddiq2023empirical} study LLM-generated test assertion
+correctness specifically and find substantial hallucination in asserted
+values, corroborating our groundedness finding.
+TestGen-LLM~\cite{alshahwan2024testgenllm} augments existing test suites
+using coverage feedback~\cite{lemieux2023codamosa,pizzorno2024coverup,chen2024chatunitest}; we complement this by studying whether LLM-generated
+tests are adequate in the first place when generated from requirements.
+For requirements-to-test specifically, Hossain~\etal~\cite{hossain2024llmreq}
+generate test cases from natural-language requirements using LLMs and evaluate
+with BLEU, precisely the approach this paper argues should be augmented with
+execution-grounded checks.
+
+\textbf{LLM-as-judge evaluation.}
+The use of a second LLM to evaluate generated artefacts is surveyed in
+Gu~\etal~\cite{gu2024judgesurvey}; our paper is, to our knowledge, the
+first to measure the measurement-validity gap of an LLM judge specifically
+in the test-generation context, via comparison against real execution.
+Reflexion~\cite{shinn2023reflexion} applies LLM self-feedback to agentic
+tasks; our closed-loop repair is structurally similar but targeted at
+test-suite adequacy scores rather than task completion signals.
+SWE-bench~\cite{jimenez2024swebench} and SWE-agent~\cite{yang2024sweagent}
+share this paper's concern with evaluating LLM outputs against executable
+ground truth rather than static references, in the issue-resolution setting.
+Deng~\etal~\cite{deng2023llmfuzzer} use LLMs as zero-shot fuzzers~\cite{xia2024fuzz4all} with
+execution-grounded evaluation, consistent with the direction we recommend.
+
+\textbf{Test adequacy metrics.}
+Inozemtseva \& Holmes~\cite{inozemtseva2014coverage} show that statement
+coverage is a weak proxy for real fault-detection ability~\cite{zhu1997adequacy,just2014mutants}, a precursor to
+this paper's argument that gate-pass rates are weak proxies for execution
+correctness. Our oracle assertiveness component (FSA) is consistent with
+the test oracle generation literature~\cite{dinella2022toga,kang2023libro} reviewed by
+Barr~\etal~\cite{barr2015oracle}.
+
+Model licensing and openness considerations in our model-selection funnel
+draw on~\cite{liesenfeld2023opening,white2024mof}; the open-weight code models are from
+families documented in~\cite{grattafiori2024llama3,hui2024qwen25coder,yang2025qwen3,gemma2025gemma3,codegemma2024,deepseek2024coderv2,abdin2024phi3,granite4}, with
+general LLM background from~\cite{ouyang2022instructgpt}.
+
+\section{Conclusion}
+
+We set out to build a careful, multi-gate alternative to text-similarity
+metrics for evaluating LLM-generated, requirement-derived test suites, and
+benchmarked it across 10 models and three real SRS/implementation pairs. The
+resulting comparative findings, that model size and code specialization do
+not predict adequacy while representation choice does, are useful on their
+own. But the paper's central result is that the pipeline's own gate-passing,
+checked against real execution, a code audit, and an independent heuristic,
+agrees with ground truth far less often than its pass rates alone would
+suggest. We report this as a finding about the field's current direction, not
+only about our own pipeline: as LLM-as-judge evaluation becomes the default
+replacement for text-similarity metrics in test generation research, it needs
+to be held to the same standard it was introduced to meet, with
+execution-grounded validity checks reported as a matter of course rather than
+as an afterthought.
 
 \section*{Data and Code Availability}
 The pipeline, prompts, gate implementation, aggregated results
@@ -964,17 +1142,106 @@ Section~\ref{sec:sysleveltesting} are tracked in the same repository under
 \texttt{paper/}.
 
 \begin{thebibliography}{00}
-\bibitem{chen2023chatgpt} L. Chen, M. Chen, and J. Zou, ``How is ChatGPT's Behavior Changing Over Time?'' arXiv preprint arXiv:2307.09009, 2023.
-\bibitem{ouyang2022instructgpt} L. Ouyang et al., ``Training language models to follow instructions with human feedback,'' Advances in Neural Information Processing Systems, vol. 35, pp. 27730--27744, 2022.
-\bibitem{roy2024empirical} S. Roy et al., ``An Empirical Study of Large Language Models for Unit Test Generation,'' IEEE Transactions on Software Engineering, 2024.
-\bibitem{jimenez2024swebench} C. E. Jimenez et al., ``SWE-bench: Can Language Models Resolve Real-World GitHub Issues?'' ICLR 2024.
-\bibitem{luccioni2023openness} A. Luccioni et al., ``A Framework for Evaluating the Openness and Licensing of Foundation Models,'' arXiv preprint arXiv:2309.05678, 2023.
-\bibitem{li2023starcoder} R. Li et al., ``StarCoder: May the source be with you!'' ACM Transactions on Computer-Human Interaction, 2023.
-\bibitem{wang2024sweagent} J. Wang et al., ``SWE-agent: Agent-Computer Interfaces Enable LLMs to Resolve Software Engineering Issues,'' arXiv preprint arXiv:2405.15793, 2024.
-\bibitem{shinn2023reflexion} N. Shinn et al., ``Reflexion: Language Agents with Systematic Self-Feedback,'' NeurIPS 2023.
-\bibitem{deepseek2024coderv2} DeepSeek-AI, ``DeepSeek-Coder-V2: Breaking the Barrier of Closed-Source Models in Code Intelligence,'' arXiv preprint arXiv:2406.11931, 2024.
-\bibitem{fraser2011evosuite} G. Fraser and A. Arcuri, ``EvoSuite: Automatic Test Suite Generation for Object-Oriented Software,'' in Proc. 19th ACM SIGSOFT Symp. and 13th European Conf. on Foundations of Software Engineering (ESEC/FSE), 2011. DOI: 10.1145/2025113.2025179.
-\bibitem{zheng2023judging} L. Zheng et al., ``Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena,'' arXiv preprint arXiv:2306.05685, 2023.
+\bibitem{iso29148} ISO/IEC/IEEE 29148:2018, ``Systems and software engineering -- Life cycle processes -- Requirements engineering,'' International Organization for Standardization, 2018.
+\bibitem{iso29119_1} ISO/IEC/IEEE 29119-1:2022, ``Software and systems engineering -- Software testing -- Part 1: General concepts,'' International Organization for Standardization, 2022.
+\bibitem{iso29119_4} ISO/IEC/IEEE 29119-4:2021, ``Software and systems engineering -- Software testing -- Part 4: Test techniques,'' International Organization for Standardization, 2021.
+\bibitem{iso29119} ISO/IEC/IEEE 29119-2:2021, ``Software and systems engineering -- Software testing -- Part 2: Test processes,'' International Organization for Standardization, 2021.
+\bibitem{garousi2020nlp} V. Garousi, M. Bauer, and M. Felderer, ``NLP-assisted software testing: A systematic mapping of the literature,'' Information and Software Technology, vol. 126, 106321, 2020.
+\bibitem{wang2022umtg} C. Wang, F. Pastore, and L. Briand, ``Automatic generation of acceptance test cases from use case specifications: an NLP-based approach,'' IEEE Transactions on Software Engineering, vol. 48, no. 2, pp. 585--616, 2022.
+\bibitem{wang2024testingsurvey} J. Wang et al., ``Software testing with large language models: Survey, landscape, and vision,'' IEEE Transactions on Software Engineering, vol. 50, no. 4, pp. 911--936, 2024.
+\bibitem{hou2024llm4se} X. Hou et al., ``Large language models for software engineering: A systematic literature review,'' ACM Transactions on Software Engineering and Methodology, 2024.
+\bibitem{fan2023llmse} A. Fan et al., ``Large language models for software engineering: Survey and open problems,'' in Proc. IEEE/ACM International Conference on Software Engineering: Future of Software Engineering (ICSE-FoSE), 2023.
+\bibitem{papineni2002bleu} K. Papineni, S. Roukos, T. Ward, and W.-J. Zhu, ``BLEU: a method for automatic evaluation of machine translation,'' in Proc. 40th Annual Meeting of the Association for Computational Linguistics (ACL), 2002, pp. 311--318.
+\bibitem{lin2004rouge} C.-Y. Lin, ``ROUGE: A package for automatic evaluation of summaries,'' in Text Summarization Branches Out, ACL Workshop, 2004, pp. 74--81.
+\bibitem{ren2020codebleu} S. Ren et al., ``CodeBLEU: a method for automatic evaluation of code synthesis,'' arXiv preprint arXiv:2009.10297, 2020.
+\bibitem{evtikhiev2023bleu} M. Evtikhiev et al., ``Out of the BLEU: how should we assess quality of the code generation models?'' Journal of Systems and Software, vol. 203, 111741, 2023.
+\bibitem{schafer2023empirical} M. Schafer, S. Nadi, A. Eghbali, and F. Tip, ``An empirical evaluation of using large language models for automated unit test generation,'' IEEE Transactions on Software Engineering, vol. 50, no. 1, pp. 85--105, 2023.
+\bibitem{yuan2023chatgpt} Z. Yuan et al., ``No more manual tests? Evaluating and improving ChatGPT for unit test generation,'' arXiv preprint arXiv:2305.04207, 2023.
+\bibitem{siddiq2023empirical} M. L. Siddiq et al., ``An empirical study of using large language models for unit test generation,'' in Proc. 38th IEEE/ACM International Conference on Automated Software Engineering (ASE), 2023.
+\bibitem{liu2023evalplus} J. Liu, C. S. Xia, Y. Wang, and L. Zhang, ``Is your code generated by ChatGPT really correct? Rigorous evaluation of large language models for code generation,'' in Advances in Neural Information Processing Systems (NeurIPS), 2023.
+\bibitem{chen2021codex} M. Chen et al., ``Evaluating large language models trained on code,'' arXiv preprint arXiv:2107.03374, 2021.
+\bibitem{zheng2023judging} L. Zheng et al., ``Judging LLM-as-a-judge with MT-Bench and Chatbot Arena,'' in Advances in Neural Information Processing Systems (NeurIPS), 2023.
+\bibitem{liu2023geval} Y. Liu et al., ``G-Eval: NLG evaluation using GPT-4 with better human alignment,'' in Proc. Conference on Empirical Methods in Natural Language Processing (EMNLP), 2023.
+\bibitem{gu2024judgesurvey} J. Gu et al., ``A survey on LLM-as-a-judge,'' arXiv preprint arXiv:2411.15594, 2024.
+\bibitem{wang2024notfair} P. Wang et al., ``Large language models are not fair evaluators,'' in Proc. 62nd Annual Meeting of the Association for Computational Linguistics (ACL), 2024.
+\bibitem{panickssery2024selfpref} A. Panickssery, S. Bowman, and S. Feng, ``LLM evaluators recognize and favor their own generations,'' in Advances in Neural Information Processing Systems (NeurIPS), 2024.
+\bibitem{ralph2018construct} P. Ralph, ``Toward methodological guidelines for process theories and taxonomies in software engineering,'' IEEE Transactions on Software Engineering, vol. 45, no. 7, pp. 712--735, 2018.
+\bibitem{kaner2004metrics} C. Kaner and W. P. Bond, ``Software engineering metrics: What do they measure and how do we know?'' in Proc. 10th International Software Metrics Symposium, 2004.
+\bibitem{kitchenham2007guidelines} B. Kitchenham and S. Charters, ``Guidelines for performing systematic literature reviews in software engineering,'' Technical Report EBSE-2007-01, Keele University and University of Durham, 2007.
+\bibitem{cohen1960kappa} J. Cohen, ``A coefficient of agreement for nominal scales,'' Educational and Psychological Measurement, vol. 20, no. 1, pp. 37--46, 1960.
+\bibitem{landis1977measurement} J. R. Landis and G. G. Koch, ``The measurement of observer agreement for categorical data,'' Biometrics, vol. 33, no. 1, pp. 159--174, 1977.
+\bibitem{utting2012taxonomy} M. Utting, A. Pretschner, and B. Legeard, ``A taxonomy of model-based testing approaches,'' Software Testing, Verification and Reliability, vol. 22, no. 5, pp. 297--312, 2012.
+\bibitem{ammann2016introduction} P. Ammann and J. Offutt, Introduction to Software Testing, 2nd ed. Cambridge University Press, 2016.
+\bibitem{chow1978fsm} T. S. Chow, ``Testing software design modeled by finite-state machines,'' IEEE Transactions on Software Engineering, vol. SE-4, no. 3, pp. 178--187, 1978.
+\bibitem{lee1996fsm} D. Lee and M. Yannakakis, ``Principles and methods of testing finite state machines -- a survey,'' Proceedings of the IEEE, vol. 84, no. 8, pp. 1090--1123, 1996.
+\bibitem{briand2002uml} L. C. Briand and Y. Labiche, ``A UML-based approach to system testing,'' Software and Systems Modeling, vol. 1, no. 1, pp. 10--42, 2002.
+\bibitem{pnueli1977temporal} A. Pnueli, ``The temporal logic of programs,'' in Proc. 18th Annual Symposium on Foundations of Computer Science (FOCS), 1977, pp. 46--57.
+\bibitem{myers2011art} G. J. Myers, C. Sandler, and T. Badgett, The Art of Software Testing, 3rd ed. Wiley, 2011.
+\bibitem{wynne2012cucumber} M. Wynne and A. Hellesoy, The Cucumber Book: Behaviour-Driven Development for Testers and Developers. Pragmatic Bookshelf, 2012.
+\bibitem{nebut2006usecase} C. Nebut, F. Fleurey, Y. Le Traon, and J.-M. Jezequel, ``Automatic test generation: a use case driven approach,'' IEEE Transactions on Software Engineering, vol. 32, no. 3, pp. 140--155, 2006.
+\bibitem{harel1987statecharts} D. Harel, ``Statecharts: A visual formalism for complex systems,'' Science of Computer Programming, vol. 8, no. 3, pp. 231--274, 1987.
+\bibitem{memon2001gui} A. M. Memon, M. E. Pollack, and M. L. Soffa, ``Hierarchical GUI test case generation using automated planning,'' IEEE Transactions on Software Engineering, vol. 27, no. 2, pp. 144--155, 2001.
+\bibitem{memon2007eventflow} A. Memon, I. Banerjee, and A. Nagarajan, ``GUI ripping: Reverse engineering of graphical user interfaces for testing,'' in Proc. 10th Working Conference on Reverse Engineering, 2003.
+\bibitem{ostrand1988category} T. J. Ostrand and M. J. Balcer, ``The category-partition method for specifying and generating fuctional tests,'' Communications of the ACM, vol. 31, no. 6, pp. 676--686, 1988.
+\bibitem{grochtmann1993classification} M. Grochtmann and K. Grimm, ``Classification trees for partition testing,'' Software Testing, Verification and Reliability, vol. 3, no. 2, pp. 63--82, 1993.
+\bibitem{nie2011combinatorial} C. Nie and H. Leung, ``A survey of combinatorial testing,'' ACM Computing Surveys, vol. 43, no. 2, pp. 1--29, 2011.
+\bibitem{meszaros2007xunit} G. Meszaros, xUnit Test Patterns: Refactoring Test Code. Addison-Wesley, 2007.
+\bibitem{baker2008utp} P. Baker et al., Model-Driven Testing: Using the UML Testing Profile. Springer, 2008.
+\bibitem{jia2011mutation} Y. Jia and M. Harman, ``An analysis and survey of the development of mutation testing,'' IEEE Transactions on Software Engineering, vol. 37, no. 5, pp. 649--678, 2011.
+\bibitem{just2014mutants} R. Just et al., ``Are mutants a valid substitute for real faults in software testing?'' in Proc. 22nd ACM SIGSOFT International Symposium on Foundations of Software Engineering (FSE), 2014.
+\bibitem{kendall1938} M. G. Kendall, ``A new measure of rank correlation,'' Biometrika, vol. 30, no. 1/2, pp. 81--93, 1938.
+\bibitem{grabowski2003ttcn3} J. Grabowski et al., ``An introduction to the testing and test control notation (TTCN-3),'' Computer Networks, vol. 42, no. 3, pp. 375--403, 2003.
+\bibitem{spearman1904} C. Spearman, ``The proof and measurement of association between two things,'' American Journal of Psychology, vol. 15, no. 1, pp. 72--101, 1904.
+\bibitem{mann1947} H. B. Mann and D. R. Whitney, ``On a test of whether one of two random variables is stochastically larger than the other,'' Annals of Mathematical Statistics, vol. 18, no. 1, pp. 50--60, 1947.
+\bibitem{kruskal1952} W. H. Kruskal and W. A. Wallis, ``Use of ranks in one-criterion variance analysis,'' Journal of the American Statistical Association, vol. 47, no. 260, pp. 583--621, 1952.
+\bibitem{arcuri2014hitchhiker} A. Arcuri and L. Briand, ``A hitchhiker's guide to statistical tests for assessing randomized algorithms in software engineering,'' Software Testing, Verification and Reliability, vol. 24, no. 3, pp. 219--250, 2014.
+\bibitem{dunn1964} O. J. Dunn, ``Multiple comparisons using rank sums,'' Technometrics, vol. 6, no. 3, pp. 241--252, 1964.
+\bibitem{wilcoxon1945} F. Wilcoxon, ``Individual comparisons by ranking methods,'' Biometrics Bulletin, vol. 1, no. 6, pp. 80--83, 1945.
+\bibitem{wilson1927} E. B. Wilson, ``Probable inference, the law of succession, and statistical inference,'' Journal of the American Statistical Association, vol. 22, no. 158, pp. 209--212, 1927.
+\bibitem{zhuo2024icescore} T. Y. Zhuo, ``ICE-Score: Instructing large language models to evaluate code,'' in Findings of the Association for Computational Linguistics: EACL, 2024.
+\bibitem{tong2024codejudge} W. Tong and T. Zhang, ``CodeJudge: Evaluating code generation with large language models,'' in Proc. Conference on Empirical Methods in Natural Language Processing (EMNLP), 2024.
+\bibitem{liu2024codehallucination} F. Liu et al., ``Exploring and evaluating hallucinations in LLM-powered code generation,'' arXiv preprint arXiv:2404.00971, 2024.
+\bibitem{ji2023hallucination} Z. Ji et al., ``Survey of hallucination in natural language generation,'' ACM Computing Surveys, vol. 55, no. 12, pp. 1--38, 2023.
+\bibitem{shinn2023reflexion} N. Shinn et al., ``Reflexion: Language agents with verbal reinforcement learning,'' in Advances in Neural Information Processing Systems (NeurIPS), 2023.
+\bibitem{liesenfeld2023opening} A. Liesenfeld, A. Lopez, and M. Dingemanse, ``Opening up ChatGPT: Tracking openness, transparency, and accountability in instruction-tuned text generators,'' in Proc. 5th International Conference on Conversational User Interfaces (CUI), 2023.
+\bibitem{white2024mof} R. White et al., ``Model openness framework: Promoting completeness and openness for reproducibility, transparency, and usability in artificial intelligence,'' arXiv preprint arXiv:2403.13784, 2024.
+\bibitem{grattafiori2024llama3} A. Grattafiori et al., ``The Llama 3 herd of models,'' arXiv preprint arXiv:2407.21783, 2024.
+\bibitem{hui2024qwen25coder} B. Hui et al., ``Qwen2.5-Coder technical report,'' arXiv preprint arXiv:2409.12186, 2024.
+\bibitem{yang2025qwen3} A. Yang et al., ``Qwen3 technical report,'' arXiv preprint arXiv:2505.09388, 2025.
+\bibitem{gemma2025gemma3} Gemma Team, Google DeepMind, ``Gemma 3 technical report,'' arXiv preprint arXiv:2503.19786, 2025.
+\bibitem{codegemma2024} CodeGemma Team, Google DeepMind, ``CodeGemma: Open code models based on Gemma,'' arXiv preprint arXiv:2406.11409, 2024.
+\bibitem{deepseek2024coderv2} Q. Zhu et al., ``DeepSeek-Coder-V2: Breaking the barrier of closed-source models in code intelligence,'' arXiv preprint arXiv:2406.11931, 2024.
+\bibitem{granite4} IBM Granite Team, ``Granite 4.0: Hybrid Mamba-2/Transformer language models,'' IBM Research Technical Report, 2025.
+\bibitem{abdin2024phi3} M. Abdin et al., ``Phi-3 technical report: A highly capable language model locally on your phone,'' arXiv preprint arXiv:2404.14219, 2024.
+\bibitem{abdin2024phi4} M. Abdin et al., ``Phi-4 technical report,'' arXiv preprint arXiv:2412.08905, 2024.
+\bibitem{browning2014doorstop} J. Browning, ``Doorstop: Text-based requirements management using version control,'' open-source software, available: https://github.com/doorstop-dev/doorstop, 2014.
+\bibitem{shah2018virtualclinic} Representative clinic-management system SRS used as a case study in this benchmark (project-internal document, not independently published).
+\bibitem{openai2025gptoss} OpenAI, ``gpt-oss-120b \& gpt-oss-20b model card,'' arXiv preprint arXiv:2508.10925, 2025.
+\bibitem{ollama} Ollama Inc., ``Ollama: Get up and running with large language models locally,'' available: https://ollama.com, 2024.
+\bibitem{pytest} H. Krekel et al., ``pytest: helps you write better programs,'' available: https://pytest.org, 2004--present.
+\bibitem{mcminn2004sbst} P. McMinn, ``Search-based software test data generation: a survey,'' Software Testing, Verification and Reliability, vol. 14, no. 2, pp. 105--156, 2004.
+\bibitem{fraser2011evosuite} G. Fraser and A. Arcuri, ``EvoSuite: automatic test suite generation for object-oriented software,'' in Proc. 19th ACM SIGSOFT Symposium and 13th European Conference on Foundations of Software Engineering (ESEC/FSE), 2011, pp. 416--419.
+\bibitem{pacheco2007randoop} C. Pacheco, S. K. Lahiri, M. D. Ernst, and T. Ball, ``Feedback-directed random test generation,'' in Proc. 29th International Conference on Software Engineering (ICSE), 2007, pp. 75--84.
+\bibitem{rojas2015combining} J. M. Rojas, G. Fraser, and A. Arcuri, ``Combining multiple coverage criteria in search-based unit test generation,'' in Proc. 7th International Symposium on Search-Based Software Engineering (SSBSE), 2015.
+\bibitem{tufano2022unit} M. Tufano et al., ``Unit test case generation with transformers and focal context,'' arXiv preprint arXiv:2009.05617, 2022.
+\bibitem{alshahwan2024testgenllm} N. Alshahwan et al., ``Automated unit test improvement using large language models at Meta,'' in Proc. 32nd ACM International Conference on the Foundations of Software Engineering (FSE), Industry Track, 2024.
+\bibitem{lemieux2023codamosa} C. Lemieux, J. P. Inala, S. K. Lahiri, and S. Sen, ``CODAMOSA: Escaping coverage plateaus in test generation with pre-trained large language models,'' in Proc. 45th International Conference on Software Engineering (ICSE), 2023.
+\bibitem{pizzorno2024coverup} J. Pizzorno and E. D. Berger, ``CoverUp: Coverage-guided LLM-based test generation,'' arXiv preprint arXiv:2403.16218, 2024.
+\bibitem{chen2024chatunitest} Y. Chen et al., ``ChatUniTest: A framework for LLM-based test generation,'' in Companion Proc. 32nd ACM International Conference on the Foundations of Software Engineering (FSE), 2024.
+\bibitem{hossain2024llmreq} S. B. Hossain, M. Jiang, and V. Filkov, ``A study on using large language models for generating test cases from software requirements,'' preprint, 2024.
+\bibitem{jimenez2024swebench} C. E. Jimenez et al., ``SWE-bench: Can language models resolve real-world GitHub issues?'' in Proc. International Conference on Learning Representations (ICLR), 2024.
+\bibitem{yang2024sweagent} J. Yang et al., ``SWE-agent: Agent-computer interfaces enable automated software engineering,'' in Advances in Neural Information Processing Systems (NeurIPS), 2024.
+\bibitem{deng2023llmfuzzer} Y. Deng et al., ``Large language models are zero-shot fuzzers: Fuzzing deep-learning libraries via large language models,'' in Proc. 32nd ACM SIGSOFT International Symposium on Software Testing and Analysis (ISSTA), 2023.
+\bibitem{xia2024fuzz4all} C. S. Xia et al., ``Fuzz4All: Universal fuzzing with large language models,'' in Proc. 46th International Conference on Software Engineering (ICSE), 2024.
+\bibitem{inozemtseva2014coverage} L. Inozemtseva and R. Holmes, ``Coverage is not strongly correlated with test suite effectiveness,'' in Proc. 36th International Conference on Software Engineering (ICSE), 2014, pp. 435--445.
+\bibitem{zhu1997adequacy} H. Zhu, P. A. V. Hall, and J. H. R. May, ``Software unit test coverage and adequacy,'' ACM Computing Surveys, vol. 29, no. 4, pp. 366--427, 1997.
+\bibitem{dinella2022toga} E. Dinella et al., ``TOGA: A neural method for test oracle generation,'' in Proc. 44th International Conference on Software Engineering (ICSE), 2022.
+\bibitem{kang2023libro} S. Kang, J. Yoon, and S. Yoo, ``Large language models are few-shot testers: Exploring LLM-based general bug reproduction,'' in Proc. 45th International Conference on Software Engineering (ICSE), 2023.
+\bibitem{barr2015oracle} E. T. Barr, M. Harman, P. McMinn, M. Shahbaz, and S. Yoo, ``The oracle problem in software testing: A survey,'' IEEE Transactions on Software Engineering, vol. 41, no. 5, pp. 507--525, 2015.
+\bibitem{ouyang2022instructgpt} L. Ouyang et al., ``Training language models to follow instructions with human feedback,'' in Advances in Neural Information Processing Systems (NeurIPS), vol. 35, pp. 27730--27744, 2022.
+\bibitem{wohlin2012experimentation} C. Wohlin et al., Experimentation in Software Engineering. Springer, 2012.
+\bibitem{ahmed2025annotation} T. Ahmed et al., ``On the reliability of human annotation for evaluating code quality,'' preprint, 2025.
+\bibitem{whalen2006requirements} M. W. Whalen, A. Rajan, M. P. E. Heimdahl, and S. P. Miller, ``Coverage metrics for requirements-based testing,'' in Proc. International Symposium on Software Testing and Analysis (ISSTA), 2006, pp. 25--36.
 \end{thebibliography}
 
 \end{document}
