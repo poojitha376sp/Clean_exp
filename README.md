@@ -10,8 +10,10 @@ Full step-by-step rationale (what / why / pros / cons / what to observe):
 ## Setup
 ```bash
 cd Clean_exp
-python3 -m venv .venv && .venv/bin/pip install pypdf python-docx gherkin-official coverage jsonschema pyyaml requests python-dotenv pytest pandas
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 ```
+Pinned to the exact versions (`requirements.txt`) and Python version (`.python-version`,
+3.10.16) the reported benchmark actually ran on.
 API keys go in `../.env` (never in code). Providers and models: `config.yaml`.
 
 ## Inputs
