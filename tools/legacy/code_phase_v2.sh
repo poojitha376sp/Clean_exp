@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+# ARCHIVED (kept for provenance, superseded by tools/run_experiment.sh; see tools/README.md).
 # Code comparison re-run with per-test-case retrieval + codebase map (v2).
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 D="--gen ollama:qwen2.5-coder:7b --gen ollama:llama3.1:8b --gen ollama:deepseek-coder-v2:16b --gen ollama:gemma3:27b"
 V="--gen ollama:qwen2.5-coder:7b --gen ollama:llama3.1:8b"
 echo "$(date +%T) CODE-PHASE v2 start" >> runs/run_all.log

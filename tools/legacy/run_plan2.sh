@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+# ARCHIVED (kept for provenance, superseded by tools/run_experiment.sh; see tools/README.md).
 # User plan (2026-09-26, final): Gemma-3-27B dropped (too slow).
 # doorstop = 4 models; ventilator = 2 (qwen2.5-coder:7b, phi4:14b). Model-major.
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 [ -n "$1" ] && while kill -0 "$1" 2>/dev/null; do sleep 10; done
 run() {
   local g=$1; shift

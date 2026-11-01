@@ -11,7 +11,7 @@ MODELS=(
   llama3.1:8b
   codegemma:7b
   granite4.1:8b               # Granite-4.1-8B (no separate -code tag exists in the registry)
-  phi4:14b
+  hf.co/bartowski/phi-4-GGUF:Q4_K_M   # Phi-4-14B; Ollama's own phi4:14b crashes on this llama.cpp build
   deepseek-coder-v2:16b       # DeepSeek-Coder-V2-Lite
   gemma3:27b
   qwen3:30b-a3b

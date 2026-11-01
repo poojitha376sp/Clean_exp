@@ -77,6 +77,53 @@ Per generator: G1/G2/G3 pass rates, SFV/FSA and sub-score means, traceability, r
 
 ---
 
+## Gate weights, thresholds and sensitivity
+
+Each gate turns several 0-1 metrics into one score with a weighted sum, then compares it with a pass threshold. The weights depend on a **system profile** inferred from the requirement text by keyword (`infer_system_type` in `tcgen/gates/config.py`: safety_critical > distributed_concurrent > data_pipeline > interaction_heavy > rapid_prototyping > standard). All values below are the ones implemented.
+
+| gate | score | weights (standard profile) | pass threshold |
+|---|---|---|---|
+| 1 RSS (representation suitability) | `sum(w_i * m_i)`, m1..m10 | m1 0.40 concern alignment, m2 0.30 abstraction level, m3 0.15 Occam, m4 0.15 LLM feasibility (m5-m10 are 0 here and used by the other five profiles) | 0.60 |
+| 2 SFV (syntactic form validity) | validator score | none | by paradigm group: 0.60 scenario / sequence / rules, 0.70 state-based and symbolic, 1.00 xUnit (a syntax error is a hard fail) |
+| 3 FSA (functional semantic adequacy) | `wc*CC + wn*NC + wo*OA + wb*BC + wg*Mg` | clause coverage 0.30, negative 0.20, oracle 0.15, boundary 0.20, groundedness 0.15 | 0.50 |
+
+For KAOS, goal-oriented, user stories and use cases, concrete values are sparse by nature, so `wg` is moved into `wc`.
+
+### Why check sensitivity
+
+The weights were set by expert judgment, not fitted to data. If small changes to them flipped the conclusions, the conclusions would be an artefact of the weights. `tools/sensitivity.py` tests that: it moves each weight of the active profile by +/-0.05 (the other weights are rescaled proportionally so the profile still sums to 1), recomputes the scores from the committed data, and counts what changes. A weight that is 0 in a profile is skipped.
+
+### Results (`runs/ANALYSIS/sensitivity.json`, delta = 0.05)
+
+**Gate 1 (RSS):** 59 units, 754 perturbed cases.
+
+| measure | result | meaning |
+|---|---|---|
+| top-ranked representation changed | 2.65% (20/754) | The best pick is stable. |
+| top-3 set changed | 2.65% | Same for the top three. |
+| top-ranked **paradigm** changed | 2.65% | The best paradigm is stable. |
+| full paradigm ordering changed | 33% (max- and mean-aggregation alike) | The order of the lower-ranked paradigms is **not** stable. |
+| Kendall tau vs baseline ordering | mean 0.945, min 0.60 | Reorderings are mostly swaps of neighbours; the worst case is a larger reshuffle. |
+| representation pass/fail at 0.60 flipped | 4.16% (940/22,620) | Few borderline representations cross the threshold. |
+
+**Gate 3 (FSA):** 311 judged suites, 10 perturbations (5 weights x +/-).
+
+| measure | result | meaning |
+|---|---|---|
+| suite pass/fail at 0.50 flipped | 3.57% (111/3,110) | Pass rates move by a few points at most. |
+| paradigm ordering changed | 6 of 10 perturbations | Rankings shift... |
+| Kendall tau vs baseline | min 0.867 | ...but only by swapping adjacent paradigms. |
+| largest rank displacement | 1 | No paradigm moved more than one place. |
+| per-model ordering (doorstop) changed | 5 of 10 | Close models can swap places. |
+| representation ordering changed | 9 of 10 | Fine-grained representation rankings are fragile. |
+| recompute check | max abs error 5.5e-5 | The script reproduces the logged FSA scores, so the analysis is trustworthy. |
+
+### How to read it
+
+- The headline findings (best paradigm, which suites pass) survive +/-0.05 changes to any single weight.
+- Do not over-read fine rankings: the order of lower-ranked paradigms, close models and individual representations does change.
+- This is a one-at-a-time, +/-0.05 test. It does not cover large weight changes, simultaneous changes, or the thresholds themselves. Thresholds are a separate check: the design-document values (SFV 0.80, FSA 0.75) are stricter than the implemented ones, and `tools/verify_threshold_claim.py` examines the claim that they would fail most suites at Gate 2. Under the stricter FSA threshold only 75 of 311 suites would pass (vs. 214), so absolute pass rates depend on the implemented thresholds.
+
 ## Improvements over the original pipeline
 1. **No silent mocks.** Failed calls raise, get logged, and are excluded (the old pipeline scored canned mock text as test suites).
 2. **Canonical test schema** under every representation → real SFV, exact traceability, and executability.

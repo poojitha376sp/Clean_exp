@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+# ARCHIVED (kept for provenance, superseded by tools/run_experiment.sh; see tools/README.md).
 # User plan 2026-09-26: doorstop = all 5 models; ventilator = 3 (qwen2.5-coder:7b, phi4:14b, gemma3:27b).
 # Model-major, projects of the same model in parallel. Waits for a still-running job first.
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 [ -n "$1" ] && while kill -0 "$1" 2>/dev/null; do sleep 10; done
 run() {  # run <model> <projects...>
   local g=$1; shift

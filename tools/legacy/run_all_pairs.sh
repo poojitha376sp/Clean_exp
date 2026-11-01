@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# ARCHIVED (kept for provenance, superseded by tools/run_experiment.sh; see tools/README.md).
 # 2026-09-27 (user: "download all the LLMs in the 14 and do all pairs"): every open model x every project.
 # Fast models first, slow ones (DeepSeek on CPU kernels, Llama-70B > 32 GB VRAM) last.
 # Waits for each model's download; after a model's generation, its code comparison runs in the background.
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 L=runs/run_all.log
 have() { curl -s -m 10 localhost:11435/api/tags | grep -q "\"name\":\"$1\""; }
 code_phase() {
