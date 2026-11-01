@@ -1,0 +1,80 @@
+name: Common
+
+on:
+  workflow_call:
+    inputs:
+      basepath:
+        required: false
+        type: string
+      os:
+        required: true
+        type: string
+      workpath:
+        required: true
+        type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: true
+
+jobs:
+  test:
+    runs-on: ${{ inputs.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Python 3.10 is excluded because macOS is missing gettext
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    name: Python ${{ matrix.python-version }}
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.workpath }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Change path on Windows
+        if: ${{ inputs.os == 'windows-latest' }}
+        # Cannot start powershell from a path that does not exist, so change
+        # working directory for this step only.
+        working-directory: ${{ inputs.basepath }}
+        run: |
+          mkdir -p ${{ inputs.workpath }}
+          mv $env:GITHUB_WORKSPACE\* ${{ inputs.workpath }}\ -Force
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+
+      - uses: Gr1N/setup-poetry@v9
+
+      - name: Check system dependencies
+        run: make doctor
+
+      - uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+
+      - name: Install project dependencies
+        run: make install
+
+      - name: Run tests
+        run: make test
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        if: ${{ inputs.os == 'ubuntu-latest' && matrix.python-version == '3.9' && (github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork)) }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+
+      - name: Run checks
+        run: make check
+        if: ${{ inputs.os == 'ubuntu-latest' }}
+
+      - name: Run demo
+        run: make demo
+        if: ${{ inputs.os == 'ubuntu-latest' }}

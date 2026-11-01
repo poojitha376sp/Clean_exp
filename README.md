@@ -22,19 +22,20 @@ API keys go in `../.env` (never in code). Providers and models: `config.yaml`.
     project.yaml    optional: language, framework, setup, test_cmd (see tcgen/execute.py)
 ```
 
-### Case-study SRS sources (reproducibility)
-The original SRS source files for the three benchmarked case studies are archived
-in this repo under `inputs/<project>/srs/`, so the extracted text in
-`runs/<project>/S0_srs.txt` can be traced back to an unmodified source document:
+### Case-study SRS and code sources (reproducibility)
+The original SRS source files AND the exact implementation code executed against
+in S6 are archived in this repo under `inputs/<project>/`, pinned to the commit
+each benchmark run actually used, so results can be independently re-verified
+(not just re-analyzed from the saved JSON):
 
-| project | SRS source | code source (not bundled here) |
-|---|---|---|
-| doorstop | `inputs/doorstop/srs/raw/*.yml` (doorstop's own native requirement format) | [doorstop-dev/doorstop](https://github.com/doorstop-dev/doorstop) |
-| ventilator | `inputs/ventilator/srs/SRS.rst` | [RespiraWorks/Ventilator](https://github.com/RespiraWorks/Ventilator) |
-| virtual_clinic | `inputs/virtual_clinic/srs/Software Requirements Specification.pdf` | [mishal23/virtual-clinic](https://github.com/mishal23/virtual-clinic) |
+| project | SRS source | code source | pinned commit | license |
+|---|---|---|---|---|
+| doorstop | `inputs/doorstop/srs/raw/*.yml` (doorstop's own native requirement format) | [doorstop-dev/doorstop](https://github.com/doorstop-dev/doorstop) | `36fc0fd` | LGPL-3.0 |
+| ventilator | `inputs/ventilator/srs/SRS.rst` | [RespiraWorks/Ventilator](https://github.com/RespiraWorks/Ventilator) (only `software/`, the subtree the pipeline was ever pointed at) | `6165c82` | Apache-2.0 |
+| virtual_clinic | `inputs/virtual_clinic/srs/Software Requirements Specification.pdf` | [mishal23/virtual-clinic](https://github.com/mishal23/virtual-clinic) | `b8241e5` | MIT |
 
-The implementation (`code/`) for each case study is not bundled in this repo and
-must be cloned separately into `../inputs/<project>/code/` to re-run S6 execution.
+`inputs/<project>/code/` is a snapshot of each repo's working tree at that commit
+(no `.git` history), kept with its original LICENSE for attribution.
 
 ## Run
 ```bash
