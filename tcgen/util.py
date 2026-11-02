@@ -6,7 +6,7 @@ import yaml
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent          # Clean_exp/
-load_dotenv(ROOT.parent / ".env")                       # Honours-Testing/.env
+load_dotenv(ROOT.parent / ".env")                       # secrets live one level ABOVE the repo (see .env.example)
 CFG = yaml.safe_load((ROOT / "config.yaml").read_text())
 PROMPTS = ROOT / "prompts"
 
@@ -48,3 +48,11 @@ def run_dir(project: str) -> Path:
     d = ROOT / CFG["paths"]["runs_dir"] / project
     d.mkdir(parents=True, exist_ok=True)
     return d
+
+
+def active_generators() -> list:
+    """models.generators minus models.skip (known-failed / not-executed models). A default run uses
+    this; `--gen <spec>` still forces any model. Analysis keeps iterating the full plan so the
+    skipped models are still reported (with zero suites)."""
+    skip = CFG["models"].get("skip") or {}
+    return [g for g in CFG["models"]["generators"] if g not in skip]

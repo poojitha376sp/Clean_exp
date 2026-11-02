@@ -9,6 +9,9 @@ One LLM client for every stage.
 - NO mock fallback: if a call finally fails it raises LLMError, and the
   caller records the failure. (The old pipeline silently saved a canned
   mock reply as a "test suite" and scored it.)
+- Strict mode (TCGEN_STRICT=1 / llm.strict): a failed call raises LLMFatal, which the stages do
+  not catch, so reproduction runs stop instead of recording a failure and moving on.
+- TCGEN_OFFLINE=1: serve from the cache only; a cache miss raises LLMFatal (no model is contacted).
 - Disk cache keyed on a hash of (model, prompt, params): re-running a stage
   costs nothing and gives identical outputs.
 - Every real call is appended to runs/llm_calls.jsonl (tokens, latency).
@@ -30,6 +33,17 @@ from .util import CFG, ROOT, append_jsonl
 
 class LLMError(RuntimeError):
     pass
+
+
+class LLMFatal(RuntimeError):
+    """Raised instead of LLMError when strict mode is on (TCGEN_STRICT=1 or llm.strict: true).
+    Callers catch LLMError and record the failure in the results; they do NOT catch this, so a
+    reproduction run stops at the first failed call instead of silently continuing."""
+
+
+def _strict() -> bool:
+    env = os.environ.get("TCGEN_STRICT", "")
+    return env.lower() in ("1", "true", "yes") if env else bool(CFG["llm"].get("strict", False))
 
 
 def _cache_path(key: str) -> Path:
@@ -58,17 +72,26 @@ def call(spec: str, prompt: str, *, system: str = None, max_tokens: int = None,
     if use_cache and cp.exists():
         return json.loads(cp.read_text())["text"]
 
+    if os.environ.get("TCGEN_OFFLINE", "").lower() in ("1", "true", "yes"):
+        # cache-only run (no GPU): a cache miss must never reach a model, and must never be skipped quietly
+        raise LLMFatal(f"offline mode: no cached answer for {spec} (stage {stage or '?'}; cache key {key[:12]}...)")
+
     t0 = time.time()
     pconf = CFG.get("providers", {}).get(provider)
     if pconf is None:
         raise LLMError(f"unknown provider {provider!r} in model spec {spec!r} (add it under providers: in config.yaml)")
-    if pconf.get("kind") == "ollama":
-        text, usage = _ollama(pconf, model, prompt, system, params)
-    else:
-        text, usage = _openai_compat(pconf, provider, model, prompt, system, params)
-    text = strip_think(text)
-    if not text:
-        raise LLMError(f"{spec} returned an empty response")
+    try:
+        if pconf.get("kind") == "ollama":
+            text, usage = _ollama(pconf, model, prompt, system, params)
+        else:
+            text, usage = _openai_compat(pconf, provider, model, prompt, system, params)
+        text = strip_think(text)
+        if not text:
+            raise LLMError(f"{spec} returned an empty response")
+    except LLMError as e:
+        if _strict():            # cache miss + failed call: stop the run, never record a stand-in answer
+            raise LLMFatal(f"strict mode: {e}") from e
+        raise
 
     cp.write_text(json.dumps({"spec": spec, "text": text}))
     append_jsonl(ROOT / CFG["paths"]["runs_dir"] / "llm_calls.jsonl", {
@@ -143,7 +166,8 @@ def _openai_compat(pconf, provider, model, prompt, system, params):
 
 def _ollama(pconf, model, prompt, system, params):
     lc = CFG["llm"]
-    base = pconf.get("base_url", "http://localhost:11434").rstrip("/")
+    # OLLAMA_BASE_URL (env) overrides config.yaml, e.g. http://localhost:11434 for a local Ollama.
+    base = (os.environ.get("OLLAMA_BASE_URL") or pconf.get("base_url", "http://localhost:11434")).rstrip("/")
 
     think = params.get("think")
     if think is None:          # per-model default, e.g. qwen3 "thinking" models: off, else the answer can come back empty

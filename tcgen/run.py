@@ -12,7 +12,7 @@ Leakage rule: S0-S5 read ONLY inputs/<p>/srs/. The implementation
 import argparse
 
 from . import extract, ingest, represent, suite
-from .util import CFG
+from .util import CFG, active_generators
 
 ALL = ["S0", "S1", "S2", "S3", "S6", "S7"]    # S6A = code audit (language-agnostic), run on request
 
@@ -21,7 +21,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--project", required=True)
     ap.add_argument("--stages", default=",".join(ALL))
-    ap.add_argument("--gen", action="append", help="generator model spec (default: all in config)")
+    ap.add_argument("--gen", action="append", help="generator model spec (default: models.generators minus models.skip)")
     ap.add_argument("--units", help="comma-separated unit ids to restrict to (smoke tests)")
     ap.add_argument("--judge", help="override models.judge for this run")
     ap.add_argument("--executor", help="override models.executor for this run")
@@ -31,7 +31,7 @@ def main():
     if a.executor:
         CFG["models"]["executor"] = a.executor
     stages = [s.strip().upper() for s in a.stages.split(",")]
-    gens = a.gen or CFG["models"]["generators"]
+    gens = a.gen or active_generators()
 
     if "S0" in stages:
         ingest.run(a.project)

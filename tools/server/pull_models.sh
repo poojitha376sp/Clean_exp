@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs ON rubyserc. Pulls the 12 open-weights subjects, smallest first, so
+# Runs ON the GPU server. Pulls the 12 open-weights subjects, smallest first, so
 # models become usable one by one. Progress/result lines go to ~/clean_exp/pull.log.
 B=~/clean_exp
 export OLLAMA_HOST=127.0.0.1:11434

@@ -9,6 +9,9 @@ All commands are run from the repo root. The project inputs are in `inputs/`; AP
 | `run_experiment.sh` | **The driver.** Every generator in `config.yaml` x every project: generation (S2,S3), then code stage (S6/S6A). |
 | `lib.sh` | Helpers sourced by the driver (`log`, `generate`, `code_phase`, waiting for server/model). |
 | `server/` | Everything for the GPU server (rubyserc): tunnel, SSH helper, Ollama install, model pulls. |
+| `reproduce.sh` | Rebuilds `runs/ANALYSIS/*`, sensitivity and figures from the committed data; PASS/FAIL per file. No GPU. |
+| `check_mock_responses.py` | Scans the cache and saved suites for stand-in (mock) answers; `mock_scan_reviewed.txt` lists the hand-reviewed false positives. |
+| `make_anonymous_package.sh` | Builds the double-blind copy for the review package and verifies nothing identifying is left. |
 | `sensitivity.py` | Weight-sensitivity check of Gate 1 (RSS) and Gate 3 (FSA). Cited in the paper. |
 | `verify_threshold_claim.py` | Checks the paper's claim that design-document thresholds fail >70% of suites at Gate 2. |
 | `legacy/` | The 13 one-off scripts that actually ran the experiment in September 2026. Archived, not for reuse. |
@@ -20,6 +23,7 @@ tools/server/tunnel_keepalive.sh &          # localhost:11435 -> server Ollama; 
 tools/run_experiment.sh                     # everything; resumable
 tools/run_experiment.sh --phase gen         # generation only
 tools/run_experiment.sh --phase code        # S6/S6A only
+tools/run_experiment.sh --offline           # no GPU: every call must come from .cache/llm, else abort
 tools/run_experiment.sh --projects "doorstop" --models "qwen2.5-coder:7b llama3.1:8b"
 ```
 
@@ -36,7 +40,8 @@ tools/run_experiment.sh --projects "doorstop" --models "qwen2.5-coder:7b llama3.
 | `gpu_ssh.sh` | your machine | Run one command on the server (`gpu_ssh.sh 'nvidia-smi'`), or `--tunnel` for a one-shot tunnel on the same port. Refuses reboot/shutdown/sudo. |
 | `setup.sh` | the server | User-space Ollama install and `start_ollama.sh` (localhost only, one model loaded, 16k context). |
 | `pull_models.sh` | the server | Pulls the 12 subjects plus `gpt-oss:20b` (judge/executor), smallest first. Log: `~/clean_exp/pull.log`. |
-| `_credentials.sh` | (sourced) | Loads `GPU_USER/GPU_HOST/GPU_PASS` from `../../.env` and sets up `SSH_ASKPASS`. |
+| `start_ollama.sh` | the server | Starts Ollama with the exact settings of the reported runs (context 12288, flash attention, q8_0 KV cache, 3 parallel). |
+| `_credentials.sh` | (sourced) | Loads `GPU_USER`, `GPU_HOST` and `GPU_SSH_KEY` (or the optional `GPU_PASS`) from `../.env`; template: `.env.example`. |
 
 Port **11435** is used everywhere on your side (`config.yaml`, `lib.sh`, both tunnel scripts); 11434 is only the server's own Ollama port.
 

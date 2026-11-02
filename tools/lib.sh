@@ -7,16 +7,17 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO"
 PY="${PY:-.venv/bin/python}"
 LOG="${LOG:-runs/run_all.log}"
-OLLAMA_URL="${OLLAMA_URL:-http://localhost:11435}"      # the SSH tunnel; see server/tunnel_keepalive.sh
+OLLAMA_URL="${OLLAMA_BASE_URL:-http://localhost:11435}"   # default: the SSH tunnel (server/tunnel_keepalive.sh); with a local GPU: export OLLAMA_BASE_URL=http://localhost:11434
 ALL_PROJECTS="doorstop ventilator virtual_clinic"
 EXECUTABLE_PROJECTS="doorstop"                           # generated tests can be run; the others get the code audit only
 mkdir -p runs
 
 log() { echo "$(date +%T) $*" >> "$LOG"; }
 
-# Generators from config.yaml (models.generators), one Ollama tag per line, "ollama:" prefix removed.
+# Generators to run: models.generators minus models.skip (config.yaml), one Ollama tag per line,
+# "ollama:" prefix removed.
 config_generators() {
-  "$PY" -c "from tcgen.util import CFG; print('\n'.join(g.split(':',1)[1] for g in CFG['models']['generators']))"
+  "$PY" -c "from tcgen.util import active_generators; print('\n'.join(g.split(':',1)[1] for g in active_generators()))"
 }
 
 wait_for_server() {          # block until the Ollama server answers through the tunnel

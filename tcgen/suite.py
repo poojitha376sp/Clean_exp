@@ -118,6 +118,8 @@ def run(project, gen, units, s2):
             return read_json(out)
         try:
             res = run_one(u, rep, gen, st)
+        except llm.LLMFatal:                         # strict / offline mode: stop the run, record nothing
+            raise
         except Exception as e:                       # never lose the whole run to one suite
             res = {"unit_id": u["unit_id"], "representation": rep, "generator": gen, "system_type": st,
                    "error": f"{type(e).__name__}: {e}", "n_attempts": 0, "repairs_used": 0,
