@@ -5,7 +5,8 @@
 #
 # What it does (the working repository is never modified):
 #   1. copies the tracked + untracked-but-not-ignored files, WITHOUT git history (history holds
-#      author names/e-mails), so .env, .cache and other ignored files can never be included;
+#      author names/e-mails), so .env and other git-ignored files can never be included (the committed
+#      .cache/llm replay cache IS included);
 #   2. leaves out this script, paper sources/PDFs/slides, logs, archives, installers, weights and Ollama tarballs;
 #   3. neutralises identifying strings inside the copied text files (usernames inside pytest temp
 #      paths in the saved results, workstation paths, server names, author names, e-mails);
@@ -26,7 +27,7 @@ git ls-files -co --exclude-standard -z | while IFS= read -r -d '' f; do
     tools/make_anonymous_package.sh) continue ;;     # authors-only: it lists the strings it removes
     paper/*.pptx|*.pptx|*.docx|*.log|*.zst|*.tar|*.tar.*|*.tgz|*.zip|*.gguf|*.safetensors|*.bin|*.run|*.deb) continue ;;
     paper/fig/*.pdf) continue ;;                                                            # rebuilt by reproduce.sh
-    .cache/*|*S6_workspace_gated*|*S6_pyenv*|.postqode/*) continue ;;
+    *S6_workspace_gated*|*S6_pyenv*|.postqode/*) continue ;;
   esac
   mkdir -p "$OUT/$(dirname "$f")"; cp -p "$f" "$OUT/$f"
 done

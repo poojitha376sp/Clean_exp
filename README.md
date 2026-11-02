@@ -125,10 +125,7 @@ Memory needed: gpt-oss:20b (judge) and the generator are loaded together; the 27
 
 ## Exact re-run without a GPU
 
-The prompt cache (`.cache/llm`, one JSON per call, keyed by the prompt hash) holds every model answer behind the committed results. With it, a full re-run is bit-identical and needs no GPU.
-
-- Cache archive: **pending** (an anonymised private link will be placed here: `<FIGSHARE PRIVATE LINK>`).
-- Unpack it so that the files sit in `.cache/llm/*.json`, then:
+The prompt cache is **committed in this repository**: `.cache/llm/` holds 3,570 JSON files (one per model call, keyed by a hash of model, prompt and parameters), the raw answers behind the committed results (`gpt-oss:20b` 1,517 calls plus the 10 subject models, and a few Groq smoke-test calls). With it, a re-run replays the exact responses returned during the benchmark: no GPU and no model needed.
 ```bash
 tools/run_experiment.sh --offline        # TCGEN_OFFLINE=1 + TCGEN_STRICT=1: every call must be a cache hit
 ```
