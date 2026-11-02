@@ -26,7 +26,7 @@ MOCK = re.compile(
     r"|\blorem ipsum\b|\bresponse unavailable\b|\bfallback (?:response|mock)\b", re.I)
 
 
-def scan_cache(d: Path):
+def scan_cache(d: Path, ok=frozenset()):
     hits, total = Counter(), Counter()
     for f in d.glob("*.json"):
         try:
@@ -35,13 +35,13 @@ def scan_cache(d: Path):
             continue
         spec = j.get("spec", "?")
         total[spec] += 1
-        if MOCK.search(j.get("text", "")):
+        if MOCK.search(j.get("text", "")) and f"cache:{f.stem[:12]}" not in ok:
             hits[spec] += 1
     return hits, total
 
 
 def reviewed(root: Path) -> set:
-    """Paths (relative to runs/) that were inspected by hand and are NOT mock responses."""
+    """Entries inspected by hand that are NOT mock responses: paths relative to runs/, or cache:<first 12 hex of the file name>."""
     f = root / "tools" / "mock_scan_reviewed.txt"
     if not f.exists():
         return set()
@@ -76,11 +76,11 @@ if __name__ == "__main__":
     ap.add_argument("--show", action="store_true", help="print the matching snippet of every hit")
     a = ap.parse_args()
     bad = 0
+    ok = reviewed(root)
     if Path(a.cache).is_dir():
-        h, t = scan_cache(Path(a.cache)); report("cache", h, t); bad += sum(h.values())
+        h, t = scan_cache(Path(a.cache), ok); report("cache", h, t); bad += sum(h.values())
     else:
         print(f"cache not found at {a.cache} (not scanned; see README 'Exact re-run without a GPU')")
-    ok = reviewed(root)
     h, t = scan_runs(Path(a.runs), a.show, ok); report("saved suites", h, t); bad += sum(h.values())
     print(f"({len(ok)} hits manually reviewed and allow-listed in tools/mock_scan_reviewed.txt)")
     print("\nRESULT:", "no mock-response text found" if not bad else f"{bad} suspicious files")

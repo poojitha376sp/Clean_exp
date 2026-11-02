@@ -130,7 +130,7 @@ The prompt cache is **committed in this repository**: `.cache/llm/` holds 3,570 
 tools/run_experiment.sh --offline        # TCGEN_OFFLINE=1 + TCGEN_STRICT=1: every call must be a cache hit
 ```
 - **It fails loudly, never quietly.** There is no mock fallback anywhere in the client. In offline mode a cache miss raises `LLMFatal` and stops the run before any file is written; in strict mode (`TCGEN_STRICT=1` or `llm.strict: true`) a failed call stops the run instead of being recorded as a failed suite. `tools/reproduce.sh` runs in strict mode.
-- `python3 tools/check_mock_responses.py` scans the cache and the saved suites for stand-in answers. On the committed results: 0 of 496 suites contain mock-response text after reviewing 5 false positives by hand (judge comments about mocks in xUnit tests, and a test input "Mocked response"; listed in `tools/mock_scan_reviewed.txt`). The cache itself is scanned when you have it.
+- `python3 tools/check_mock_responses.py` scans the cache and the saved suites for stand-in answers. On the committed results: 0 of 496 saved suites and 0 of 3,570 cached responses contain mock-response text after reviewing 5 + 8 false positives by hand (judge comments about mocks in xUnit tests, and a test input "Mocked response"; listed in `tools/mock_scan_reviewed.txt`). The cache itself is scanned when you have it.
 
 ## Reproduce the derived results (no GPU, no cache)
 
