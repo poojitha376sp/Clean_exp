@@ -141,7 +141,7 @@ tools/reproduce.sh            # installs requirements.txt into .venv, rebuilds r
 
 ## Anonymised package for review
 
-`tools/make_anonymous_package.sh OUT_DIR` builds a double-blind copy: no git history (author names and e-mails live in the history), no paper sources, slides, logs, archives, installers or model weights, and identifying strings neutralised (workstation paths and usernames inside the saved pytest output, server name, author names, e-mails). It then refuses to finish if any identifying token or secret-looking string is left outside `inputs/`, which keeps the third-party projects' own attribution and licences.
+The review package is a double-blind copy of this repository: no git history (author names and e-mails live in the history), no paper sources, slides, logs, archives, installers or model weights, and no identifying strings (workstation paths and usernames inside the saved pytest output, server name, author names, e-mails). It includes the committed replay cache. The builder script is kept by the authors and is not part of the repository.
 
 ## Checks to run yourself after cloning
 

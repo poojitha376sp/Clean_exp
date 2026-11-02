@@ -11,7 +11,6 @@ All commands are run from the repo root. The project inputs are in `inputs/`; AP
 | `server/` | Everything for the GPU server (rubyserc): tunnel, SSH helper, Ollama install, model pulls. |
 | `reproduce.sh` | Rebuilds `runs/ANALYSIS/*`, sensitivity and figures from the committed data; PASS/FAIL per file. No GPU. |
 | `check_mock_responses.py` | Scans the cache and saved suites for stand-in (mock) answers; `mock_scan_reviewed.txt` lists the hand-reviewed false positives. |
-| `make_anonymous_package.sh` | Builds the double-blind copy for the review package and verifies nothing identifying is left. |
 | `sensitivity.py` | Weight-sensitivity check of Gate 1 (RSS) and Gate 3 (FSA). Cited in the paper. |
 | `verify_threshold_claim.py` | Checks the paper's claim that design-document thresholds fail >70% of suites at Gate 2. |
 | `legacy/` | The 13 one-off scripts that actually ran the experiment in September 2026. Archived, not for reuse. |
